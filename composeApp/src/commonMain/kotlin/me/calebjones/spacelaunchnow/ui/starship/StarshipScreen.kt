@@ -44,6 +44,13 @@ import me.calebjones.spacelaunchnow.ui.starship.components.StarshipVehiclesTab
 import me.calebjones.spacelaunchnow.ui.viewmodel.StarshipTab
 import me.calebjones.spacelaunchnow.ui.viewmodel.StarshipViewModel
 import org.koin.compose.viewmodel.koinViewModel
+import spacelaunchnow_kmp.composeapp.generated.resources.Res
+import org.jetbrains.compose.resources.stringResource
+import spacelaunchnow_kmp.composeapp.generated.resources.common_back
+import spacelaunchnow_kmp.composeapp.generated.resources.starship_tab_events
+import spacelaunchnow_kmp.composeapp.generated.resources.starship_tab_overview
+import spacelaunchnow_kmp.composeapp.generated.resources.starship_tab_vehicles
+import spacelaunchnow_kmp.composeapp.generated.resources.starship_title
 
 /**
  * Main Starship Dashboard screen with three tabs: Overview, Events, and Vehicles
@@ -124,13 +131,13 @@ fun StarshipScreen(
                     IconButton(onClick = { navController.popBackStack() }) {
                         Icon(
                             imageVector = Icons.AutoMirrored.Filled.ArrowBack,
-                            contentDescription = "Back"
+                            contentDescription = stringResource(Res.string.common_back)
                         )
                     }
                 },
                 title = {
                     Text(
-                        text = "Starship",
+                        text = stringResource(Res.string.starship_title),
                         style = MaterialTheme.typography.headlineMedium,
                         fontWeight = FontWeight.Bold,
                         fontSize = 36.sp
@@ -175,7 +182,7 @@ fun StarshipScreen(
                                 pagerState.animateScrollToPage(0)
                             }
                         },
-                        text = { Text("Overview") }
+                        text = { Text(stringResource(Res.string.starship_tab_overview)) }
                     )
                     Tab(
                         selected = pagerState.currentPage == 1,
@@ -184,7 +191,7 @@ fun StarshipScreen(
                                 pagerState.animateScrollToPage(1)
                             }
                         },
-                        text = { Text("Events") }
+                        text = { Text(stringResource(Res.string.starship_tab_events)) }
                     )
                     Tab(
                         selected = pagerState.currentPage == 2,
@@ -193,7 +200,7 @@ fun StarshipScreen(
                                 pagerState.animateScrollToPage(2)
                             }
                         },
-                        text = { Text("Vehicles") }
+                        text = { Text(stringResource(Res.string.starship_tab_vehicles)) }
                     )
                 }
 

@@ -23,6 +23,12 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import me.calebjones.spacelaunchnow.data.model.FilterOption
+import org.jetbrains.compose.resources.stringResource
+import spacelaunchnow_kmp.composeapp.generated.resources.Res
+import spacelaunchnow_kmp.composeapp.generated.resources.schedule_filter_apply
+import spacelaunchnow_kmp.composeapp.generated.resources.schedule_filter_apply_filters
+import spacelaunchnow_kmp.composeapp.generated.resources.schedule_filter_close
+import spacelaunchnow_kmp.composeapp.generated.resources.schedule_filter_sheet_title
 
 /**
  * Bottom sheet for phone layout
@@ -76,12 +82,12 @@ fun ScheduleFilterBottomSheet(
                     verticalAlignment = Alignment.CenterVertically
                 ) {
                     Text(
-                        text = "Filter Launches",
+                        text = stringResource(Res.string.schedule_filter_sheet_title),
                         style = MaterialTheme.typography.headlineSmall,
                         fontWeight = FontWeight.Bold
                     )
                     TextButton(onClick = onDismiss) {
-                        Text("Close")
+                        Text(stringResource(Res.string.schedule_filter_close))
                     }
                 }
 
@@ -125,9 +131,9 @@ fun ScheduleFilterBottomSheet(
                     ) {
                         Text(
                             text = if (pendingFilterState.hasActiveFilters())
-                                "Apply ${pendingFilterState.activeFilterCount()} Filters"
+                                stringResource(Res.string.schedule_filter_apply_filters, pendingFilterState.activeFilterCount())
                             else
-                                "Apply"
+                                stringResource(Res.string.schedule_filter_apply)
                         )
                     }
                 }

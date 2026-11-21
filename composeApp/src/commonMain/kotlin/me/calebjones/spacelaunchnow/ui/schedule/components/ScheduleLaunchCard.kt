@@ -37,6 +37,11 @@ import me.calebjones.spacelaunchnow.ui.theme.SpaceLaunchNowPreviewTheme
 import me.calebjones.spacelaunchnow.util.DateTimeUtil
 import me.calebjones.spacelaunchnow.util.resolve
 import org.jetbrains.compose.ui.tooling.preview.Preview
+import org.jetbrains.compose.resources.stringResource
+import spacelaunchnow_kmp.composeapp.generated.resources.Res
+import spacelaunchnow_kmp.composeapp.generated.resources.schedule_launch_image_placeholder
+import spacelaunchnow_kmp.composeapp.generated.resources.schedule_launch_unknown_location
+import spacelaunchnow_kmp.composeapp.generated.resources.schedule_launch_unknown_name
 
 /**
  * Reusable launch card component displaying a compact launch summary.
@@ -66,8 +71,8 @@ fun ScheduleLaunchView(
         val imageUrl = launch.thumbnailUrl ?: launch.imageUrl
         val useUtc = LocalUseUtc.current
         val dateText = DateTimeUtil.dateWithPrecisionFallback(launch, useUtc).resolve()
-        val title = launch.name ?: "Unknown Launch"
-        val location = launch.pad?.location?.name ?: "Unknown Location"
+        val title = launch.name ?: stringResource(Res.string.schedule_launch_unknown_name)
+        val location = launch.pad?.location?.name ?: stringResource(Res.string.schedule_launch_unknown_location)
         val mission = launch.provider.name
 
         if (imageUrl != null) {
@@ -92,7 +97,7 @@ fun ScheduleLaunchView(
             ) {
                 Icon(
                     imageVector = CustomIcons.RocketLaunch,
-                    contentDescription = "placeholder",
+                    contentDescription = stringResource(Res.string.schedule_launch_image_placeholder),
                     modifier = Modifier.size(48.dp).padding(4.dp),
                     tint = MaterialTheme.colorScheme.primary.copy(alpha = 0.6f),
                 )
@@ -151,7 +156,7 @@ private fun RocketIconPlaceholder() {
     ) {
         Icon(
             imageVector = CustomIcons.RocketLaunch,
-            contentDescription = "placeholder",
+            contentDescription = stringResource(Res.string.schedule_launch_image_placeholder),
             modifier = Modifier.size(48.dp).padding(4.dp),
             tint = MaterialTheme.colorScheme.primary.copy(alpha = 0.6f)
         )

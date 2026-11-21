@@ -38,6 +38,12 @@ import me.calebjones.spacelaunchnow.api.snapi.models.Article
 import me.calebjones.spacelaunchnow.ui.viewmodel.ViewState
 import me.calebjones.spacelaunchnow.util.DateTimeUtil
 import kotlin.time.Instant
+import org.jetbrains.compose.resources.stringResource
+import spacelaunchnow_kmp.composeapp.generated.resources.Res
+import spacelaunchnow_kmp.composeapp.generated.resources.home_articles_error
+import spacelaunchnow_kmp.composeapp.generated.resources.home_articles_icon_description
+import spacelaunchnow_kmp.composeapp.generated.resources.home_articles_image_description
+import spacelaunchnow_kmp.composeapp.generated.resources.home_cached_data_notice
 
 
 @Composable
@@ -61,7 +67,7 @@ fun ArticlesView(
                             .padding(horizontal = 16.dp, vertical = 4.dp)
                     ) {
                         Text(
-                            text = "Showing cached data",
+                            text = stringResource(Res.string.home_cached_data_notice),
                             style = MaterialTheme.typography.bodySmall,
                             color = MaterialTheme.colorScheme.onErrorContainer,
                             modifier = Modifier.padding(8.dp)
@@ -149,7 +155,7 @@ fun ArticleItem(article: Article, onClick: () -> Unit = {}) {
             val image = article.imageUrl
             SubcomposeAsyncImage(
                 model = image,
-                contentDescription = "Article Image",
+                contentDescription = stringResource(Res.string.home_articles_image_description),
                 modifier = Modifier
                     .size(96.dp)
                     .clip(shape = RoundedCornerShape(2.dp)),
@@ -176,7 +182,7 @@ fun ArticleItem(article: Article, onClick: () -> Unit = {}) {
                     ) {
                         Icon(
                             imageVector = FontAwesomeIcons.Solid.Newspaper,
-                            contentDescription = "Article Icon",
+                            contentDescription = stringResource(Res.string.home_articles_icon_description),
                             modifier = Modifier.size(48.dp),
                             tint = MaterialTheme.colorScheme.primary.copy(alpha = 0.6f)
                         )
@@ -254,7 +260,7 @@ fun ArticleErrorCard(
             verticalArrangement = Arrangement.spacedBy(8.dp)
         ) {
             Text(
-                text = "Failed to load articles",
+                text = stringResource(Res.string.home_articles_error),
                 style = MaterialTheme.typography.titleSmall,
                 fontWeight = FontWeight.Medium,
                 color = MaterialTheme.colorScheme.onErrorContainer

@@ -81,6 +81,19 @@ import me.calebjones.spacelaunchnow.ui.viewmodel.SCHEDULE_PAGE_SIZE
 import me.calebjones.spacelaunchnow.ui.viewmodel.ScheduleTab
 import me.calebjones.spacelaunchnow.ui.viewmodel.ScheduleViewModel
 import org.koin.compose.viewmodel.koinViewModel
+import org.jetbrains.compose.resources.stringResource
+import spacelaunchnow_kmp.composeapp.generated.resources.Res
+import spacelaunchnow_kmp.composeapp.generated.resources.common_retry
+import spacelaunchnow_kmp.composeapp.generated.resources.schedule_close_search
+import spacelaunchnow_kmp.composeapp.generated.resources.schedule_empty
+import spacelaunchnow_kmp.composeapp.generated.resources.schedule_error_loading
+import spacelaunchnow_kmp.composeapp.generated.resources.schedule_filter_button_description
+import spacelaunchnow_kmp.composeapp.generated.resources.schedule_search_button_description
+import spacelaunchnow_kmp.composeapp.generated.resources.schedule_search_placeholder
+import spacelaunchnow_kmp.composeapp.generated.resources.schedule_select_launch_prompt
+import spacelaunchnow_kmp.composeapp.generated.resources.schedule_tab_previous
+import spacelaunchnow_kmp.composeapp.generated.resources.schedule_tab_upcoming
+import spacelaunchnow_kmp.composeapp.generated.resources.schedule_title
 
 /** Page-end ad slots per tab: after rows 25, 50, 75 and 100. */
 private const val MAX_PAGE_AD_SLOTS = 4
@@ -122,7 +135,7 @@ fun ScheduleScreen(
                         contentAlignment = Alignment.Center
                     ) {
                         Text(
-                            text = "Select a launch to view details",
+                            text = stringResource(Res.string.schedule_select_launch_prompt),
                             style = MaterialTheme.typography.bodyLarge
                         )
                     }
@@ -236,13 +249,13 @@ private fun ScheduleContent(
                         leadingIcon = { Icon(Icons.Default.Search, contentDescription = null) },
                         trailingIcon = {
                             IconButton(onClick = { viewModel.toggleSearchExpanded(false) }) {
-                                Icon(Icons.Default.Close, contentDescription = "Close search")
+                                Icon(Icons.Default.Close, contentDescription = stringResource(Res.string.schedule_close_search))
                             }
                         },
                         modifier = Modifier
                             .fillMaxWidth()
                             .focusRequester(focusRequester),
-                        placeholder = { Text("Search launches") },
+                        placeholder = { Text(stringResource(Res.string.schedule_search_placeholder)) },
                         singleLine = true,
                         shape = RoundedCornerShape(28.dp),
                         colors = OutlinedTextFieldDefaults.colors(
@@ -256,7 +269,7 @@ private fun ScheduleContent(
                         verticalAlignment = Alignment.CenterVertically
                     ) {
                         Text(
-                            text = "Launch Schedule",
+                            text = stringResource(Res.string.schedule_title),
                             style = MaterialTheme.typography.headlineMedium,
                             fontWeight = FontWeight.Bold
                         )
@@ -266,21 +279,22 @@ private fun ScheduleContent(
                             BadgedBox(
                                 badge = {
                                     Badge {
+                                        // i18n-ignore: number only, no words
                                         Text("${uiState.filterState.activeFilterCount()}")
                                     }
                                 }
                             ) {
                                 IconButton(onClick = { viewModel.openFilterSheet() }) {
-                                    Icon(Icons.Default.FilterList, contentDescription = "Filter")
+                                    Icon(Icons.Default.FilterList, contentDescription = stringResource(Res.string.schedule_filter_button_description))
                                 }
                             }
                         } else {
                             IconButton(onClick = { viewModel.openFilterSheet() }) {
-                                Icon(Icons.Default.FilterList, contentDescription = "Filter")
+                                Icon(Icons.Default.FilterList, contentDescription = stringResource(Res.string.schedule_filter_button_description))
                             }
                         }
                         IconButton(onClick = { viewModel.toggleSearchExpanded(true) }) {
-                            Icon(Icons.Default.Search, contentDescription = "Search")
+                            Icon(Icons.Default.Search, contentDescription = stringResource(Res.string.schedule_search_button_description))
                         }
                     }
                 }
@@ -301,7 +315,7 @@ private fun ScheduleContent(
                                 horizontalArrangement = Arrangement.Center,
                                 verticalAlignment = Alignment.CenterVertically
                             ) {
-                                Text("Upcoming")
+                                Text(stringResource(Res.string.schedule_tab_upcoming))
                                 Spacer(modifier = Modifier.width(4.dp))
                                 Badge {
                                     Text(
@@ -311,7 +325,7 @@ private fun ScheduleContent(
                                 }
                             }
                         } else {
-                            Text("Upcoming")
+                            Text(stringResource(Res.string.schedule_tab_upcoming))
                         }
                     }
                 )
@@ -326,7 +340,7 @@ private fun ScheduleContent(
                                 horizontalArrangement = Arrangement.Center,
                                 verticalAlignment = Alignment.CenterVertically
                             ) {
-                                Text("Previous")
+                                Text(stringResource(Res.string.schedule_tab_previous))
                                 Spacer(modifier = Modifier.width(4.dp))
                                 Badge {
                                     Text(
@@ -336,7 +350,7 @@ private fun ScheduleContent(
                                 }
                             }
                         } else {
-                            Text("Previous")
+                            Text(stringResource(Res.string.schedule_tab_previous))
                         }
                     }
                 )
@@ -377,7 +391,7 @@ private fun ScheduleContent(
                                 verticalArrangement = Arrangement.spacedBy(8.dp)
                             ) {
                                 Text(
-                                    "Error loading launches",
+                                    stringResource(Res.string.schedule_error_loading),
                                     style = MaterialTheme.typography.titleMedium
                                 )
                                 Text(
@@ -386,7 +400,7 @@ private fun ScheduleContent(
                                     color = MaterialTheme.colorScheme.error
                                 )
                                 TextButton(onClick = { viewModel.loadNextPage(tab) }) {
-                                    Text("Retry")
+                                    Text(stringResource(Res.string.common_retry))
                                 }
                             }
                         }
@@ -449,7 +463,7 @@ private fun ScheduleContent(
                                 Modifier.fillMaxWidth().padding(24.dp),
                                 contentAlignment = Alignment.Center
                             ) {
-                                Text("No launches found")
+                                Text(stringResource(Res.string.schedule_empty))
                             }
                         }
                     }

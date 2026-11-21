@@ -46,6 +46,15 @@ import me.calebjones.spacelaunchnow.ui.home.components.UpdateCard
 import me.calebjones.spacelaunchnow.ui.layout.rememberAdaptiveLayoutState
 import me.calebjones.spacelaunchnow.ui.state.VideoPlayerState
 import me.calebjones.spacelaunchnow.ui.viewmodel.ViewState
+import spacelaunchnow_kmp.composeapp.generated.resources.Res
+import org.jetbrains.compose.resources.stringResource
+import spacelaunchnow_kmp.composeapp.generated.resources.starship_overview_cached
+import spacelaunchnow_kmp.composeapp.generated.resources.starship_overview_empty
+import spacelaunchnow_kmp.composeapp.generated.resources.starship_overview_load_failed
+import spacelaunchnow_kmp.composeapp.generated.resources.starship_overview_tap_to_retry
+import spacelaunchnow_kmp.composeapp.generated.resources.starship_title
+import spacelaunchnow_kmp.composeapp.generated.resources.starship_updates_empty
+import spacelaunchnow_kmp.composeapp.generated.resources.starship_updates_title
 
 /**
  * Overview tab for Starship Dashboard
@@ -94,12 +103,12 @@ fun StarshipOverviewTab(
                         verticalArrangement = Arrangement.spacedBy(8.dp)
                     ) {
                         Text(
-                            text = programState.error ?: "Failed to load data",
+                            text = programState.error ?: stringResource(Res.string.starship_overview_load_failed),
                             color = MaterialTheme.colorScheme.error,
                             style = MaterialTheme.typography.bodyLarge
                         )
                         Text(
-                            text = "Tap to retry",
+                            text = stringResource(Res.string.starship_overview_tap_to_retry),
                             color = MaterialTheme.colorScheme.primary,
                             style = MaterialTheme.typography.bodyMedium,
                             modifier = Modifier.clickable { onRefresh() }
@@ -199,7 +208,7 @@ private fun TabletOverviewLayout(
                     ) {
                         VideoPlayer(
                             videoPlayerState = videoPlayerState,
-                            launchName = programState.data?.name ?: "Starship",
+                            launchName = programState.data?.name ?: stringResource(Res.string.starship_title),
                             onSetPlayerVisible = onSetPlayerVisible,
                             onNavigateToFullscreen = onNavigateToFullscreen,
                             onVideoSelected = onVideoSelected
@@ -241,7 +250,7 @@ private fun TabletOverviewLayout(
                 verticalArrangement = Arrangement.spacedBy(12.dp)
             ) {
                 SectionTitle(
-                    title = "Updates",
+                    title = stringResource(Res.string.starship_updates_title),
                     hasAction = false
                 )
                 
@@ -255,7 +264,7 @@ private fun TabletOverviewLayout(
                     }
                 } else {
                     Text(
-                        text = "No updates available",
+                        text = stringResource(Res.string.starship_updates_empty),
                         style = MaterialTheme.typography.bodyMedium,
                         color = MaterialTheme.colorScheme.onSurfaceVariant
                     )
@@ -274,7 +283,7 @@ private fun TabletOverviewLayout(
                 contentAlignment = Alignment.Center
             ) {
                 Text(
-                    text = "No Starship data available",
+                    text = stringResource(Res.string.starship_overview_empty),
                     style = MaterialTheme.typography.bodyLarge,
                     color = MaterialTheme.colorScheme.onSurfaceVariant
                 )
@@ -318,7 +327,7 @@ private fun PhoneOverviewLayout(
                 Column {
                     VideoPlayer(
                         videoPlayerState = videoPlayerState,
-                        launchName = programState.data?.name ?: "Starship",
+                        launchName = programState.data?.name ?: stringResource(Res.string.starship_title),
                         onSetPlayerVisible = onSetPlayerVisible,
                         onNavigateToFullscreen = onNavigateToFullscreen,
                         onVideoSelected = onVideoSelected
@@ -343,7 +352,7 @@ private fun PhoneOverviewLayout(
                 Column {
                     Box(modifier = Modifier.padding(horizontal = 16.dp)) {
                         SectionTitle(
-                            title = "Updates",
+                            title = stringResource(Res.string.starship_updates_title),
                             hasAction = false
                         )
                     }
@@ -388,7 +397,7 @@ private fun PhoneOverviewLayout(
                     contentAlignment = Alignment.Center
                 ) {
                     Text(
-                        text = "No Starship data available",
+                        text = stringResource(Res.string.starship_overview_empty),
                         style = MaterialTheme.typography.bodyLarge,
                         color = MaterialTheme.colorScheme.onSurfaceVariant
                     )
@@ -409,7 +418,7 @@ internal fun StalenessIndicator(modifier: Modifier = Modifier) {
         shape = RoundedCornerShape(8.dp)
     ) {
         Text(
-            text = "Showing cached data • Pull to refresh",
+            text = stringResource(Res.string.starship_overview_cached),
             style = MaterialTheme.typography.labelSmall,
             color = MaterialTheme.colorScheme.onTertiaryContainer,
             modifier = Modifier.padding(horizontal = 12.dp, vertical = 6.dp)

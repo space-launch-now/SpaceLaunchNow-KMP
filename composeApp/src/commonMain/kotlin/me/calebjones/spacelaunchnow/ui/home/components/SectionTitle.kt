@@ -20,6 +20,10 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import org.jetbrains.compose.resources.stringResource
+import spacelaunchnow_kmp.composeapp.generated.resources.Res
+import spacelaunchnow_kmp.composeapp.generated.resources.home_section_info_description
+import spacelaunchnow_kmp.composeapp.generated.resources.home_section_see_all
 
 @Composable
 fun SectionTitle(
@@ -44,7 +48,7 @@ fun SectionTitle(
                 ) {
                     Icon(
                         imageVector = Icons.Outlined.Info,
-                        contentDescription = "Info about $title",
+                        contentDescription = stringResource(Res.string.home_section_info_description, title),
                         tint = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.6f),
                         modifier = Modifier.size(20.dp)
                     )
@@ -53,7 +57,7 @@ fun SectionTitle(
         }
         if (hasAction) {
             TextButton(onClick = { onActionClick?.invoke() }) {
-                Text(text = "See All", color = MaterialTheme.colorScheme.primary)
+                Text(text = stringResource(Res.string.home_section_see_all), color = MaterialTheme.colorScheme.primary)
             }
         }
     }

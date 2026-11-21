@@ -38,6 +38,11 @@ import me.calebjones.spacelaunchnow.domain.model.VideoLink
 import me.calebjones.spacelaunchnow.ui.theme.SpaceLaunchNowPreviewTheme
 import me.calebjones.spacelaunchnow.util.VideoUtil
 import org.jetbrains.compose.ui.tooling.preview.Preview
+import org.jetbrains.compose.resources.stringResource
+import spacelaunchnow_kmp.composeapp.generated.resources.Res
+import spacelaunchnow_kmp.composeapp.generated.resources.launch_detail_videos_live_badge
+import spacelaunchnow_kmp.composeapp.generated.resources.launch_detail_videos_more_heading
+import spacelaunchnow_kmp.composeapp.generated.resources.launch_detail_videos_open_description
 
 /**
  * Card list of alternate videos for a launch/event. Shown below the embedded
@@ -60,7 +65,7 @@ fun AlternateVideosCard(
         verticalArrangement = Arrangement.spacedBy(8.dp)
     ) {
         Text(
-            text = "More Videos",
+            text = stringResource(Res.string.launch_detail_videos_more_heading),
             style = MaterialTheme.typography.titleMedium,
             fontWeight = FontWeight.SemiBold,
             color = MaterialTheme.colorScheme.onSurface,
@@ -140,7 +145,7 @@ private fun AlternateVideoRow(
             ) {
                 Icon(
                     imageVector = Icons.Default.PlayArrow,
-                    contentDescription = "Open video in app",
+                    contentDescription = stringResource(Res.string.launch_detail_videos_open_description),
                     modifier = Modifier.size(22.dp)
                 )
             }
@@ -185,7 +190,7 @@ private fun VideoThumbnail(
                     .padding(4.dp)
             ) {
                 Text(
-                    text = "LIVE",
+                    text = stringResource(Res.string.launch_detail_videos_live_badge),
                     modifier = Modifier.padding(horizontal = 4.dp, vertical = 2.dp),
                     style = MaterialTheme.typography.labelSmall,
                     color = Color.White,
@@ -227,6 +232,7 @@ private fun extractDomain(url: String): String {
 private val previewVideos = listOf(
     VideoLink(
         url = "https://www.youtube.com/watch?v=abc123",
+        // i18n-ignore: preview sample data
         title = "SpaceX NROL-172",
         source = "youtube",
         publisher = "The Space Devs",
@@ -237,6 +243,7 @@ private val previewVideos = listOf(
     ),
     VideoLink(
         url = "https://www.youtube.com/watch?v=def456",
+        // i18n-ignore: preview sample data
         title = "Live: SpaceX Falcon 9 rocket launches from California on a mission for U.S. spy satellites",
         source = "youtube",
         publisher = "Spaceflight Now",
@@ -247,6 +254,7 @@ private val previewVideos = listOf(
     ),
     VideoLink(
         url = "https://x.com/SpaceX/status/12345",
+        // i18n-ignore: preview sample data
         title = "NROL-172 Mission",
         source = "x",
         publisher = "SpaceX",

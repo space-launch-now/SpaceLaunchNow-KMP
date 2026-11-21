@@ -19,6 +19,19 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import me.calebjones.spacelaunchnow.util.LatLng
 import me.calebjones.spacelaunchnow.util.NumberFormatUtil
+import spacelaunchnow_kmp.composeapp.generated.resources.Res
+import org.jetbrains.compose.resources.stringResource
+import spacelaunchnow_kmp.composeapp.generated.resources.station_position_altitude
+import spacelaunchnow_kmp.composeapp.generated.resources.station_position_altitude_value
+import spacelaunchnow_kmp.composeapp.generated.resources.station_position_degrees
+import spacelaunchnow_kmp.composeapp.generated.resources.station_position_latitude
+import spacelaunchnow_kmp.composeapp.generated.resources.station_position_loading
+import spacelaunchnow_kmp.composeapp.generated.resources.station_position_location
+import spacelaunchnow_kmp.composeapp.generated.resources.station_position_longitude
+import spacelaunchnow_kmp.composeapp.generated.resources.station_position_orbit
+import spacelaunchnow_kmp.composeapp.generated.resources.station_position_speed_value
+import spacelaunchnow_kmp.composeapp.generated.resources.station_position_title
+import spacelaunchnow_kmp.composeapp.generated.resources.station_position_velocity
 
 /**
  * Card displaying current ISS position and velocity
@@ -37,7 +50,7 @@ fun PositionCard(
     ) {
         Column(modifier = Modifier.padding(16.dp)) {
             Text(
-                text = "Current Position",
+                text = stringResource(Res.string.station_position_title),
                 style = MaterialTheme.typography.titleMedium,
                 modifier = Modifier.padding(bottom = 12.dp)
             )
@@ -51,17 +64,17 @@ fun PositionCard(
                         Row(verticalAlignment = Alignment.CenterVertically) {
                             Icon(
                                 imageVector = Icons.Default.LocationOn,
-                                contentDescription = "Location",
+                                contentDescription = stringResource(Res.string.station_position_location),
                                 tint = MaterialTheme.colorScheme.primary
                             )
                             Column(modifier = Modifier.padding(start = 8.dp)) {
                                 Text(
-                                    text = "Latitude",
+                                    text = stringResource(Res.string.station_position_latitude),
                                     style = MaterialTheme.typography.labelSmall,
                                     color = MaterialTheme.colorScheme.onSurfaceVariant
                                 )
                                 Text(
-                                    text = "${NumberFormatUtil.formatDecimal(position.latitude, 4)}°",
+                                    text = stringResource(Res.string.station_position_degrees, NumberFormatUtil.formatDecimal(position.latitude, 4)),
                                     style = MaterialTheme.typography.bodyLarge
                                 )
                             }
@@ -72,17 +85,17 @@ fun PositionCard(
                         Row(verticalAlignment = Alignment.CenterVertically) {
                             Icon(
                                 imageVector = Icons.Default.LocationOn,
-                                contentDescription = "Location",
+                                contentDescription = stringResource(Res.string.station_position_location),
                                 tint = MaterialTheme.colorScheme.primary
                             )
                             Column(modifier = Modifier.padding(start = 8.dp)) {
                                 Text(
-                                    text = "Longitude",
+                                    text = stringResource(Res.string.station_position_longitude),
                                     style = MaterialTheme.typography.labelSmall,
                                     color = MaterialTheme.colorScheme.onSurfaceVariant
                                 )
                                 Text(
-                                    text = "${NumberFormatUtil.formatDecimal(position.longitude, 4)}°",
+                                    text = stringResource(Res.string.station_position_degrees, NumberFormatUtil.formatDecimal(position.longitude, 4)),
                                     style = MaterialTheme.typography.bodyLarge
                                 )
                             }
@@ -98,7 +111,7 @@ fun PositionCard(
                     ) {
                         Column {
                             Text(
-                                text = "Orbit",
+                                text = stringResource(Res.string.station_position_orbit),
                                 style = MaterialTheme.typography.labelSmall,
                                 color = MaterialTheme.colorScheme.onSurfaceVariant
                             )
@@ -121,12 +134,12 @@ fun PositionCard(
                         altitude?.let {
                             Column(modifier = Modifier.weight(1f)) {
                                 Text(
-                                    text = "Altitude",
+                                    text = stringResource(Res.string.station_position_altitude),
                                     style = MaterialTheme.typography.labelSmall,
                                     color = MaterialTheme.colorScheme.onSurfaceVariant
                                 )
                                 Text(
-                                    text = "${NumberFormatUtil.formatDecimal(it, 1)} km",
+                                    text = stringResource(Res.string.station_position_altitude_value, NumberFormatUtil.formatDecimal(it, 1)),
                                     style = MaterialTheme.typography.bodyMedium
                                 )
                             }
@@ -137,17 +150,17 @@ fun PositionCard(
                                 Row(verticalAlignment = Alignment.CenterVertically) {
                                     Icon(
                                         imageVector = Icons.Default.Speed,
-                                        contentDescription = "Velocity",
+                                        contentDescription = stringResource(Res.string.station_position_velocity),
                                         tint = MaterialTheme.colorScheme.primary
                                     )
                                     Column(modifier = Modifier.padding(start = 8.dp)) {
                                         Text(
-                                            text = "Velocity",
+                                            text = stringResource(Res.string.station_position_velocity),
                                             style = MaterialTheme.typography.labelSmall,
                                             color = MaterialTheme.colorScheme.onSurfaceVariant
                                         )
                                         Text(
-                                            text = "${NumberFormatUtil.formatDecimal(it, 0)} km/h",
+                                            text = stringResource(Res.string.station_position_speed_value, NumberFormatUtil.formatDecimal(it, 0)),
                                             style = MaterialTheme.typography.bodyMedium
                                         )
                                     }
@@ -158,7 +171,7 @@ fun PositionCard(
                 }
             } else {
                 Text(
-                    text = "Loading position...",
+                    text = stringResource(Res.string.station_position_loading),
                     style = MaterialTheme.typography.bodyMedium,
                     color = MaterialTheme.colorScheme.onSurfaceVariant
                 )

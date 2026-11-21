@@ -247,6 +247,7 @@ private fun DeviceFrameAndroidPreview() {
                 modifier = Modifier.fillMaxSize().background(MaterialTheme.colorScheme.surface),
                 contentAlignment = Alignment.Center
             ) {
+                // i18n-ignore: preview-only placeholder
                 Text("Android Frame", style = MaterialTheme.typography.bodyMedium)
             }
         }
@@ -265,6 +266,7 @@ private fun DeviceFrameAndroidDarkPreview() {
                 modifier = Modifier.fillMaxSize().background(MaterialTheme.colorScheme.surface),
                 contentAlignment = Alignment.Center
             ) {
+                // i18n-ignore: preview-only placeholder
                 Text("Android Frame", style = MaterialTheme.typography.bodyMedium)
             }
         }
@@ -283,6 +285,7 @@ private fun DeviceFrameIPhonePreview() {
                 modifier = Modifier.fillMaxSize().background(MaterialTheme.colorScheme.surface),
                 contentAlignment = Alignment.Center
             ) {
+                // i18n-ignore: preview-only placeholder
                 Text("iPhone Frame", style = MaterialTheme.typography.bodyMedium)
             }
         }
@@ -301,6 +304,7 @@ private fun DeviceFrameIPhoneDarkPreview() {
                 modifier = Modifier.fillMaxSize().background(MaterialTheme.colorScheme.surface),
                 contentAlignment = Alignment.Center
             ) {
+                // i18n-ignore: preview-only placeholder
                 Text("iPhone Frame", style = MaterialTheme.typography.bodyMedium)
             }
         }

@@ -40,6 +40,12 @@ import me.calebjones.spacelaunchnow.ui.detail.compose.components.RelatedNewsCard
 import me.calebjones.spacelaunchnow.ui.home.components.SectionTitle
 import me.calebjones.spacelaunchnow.ui.viewmodel.ViewState
 import me.calebjones.spacelaunchnow.util.DateTimeUtil.formatLaunchDateTime
+import spacelaunchnow_kmp.composeapp.generated.resources.Res
+import org.jetbrains.compose.resources.stringResource
+import spacelaunchnow_kmp.composeapp.generated.resources.starship_event_type_unknown
+import spacelaunchnow_kmp.composeapp.generated.resources.starship_events_empty
+import spacelaunchnow_kmp.composeapp.generated.resources.starship_events_news_title
+import spacelaunchnow_kmp.composeapp.generated.resources.starship_events_title
 
 /**
  * Events tab for Starship Dashboard
@@ -86,7 +92,7 @@ fun StarshipEventsTab(
                                 )
                             ) {
                                 SectionTitle(
-                                    title = "Events",
+                                    title = stringResource(Res.string.starship_events_title),
                                     hasAction = false
                                 )
                                 // Staleness indicator for events
@@ -118,7 +124,7 @@ fun StarshipEventsTab(
                                 )
                             ) {
                                 SectionTitle(
-                                    title = "News & Articles",
+                                    title = stringResource(Res.string.starship_events_news_title),
                                     hasAction = false
                                 )
                                 // Staleness indicator for news
@@ -155,7 +161,7 @@ fun StarshipEventsTab(
                     contentAlignment = Alignment.Center
                 ) {
                     Text(
-                        text = "No Starship events available",
+                        text = stringResource(Res.string.starship_events_empty),
                         style = MaterialTheme.typography.bodyLarge,
                         color = MaterialTheme.colorScheme.onSurfaceVariant
                     )
@@ -249,7 +255,7 @@ private fun EventListCard(
                 }
 
                 Text(
-                    text = event.type.name ?: "Unknown Type",
+                    text = event.type.name ?: stringResource(Res.string.starship_event_type_unknown),
                     style = MaterialTheme.typography.bodySmall,
                     color = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.7f)
                 )

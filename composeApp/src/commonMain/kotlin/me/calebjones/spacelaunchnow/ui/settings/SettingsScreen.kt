@@ -82,6 +82,71 @@ import me.calebjones.spacelaunchnow.util.isWearOsSupportedPlatform
 import me.calebjones.spacelaunchnow.util.logging.LoggingPreferences
 import org.koin.compose.koinInject
 import org.koin.compose.viewmodel.koinViewModel
+import org.jetbrains.compose.resources.stringResource
+import spacelaunchnow_kmp.composeapp.generated.resources.Res
+import spacelaunchnow_kmp.composeapp.generated.resources.settings_calendar_title
+import spacelaunchnow_kmp.composeapp.generated.resources.settings_main_about_details
+import spacelaunchnow_kmp.composeapp.generated.resources.settings_main_ad_privacy
+import spacelaunchnow_kmp.composeapp.generated.resources.settings_main_calendar_subtitle
+import spacelaunchnow_kmp.composeapp.generated.resources.settings_main_debug_dialog_cancel
+import spacelaunchnow_kmp.composeapp.generated.resources.settings_main_debug_dialog_error_password
+import spacelaunchnow_kmp.composeapp.generated.resources.settings_main_debug_dialog_error_totp
+import spacelaunchnow_kmp.composeapp.generated.resources.settings_main_debug_dialog_field_password
+import spacelaunchnow_kmp.composeapp.generated.resources.settings_main_debug_dialog_field_totp
+import spacelaunchnow_kmp.composeapp.generated.resources.settings_main_debug_dialog_hide_password
+import spacelaunchnow_kmp.composeapp.generated.resources.settings_main_debug_dialog_message_password
+import spacelaunchnow_kmp.composeapp.generated.resources.settings_main_debug_dialog_message_totp
+import spacelaunchnow_kmp.composeapp.generated.resources.settings_main_debug_dialog_show_password
+import spacelaunchnow_kmp.composeapp.generated.resources.settings_main_debug_dialog_title_password
+import spacelaunchnow_kmp.composeapp.generated.resources.settings_main_debug_dialog_title_totp
+import spacelaunchnow_kmp.composeapp.generated.resources.settings_main_debug_dialog_unlock
+import spacelaunchnow_kmp.composeapp.generated.resources.settings_main_debug_dialog_use_password
+import spacelaunchnow_kmp.composeapp.generated.resources.settings_main_debug_dialog_use_totp
+import spacelaunchnow_kmp.composeapp.generated.resources.settings_main_debug_subtitle
+import spacelaunchnow_kmp.composeapp.generated.resources.settings_main_debug_title
+import spacelaunchnow_kmp.composeapp.generated.resources.settings_main_feedback_subtitle
+import spacelaunchnow_kmp.composeapp.generated.resources.settings_main_feedback_title
+import spacelaunchnow_kmp.composeapp.generated.resources.settings_main_go_premium_subtitle
+import spacelaunchnow_kmp.composeapp.generated.resources.settings_main_go_premium_title
+import spacelaunchnow_kmp.composeapp.generated.resources.settings_main_hide_tbd_subtitle
+import spacelaunchnow_kmp.composeapp.generated.resources.settings_main_hide_tbd_title
+import spacelaunchnow_kmp.composeapp.generated.resources.settings_main_notification_filters_subtitle
+import spacelaunchnow_kmp.composeapp.generated.resources.settings_main_notification_filters_title
+import spacelaunchnow_kmp.composeapp.generated.resources.settings_main_notifications_disabled_subtitle
+import spacelaunchnow_kmp.composeapp.generated.resources.settings_main_notifications_disabled_title
+import spacelaunchnow_kmp.composeapp.generated.resources.settings_main_notifications_enable
+import spacelaunchnow_kmp.composeapp.generated.resources.settings_main_notifications_enabled_subtitle
+import spacelaunchnow_kmp.composeapp.generated.resources.settings_main_notifications_enabled_title
+import spacelaunchnow_kmp.composeapp.generated.resources.settings_main_notifications_open_settings
+import spacelaunchnow_kmp.composeapp.generated.resources.settings_main_privacy_policy
+import spacelaunchnow_kmp.composeapp.generated.resources.settings_main_roadmap_subtitle
+import spacelaunchnow_kmp.composeapp.generated.resources.settings_main_roadmap_title
+import spacelaunchnow_kmp.composeapp.generated.resources.settings_main_section_about
+import spacelaunchnow_kmp.composeapp.generated.resources.settings_main_section_developer
+import spacelaunchnow_kmp.composeapp.generated.resources.settings_main_section_diagnostic
+import spacelaunchnow_kmp.composeapp.generated.resources.settings_main_section_general
+import spacelaunchnow_kmp.composeapp.generated.resources.settings_main_section_notifications
+import spacelaunchnow_kmp.composeapp.generated.resources.settings_main_section_premium
+import spacelaunchnow_kmp.composeapp.generated.resources.settings_main_section_wear_os
+import spacelaunchnow_kmp.composeapp.generated.resources.settings_main_shop_subtitle
+import spacelaunchnow_kmp.composeapp.generated.resources.settings_main_shop_title
+import spacelaunchnow_kmp.composeapp.generated.resources.settings_main_system_settings_subtitle
+import spacelaunchnow_kmp.composeapp.generated.resources.settings_main_system_settings_title
+import spacelaunchnow_kmp.composeapp.generated.resources.settings_main_terms_of_service
+import spacelaunchnow_kmp.composeapp.generated.resources.settings_main_theme_subtitle
+import spacelaunchnow_kmp.composeapp.generated.resources.settings_main_title
+import spacelaunchnow_kmp.composeapp.generated.resources.settings_main_utc_subtitle
+import spacelaunchnow_kmp.composeapp.generated.resources.settings_main_utc_title
+import spacelaunchnow_kmp.composeapp.generated.resources.settings_main_version
+import spacelaunchnow_kmp.composeapp.generated.resources.settings_main_wear_available_body
+import spacelaunchnow_kmp.composeapp.generated.resources.settings_main_wear_available_title
+import spacelaunchnow_kmp.composeapp.generated.resources.settings_main_wear_connected
+import spacelaunchnow_kmp.composeapp.generated.resources.settings_main_wear_data_updates_body
+import spacelaunchnow_kmp.composeapp.generated.resources.settings_main_wear_data_updates_title
+import spacelaunchnow_kmp.composeapp.generated.resources.settings_main_wear_early_release
+import spacelaunchnow_kmp.composeapp.generated.resources.settings_main_wear_early_release_body
+import spacelaunchnow_kmp.composeapp.generated.resources.settings_theme_tab_label
+import spacelaunchnow_kmp.composeapp.generated.resources.settings_theme_title
 
 @OptIn(ExperimentalMaterial3Api::class, androidx.compose.material3.ExperimentalMaterial3ExpressiveApi::class)
 @Composable
@@ -162,7 +227,7 @@ fun SettingsScreen(
             windowInsets = WindowInsets(0, 0, 0, 0),
             title = {
                 Text(
-                    text = "Settings",
+                    text = stringResource(Res.string.settings_main_title),
                     style = MaterialTheme.typography.headlineMedium,
                     fontWeight = FontWeight.Bold
                 )
@@ -182,33 +247,33 @@ fun SettingsScreen(
         ) {
             // GENERAL
             item {
-                SectionHeaderText("General")
+                SectionHeaderText(stringResource(Res.string.settings_main_section_general))
                 Spacer(Modifier.height(2.dp))
                 SettingsCardRow {
                     Column(Modifier.fillMaxWidth()) {
                         SettingsToggleRow(
-                            title = "Use UTC time",
-                            subtitle = "Show dates/times in UTC instead of local timezone",
+                            title = stringResource(Res.string.settings_main_utc_title),
+                            subtitle = stringResource(Res.string.settings_main_utc_subtitle),
                             checked = uiState.useUtc,
                             onCheckedChange = viewModel::updateUseUtc
                         )
                         Spacer(modifier = Modifier.height(12.dp))
                         NotificationTopicToggle(
-                            title = "Hide TBD Launches",
-                            description = "Hide launches without confirmed dates",
+                            title = stringResource(Res.string.settings_main_hide_tbd_title),
+                            description = stringResource(Res.string.settings_main_hide_tbd_subtitle),
                             checked = uiState.hideTbdLaunches,
                             onCheckedChange = viewModel::updateHideTbdLaunches
                         )
                         Spacer(modifier = Modifier.height(12.dp))
                         SettingsNavigationRow(
-                            title = "Theme Settings",
-                            subtitle = "Appearance, colors, and palette customization",
+                            title = stringResource(Res.string.settings_theme_title),
+                            subtitle = stringResource(Res.string.settings_main_theme_subtitle),
                             onClick = { navController.navigate(ThemeCustomization) },
                         )
                         Spacer(modifier = Modifier.height(12.dp))
                         SettingsNavigationRow(
-                            title = "Calendar Sync",
-                            subtitle = "Sync Launches and Events to your calendar",
+                            title = stringResource(Res.string.settings_calendar_title),
+                            subtitle = stringResource(Res.string.settings_main_calendar_subtitle),
                             onClick = { navController.navigate(CalendarSync) },
                         )
                     }
@@ -216,7 +281,7 @@ fun SettingsScreen(
             }
             // NOTIFICATIONS
             item {
-                SectionHeaderText("Notifications")
+                SectionHeaderText(stringResource(Res.string.settings_main_section_notifications))
                 Spacer(Modifier.height(2.dp))
                 SettingsCardRow {
                     Column(Modifier.fillMaxWidth()) {
@@ -227,13 +292,13 @@ fun SettingsScreen(
                             ) {
                                 Column(modifier = Modifier.weight(1f)) {
                                     Text(
-                                        text = "Notifications Disabled",
+                                        text = stringResource(Res.string.settings_main_notifications_disabled_title),
                                         style = MaterialTheme.typography.bodyLarge,
                                         fontWeight = FontWeight.SemiBold,
                                         color = MaterialTheme.colorScheme.error
                                     )
                                     Text(
-                                        text = "Permission required to send notifications",
+                                        text = stringResource(Res.string.settings_main_notifications_disabled_subtitle),
                                         style = MaterialTheme.typography.bodySmall,
                                         color = MaterialTheme.colorScheme.onSurfaceVariant,
                                         modifier = Modifier.padding(top = 2.dp)
@@ -255,32 +320,32 @@ fun SettingsScreen(
                                 ) {
                                     Text(
                                         if (permissionRemedy == NotificationPermissionRemedy.REQUEST_PERMISSION) {
-                                            "Enable"
+                                            stringResource(Res.string.settings_main_notifications_enable)
                                         } else {
-                                            "Open Settings"
+                                            stringResource(Res.string.settings_main_notifications_open_settings)
                                         }
                                     )
                                 }
                             }
                         } else {
                             SettingsToggleRow(
-                                title = "Notifications Enabled",
-                                subtitle = "Allow notifications for news, launches and events",
+                                title = stringResource(Res.string.settings_main_notifications_enabled_title),
+                                subtitle = stringResource(Res.string.settings_main_notifications_enabled_subtitle),
                                 checked = uiState.notificationsEnabled,
                                 onCheckedChange = viewModel::updateNotificationsEnabled
                             )
                         }
                         Spacer(modifier = Modifier.height(8.dp))
                         SettingsNavigationRow(
-                            title = "Notification Filters",
-                            subtitle = "Filter launches shown in app and notifications",
+                            title = stringResource(Res.string.settings_main_notification_filters_title),
+                            subtitle = stringResource(Res.string.settings_main_notification_filters_subtitle),
                             onClick = onOpenNotificationSettings,
                             enabled = hasNotificationPermission && uiState.notificationsEnabled
                         )
                         Spacer(modifier = Modifier.height(8.dp))
                         SettingsNavigationRow(
-                            title = "System Settings",
-                            subtitle = "Manage notification channels, sounds, and do-not-disturb",
+                            title = stringResource(Res.string.settings_main_system_settings_title),
+                            subtitle = stringResource(Res.string.settings_main_system_settings_subtitle),
                             onClick = onOpenSystemNotificationSettings,
                             enabled = hasNotificationPermission && uiState.notificationsEnabled
                         )
@@ -290,13 +355,13 @@ fun SettingsScreen(
 
             // SUPPORT & MEMBERSHIP
             item {
-                SectionHeaderText("Premium")
+                SectionHeaderText(stringResource(Res.string.settings_main_section_premium))
                 Spacer(Modifier.height(2.dp))
                 SettingsCardRow {
                     Column(Modifier.fillMaxWidth()) {
                         SettingsNavigationRow(
-                            title = "Go Premium \u2728",
-                            subtitle = "Ad-free, widgets, themes & more",
+                            title = stringResource(Res.string.settings_main_go_premium_title),
+                            subtitle = stringResource(Res.string.settings_main_go_premium_subtitle),
                             onClick = { navController.navigate(me.calebjones.spacelaunchnow.navigation.SupportUs(PaywallSource.SETTINGS_ROW.value)) },
                             icon = Icons.Filled.Star
                         )
@@ -312,7 +377,7 @@ fun SettingsScreen(
                         watchConnected = isWearOsConnected()
                     }
 
-                    SectionHeaderText("Wear OS")
+                    SectionHeaderText(stringResource(Res.string.settings_main_section_wear_os))
                     Spacer(Modifier.height(2.dp))
 
                     when (watchConnected) {
@@ -335,13 +400,13 @@ fun SettingsScreen(
                                     )
                                     Column(modifier = Modifier.weight(1f)) {
                                         Text(
-                                            text = "Wear OS App Available",
+                                            text = stringResource(Res.string.settings_main_wear_available_title),
                                             style = MaterialTheme.typography.bodyLarge,
                                             fontWeight = FontWeight.SemiBold,
                                             color = MaterialTheme.colorScheme.onSurface
                                         )
                                         Text(
-                                            text = "Space Launch Now is also available on Wear OS.",
+                                            text = stringResource(Res.string.settings_main_wear_available_body),
                                             style = MaterialTheme.typography.bodySmall,
                                             color = MaterialTheme.colorScheme.onSurfaceVariant,
                                             modifier = Modifier.padding(top = 2.dp)
@@ -375,21 +440,21 @@ fun SettingsScreen(
                                                 modifier = Modifier.size(18.dp)
                                             )
                                             Text(
-                                                text = "Early Release",
+                                                text = stringResource(Res.string.settings_main_wear_early_release),
                                                 style = MaterialTheme.typography.bodyLarge,
                                                 fontWeight = FontWeight.SemiBold,
                                                 color = MaterialTheme.colorScheme.primary
                                             )
                                         }
                                         Text(
-                                            text = "● Watch connected",
+                                            text = stringResource(Res.string.settings_main_wear_connected),
                                             style = MaterialTheme.typography.labelSmall,
                                             color = MaterialTheme.colorScheme.tertiary
                                         )
                                     }
                                     Spacer(Modifier.height(4.dp))
                                     Text(
-                                        text = "Wear OS support is in early release. More features, polish, and improvements are on the way.",
+                                        text = stringResource(Res.string.settings_main_wear_early_release_body),
                                         style = MaterialTheme.typography.bodySmall,
                                         color = MaterialTheme.colorScheme.onSurfaceVariant
                                     )
@@ -397,14 +462,14 @@ fun SettingsScreen(
                                     HorizontalDivider()
                                     Spacer(Modifier.height(8.dp))
                                     Text(
-                                        text = "Data updates",
+                                        text = stringResource(Res.string.settings_main_wear_data_updates_title),
                                         style = MaterialTheme.typography.bodyMedium,
                                         fontWeight = FontWeight.SemiBold,
                                         color = MaterialTheme.colorScheme.onSurface
                                     )
                                     Spacer(Modifier.height(4.dp))
                                     Text(
-                                        text = "Launch data on your watch is refreshed every 5 minutes when a launch is under 1 hour away, and every 30 minutes otherwise. The tile and complication follow the same filter preferences you set here in the app.",
+                                        text = stringResource(Res.string.settings_main_wear_data_updates_body),
                                         style = MaterialTheme.typography.bodySmall,
                                         color = MaterialTheme.colorScheme.onSurfaceVariant
                                     )
@@ -418,7 +483,7 @@ fun SettingsScreen(
             // DIAGNOSTIC LOGGING
             item {
                 val loggingPreferences: LoggingPreferences = koinInject()
-                SectionHeaderText("Diagnostic")
+                SectionHeaderText(stringResource(Res.string.settings_main_section_diagnostic))
                 Spacer(Modifier.height(2.dp))
                 LoggingSettingsSection(
                     loggingPreferences = loggingPreferences,
@@ -430,12 +495,12 @@ fun SettingsScreen(
             // DEBUG
             if (BuildConfig.IS_DEBUG || debugMenuUnlocked) {
                 item {
-                    SectionHeaderText("Developer")
+                    SectionHeaderText(stringResource(Res.string.settings_main_section_developer))
                     Spacer(Modifier.height(2.dp))
                     SettingsCardRow {
                         SettingsNavigationRow(
-                            title = "Debug Settings",
-                            subtitle = "API URL switching, topic testing, and developer options",
+                            title = stringResource(Res.string.settings_main_debug_title),
+                            subtitle = stringResource(Res.string.settings_main_debug_subtitle),
                             onClick = onOpenDebugSettings,
                             icon = Icons.Filled.Warning
                         )
@@ -445,35 +510,35 @@ fun SettingsScreen(
 
             // ABOUT
             item {
-                SectionHeaderText("About")
+                SectionHeaderText(stringResource(Res.string.settings_main_section_about))
                 Spacer(Modifier.height(2.dp))
                 SettingsCardRow {
                     SettingsNavigationRow(
-                        title = "Roadmap",
-                        subtitle = "View planned features and development timeline",
+                        title = stringResource(Res.string.settings_main_roadmap_title),
+                        subtitle = stringResource(Res.string.settings_main_roadmap_subtitle),
                         onClick = { navController.navigate(me.calebjones.spacelaunchnow.navigation.Roadmap) }
                     )
                 }
                 Spacer(Modifier.height(4.dp))
                 SettingsCardRow {
                     SettingsNavigationRow(
-                        title = "Send Feedback",
-                        subtitle = "Report issues or suggest improvements",
+                        title = stringResource(Res.string.settings_main_feedback_title),
+                        subtitle = stringResource(Res.string.settings_main_feedback_subtitle),
                         onClick = { appRatingViewModel.showFeedbackDialog() }
                     )
                 }
                 Spacer(Modifier.height(4.dp))
                 SettingsCardRow {
                     SettingsNavigationRow(
-                        title = "About Details",
+                        title = stringResource(Res.string.settings_main_about_details),
                         onClick = onAbout
                     )
                 }
                 Spacer(Modifier.height(4.dp))
                 SettingsCardRow {
                     SettingsNavigationRow(
-                        title = "Shop",
-                        subtitle = "Space Launch Now merch",
+                        title = stringResource(Res.string.settings_main_shop_title),
+                        subtitle = stringResource(Res.string.settings_main_shop_subtitle),
                         onClick = { uriHandler.openUri(ShopLink.URL) }
                     )
                 }
@@ -486,7 +551,7 @@ fun SettingsScreen(
                         val contextFactory =
                             me.calebjones.spacelaunchnow.LocalContextFactory.current
                         SettingsNavigationRow(
-                            title = "Ad privacy settings",
+                            title = stringResource(Res.string.settings_main_ad_privacy),
                             onClick = {
                                 me.calebjones.spacelaunchnow.ui.ads.showPrivacyOptionsForm(
                                     activity = contextFactory?.getActivity()
@@ -499,14 +564,14 @@ fun SettingsScreen(
                 Spacer(Modifier.height(4.dp))
                 SettingsCardRow {
                     SettingsNavigationRow(
-                        title = "Privacy policy",
+                        title = stringResource(Res.string.settings_main_privacy_policy),
                         onClick = onPrivacyPolicy
                     )
                 }
                 Spacer(Modifier.height(4.dp))
                 SettingsCardRow {
                     SettingsNavigationRow(
-                        title = "Terms of service",
+                        title = stringResource(Res.string.settings_main_terms_of_service),
                         onClick = onTerms
                     )
                 }
@@ -528,7 +593,7 @@ fun SettingsScreen(
                                     tapCount = 0
                                 }
                             },
-                        text = "Version ${BuildConfig.VERSION_NAME}",
+                        text = stringResource(Res.string.settings_main_version, BuildConfig.VERSION_NAME),
                         style = MaterialTheme.typography.bodySmall,
                         color = MaterialTheme.colorScheme.onSurfaceVariant
                     )
@@ -548,14 +613,14 @@ fun SettingsScreen(
                 showPassword = false
                 useTotp = false
             },
-            title = { Text(if (useTotp) "Enter TOTP Code" else "Enter Debug Password") },
+            title = { Text(if (useTotp) stringResource(Res.string.settings_main_debug_dialog_title_totp) else stringResource(Res.string.settings_main_debug_dialog_title_password)) },
             text = {
                 Column {
                     Text(
                         if (useTotp)
-                            "Enter the 6-digit code from your authenticator app:"
+                            stringResource(Res.string.settings_main_debug_dialog_message_totp)
                         else
-                            "Enter the password to unlock developer settings:"
+                            stringResource(Res.string.settings_main_debug_dialog_message_password)
                     )
                     Spacer(Modifier.height(8.dp))
                     OutlinedTextField(
@@ -569,7 +634,7 @@ fun SettingsScreen(
                             }
                             showPasswordError = false
                         },
-                        label = { Text(if (useTotp) "TOTP Code" else "Password") },
+                        label = { Text(if (useTotp) stringResource(Res.string.settings_main_debug_dialog_field_totp) else stringResource(Res.string.settings_main_debug_dialog_field_password)) },
                         visualTransformation = if (useTotp || showPassword)
                             VisualTransformation.None
                         else
@@ -579,7 +644,7 @@ fun SettingsScreen(
                                 IconButton(onClick = { showPassword = !showPassword }) {
                                     Icon(
                                         imageVector = if (showPassword) Icons.Filled.VisibilityOff else Icons.Filled.Visibility,
-                                        contentDescription = if (showPassword) "Hide password" else "Show password"
+                                        contentDescription = if (showPassword) stringResource(Res.string.settings_main_debug_dialog_hide_password) else stringResource(Res.string.settings_main_debug_dialog_show_password)
                                     )
                                 }
                             }
@@ -588,7 +653,7 @@ fun SettingsScreen(
                         supportingText = if (showPasswordError) {
                             {
                                 Text(
-                                    if (useTotp) "Invalid TOTP code" else "Incorrect password",
+                                    if (useTotp) stringResource(Res.string.settings_main_debug_dialog_error_totp) else stringResource(Res.string.settings_main_debug_dialog_error_password),
                                     color = MaterialTheme.colorScheme.error
                                 )
                             }
@@ -615,7 +680,7 @@ fun SettingsScreen(
                             }
                         ) {
                             Text(
-                                if (useTotp) "Use Password Instead" else "Use TOTP Instead",
+                                if (useTotp) stringResource(Res.string.settings_main_debug_dialog_use_password) else stringResource(Res.string.settings_main_debug_dialog_use_totp),
                                 style = MaterialTheme.typography.bodySmall
                             )
                         }
@@ -638,7 +703,7 @@ fun SettingsScreen(
                         }
                     }
                 ) {
-                    Text("Unlock")
+                    Text(stringResource(Res.string.settings_main_debug_dialog_unlock))
                 }
             },
             dismissButton = {
@@ -650,7 +715,7 @@ fun SettingsScreen(
                         useTotp = false
                     }
                 ) {
-                    Text("Cancel")
+                    Text(stringResource(Res.string.settings_main_debug_dialog_cancel))
                 }
             }
         )
@@ -837,7 +902,7 @@ private fun ThemeSettingRow(
             value = selected.label,
             onValueChange = {},
             readOnly = true,
-            label = { Text("Theme") },
+            label = { Text(stringResource(Res.string.settings_theme_tab_label)) },
             trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expanded = expanded) },
             modifier = Modifier
                 .menuAnchor(ExposedDropdownMenuAnchorType.PrimaryNotEditable)

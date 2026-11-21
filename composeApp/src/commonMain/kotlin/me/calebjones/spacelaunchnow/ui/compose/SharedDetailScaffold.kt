@@ -64,6 +64,10 @@ import me.calebjones.spacelaunchnow.ui.layout.rememberAdaptiveLayoutState
 import kotlin.math.max
 import kotlin.math.min
 import kotlin.math.roundToInt
+import spacelaunchnow_kmp.composeapp.generated.resources.Res
+import spacelaunchnow_kmp.composeapp.generated.resources.app_compose_shared_detail_image_placeholder_description
+import spacelaunchnow_kmp.composeapp.generated.resources.common_back
+import org.jetbrains.compose.resources.stringResource
 
 /**
  * CompositionLocal indicating whether the SharedDetailScaffold is in collapsed/tablet mode.
@@ -428,7 +432,7 @@ private fun SharedDetailImage(
                 ) {
                     Icon(
                         imageVector = Icons.Filled.Image,
-                        contentDescription = "Image placeholder",
+                        contentDescription = stringResource(Res.string.app_compose_shared_detail_image_placeholder_description),
                         modifier = Modifier.size(64.dp),
                         tint = MaterialTheme.colorScheme.primary.copy(alpha = 0.6f)
                     )
@@ -474,7 +478,7 @@ private fun SharedDetailUp(upPress: () -> Unit, forcePhoneLayout: Boolean = fals
         ) {
             Icon(
                 imageVector = Icons.AutoMirrored.Outlined.ArrowBack,
-                contentDescription = "Back",
+                contentDescription = stringResource(Res.string.common_back),
                 tint = if (isLargeScreen)
                     MaterialTheme.colorScheme.onSurface
                 else

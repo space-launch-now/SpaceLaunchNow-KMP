@@ -33,6 +33,14 @@ import me.calebjones.spacelaunchnow.ui.compose.SharedDetailScaffold
 import me.calebjones.spacelaunchnow.ui.viewmodel.AstronautDetailViewModel
 import org.koin.compose.viewmodel.koinViewModel
 import org.koin.core.parameter.parametersOf
+import org.jetbrains.compose.resources.stringResource
+import spacelaunchnow_kmp.composeapp.generated.resources.Res
+import spacelaunchnow_kmp.composeapp.generated.resources.astronaut_detail_error_title
+import spacelaunchnow_kmp.composeapp.generated.resources.astronaut_unknown_error
+import spacelaunchnow_kmp.composeapp.generated.resources.astronaut_unknown
+import spacelaunchnow_kmp.composeapp.generated.resources.common_error
+import spacelaunchnow_kmp.composeapp.generated.resources.common_loading
+import spacelaunchnow_kmp.composeapp.generated.resources.common_retry
 
 /**
  * Height constant for SharedDetailScaffold title area.
@@ -70,7 +78,7 @@ fun AstronautDetailView(
     when {
         uiState.error != null -> {
             ErrorView(
-                errorMessage = uiState.error ?: "Unknown error",
+                errorMessage = uiState.error ?: stringResource(Res.string.astronaut_unknown_error),
                 onRetry = { viewModel.retry() },
                 onNavigateBack = onNavigateBack
             )
@@ -80,7 +88,7 @@ fun AstronautDetailView(
             val astronaut = uiState.astronaut!!
             
             SharedDetailScaffold(
-                titleText = astronaut.name ?: "Unknown",
+                titleText = astronaut.name ?: stringResource(Res.string.astronaut_unknown),
                 taglineText = astronaut.agencyAbbrev,
                 imageUrl = astronaut.imageUrl,
                 onNavigateBack = onNavigateBack
@@ -133,7 +141,7 @@ fun AstronautDetailView(
 @Composable
 private fun LoadingView(onNavigateBack: () -> Unit) {
     SharedDetailScaffold(
-        titleText = "Loading...",
+        titleText = stringResource(Res.string.common_loading),
         taglineText = null,
         imageUrl = null,
         onNavigateBack = onNavigateBack
@@ -159,7 +167,7 @@ private fun ErrorView(
     onNavigateBack: () -> Unit
 ) {
     SharedDetailScaffold(
-        titleText = "Error",
+        titleText = stringResource(Res.string.common_error),
         taglineText = null,
         imageUrl = null,
         onNavigateBack = onNavigateBack
@@ -180,7 +188,7 @@ private fun ErrorView(
                     tint = MaterialTheme.colorScheme.error
                 )
                 Text(
-                    text = "Failed to load astronaut",
+                    text = stringResource(Res.string.astronaut_detail_error_title),
                     style = MaterialTheme.typography.titleMedium,
                     fontWeight = FontWeight.Bold,
                     textAlign = TextAlign.Center
@@ -192,7 +200,7 @@ private fun ErrorView(
                     textAlign = TextAlign.Center
                 )
                 Button(onClick = onRetry) {
-                    Text("Retry")
+                    Text(stringResource(Res.string.common_retry))
                 }
             }
         }

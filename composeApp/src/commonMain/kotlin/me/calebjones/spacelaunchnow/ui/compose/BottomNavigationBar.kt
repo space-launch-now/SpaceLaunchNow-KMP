@@ -24,7 +24,7 @@ import me.calebjones.spacelaunchnow.ui.ads.SmartBannerAd
 import me.calebjones.spacelaunchnow.ui.ads.AdPlacementType
 
 @Deprecated(
-    message = "Navigation is now handled by NavigationSuiteScaffold inside AdaptiveAppScaffold"
+    message = "Navigation is now handled by NavigationSuiteScaffold inside AdaptiveAppScaffold" // i18n-ignore: @Deprecated message, read by developers only
 )
 @Composable
 fun BottomNavigationBar(navController: NavHostController) {

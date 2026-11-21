@@ -15,6 +15,9 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
+import org.jetbrains.compose.resources.stringResource
+import spacelaunchnow_kmp.composeapp.generated.resources.Res
+import spacelaunchnow_kmp.composeapp.generated.resources.home_placeholder_content
 
 @Composable
 fun HorizontalScrollableList() {
@@ -37,7 +40,7 @@ fun PlaceholderCard() {
             modifier = Modifier.fillMaxSize(),
             contentAlignment = Alignment.Center
         ) {
-            Text(text = "Content", color = Color.Gray)
+            Text(text = stringResource(Res.string.home_placeholder_content), color = Color.Gray)
         }
     }
 }
@@ -52,7 +55,7 @@ fun LargePlaceholderCard() {
             modifier = Modifier.fillMaxSize(),
             contentAlignment = Alignment.Center
         ) {
-            Text(text = "Content", color = Color.Gray)
+            Text(text = stringResource(Res.string.home_placeholder_content), color = Color.Gray)
         }
     }
 }

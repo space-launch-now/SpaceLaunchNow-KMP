@@ -13,7 +13,7 @@ import kotlin.test.assertTrue
  * - Correct number of tabs
  * - Correct tab order
  * - Correct index-to-tab mapping
- * - Correct tab display names
+ * - Correct tab title resource keys
  */
 class LaunchDetailTabsTest {
 
@@ -37,34 +37,34 @@ class LaunchDetailTabsTest {
     fun `fromIndex(0) returns Overview tab`() {
         val tab = LaunchDetailTab.fromIndex(0)
         assertIs<LaunchDetailTab.Overview>(tab)
-        assertEquals("Overview", tab.displayName)
+        assertEquals("launch_detail_tab_overview", tab.titleRes.key)
     }
 
     @Test
     fun `fromIndex(1) returns Mission tab`() {
         val tab = LaunchDetailTab.fromIndex(1)
         assertIs<LaunchDetailTab.Mission>(tab)
-        assertEquals("Mission", tab.displayName)
+        assertEquals("launch_detail_tab_mission", tab.titleRes.key)
     }
 
     @Test
     fun `fromIndex(2) returns Agency tab`() {
         val tab = LaunchDetailTab.fromIndex(2)
         assertIs<LaunchDetailTab.Agency>(tab)
-        assertEquals("Agency", tab.displayName)
+        assertEquals("launch_detail_tab_agency", tab.titleRes.key)
     }
 
     @Test
     fun `fromIndex(3) returns Rocket tab`() {
         val tab = LaunchDetailTab.fromIndex(3)
         assertIs<LaunchDetailTab.Rocket>(tab)
-        assertEquals("Rocket", tab.displayName)
+        assertEquals("launch_detail_tab_rocket", tab.titleRes.key)
     }
 
     @Test
     fun `all tabs have unique display names`() {
         val tabs = LaunchDetailTab.values()
-        val displayNames = tabs.map { it.displayName }
+        val displayNames = tabs.map { it.titleRes.key }
         
         assertEquals(
             displayNames.size,
@@ -79,7 +79,7 @@ class LaunchDetailTabsTest {
         
         tabs.forEach { tab ->
             assertTrue(
-                tab.displayName.isNotBlank(),
+                tab.titleRes.key.isNotBlank(),
                 "Tab display name should not be blank: $tab"
             )
         }
@@ -87,21 +87,21 @@ class LaunchDetailTabsTest {
 
     @Test
     fun `Overview tab has correct display name`() {
-        assertEquals("Overview", LaunchDetailTab.Overview.displayName)
+        assertEquals("launch_detail_tab_overview", LaunchDetailTab.Overview.titleRes.key)
     }
 
     @Test
     fun `Mission tab has correct display name`() {
-        assertEquals("Mission", LaunchDetailTab.Mission.displayName)
+        assertEquals("launch_detail_tab_mission", LaunchDetailTab.Mission.titleRes.key)
     }
 
     @Test
     fun `Agency tab has correct display name`() {
-        assertEquals("Agency", LaunchDetailTab.Agency.displayName)
+        assertEquals("launch_detail_tab_agency", LaunchDetailTab.Agency.titleRes.key)
     }
 
     @Test
     fun `Rocket tab has correct display name`() {
-        assertEquals("Rocket", LaunchDetailTab.Rocket.displayName)
+        assertEquals("launch_detail_tab_rocket", LaunchDetailTab.Rocket.titleRes.key)
     }
 }

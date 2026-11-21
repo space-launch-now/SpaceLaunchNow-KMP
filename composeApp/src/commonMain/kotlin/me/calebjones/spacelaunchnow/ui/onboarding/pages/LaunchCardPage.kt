@@ -14,6 +14,10 @@ import me.calebjones.spacelaunchnow.ui.onboarding.OnboardingPage
 import me.calebjones.spacelaunchnow.ui.preview.PreviewData
 import me.calebjones.spacelaunchnow.ui.theme.SpaceLaunchNowPreviewTheme
 import org.jetbrains.compose.ui.tooling.preview.Preview
+import org.jetbrains.compose.resources.stringResource
+import spacelaunchnow_kmp.composeapp.generated.resources.Res
+import spacelaunchnow_kmp.composeapp.generated.resources.onboarding_launch_card_subtitle
+import spacelaunchnow_kmp.composeapp.generated.resources.onboarding_launch_card_title
 
 /**
  * Onboarding page 1 — shows a live [NextLaunchItemView] with real launch data
@@ -27,8 +31,8 @@ fun LaunchCardPage(
     val navController = rememberNavController()
 
     OnboardingPage(
-        title = "Track Every Launch",
-        subtitle = "Get real-time updates on upcoming rocket launches from agencies worldwide.",
+        title = stringResource(Res.string.onboarding_launch_card_title),
+        subtitle = stringResource(Res.string.onboarding_launch_card_subtitle),
         icon = Icons.Default.RocketLaunch,
         modifier = modifier
     ) {

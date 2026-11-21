@@ -40,6 +40,24 @@ import me.calebjones.spacelaunchnow.ui.detail.compose.components.VideoPlayerCard
 import me.calebjones.spacelaunchnow.ui.state.VideoPlayerState
 import kotlin.time.Clock.System
 import org.koin.compose.koinInject
+import org.jetbrains.compose.resources.stringResource
+import spacelaunchnow_kmp.composeapp.generated.resources.Res
+import spacelaunchnow_kmp.composeapp.generated.resources.launch_detail_launch_fallback_name
+import spacelaunchnow_kmp.composeapp.generated.resources.launch_detail_section_landing_details
+import spacelaunchnow_kmp.composeapp.generated.resources.launch_detail_section_launch_location
+import spacelaunchnow_kmp.composeapp.generated.resources.launch_detail_section_launch_service_provider
+import spacelaunchnow_kmp.composeapp.generated.resources.launch_detail_section_launch_service_provider_statistics
+import spacelaunchnow_kmp.composeapp.generated.resources.launch_detail_section_launch_vehicle_details
+import spacelaunchnow_kmp.composeapp.generated.resources.launch_detail_section_mission_details
+import spacelaunchnow_kmp.composeapp.generated.resources.launch_detail_section_overview
+import spacelaunchnow_kmp.composeapp.generated.resources.launch_detail_section_related_events
+import spacelaunchnow_kmp.composeapp.generated.resources.launch_detail_section_related_news
+import spacelaunchnow_kmp.composeapp.generated.resources.launch_detail_section_spacecraft_details
+import spacelaunchnow_kmp.composeapp.generated.resources.launch_detail_section_timeline
+import spacelaunchnow_kmp.composeapp.generated.resources.launch_detail_section_updates
+import spacelaunchnow_kmp.composeapp.generated.resources.launch_detail_watch_launch
+import spacelaunchnow_kmp.composeapp.generated.resources.launch_detail_watch_live
+import spacelaunchnow_kmp.composeapp.generated.resources.launch_detail_watch_replay
 
 /**
  * Tablet/Desktop-specific layout for launch detail view.
@@ -82,7 +100,7 @@ fun TabletLaunchDetailContent(
         ) {
             // 1. Combined Launch Overview Card
             Text(
-                text = "Overview",
+                text = stringResource(Res.string.launch_detail_section_overview),
                 style = MaterialTheme.typography.titleLarge,
                 fontWeight = FontWeight.Bold
             )
@@ -106,7 +124,7 @@ fun TabletLaunchDetailContent(
             // Timeline Card
             if (launch.timeline.isNotEmpty()) {
                 Text(
-                    text = "Timeline",
+                    text = stringResource(Res.string.launch_detail_section_timeline),
                     style = MaterialTheme.typography.titleLarge,
                     fontWeight = FontWeight.Bold
                 )
@@ -133,7 +151,7 @@ fun TabletLaunchDetailContent(
             // Updates Section
             if (launch.updates.isNotEmpty()) {
                 Text(
-                    text = "Updates",
+                    text = stringResource(Res.string.launch_detail_section_updates),
                     style = MaterialTheme.typography.titleLarge,
                     fontWeight = FontWeight.Bold,
                     modifier = Modifier.padding(top = 16.dp)
@@ -144,7 +162,7 @@ fun TabletLaunchDetailContent(
             // Related Events Section
             if (relatedEvents.isNotEmpty() || isEventsLoading || eventsError != null) {
                 Text(
-                    text = "Related Events",
+                    text = stringResource(Res.string.launch_detail_section_related_events),
                     style = MaterialTheme.typography.titleLarge,
                     fontWeight = FontWeight.Bold,
                     modifier = Modifier.padding(top = 16.dp)
@@ -160,7 +178,7 @@ fun TabletLaunchDetailContent(
             // Related News Section
             if (relatedNews.isNotEmpty() || isNewsLoading || newsError != null) {
                 Text(
-                    text = "Related News",
+                    text = stringResource(Res.string.launch_detail_section_related_news),
                     style = MaterialTheme.typography.titleLarge,
                     fontWeight = FontWeight.Bold,
                     modifier = Modifier.padding(top = 16.dp)
@@ -176,7 +194,7 @@ fun TabletLaunchDetailContent(
             // Mission Details Card
             launch.mission?.let { mission ->
                 Text(
-                    text = "Mission Details",
+                    text = stringResource(Res.string.launch_detail_section_mission_details),
                     style = MaterialTheme.typography.titleLarge,
                     fontWeight = FontWeight.Bold
                 )
@@ -189,7 +207,7 @@ fun TabletLaunchDetailContent(
             // Launch Location
             launch.pad?.let { pad ->
                 Text(
-                    text = "Launch Location",
+                    text = stringResource(Res.string.launch_detail_section_launch_location),
                     style = MaterialTheme.typography.titleLarge,
                     fontWeight = FontWeight.Bold
                 )
@@ -206,7 +224,7 @@ fun TabletLaunchDetailContent(
             // Spacecraft Details Card
             if (!launch.rocketDetail?.spacecraftFlights.isNullOrEmpty()) {
                 Text(
-                    text = "Spacecraft Details",
+                    text = stringResource(Res.string.launch_detail_section_spacecraft_details),
                     style = MaterialTheme.typography.titleLarge,
                     fontWeight = FontWeight.Bold
                 )
@@ -218,7 +236,7 @@ fun TabletLaunchDetailContent(
             // Agency Card
             launch.provider.let { provider ->
                 Text(
-                    text = "Launch Service Provider",
+                    text = stringResource(Res.string.launch_detail_section_launch_service_provider),
                     style = MaterialTheme.typography.titleLarge,
                     fontWeight = FontWeight.Bold
                 )
@@ -235,8 +253,8 @@ fun TabletLaunchDetailContent(
             if (videoPlayerState.availableVideos.isNotEmpty()) {
                 val videoTitle = launch.net?.let { net ->
                     val now = System.now()
-                    if (net > now) "Watch Live" else "Watch Replay"
-                } ?: "Watch Launch"
+                    if (net > now) stringResource(Res.string.launch_detail_watch_live) else stringResource(Res.string.launch_detail_watch_replay)
+                } ?: stringResource(Res.string.launch_detail_watch_launch)
 
                 Text(
                     text = videoTitle,
@@ -245,7 +263,7 @@ fun TabletLaunchDetailContent(
                 )
                 VideoPlayerCard(
                     videoPlayerState = videoPlayerState,
-                    launchName = launch.mission?.name ?: "Space Launch",
+                    launchName = launch.mission?.name ?: stringResource(Res.string.launch_detail_launch_fallback_name),
                     onSetPlayerVisible = onSetPlayerVisible,
                     onNavigateToFullscreen = onNavigateToFullscreen,
                     onVideoSelected = onVideoSelected,
@@ -256,7 +274,7 @@ fun TabletLaunchDetailContent(
             // Launch Vehicle Details Card
             launch.rocket?.let { rocketConfig ->
                 Text(
-                    text = "Launch Vehicle Details",
+                    text = stringResource(Res.string.launch_detail_section_launch_vehicle_details),
                     style = MaterialTheme.typography.titleLarge,
                     fontWeight = FontWeight.Bold
                 )
@@ -269,7 +287,7 @@ fun TabletLaunchDetailContent(
                 val landingStages = launch.rocketDetail?.stages ?: emptyList()
                 if (landingStages.any { it.landingAttempt != null }) {
                     Text(
-                        text = "Landing Details",
+                        text = stringResource(Res.string.launch_detail_section_landing_details),
                         style = MaterialTheme.typography.titleLarge,
                         fontWeight = FontWeight.Bold
                     )
@@ -280,7 +298,7 @@ fun TabletLaunchDetailContent(
             // Agency Statistics
             launch.providerDetail.let { providerDetail ->
                 Text(
-                    text = "Launch Service Provider Statistics",
+                    text = stringResource(Res.string.launch_detail_section_launch_service_provider_statistics),
                     style = MaterialTheme.typography.titleLarge,
                     fontWeight = FontWeight.Bold
                 )

@@ -1,0 +1,103 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- Error message in the Latest News section when the articles fail to load. One or two lines. -->
+    <string name="home_articles_error">Failed to load articles</string>
+    <!-- Content description of the placeholder icon shown when a news article has no image. Read by screen readers. -->
+    <string name="home_articles_icon_description">Article Icon</string>
+    <!-- Content description of a news article thumbnail. Read by screen readers. -->
+    <string name="home_articles_image_description">Article Image</string>
+    <!-- Banner above a home list when the data shown comes from the cache. One line, small text. -->
+    <string name="home_cached_data_notice">Showing cached data</string>
+    <!-- Error message in the Upcoming Events section when events fail to load. One or two lines. -->
+    <string name="home_events_error">Failed to load events</string>
+    <!-- Content description of the placeholder icon shown when an event has no image. Read by screen readers. -->
+    <string name="home_events_icon_description">Event Icon</string>
+    <!-- Content description of an event image. Read by screen readers. -->
+    <string name="home_events_image_description">Event Image</string>
+    <!-- Section heading on the home screen. One line, bold. -->
+    <string name="home_events_title">Upcoming Events</string>
+    <!-- Button under the featured launches row. Opens the full launch list. One line, max 14 chars. -->
+    <string name="home_featured_view_more">View more</string>
+    <!-- Message in the This Day in History section when no launch happened on this date. One line. -->
+    <string name="home_history_empty">No launches on this day</string>
+    <!-- Error message in the This Day in History section when launches fail to load. One or two lines. -->
+    <string name="home_history_error">Failed to load history launches</string>
+    <!-- Heading of the This Day in History section, label of its quick stats tile and icon description. One line. -->
+    <string name="home_history_title">This Day in History</string>
+    <!-- Heading of the last launch card, and content description of its check icon. One line. -->
+    <string name="home_last_launch_title">Last Launch</string>
+    <!-- Launch date on a featured launch card when the date is not known. One short word. -->
+    <string name="home_launch_date_tbd">TBD</string>
+    <!-- Content description of a launch image on the home screen. Read by screen readers. -->
+    <string name="home_launch_image_description">Launch Image</string>
+    <!-- Content description of a launch image on a card. %1$s is the launch title. Read by screen readers. -->
+    <string name="home_launch_image_for_title_description">Launch image for %1$s</string>
+    <!-- Content description of the rocket icon shown when a launch has no image. Read by screen readers. -->
+    <string name="home_launch_placeholder_description">Launch placeholder</string>
+    <!-- Error message in the home launch list when launches fail to load. One or two lines. -->
+    <string name="home_launches_error">Failed to load launches</string>
+    <!-- Content description of the live launch card. %1$s is the launch title, %2$s the status name. Read by screen readers. -->
+    <string name="home_live_launch_description">In-flight launch: %1$s. Status: %2$s. Tap to view details.</string>
+    <!-- Section heading on the home screen. One line, bold. -->
+    <string name="home_news_title">Latest News</string>
+    <!-- Heading of the error card shown when the next launch fails to load. One line. -->
+    <string name="home_next_up_error_title">API Request Error</string>
+    <!-- Button on the next launch card, and content description of its icon. Opens the launch details. One word. -->
+    <string name="home_next_up_explore">Explore</string>
+    <!-- Button on the next launch card, and content description of its icon. Shares the launch. One word. -->
+    <string name="home_next_up_share">Share</string>
+    <!-- Badge on the featured launch card. Upper case, one word, small label. -->
+    <string name="home_pinned_badge">FEATURED</string>
+    <!-- Content description of the close icon on the featured launch card. Read by screen readers. -->
+    <string name="home_pinned_dismiss_featured">Dismiss featured launch</string>
+    <!-- Content description of the close icon on the message of the day banner. Read by screen readers. -->
+    <string name="home_pinned_dismiss_message">Dismiss message</string>
+    <!-- Content description of the featured card. %1$s is the title, %2$s the custom message (may be empty). Read by screen readers. -->
+    <string name="home_pinned_featured_description">Featured: %1$s. %2$s. Tap to view details.</string>
+    <!-- Content description of the featured launch card in previews. %1$s is the launch title, %2$s the custom message (may be empty). Read by screen readers. -->
+    <string name="home_pinned_featured_launch_description">Featured launch: %1$s. %2$s. Tap to view details.</string>
+    <!-- Content description of the message of the day banner. %1$s is the message. Read by screen readers. -->
+    <string name="home_pinned_motd_description">Message of the Day: %1$s</string>
+    <!-- Grey placeholder text in an empty content box. One word. -->
+    <string name="home_placeholder_content">Content</string>
+    <!-- Placeholder text of the search field, and content description of its icon. One word. -->
+    <string name="home_search_label">Search</string>
+    <!-- Content description of the info button in a section heading. %1$s is the section title. Read by screen readers. -->
+    <string name="home_section_info_description">Info about %1$s</string>
+    <!-- Text button at the end of a home section heading. Opens the full list. One line, max 14 chars. -->
+    <string name="home_section_see_all">See All</string>
+    <!-- Label of a quick stats tile. Number of launches in the next 24 hours. One line. -->
+    <string name="home_stats_next_24_hours">Next 24 Hours</string>
+    <!-- Label of a quick stats tile. Number of launches in the next 30 days. One line. -->
+    <string name="home_stats_next_30_days">Next 30 Days</string>
+    <!-- Label of a quick stats tile. Number of launches in the next 7 days. One line. -->
+    <string name="home_stats_next_7_days">Next 7 Days</string>
+    <!-- Heading above the quick stats tiles. One line, bold. -->
+    <string name="home_stats_title">Quick Stats</string>
+    <!-- Content description of the filter icon button in the home top bar. Read by screen readers. -->
+    <string name="home_top_bar_filters_description">Filters</string>
+    <!-- Content description of the heart icon button in the home top bar. Opens the support screen. Read by screen readers. -->
+    <string name="home_top_bar_support_description">Support Me</string>
+    <!-- App name as the home screen top bar title. One line, large heading. -->
+    <string name="home_top_bar_title">Space Launch Now</string>
+    <!-- Content description of the profile picture of a launch update author. Read by screen readers. -->
+    <string name="home_updates_author_profile_description">Author profile</string>
+    <!-- Message in the Latest Updates section when there are no updates. One line. -->
+    <string name="home_updates_empty">No updates available</string>
+    <!-- Error message in the Latest Updates section when updates fail to load. One or two lines. -->
+    <string name="home_updates_error">Failed to load updates</string>
+    <!-- Body of the Latest Updates info dialog. Two paragraphs with a blank line between them. -->
+    <string name="home_updates_info_body">Updates are sourced from The Space Devs' volunteer librarians who use open-source intelligence (OSINT) techniques to track launches worldwide. They monitor agency announcements, regulatory filings, and social media to keep the database accurate and current.
+
+As Space Launch Now's developer, I am a Founding Board Member and Proud Supporter of The Space Devs!</string>
+    <!-- Confirm button of the Latest Updates info dialog. One line, max 14 chars. -->
+    <string name="home_updates_info_confirm">Got it</string>
+    <!-- Title of the dialog that explains where launch updates come from. One line. -->
+    <string name="home_updates_info_title">About Latest Updates</string>
+    <!-- Content description of the person icon shown when an update author has no picture. Read by screen readers. -->
+    <string name="home_updates_profile_placeholder_description">Profile placeholder</string>
+    <!-- Content description of the info icon that marks the source of an update. Read by screen readers. -->
+    <string name="home_updates_source_description">Source</string>
+    <!-- Section heading on the home screen. One line, bold. -->
+    <string name="home_updates_title">Latest Updates</string>
+</resources>
