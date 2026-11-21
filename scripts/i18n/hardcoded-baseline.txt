@@ -4,7 +4,6 @@
 composeApp/src/androidMain/kotlin/me/calebjones/spacelaunchnow/data/billing/AndroidBillingManager.kt	${pkg.packageType} - ${product.period?.unit?.name ?: 
 composeApp/src/androidMain/kotlin/me/calebjones/spacelaunchnow/data/notifications/NotificationDisplayHelper.kt	🔴 LIVE
 composeApp/src/androidMain/kotlin/me/calebjones/spacelaunchnow/ui/ads/SmartBannerAd.android.kt	Remove Ads
-composeApp/src/androidMain/kotlin/me/calebjones/spacelaunchnow/ui/spacestation/components/IssMapView.android.kt	ISS
 composeApp/src/androidMain/kotlin/me/calebjones/spacelaunchnow/ui/viewmodel/TestNotificationHelper.kt	Test: ${notificationData.launchName}
 composeApp/src/androidMain/kotlin/me/calebjones/spacelaunchnow/widgets/LaunchListWidget.kt	No upcoming launches
 composeApp/src/androidMain/kotlin/me/calebjones/spacelaunchnow/widgets/LaunchListWidget.kt	Space Launch Now
@@ -912,99 +911,6 @@ composeApp/src/commonMain/kotlin/me/calebjones/spacelaunchnow/ui/settings/ThemeC
 composeApp/src/commonMain/kotlin/me/calebjones/spacelaunchnow/ui/settings/ThemeCustomizationScreen.kt	Upgrade to Premium
 composeApp/src/commonMain/kotlin/me/calebjones/spacelaunchnow/ui/settings/ThemeCustomizationScreen.kt	Use your custom app theme colors in widgets
 composeApp/src/commonMain/kotlin/me/calebjones/spacelaunchnow/ui/settings/ThemeCustomizationScreen.kt	Watch an ad to unlock premium theme features for 24 hours
-composeApp/src/commonMain/kotlin/me/calebjones/spacelaunchnow/ui/spacestation/SpaceStationDetailLoadingView.kt	Error
-composeApp/src/commonMain/kotlin/me/calebjones/spacelaunchnow/ui/spacestation/SpaceStationDetailLoadingView.kt	Failed to load station details
-composeApp/src/commonMain/kotlin/me/calebjones/spacelaunchnow/ui/spacestation/SpaceStationDetailLoadingView.kt	Navigate back
-composeApp/src/commonMain/kotlin/me/calebjones/spacelaunchnow/ui/spacestation/SpaceStationDetailLoadingView.kt	Retry
-composeApp/src/commonMain/kotlin/me/calebjones/spacelaunchnow/ui/spacestation/SpaceStationDetailView.kt	${NumberFormatUtil.formatDecimal(issPositionData.altitude, 1)} km
-composeApp/src/commonMain/kotlin/me/calebjones/spacelaunchnow/ui/spacestation/SpaceStationDetailView.kt	${NumberFormatUtil.formatDecimal(it, 0)} km/h
-composeApp/src/commonMain/kotlin/me/calebjones/spacelaunchnow/ui/spacestation/SpaceStationDetailView.kt	${NumberFormatUtil.formatDecimal(position.latitude, 4)}°
-composeApp/src/commonMain/kotlin/me/calebjones/spacelaunchnow/ui/spacestation/SpaceStationDetailView.kt	${NumberFormatUtil.formatDecimal(position.longitude, 4)}°
-composeApp/src/commonMain/kotlin/me/calebjones/spacelaunchnow/ui/spacestation/SpaceStationDetailView.kt	Altitude
-composeApp/src/commonMain/kotlin/me/calebjones/spacelaunchnow/ui/spacestation/SpaceStationDetailView.kt	Current Position
-composeApp/src/commonMain/kotlin/me/calebjones/spacelaunchnow/ui/spacestation/SpaceStationDetailView.kt	Exit Fullscreen
-composeApp/src/commonMain/kotlin/me/calebjones/spacelaunchnow/ui/spacestation/SpaceStationDetailView.kt	Fullscreen Map
-composeApp/src/commonMain/kotlin/me/calebjones/spacelaunchnow/ui/spacestation/SpaceStationDetailView.kt	Fullscreen Map
-composeApp/src/commonMain/kotlin/me/calebjones/spacelaunchnow/ui/spacestation/SpaceStationDetailView.kt	Latitude
-composeApp/src/commonMain/kotlin/me/calebjones/spacelaunchnow/ui/spacestation/SpaceStationDetailView.kt	Location
-composeApp/src/commonMain/kotlin/me/calebjones/spacelaunchnow/ui/spacestation/SpaceStationDetailView.kt	Location
-composeApp/src/commonMain/kotlin/me/calebjones/spacelaunchnow/ui/spacestation/SpaceStationDetailView.kt	Longitude
-composeApp/src/commonMain/kotlin/me/calebjones/spacelaunchnow/ui/spacestation/SpaceStationDetailView.kt	Orbit
-composeApp/src/commonMain/kotlin/me/calebjones/spacelaunchnow/ui/spacestation/SpaceStationDetailView.kt	Velocity
-composeApp/src/commonMain/kotlin/me/calebjones/spacelaunchnow/ui/spacestation/SpaceStationDetailView.kt	Velocity
-composeApp/src/commonMain/kotlin/me/calebjones/spacelaunchnow/ui/spacestation/SpaceStationDetailView.kt	Visibility
-composeApp/src/commonMain/kotlin/me/calebjones/spacelaunchnow/ui/spacestation/components/CrewCard.kt	Current Crew (${crew.size})
-composeApp/src/commonMain/kotlin/me/calebjones/spacelaunchnow/ui/spacestation/components/DockingLocationsCard.kt	Docked Vehicle
-composeApp/src/commonMain/kotlin/me/calebjones/spacelaunchnow/ui/spacestation/components/DockingLocationsCard.kt	Docked Vehicles
-composeApp/src/commonMain/kotlin/me/calebjones/spacelaunchnow/ui/spacestation/components/DockingLocationsCard.kt	Since ${DateTimeUtil.formatLaunchDate(dockedEvent.docking, useUtc)}
-composeApp/src/commonMain/kotlin/me/calebjones/spacelaunchnow/ui/spacestation/components/ExpeditionInfoCard.kt	Crew (${crew.size})
-composeApp/src/commonMain/kotlin/me/calebjones/spacelaunchnow/ui/spacestation/components/ExpeditionInfoCard.kt	Crew placeholder
-composeApp/src/commonMain/kotlin/me/calebjones/spacelaunchnow/ui/spacestation/components/ExpeditionInfoCard.kt	End
-composeApp/src/commonMain/kotlin/me/calebjones/spacelaunchnow/ui/spacestation/components/ExpeditionInfoCard.kt	End
-composeApp/src/commonMain/kotlin/me/calebjones/spacelaunchnow/ui/spacestation/components/ExpeditionInfoCard.kt	Expedition Icon
-composeApp/src/commonMain/kotlin/me/calebjones/spacelaunchnow/ui/spacestation/components/ExpeditionInfoCard.kt	Mission Patch
-composeApp/src/commonMain/kotlin/me/calebjones/spacelaunchnow/ui/spacestation/components/ExpeditionInfoCard.kt	Start
-composeApp/src/commonMain/kotlin/me/calebjones/spacelaunchnow/ui/spacestation/components/ExpeditionInfoCard.kt	Start
-composeApp/src/commonMain/kotlin/me/calebjones/spacelaunchnow/ui/spacestation/components/OwnerAgenciesCard.kt	${agency.name} logo
-composeApp/src/commonMain/kotlin/me/calebjones/spacelaunchnow/ui/spacestation/components/OwnerAgenciesCard.kt	Operating Agencies
-composeApp/src/commonMain/kotlin/me/calebjones/spacelaunchnow/ui/spacestation/components/PositionCard.kt	${NumberFormatUtil.formatDecimal(it, 0)} km/h
-composeApp/src/commonMain/kotlin/me/calebjones/spacelaunchnow/ui/spacestation/components/PositionCard.kt	${NumberFormatUtil.formatDecimal(it, 1)} km
-composeApp/src/commonMain/kotlin/me/calebjones/spacelaunchnow/ui/spacestation/components/PositionCard.kt	${NumberFormatUtil.formatDecimal(position.latitude, 4)}°
-composeApp/src/commonMain/kotlin/me/calebjones/spacelaunchnow/ui/spacestation/components/PositionCard.kt	${NumberFormatUtil.formatDecimal(position.longitude, 4)}°
-composeApp/src/commonMain/kotlin/me/calebjones/spacelaunchnow/ui/spacestation/components/PositionCard.kt	Altitude
-composeApp/src/commonMain/kotlin/me/calebjones/spacelaunchnow/ui/spacestation/components/PositionCard.kt	Current Position
-composeApp/src/commonMain/kotlin/me/calebjones/spacelaunchnow/ui/spacestation/components/PositionCard.kt	Latitude
-composeApp/src/commonMain/kotlin/me/calebjones/spacelaunchnow/ui/spacestation/components/PositionCard.kt	Loading position...
-composeApp/src/commonMain/kotlin/me/calebjones/spacelaunchnow/ui/spacestation/components/PositionCard.kt	Location
-composeApp/src/commonMain/kotlin/me/calebjones/spacelaunchnow/ui/spacestation/components/PositionCard.kt	Location
-composeApp/src/commonMain/kotlin/me/calebjones/spacelaunchnow/ui/spacestation/components/PositionCard.kt	Longitude
-composeApp/src/commonMain/kotlin/me/calebjones/spacelaunchnow/ui/spacestation/components/PositionCard.kt	Orbit
-composeApp/src/commonMain/kotlin/me/calebjones/spacelaunchnow/ui/spacestation/components/PositionCard.kt	Velocity
-composeApp/src/commonMain/kotlin/me/calebjones/spacelaunchnow/ui/spacestation/components/PositionCard.kt	Velocity
-composeApp/src/commonMain/kotlin/me/calebjones/spacelaunchnow/ui/spacestation/components/StationReportsCard.kt	Load More (${articles.size - 5} more)
-composeApp/src/commonMain/kotlin/me/calebjones/spacelaunchnow/ui/spacestation/components/StationReportsCard.kt	News and Reports
-composeApp/src/commonMain/kotlin/me/calebjones/spacelaunchnow/ui/spacestation/components/StationReportsCard.kt	Show Less
-composeApp/src/commonMain/kotlin/me/calebjones/spacelaunchnow/ui/spacestation/components/StationSpecsCard.kt	Docked Vehicles
-composeApp/src/commonMain/kotlin/me/calebjones/spacelaunchnow/ui/spacestation/components/StationSpecsCard.kt	Founded
-composeApp/src/commonMain/kotlin/me/calebjones/spacelaunchnow/ui/spacestation/components/StationSpecsCard.kt	Height
-composeApp/src/commonMain/kotlin/me/calebjones/spacelaunchnow/ui/spacestation/components/StationSpecsCard.kt	Mass
-composeApp/src/commonMain/kotlin/me/calebjones/spacelaunchnow/ui/spacestation/components/StationSpecsCard.kt	Onboard Crew
-composeApp/src/commonMain/kotlin/me/calebjones/spacelaunchnow/ui/spacestation/components/StationSpecsCard.kt	Station Statistics
-composeApp/src/commonMain/kotlin/me/calebjones/spacelaunchnow/ui/spacestation/components/StationSpecsCard.kt	Volume
-composeApp/src/commonMain/kotlin/me/calebjones/spacelaunchnow/ui/spacestation/components/StationSpecsCard.kt	Width
-composeApp/src/commonMain/kotlin/me/calebjones/spacelaunchnow/ui/starship/StarshipScreen.kt	Back
-composeApp/src/commonMain/kotlin/me/calebjones/spacelaunchnow/ui/starship/StarshipScreen.kt	Events
-composeApp/src/commonMain/kotlin/me/calebjones/spacelaunchnow/ui/starship/StarshipScreen.kt	Overview
-composeApp/src/commonMain/kotlin/me/calebjones/spacelaunchnow/ui/starship/StarshipScreen.kt	Starship
-composeApp/src/commonMain/kotlin/me/calebjones/spacelaunchnow/ui/starship/StarshipScreen.kt	Vehicles
-composeApp/src/commonMain/kotlin/me/calebjones/spacelaunchnow/ui/starship/components/StarshipEventsTab.kt	Events
-composeApp/src/commonMain/kotlin/me/calebjones/spacelaunchnow/ui/starship/components/StarshipEventsTab.kt	News & Articles
-composeApp/src/commonMain/kotlin/me/calebjones/spacelaunchnow/ui/starship/components/StarshipEventsTab.kt	No Starship events available
-composeApp/src/commonMain/kotlin/me/calebjones/spacelaunchnow/ui/starship/components/StarshipHistoryTimeline.kt	Error loading history: ${historyLaunchesState.error}
-composeApp/src/commonMain/kotlin/me/calebjones/spacelaunchnow/ui/starship/components/StarshipHistoryTimeline.kt	Launch image
-composeApp/src/commonMain/kotlin/me/calebjones/spacelaunchnow/ui/starship/components/StarshipHistoryTimeline.kt	Launch image
-composeApp/src/commonMain/kotlin/me/calebjones/spacelaunchnow/ui/starship/components/StarshipHistoryTimeline.kt	Program Timeline
-composeApp/src/commonMain/kotlin/me/calebjones/spacelaunchnow/ui/starship/components/StarshipHistoryTimeline.kt	UPCOMING
-composeApp/src/commonMain/kotlin/me/calebjones/spacelaunchnow/ui/starship/components/StarshipHistoryTimeline.kt	⚠ ${launch.failreason}
-composeApp/src/commonMain/kotlin/me/calebjones/spacelaunchnow/ui/starship/components/StarshipOverviewTab.kt	No Starship data available
-composeApp/src/commonMain/kotlin/me/calebjones/spacelaunchnow/ui/starship/components/StarshipOverviewTab.kt	No Starship data available
-composeApp/src/commonMain/kotlin/me/calebjones/spacelaunchnow/ui/starship/components/StarshipOverviewTab.kt	No updates available
-composeApp/src/commonMain/kotlin/me/calebjones/spacelaunchnow/ui/starship/components/StarshipOverviewTab.kt	Showing cached data • Pull to refresh
-composeApp/src/commonMain/kotlin/me/calebjones/spacelaunchnow/ui/starship/components/StarshipOverviewTab.kt	Tap to retry
-composeApp/src/commonMain/kotlin/me/calebjones/spacelaunchnow/ui/starship/components/StarshipOverviewTab.kt	Updates
-composeApp/src/commonMain/kotlin/me/calebjones/spacelaunchnow/ui/starship/components/StarshipOverviewTab.kt	Updates
-composeApp/src/commonMain/kotlin/me/calebjones/spacelaunchnow/ui/starship/components/StarshipVehiclesTab.kt	Back to configurations
-composeApp/src/commonMain/kotlin/me/calebjones/spacelaunchnow/ui/starship/components/StarshipVehiclesTab.kt	Boosters
-composeApp/src/commonMain/kotlin/me/calebjones/spacelaunchnow/ui/starship/components/StarshipVehiclesTab.kt	Individual vehicles
-composeApp/src/commonMain/kotlin/me/calebjones/spacelaunchnow/ui/starship/components/StarshipVehiclesTab.kt	No vehicle configurations found
-composeApp/src/commonMain/kotlin/me/calebjones/spacelaunchnow/ui/starship/components/StarshipVehiclesTab.kt	Spacecraft
-composeApp/src/commonMain/kotlin/me/calebjones/spacelaunchnow/ui/starship/components/StarshipVehiclesTab.kt	Starship vehicles
-composeApp/src/commonMain/kotlin/me/calebjones/spacelaunchnow/ui/starship/components/StarshipVehiclesTab.kt	Super Heavy first stages
-composeApp/src/commonMain/kotlin/me/calebjones/spacelaunchnow/ui/starship/components/VehicleConfigCards.kt	$count launches
-composeApp/src/commonMain/kotlin/me/calebjones/spacelaunchnow/ui/starship/components/VehicleGrids.kt	Failed to load boosters
-composeApp/src/commonMain/kotlin/me/calebjones/spacelaunchnow/ui/starship/components/VehicleGrids.kt	Failed to load spacecraft
-composeApp/src/commonMain/kotlin/me/calebjones/spacelaunchnow/ui/starship/components/VehicleGrids.kt	No Starship spacecraft available
-composeApp/src/commonMain/kotlin/me/calebjones/spacelaunchnow/ui/starship/components/VehicleGrids.kt	No Super Heavy boosters available
 composeApp/src/commonMain/kotlin/me/calebjones/spacelaunchnow/ui/subscription/PremiumFeatureGate.kt	Advanced Filters
 composeApp/src/commonMain/kotlin/me/calebjones/spacelaunchnow/ui/subscription/PremiumFeatureGate.kt	Premium
 composeApp/src/commonMain/kotlin/me/calebjones/spacelaunchnow/ui/subscription/PremiumFeatureGate.kt	Premium
@@ -1084,7 +990,6 @@ composeApp/src/commonMain/kotlin/me/calebjones/spacelaunchnow/ui/video/Fullscree
 composeApp/src/commonMain/kotlin/me/calebjones/spacelaunchnow/ui/viewmodel/SpaceStationViewModel.kt	Live HD views of Earth from the International Space Station
 composeApp/src/commonMain/kotlin/me/calebjones/spacelaunchnow/util/logging/PushDiagnostics.kt	Push registration summary
 composeApp/src/desktopMain/kotlin/me/calebjones/spacelaunchnow/Main.kt	Space Launch Now
-composeApp/src/desktopMain/kotlin/me/calebjones/spacelaunchnow/ui/spacestation/components/IssMapView.desktop.kt	Map view not available on Desktop\n\n
 composeApp/src/iosMain/kotlin/me/calebjones/spacelaunchnow/data/billing/IosBillingManager.kt	${pkg.packageType} - ${pkg.storeProduct.period?.unit?.name ?: 
 composeApp/src/iosMain/kotlin/me/calebjones/spacelaunchnow/data/notifications/NSEPreferenceBridge.kt	[NSE-DELIVERY] type=$type decision=$decision reason=$reason ts=$ts platform=ios
 composeApp/src/iosMain/kotlin/me/calebjones/spacelaunchnow/ui/ads/SmartBannerAd.ios.kt	Remove Ads

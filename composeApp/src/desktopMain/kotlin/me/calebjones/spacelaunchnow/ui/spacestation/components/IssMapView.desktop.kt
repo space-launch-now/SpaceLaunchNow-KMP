@@ -28,6 +28,7 @@ actual fun IssMapView(
         contentAlignment = Alignment.Center
     ) {
         Text(
+            // i18n-ignore: desktop is a developer target; this stub text is never shown to users
             text = "Map view not available on Desktop\n\n" +
                     currentPosition?.let {
                         "Current Position:\nLat: ${NumberFormatUtil.formatDecimal(it.latitude, 2)}°\nLon: ${NumberFormatUtil.formatDecimal(it.longitude, 2)}°"

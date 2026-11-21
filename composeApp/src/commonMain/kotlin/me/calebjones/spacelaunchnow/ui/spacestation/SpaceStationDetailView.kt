@@ -55,6 +55,21 @@ import me.calebjones.spacelaunchnow.ui.state.VideoPlayerState
 import me.calebjones.spacelaunchnow.ui.viewmodel.IssPositionData
 import me.calebjones.spacelaunchnow.util.LatLng
 import me.calebjones.spacelaunchnow.util.NumberFormatUtil
+import spacelaunchnow_kmp.composeapp.generated.resources.Res
+import org.jetbrains.compose.resources.stringResource
+import spacelaunchnow_kmp.composeapp.generated.resources.station_exit_fullscreen_description
+import spacelaunchnow_kmp.composeapp.generated.resources.station_fullscreen_map_description
+import spacelaunchnow_kmp.composeapp.generated.resources.station_position_altitude
+import spacelaunchnow_kmp.composeapp.generated.resources.station_position_altitude_value
+import spacelaunchnow_kmp.composeapp.generated.resources.station_position_degrees
+import spacelaunchnow_kmp.composeapp.generated.resources.station_position_latitude
+import spacelaunchnow_kmp.composeapp.generated.resources.station_position_location
+import spacelaunchnow_kmp.composeapp.generated.resources.station_position_longitude
+import spacelaunchnow_kmp.composeapp.generated.resources.station_position_orbit
+import spacelaunchnow_kmp.composeapp.generated.resources.station_position_speed_value
+import spacelaunchnow_kmp.composeapp.generated.resources.station_position_title
+import spacelaunchnow_kmp.composeapp.generated.resources.station_position_velocity
+import spacelaunchnow_kmp.composeapp.generated.resources.station_position_visibility
 
 private val TitleHeight = 110.dp
 private const val ISS_STATION_ID = 4
@@ -281,7 +296,7 @@ private fun SpaceStationDetailContent(
                                 ) {
                                     Icon(
                                         imageVector = Icons.Default.Fullscreen,
-                                        contentDescription = "Fullscreen Map"
+                                        contentDescription = stringResource(Res.string.station_fullscreen_map_description)
                                     )
                                 }
                             }
@@ -322,7 +337,7 @@ private fun SpaceStationDetailContent(
                                 ) {
                                     Icon(
                                         imageVector = Icons.Default.Fullscreen,
-                                        contentDescription = "Fullscreen Map"
+                                        contentDescription = stringResource(Res.string.station_fullscreen_map_description)
                                     )
                                 }
                             }
@@ -363,7 +378,7 @@ private fun SpaceStationDetailContent(
                             ) {
                                 Icon(
                                     imageVector = Icons.Default.Close,
-                                    contentDescription = "Exit Fullscreen"
+                                    contentDescription = stringResource(Res.string.station_exit_fullscreen_description)
                                 )
                             }
                         }
@@ -422,7 +437,7 @@ private fun IssPositionInfoSection(
 ) {
     Column(modifier = modifier) {
         Text(
-            text = "Current Position",
+            text = stringResource(Res.string.station_position_title),
             style = MaterialTheme.typography.titleMedium,
             modifier = Modifier.padding(bottom = 12.dp)
         )
@@ -436,17 +451,17 @@ private fun IssPositionInfoSection(
                 Row(verticalAlignment = Alignment.CenterVertically) {
                     Icon(
                         imageVector = Icons.Default.LocationOn,
-                        contentDescription = "Location",
+                        contentDescription = stringResource(Res.string.station_position_location),
                         tint = MaterialTheme.colorScheme.primary
                     )
                     Column(modifier = Modifier.padding(start = 8.dp)) {
                         Text(
-                            text = "Latitude",
+                            text = stringResource(Res.string.station_position_latitude),
                             style = MaterialTheme.typography.labelSmall,
                             color = MaterialTheme.colorScheme.onSurfaceVariant
                         )
                         Text(
-                            text = "${NumberFormatUtil.formatDecimal(position.latitude, 4)}°",
+                            text = stringResource(Res.string.station_position_degrees, NumberFormatUtil.formatDecimal(position.latitude, 4)),
                             style = MaterialTheme.typography.bodyLarge
                         )
                     }
@@ -457,17 +472,17 @@ private fun IssPositionInfoSection(
                 Row(verticalAlignment = Alignment.CenterVertically) {
                     Icon(
                         imageVector = Icons.Default.LocationOn,
-                        contentDescription = "Location",
+                        contentDescription = stringResource(Res.string.station_position_location),
                         tint = MaterialTheme.colorScheme.primary
                     )
                     Column(modifier = Modifier.padding(start = 8.dp)) {
                         Text(
-                            text = "Longitude",
+                            text = stringResource(Res.string.station_position_longitude),
                             style = MaterialTheme.typography.labelSmall,
                             color = MaterialTheme.colorScheme.onSurfaceVariant
                         )
                         Text(
-                            text = "${NumberFormatUtil.formatDecimal(position.longitude, 4)}°",
+                            text = stringResource(Res.string.station_position_degrees, NumberFormatUtil.formatDecimal(position.longitude, 4)),
                             style = MaterialTheme.typography.bodyLarge
                         )
                     }
@@ -482,12 +497,12 @@ private fun IssPositionInfoSection(
         ) {
             Column(modifier = Modifier.weight(1f)) {
                 Text(
-                    text = "Altitude",
+                    text = stringResource(Res.string.station_position_altitude),
                     style = MaterialTheme.typography.labelSmall,
                     color = MaterialTheme.colorScheme.onSurfaceVariant
                 )
                 Text(
-                    text = "${NumberFormatUtil.formatDecimal(issPositionData.altitude, 1)} km",
+                    text = stringResource(Res.string.station_position_altitude_value, NumberFormatUtil.formatDecimal(issPositionData.altitude, 1)),
                     style = MaterialTheme.typography.bodyMedium
                 )
             }
@@ -496,18 +511,18 @@ private fun IssPositionInfoSection(
                 Row(verticalAlignment = Alignment.CenterVertically) {
                     Icon(
                         imageVector = Icons.Default.Speed,
-                        contentDescription = "Velocity",
+                        contentDescription = stringResource(Res.string.station_position_velocity),
                         tint = MaterialTheme.colorScheme.primary
                     )
                     Column(modifier = Modifier.padding(start = 8.dp)) {
                         Text(
-                            text = "Velocity",
+                            text = stringResource(Res.string.station_position_velocity),
                             style = MaterialTheme.typography.labelSmall,
                             color = MaterialTheme.colorScheme.onSurfaceVariant
                         )
                         issPositionData.velocity?.let {
                             Text(
-                                text = "${NumberFormatUtil.formatDecimal(it, 0)} km/h",
+                                text = stringResource(Res.string.station_position_speed_value, NumberFormatUtil.formatDecimal(it, 0)),
                                 style = MaterialTheme.typography.bodyMedium
                             )
                         }
@@ -523,7 +538,7 @@ private fun IssPositionInfoSection(
         ) {
             Column {
                 Text(
-                    text = "Visibility",
+                    text = stringResource(Res.string.station_position_visibility),
                     style = MaterialTheme.typography.labelSmall,
                     color = MaterialTheme.colorScheme.onSurfaceVariant
                 )
@@ -549,7 +564,7 @@ private fun IssPositionInfoSection(
             ) {
                 Column {
                     Text(
-                        text = "Orbit",
+                        text = stringResource(Res.string.station_position_orbit),
                         style = MaterialTheme.typography.labelSmall,
                         color = MaterialTheme.colorScheme.onSurfaceVariant
                     )
