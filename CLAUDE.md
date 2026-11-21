@@ -8,7 +8,7 @@ Space Launch Now is a Kotlin Multiplatform Compose app (Android, iOS, Desktop, W
 
 ## Toolchain
 
-- **JDK 21** required (JetBrains JDK recommended — Compose Hot Reload depends on it). Kotlin compiles to `JVM_11`.
+- **JDK 21** required (JetBrains JDK recommended — Compose Hot Reload depends on it). Kotlin compiles to `JVM_11`. Unit tests need **JDK 26 or newer**: basic-ads 1.2.x ships Java 26 bytecode (`UnsupportedClassVersionError` on older JDKs); CI uses 26.
 - Kotlin 2.1, Compose Multiplatform, Koin, Ktor, SQLDelight, DataStore, kotlinx-datetime/-coroutines/-serialization.
 - Three Gradle modules: `:composeApp` (shared Kotlin Multiplatform library for Android, iOS and desktop; the Android target uses `com.android.kotlin.multiplatform.library`), `:androidApp` (the phone application: manifest, `MainActivity`, `MainApplication`, launcher resources, signing, Firebase plugins, R8), `:wearApp` (Wear OS standalone, same `applicationId`).
 - `.env` file at repo root must exist before any build (see `.env.example`). API keys, RevenueCat keys, AdMob unit IDs, Datadog tokens, Maps key, and the debug-menu TOTP secret reach Android code through `AndroidEnvConfig` (generated from `.env` by `:composeApp:generateAndroidEnvConfig`) and manifest placeholders (`androidApp/build.gradle.kts`). The version name, version code and debug flag come from `androidApp`'s `BuildConfig` and are passed to `AndroidBuildConfig` in `MainApplication.onCreate`.
