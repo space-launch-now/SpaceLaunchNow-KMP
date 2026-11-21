@@ -31,6 +31,12 @@ import me.calebjones.spacelaunchnow.domain.model.LauncherDetail
 import me.calebjones.spacelaunchnow.domain.model.Spacecraft
 import me.calebjones.spacelaunchnow.ui.icons.CustomIcons
 import me.calebjones.spacelaunchnow.ui.icons.RocketLaunch
+import spacelaunchnow_kmp.composeapp.generated.resources.Res
+import org.jetbrains.compose.resources.stringResource
+import spacelaunchnow_kmp.composeapp.generated.resources.starship_vehicle_serial_unknown
+import spacelaunchnow_kmp.composeapp.generated.resources.starship_vehicle_unlaunched
+import org.jetbrains.compose.resources.pluralStringResource
+import spacelaunchnow_kmp.composeapp.generated.resources.starship_vehicle_flights_count
 
 /**
  * Square grid card for spacecraft (individual vehicles)
@@ -197,7 +203,7 @@ internal fun LauncherGridCard(
             ) {
                 Column(verticalArrangement = Arrangement.spacedBy(2.dp)) {
                     Text(
-                        text = launcher.serialNumber ?: "Unknown",
+                        text = launcher.serialNumber ?: stringResource(Res.string.starship_vehicle_serial_unknown),
                         style = MaterialTheme.typography.titleSmall,
                         fontWeight = FontWeight.Bold,
                         color = Color.White,
@@ -209,7 +215,7 @@ internal fun LauncherGridCard(
                     ) {
                         val flights = launcher.flights ?: 0
                         val flightsText =
-                            if (flights == 0) "Unlaunched" else if (flights == 1) "$flights Flight" else "$flights Flights"
+                            if (flights == 0) stringResource(Res.string.starship_vehicle_unlaunched) else pluralStringResource(Res.plurals.starship_vehicle_flights_count, flights, flights)
                         Text(
                             text = flightsText,
                             style = MaterialTheme.typography.labelSmall,

@@ -23,6 +23,10 @@ import com.google.maps.android.compose.rememberMarkerState
 import kotlinx.coroutines.delay
 import me.calebjones.spacelaunchnow.util.LatLng
 import me.calebjones.spacelaunchnow.util.SolarCalculator
+import org.jetbrains.compose.resources.stringResource
+import spacelaunchnow_kmp.composeapp.generated.resources.Res
+import spacelaunchnow_kmp.composeapp.generated.resources.station_map_marker_snippet
+import spacelaunchnow_kmp.composeapp.generated.resources.station_map_marker_title
 import com.google.android.gms.maps.model.LatLng as GoogleLatLng
 
 /**
@@ -203,13 +207,12 @@ actual fun IssMapView(
         if (googleCurrentPosition != null) {
             Marker(
                 state = markerState,
-                title = "ISS",
-                snippet = "Lat: ${
-                    String.format(
-                        "%.4f",
-                        googleCurrentPosition.latitude
-                    )
-                }°, Lon: ${String.format("%.4f", googleCurrentPosition.longitude)}°"
+                title = stringResource(Res.string.station_map_marker_title),
+                snippet = stringResource(
+                    Res.string.station_map_marker_snippet,
+                    String.format("%.4f", googleCurrentPosition.latitude),
+                    String.format("%.4f", googleCurrentPosition.longitude)
+                )
             )
         }
     }

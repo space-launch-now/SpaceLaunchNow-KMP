@@ -33,6 +33,12 @@ import me.calebjones.spacelaunchnow.LocalUseUtc
 import me.calebjones.spacelaunchnow.domain.model.DockingLocation
 import me.calebjones.spacelaunchnow.ui.compose.PlainShimmerCard
 import me.calebjones.spacelaunchnow.util.DateTimeUtil
+import spacelaunchnow_kmp.composeapp.generated.resources.Res
+import org.jetbrains.compose.resources.stringResource
+import spacelaunchnow_kmp.composeapp.generated.resources.station_docked_vehicles
+import spacelaunchnow_kmp.composeapp.generated.resources.station_docking_since
+import spacelaunchnow_kmp.composeapp.generated.resources.station_docking_vehicle_description
+import spacelaunchnow_kmp.composeapp.generated.resources.station_docking_vehicle_unknown
 
 /**
  * Card displaying docked vehicles at the space station
@@ -55,7 +61,7 @@ fun DockingLocationsCard(
     if (occupiedLocations.isEmpty()) return
 
     Text(
-        text = "Docked Vehicles",
+        text = stringResource(Res.string.station_docked_vehicles),
         fontWeight = FontWeight.Bold,
         fontSize = 20.sp
     )
@@ -99,7 +105,7 @@ private fun DockedVehicleItem(
             // Vehicle image
             SubcomposeAsyncImage(
                 model = imageUrl,
-                contentDescription = "Docked Vehicle",
+                contentDescription = stringResource(Res.string.station_docking_vehicle_description),
                 modifier = Modifier
                     .size(64.dp)
                     .clip(RoundedCornerShape(8.dp)),
@@ -132,7 +138,7 @@ private fun DockedVehicleItem(
 
             Column(modifier = Modifier.weight(1f)) {
                 // Vehicle name
-                val vehicleName = dockedEvent.vehicleName ?: "Unknown Vehicle"
+                val vehicleName = dockedEvent.vehicleName ?: stringResource(Res.string.station_docking_vehicle_unknown)
 
                 Text(
                     text = vehicleName,
@@ -164,7 +170,7 @@ private fun DockedVehicleItem(
                 // Docking date
                 val useUtc = LocalUseUtc.current
                 Text(
-                    text = "Since ${DateTimeUtil.formatLaunchDate(dockedEvent.docking, useUtc)}",
+                    text = stringResource(Res.string.station_docking_since, DateTimeUtil.formatLaunchDate(dockedEvent.docking, useUtc)),
                     style = MaterialTheme.typography.labelSmall,
                     color = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.7f)
                 )

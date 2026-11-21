@@ -23,6 +23,19 @@ import me.calebjones.spacelaunchnow.LocalUseUtc
 import me.calebjones.spacelaunchnow.domain.model.SpaceStationDetail
 import me.calebjones.spacelaunchnow.util.DateTimeUtil
 import me.calebjones.spacelaunchnow.util.NumberFormatUtil
+import spacelaunchnow_kmp.composeapp.generated.resources.Res
+import org.jetbrains.compose.resources.stringResource
+import spacelaunchnow_kmp.composeapp.generated.resources.station_docked_vehicles
+import spacelaunchnow_kmp.composeapp.generated.resources.station_specs_crew
+import spacelaunchnow_kmp.composeapp.generated.resources.station_specs_cubic_meters_value
+import spacelaunchnow_kmp.composeapp.generated.resources.station_specs_founded
+import spacelaunchnow_kmp.composeapp.generated.resources.station_specs_height
+import spacelaunchnow_kmp.composeapp.generated.resources.station_specs_kilograms_value
+import spacelaunchnow_kmp.composeapp.generated.resources.station_specs_mass
+import spacelaunchnow_kmp.composeapp.generated.resources.station_specs_meters_value
+import spacelaunchnow_kmp.composeapp.generated.resources.station_specs_title
+import spacelaunchnow_kmp.composeapp.generated.resources.station_specs_volume
+import spacelaunchnow_kmp.composeapp.generated.resources.station_specs_width
 
 /**
  * Card displaying station specifications and statistics
@@ -39,7 +52,7 @@ fun StationSpecsCard(
     if (!hasSpecs) return
 
     Text(
-        text = "Station Statistics",
+        text = stringResource(Res.string.station_specs_title),
         fontWeight = FontWeight.Bold,
         fontSize = 20.sp
     )
@@ -57,7 +70,7 @@ fun StationSpecsCard(
             ) {
                 station.onboardCrew?.let { crew ->
                     StatItem(
-                        label = "Onboard Crew",
+                        label = stringResource(Res.string.station_specs_crew),
                         value = "$crew",
                         modifier = Modifier.weight(1f)
                     )
@@ -69,7 +82,7 @@ fun StationSpecsCard(
 
                 station.dockedVehicles?.let { vehicles ->
                     StatItem(
-                        label = "Docked Vehicles",
+                        label = stringResource(Res.string.station_docked_vehicles),
                         value = "$vehicles",
                         modifier = Modifier.weight(1f)
                     )
@@ -87,8 +100,8 @@ fun StationSpecsCard(
             ) {
                 station.height?.let { height ->
                     StatItem(
-                        label = "Height",
-                        value = "${NumberFormatUtil.formatDecimal(height, 1)} m",
+                        label = stringResource(Res.string.station_specs_height),
+                        value = stringResource(Res.string.station_specs_meters_value, NumberFormatUtil.formatDecimal(height, 1)),
                         modifier = Modifier.weight(1f)
                     )
                 }
@@ -99,8 +112,8 @@ fun StationSpecsCard(
 
                 station.width?.let { width ->
                     StatItem(
-                        label = "Width",
-                        value = "${NumberFormatUtil.formatDecimal(width, 1)} m",
+                        label = stringResource(Res.string.station_specs_width),
+                        value = stringResource(Res.string.station_specs_meters_value, NumberFormatUtil.formatDecimal(width, 1)),
                         modifier = Modifier.weight(1f)
                     )
                 }
@@ -117,8 +130,8 @@ fun StationSpecsCard(
             ) {
                 station.mass?.let { mass ->
                     StatItem(
-                        label = "Mass",
-                        value = "${NumberFormatUtil.formatNumber(mass)} kg",
+                        label = stringResource(Res.string.station_specs_mass),
+                        value = stringResource(Res.string.station_specs_kilograms_value, NumberFormatUtil.formatNumber(mass)),
                         modifier = Modifier.weight(1f)
                     )
                 }
@@ -129,8 +142,8 @@ fun StationSpecsCard(
 
                 station.volume?.let { volume ->
                     StatItem(
-                        label = "Volume",
-                        value = "$volume m³",
+                        label = stringResource(Res.string.station_specs_volume),
+                        value = stringResource(Res.string.station_specs_cubic_meters_value, volume),
                         modifier = Modifier.weight(1f)
                     )
                 }
@@ -141,7 +154,7 @@ fun StationSpecsCard(
                 val tz = if (useUtc) TimeZone.UTC else TimeZone.currentSystemDefault()
                 val foundedInstant = founded.atStartOfDayIn(tz)
                 StatItem(
-                    label = "Founded",
+                    label = stringResource(Res.string.station_specs_founded),
                     value = DateTimeUtil.formatLaunchDate(foundedInstant, useUtc)
                 )
             }
