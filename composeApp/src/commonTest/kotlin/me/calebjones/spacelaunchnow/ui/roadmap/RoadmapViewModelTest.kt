@@ -118,11 +118,12 @@ class RoadmapViewModelTest {
         viewModel = RoadmapViewModel(mockRepository)
         testDispatcher.scheduler.advanceUntilIdle()
         
-        // Then: Screen is told to use the placeholder roadmap
+        // Then: Uses placeholder data (non-empty)
         val state = viewModel.uiState.value
         assertFalse(state.isLoading)
-        assertTrue(state.usePlaceholder)
         assertNull(state.roadmapData)
+        assertNotNull(state.placeholderData)
+        assertTrue(state.placeholderData!!.items.isNotEmpty())
     }
     
     // ========================================
@@ -144,8 +145,8 @@ class RoadmapViewModelTest {
         assertFalse(state.isLoading)
         assertNotNull(state.errorMessage)
         assertTrue(state.errorMessage!!.contains("cached data"))
-        // Still falls back to the placeholder roadmap
-        assertTrue(state.usePlaceholder)
+        // Still has placeholder data as fallback
+        assertNotNull(state.placeholderData)
     }
     
     @Test

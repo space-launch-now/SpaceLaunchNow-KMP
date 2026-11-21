@@ -46,6 +46,7 @@ import spacelaunchnow_kmp.composeapp.generated.resources.app_newsevents_event_it
 import spacelaunchnow_kmp.composeapp.generated.resources.app_newsevents_event_item_image_description
 import spacelaunchnow_kmp.composeapp.generated.resources.common_unknown
 import org.jetbrains.compose.resources.stringResource
+import me.calebjones.spacelaunchnow.ui.components.buttonContentDescription
 
 /**
  * A card component for displaying a space event in a list.
@@ -64,16 +65,12 @@ fun EventListItem(
 ) {
     val useUtc = LocalUseUtc.current
 
-    val cardDescription = stringResource(Res.string.app_newsevents_event_item_description, event.name.toString(), event.type.name.toString())
     Card(
         onClick = onClick,
         modifier = modifier
             .fillMaxWidth()
             .padding(horizontal = 16.dp, vertical = 4.dp)
-            .semantics {
-                contentDescription = cardDescription
-                role = Role.Button
-            },
+            .buttonContentDescription(stringResource(Res.string.app_newsevents_event_item_description, event.name.toString(), event.type.name.toString())),
         colors = CardDefaults.cardColors(
             containerColor = MaterialTheme.colorScheme.surface
         ),

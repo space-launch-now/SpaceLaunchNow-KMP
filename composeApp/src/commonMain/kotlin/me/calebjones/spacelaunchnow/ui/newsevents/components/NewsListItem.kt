@@ -47,6 +47,7 @@ import spacelaunchnow_kmp.composeapp.generated.resources.Res
 import spacelaunchnow_kmp.composeapp.generated.resources.app_newsevents_news_item_description
 import spacelaunchnow_kmp.composeapp.generated.resources.app_newsevents_news_item_image_description
 import org.jetbrains.compose.resources.stringResource
+import me.calebjones.spacelaunchnow.ui.components.buttonContentDescription
 
 /**
  * A card component for displaying a news article in a list.
@@ -65,16 +66,12 @@ fun NewsListItem(
 ) {
     val useUtc = LocalUseUtc.current
 
-    val cardDescription = stringResource(Res.string.app_newsevents_news_item_description, article.title.toString(), article.newsSite.toString())
     Card(
         onClick = onClick,
         modifier = modifier
             .fillMaxWidth()
             .padding(horizontal = 16.dp, vertical = 4.dp)
-            .semantics {
-                contentDescription = cardDescription
-                role = Role.Button
-            },
+            .buttonContentDescription(stringResource(Res.string.app_newsevents_news_item_description, article.title.toString(), article.newsSite.toString())),
         colors = CardDefaults.cardColors(
             containerColor = MaterialTheme.colorScheme.surface
         ),

@@ -47,10 +47,10 @@ fun LiveIndicator(modifier: Modifier = Modifier) {
     // LIVE indicator red color
     val liveRed = Color(0xFFE53935)
 
-    val liveDescription = stringResource(Res.string.app_compose_live_indicator_description)
     Surface(
-        modifier = modifier.semantics {
-            contentDescription = liveDescription
+        modifier = run {
+            val liveDescription = stringResource(Res.string.app_compose_live_indicator_description)
+            modifier.semantics { contentDescription = liveDescription }
         },
         shape = RoundedCornerShape(4.dp),
         color = liveRed.copy(alpha = alpha)

@@ -46,6 +46,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import me.calebjones.spacelaunchnow.data.model.RoadmapData
 import me.calebjones.spacelaunchnow.data.model.RoadmapItem
 import me.calebjones.spacelaunchnow.data.model.RoadmapStatus
 import org.koin.compose.viewmodel.koinViewModel
@@ -74,8 +75,8 @@ fun RoadmapScreen(
     viewModel: RoadmapViewModel = koinViewModel()
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
-    // Fallback items are built here because their text comes from string resources.
-    val roadmapData = if (uiState.usePlaceholder) placeholderRoadmapData() else uiState.roadmapData
+    // Fallback items are resolved here because their text comes from string resources.
+    val roadmapData = uiState.placeholderData?.toRoadmapData() ?: uiState.roadmapData
 
     Scaffold(
         topBar = {
@@ -376,3 +377,20 @@ private fun getStatusIcon(status: RoadmapStatus) = when (status) {
     RoadmapStatus.PLANNED -> Icons.Filled.Schedule
     RoadmapStatus.BACKLOG -> Icons.Filled.ThumbUp
 }
+
+@Composable
+private fun PlaceholderRoadmapData.toRoadmapData(): RoadmapData = RoadmapData(
+    items = items.map { item ->
+        RoadmapItem(
+            id = item.id,
+            title = stringResource(item.title),
+            description = stringResource(item.description),
+            status = item.status,
+            quarter = stringResource(item.quarter),
+            category = item.category,
+            priority = item.priority
+        )
+    },
+    lastUpdated = stringResource(lastUpdated),
+    message = stringResource(message)
+)

@@ -28,12 +28,10 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import me.calebjones.spacelaunchnow.navigation.Rockets
 import me.calebjones.spacelaunchnow.ui.explore.ExploreSection
+import me.calebjones.spacelaunchnow.ui.explore.ExploreSections
 import me.calebjones.spacelaunchnow.ui.theme.SpaceLaunchNowPreviewTheme
 import org.jetbrains.compose.ui.tooling.preview.Preview
 import spacelaunchnow_kmp.composeapp.generated.resources.Res
-import spacelaunchnow_kmp.composeapp.generated.resources.app_explore_card_rockets_content_description
-import spacelaunchnow_kmp.composeapp.generated.resources.app_explore_card_rockets_description
-import spacelaunchnow_kmp.composeapp.generated.resources.app_explore_card_rockets_title
 import org.jetbrains.compose.resources.stringResource
 
 /**
@@ -130,14 +128,7 @@ fun ExploreCard(
 private fun ExploreCardPreview() {
     SpaceLaunchNowPreviewTheme {
         ExploreCard(
-            section = ExploreSection(
-                id = "rockets",
-                title = Res.string.app_explore_card_rockets_title,
-                description = Res.string.app_explore_card_rockets_description,
-                icon = Icons.Filled.Rocket,
-                route = Rockets,
-                contentDescription = Res.string.app_explore_card_rockets_content_description
-            ),
+            section = ExploreSections.sections.first { it.id == "rockets" },
             onClick = {}
         )
     }
@@ -148,14 +139,7 @@ private fun ExploreCardPreview() {
 private fun ExploreCardDarkPreview() {
     SpaceLaunchNowPreviewTheme(isDark = true) {
         ExploreCard(
-            section = ExploreSection(
-                id = "rockets",
-                title = Res.string.app_explore_card_rockets_title,
-                description = Res.string.app_explore_card_rockets_description,
-                icon = Icons.Filled.Rocket,
-                route = Rockets,
-                contentDescription = Res.string.app_explore_card_rockets_content_description
-            ),
+            section = ExploreSections.sections.first { it.id == "rockets" },
             onClick = {}
         )
     }
@@ -166,14 +150,7 @@ private fun ExploreCardDarkPreview() {
 private fun ExploreCardLargeScreenPreview() {
     SpaceLaunchNowPreviewTheme {
         ExploreCard(
-            section = ExploreSection(
-                id = "rockets",
-                title = Res.string.app_explore_card_rockets_title,
-                description = Res.string.app_explore_card_rockets_description,
-                icon = Icons.Filled.Rocket,
-                route = Rockets,
-                contentDescription = Res.string.app_explore_card_rockets_content_description
-            ),
+            section = ExploreSections.sections.first { it.id == "rockets" },
             onClick = {},
             isLargeScreen = true
         )
@@ -185,14 +162,7 @@ private fun ExploreCardLargeScreenPreview() {
 private fun ExploreCardLargeScreenDarkPreview() {
     SpaceLaunchNowPreviewTheme(isDark = true) {
         ExploreCard(
-            section = ExploreSection(
-                id = "rockets",
-                title = Res.string.app_explore_card_rockets_title,
-                description = Res.string.app_explore_card_rockets_description,
-                icon = Icons.Filled.Rocket,
-                route = Rockets,
-                contentDescription = Res.string.app_explore_card_rockets_content_description
-            ),
+            section = ExploreSections.sections.first { it.id == "rockets" },
             onClick = {},
             isLargeScreen = true
         )
