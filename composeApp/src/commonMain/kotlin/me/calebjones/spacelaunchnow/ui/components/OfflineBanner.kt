@@ -12,6 +12,11 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import me.calebjones.spacelaunchnow.data.model.DataSource
 import me.calebjones.spacelaunchnow.util.formatTimeAgo
+import spacelaunchnow_kmp.composeapp.generated.resources.Res
+import spacelaunchnow_kmp.composeapp.generated.resources.app_components_cache_indicator_label
+import spacelaunchnow_kmp.composeapp.generated.resources.app_components_offline_banner_message
+import spacelaunchnow_kmp.composeapp.generated.resources.common_retry
+import org.jetbrains.compose.resources.stringResource
 
 /**
  * Banner shown at the top of the screen when viewing stale cached data
@@ -49,7 +54,7 @@ fun OfflineBanner(
                     )
                     Spacer(Modifier.width(12.dp))
                     Text(
-                        text = "Offline - Showing cached data",
+                        text = stringResource(Res.string.app_components_offline_banner_message),
                         style = MaterialTheme.typography.labelMedium,
                         color = MaterialTheme.colorScheme.onSecondaryContainer,
                         fontWeight = FontWeight.SemiBold
@@ -68,7 +73,7 @@ fun OfflineBanner(
                         modifier = Modifier.size(16.dp)
                     )
                     Spacer(Modifier.width(4.dp))
-                    Text("Retry")
+                    Text(stringResource(Res.string.common_retry))
                 }
             }
         }
@@ -104,7 +109,7 @@ fun CacheIndicator(
                 )
                 Spacer(Modifier.width(4.dp))
                 Text(
-                    text = "Cached",
+                    text = stringResource(Res.string.app_components_cache_indicator_label),
                     style = MaterialTheme.typography.labelSmall,
                     color = MaterialTheme.colorScheme.onSurfaceVariant
                 )

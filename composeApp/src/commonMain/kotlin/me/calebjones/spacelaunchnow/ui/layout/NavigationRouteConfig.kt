@@ -7,6 +7,7 @@ import androidx.compose.material.icons.filled.Home
 import androidx.compose.material.icons.filled.Newspaper
 import androidx.compose.material.icons.filled.Settings
 import androidx.compose.ui.graphics.vector.ImageVector
+import org.jetbrains.compose.resources.StringResource
 import me.calebjones.spacelaunchnow.navigation.Explore
 import me.calebjones.spacelaunchnow.navigation.Home
 import me.calebjones.spacelaunchnow.navigation.LiveOnboarding
@@ -16,6 +17,17 @@ import me.calebjones.spacelaunchnow.navigation.Preload
 import me.calebjones.spacelaunchnow.navigation.Schedule
 import me.calebjones.spacelaunchnow.navigation.Settings
 import kotlin.reflect.KClass
+import spacelaunchnow_kmp.composeapp.generated.resources.Res
+import spacelaunchnow_kmp.composeapp.generated.resources.app_layout_nav_explore_content_description
+import spacelaunchnow_kmp.composeapp.generated.resources.app_layout_nav_explore_label
+import spacelaunchnow_kmp.composeapp.generated.resources.app_layout_nav_home_content_description
+import spacelaunchnow_kmp.composeapp.generated.resources.app_layout_nav_home_label
+import spacelaunchnow_kmp.composeapp.generated.resources.app_layout_nav_news_content_description
+import spacelaunchnow_kmp.composeapp.generated.resources.app_layout_nav_news_label
+import spacelaunchnow_kmp.composeapp.generated.resources.app_layout_nav_schedule_content_description
+import spacelaunchnow_kmp.composeapp.generated.resources.app_layout_nav_schedule_label
+import spacelaunchnow_kmp.composeapp.generated.resources.app_layout_nav_settings_content_description
+import spacelaunchnow_kmp.composeapp.generated.resources.app_layout_nav_settings_label
 
 /**
  * Data class for a navigation tab item. Replaces the parallel lists of
@@ -23,9 +35,11 @@ import kotlin.reflect.KClass
  */
 data class NavigationTabItem(
     val route: Any,
-    val label: String,
+    val label: StringResource,
     val icon: ImageVector,
-    val contentDescription: String
+    val contentDescription: StringResource,
+    /** English tab name sent to analytics; not shown to the user. */
+    val analyticsName: String
 )
 
 /**
@@ -34,33 +48,38 @@ data class NavigationTabItem(
 val mainNavigationItems = listOf(
     NavigationTabItem(
         route = Home,
-        label = "Home",
+        label = Res.string.app_layout_nav_home_label,
         icon = Icons.Filled.Home,
-        contentDescription = "Home tab"
+        contentDescription = Res.string.app_layout_nav_home_content_description,
+        analyticsName = "Home"
     ),
     NavigationTabItem(
         route = Schedule,
-        label = "Schedule",
+        label = Res.string.app_layout_nav_schedule_label,
         icon = Icons.AutoMirrored.Filled.List,
-        contentDescription = "Schedule tab"
+        contentDescription = Res.string.app_layout_nav_schedule_content_description,
+        analyticsName = "Schedule"
     ),
     NavigationTabItem(
         route = Explore,
-        label = "Explore",
+        label = Res.string.app_layout_nav_explore_label,
         icon = Icons.Filled.Explore,
-        contentDescription = "Explore tab"
+        contentDescription = Res.string.app_layout_nav_explore_content_description,
+        analyticsName = "Explore"
     ),
     NavigationTabItem(
         route = NewsEvents(),
-        label = "News",
+        label = Res.string.app_layout_nav_news_label,
         icon = Icons.Filled.Newspaper,
-        contentDescription = "News and Events tab"
+        contentDescription = Res.string.app_layout_nav_news_content_description,
+        analyticsName = "News"
     ),
     NavigationTabItem(
         route = Settings,
-        label = "Settings",
+        label = Res.string.app_layout_nav_settings_label,
         icon = Icons.Filled.Settings,
-        contentDescription = "Settings tab"
+        contentDescription = Res.string.app_layout_nav_settings_content_description,
+        analyticsName = "Settings"
     )
 )
 

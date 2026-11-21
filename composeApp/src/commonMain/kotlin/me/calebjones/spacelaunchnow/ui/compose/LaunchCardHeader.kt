@@ -50,6 +50,9 @@ import me.calebjones.spacelaunchnow.ui.theme.SpaceLaunchNowPreviewTheme
 import me.calebjones.spacelaunchnow.util.DateTimeUtil
 import me.calebjones.spacelaunchnow.util.resolve
 import org.jetbrains.compose.ui.tooling.preview.Preview
+import spacelaunchnow_kmp.composeapp.generated.resources.app_compose_launch_card_header_agency_logo_description
+import spacelaunchnow_kmp.composeapp.generated.resources.app_compose_launch_card_header_agency_placeholder_description
+import spacelaunchnow_kmp.composeapp.generated.resources.app_compose_launch_card_header_location_description
 
 @Composable
 private fun AgencyLogoShimmer(logoSize: Dp) {
@@ -129,7 +132,7 @@ fun LaunchCardHeaderOverlay(
         if (showAgencyLogo && launch.provider.socialLogo != null) {
             SubcomposeAsyncImage(
                 model = launch.provider.socialLogo,
-                contentDescription = "Agency Logo",
+                contentDescription = stringResource(Res.string.app_compose_launch_card_header_agency_logo_description),
                 modifier = Modifier
                     .size(logoSize)
                     .clip(CircleShape),
@@ -144,7 +147,7 @@ fun LaunchCardHeaderOverlay(
                     ) {
                         Icon(
                             imageVector = Icons.Default.RocketLaunch,
-                            contentDescription = "Agency placeholder",
+                            contentDescription = stringResource(Res.string.app_compose_launch_card_header_agency_placeholder_description),
                             modifier = Modifier.size(logoSize / 2),
                             tint = MaterialTheme.colorScheme.primary.copy(alpha = 0.6f)
                         )
@@ -200,7 +203,7 @@ fun LaunchCardHeaderOverlay(
                 ) {
                     Icon(
                         imageVector = Icons.Default.LocationOn,
-                        contentDescription = "Launch Location",
+                        contentDescription = stringResource(Res.string.app_compose_launch_card_header_location_description),
                         modifier = Modifier.size(16.dp),
                         tint = Color.White.copy(alpha = 0.9f)
                     )

@@ -21,6 +21,11 @@ import kotlin.time.Instant
 import me.calebjones.spacelaunchnow.util.DateTimeUtil
 import me.calebjones.spacelaunchnow.LocalUseUtc
 import kotlin.time.Duration
+import spacelaunchnow_kmp.composeapp.generated.resources.Res
+import spacelaunchnow_kmp.composeapp.generated.resources.app_compose_launch_window_duration_label
+import spacelaunchnow_kmp.composeapp.generated.resources.app_compose_launch_window_instantaneous
+import spacelaunchnow_kmp.composeapp.generated.resources.app_compose_launch_window_title
+import org.jetbrains.compose.resources.stringResource
 
 @Composable
 fun LaunchWindowIndicator(
@@ -43,7 +48,7 @@ fun LaunchWindowIndicator(
 
 
         Text(
-            text = "Launch Window",
+            text = stringResource(Res.string.app_compose_launch_window_title),
             style = MaterialTheme.typography.titleSmall.copy(fontWeight = FontWeight.SemiBold),
             color = MaterialTheme.colorScheme.onSurface
         )
@@ -66,12 +71,12 @@ fun LaunchWindowIndicator(
         val duration: Duration = windowEnd - windowStart
         Column(horizontalAlignment = Alignment.CenterHorizontally, verticalArrangement = Arrangement.Center) {
             Text(
-                text = "Duration",
+                text = stringResource(Res.string.app_compose_launch_window_duration_label),
                 style = MaterialTheme.typography.labelSmall,
                 color = MaterialTheme.colorScheme.onSurfaceVariant
             )
             Text(
-                text = if (duration <= Duration.ZERO) "Instantaneous" else formatDurationShort(
+                text = if (duration <= Duration.ZERO) stringResource(Res.string.app_compose_launch_window_instantaneous) else formatDurationShort(
                     duration
                 ),
                 style = MaterialTheme.typography.bodySmall,

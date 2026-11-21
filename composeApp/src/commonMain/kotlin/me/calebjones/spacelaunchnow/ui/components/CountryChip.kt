@@ -18,6 +18,10 @@ import coil3.compose.AsyncImage
 import me.calebjones.spacelaunchnow.domain.mapper.countryLabel
 import me.calebjones.spacelaunchnow.domain.model.Country
 import org.jetbrains.compose.ui.tooling.preview.Preview
+import spacelaunchnow_kmp.composeapp.generated.resources.Res
+import spacelaunchnow_kmp.composeapp.generated.resources.app_components_country_chip_flag_description
+import spacelaunchnow_kmp.composeapp.generated.resources.common_unknown
+import org.jetbrains.compose.resources.stringResource
 
 /**
  * Country chip with flag image
@@ -26,7 +30,7 @@ import org.jetbrains.compose.ui.tooling.preview.Preview
  */
 @Composable
 fun CountryChip(country: Country) {
-    val label = countryLabel(country) ?: country.alpha2Code ?: "Unknown"
+    val label = countryLabel(country) ?: country.alpha2Code ?: stringResource(Res.string.common_unknown)
     val flagUrl = country.alpha2Code?.let { code ->
         "https://flagcdn.com/w40/${code.lowercase()}.png"
     }
@@ -44,7 +48,7 @@ fun CountryChip(country: Country) {
             {
                 AsyncImage(
                     model = url,
-                    contentDescription = "Flag of ${country.name}",
+                    contentDescription = stringResource(Res.string.app_components_country_chip_flag_description, country.name.toString()),
                     modifier = Modifier
                         .width(18.dp)
                         .height(12.dp)
