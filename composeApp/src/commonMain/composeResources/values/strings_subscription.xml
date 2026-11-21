@@ -197,13 +197,13 @@
     <string name="support_us_legacy_banner_prompt">Choose a plan below to continue supporting development!</string>
     <!-- Heading of the fine print on subscription screens. One line. -->
     <string name="fine_print_secure_billing_title">Secure Billing</string>
-    <!-- Billing note. %1$s is the store name: the next three strings. -->
+    <!-- Billing note. %1$s is a store name, filled in from one of the next three strings (fine_print_store_*). Translate the sentence around it; the store name arrives as the form that sentence needs. -->
     <string name="fine_print_billing_note">Purchases are processed securely through %1$s.</string>
-    <!-- Store name on Android, used in the billing note. -->
+    <!-- Store name on Android. Used only in fine_print_billing_note, as %1$s. Write the store name in the form that sentence needs, with its article where the language has one. -->
     <string name="fine_print_store_google_play">Google Play</string>
-    <!-- Store name on iOS, used in the billing note. Reads after "through". -->
+    <!-- Store name on iOS. Used only in fine_print_billing_note, as %1$s, where it reads after "through". Write the store name in the form that sentence needs, with its article where the language has one (English: "the App Store"). -->
     <string name="fine_print_store_app_store">the App Store</string>
-    <!-- Store name on other platforms, such as desktop, used in the billing note. -->
+    <!-- Store name on other platforms, such as desktop. Used only in fine_print_billing_note, as %1$s. Write the store name in the form that sentence needs, with its article where the language has one. -->
     <string name="fine_print_store_other">your platform's store</string>
     <!-- Free trial disclosure required by store policy. %1$s is the price after the trial, such as $9.99/year. %2$s is the trial length, such as 3-day. -->
     <string name="fine_print_trial_disclosure">Free trial will automatically convert to a paid subscription at %1$s unless canceled before the trial ends. You won't be charged if you cancel during the %2$s trial period.</string>
