@@ -246,4 +246,26 @@
     <string name="app_video_fullscreen_external_description">Open in external app</string>
     <!-- Label in the fullscreen video controls. %1$d is the position of the selected video, %2$d the number of videos. One line. -->
     <string name="app_video_fullscreen_position">Video %1$d of %2$d</string>
+    <!-- Status badge on a roadmap item, and the description of its status icon. One or two words. -->
+    <string name="app_roadmap_status_completed">Completed</string>
+    <!-- Status badge on a roadmap item, and the description of its status icon. One or two words. -->
+    <string name="app_roadmap_status_in_testing">In Testing</string>
+    <!-- Status badge on a roadmap item, and the description of its status icon. One or two words. -->
+    <string name="app_roadmap_status_in_progress">In Progress</string>
+    <!-- Status badge on a roadmap item, and the description of its status icon. One or two words. -->
+    <string name="app_roadmap_status_planned">Planned</string>
+    <!-- Status badge on a roadmap item, and the description of its status icon. One or two words. -->
+    <string name="app_roadmap_status_backlog">Backlog</string>
+    <!-- Category label on a roadmap item. One or two words. -->
+    <string name="app_roadmap_category_feature">Feature</string>
+    <!-- Category label on a roadmap item. One or two words. -->
+    <string name="app_roadmap_category_enhancement">Enhancement</string>
+    <!-- Category label on a roadmap item. One or two words. -->
+    <string name="app_roadmap_category_bug_fix">Bug Fix</string>
+    <!-- Category label on a roadmap item. One or two words. -->
+    <string name="app_roadmap_category_infrastructure">Infrastructure</string>
+    <!-- Category label on a roadmap item. One or two words. -->
+    <string name="app_roadmap_category_design">Design</string>
+    <!-- Description of the loading text on the start-up screen. Read by screen readers. -->
+    <string name="preload_loading_description">Loading launch data</string>
 </resources>

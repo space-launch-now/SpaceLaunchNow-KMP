@@ -148,7 +148,7 @@ class IosBillingManager : BillingManager {
                     productId = pkg.storeProduct.id,
                     basePlanId = pkg.identifier,
                     title = pkg.storeProduct.title,
-                    description = "${pkg.packageType} - ${pkg.storeProduct.period?.unit?.name ?: "One-time"}",
+                    description = "${pkg.packageType} - ${pkg.storeProduct.period?.unit?.name ?: "One-time"}", // i18n-ignore: debug product summary, shown only in Debug settings
                     formattedPrice = pkg.storeProduct.price.formatted,
                     priceAmountMicros = pkg.storeProduct.price.amountMicros.toLong(),
                     currencyCode = pkg.storeProduct.price.currencyCode,

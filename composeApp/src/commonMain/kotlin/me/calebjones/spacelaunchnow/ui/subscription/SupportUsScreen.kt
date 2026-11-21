@@ -203,7 +203,7 @@ fun SupportUsScreen(
             CenterAlignedTopAppBar(
                 title = {
 //                    Text(
-//                        text = "Space Launch Now",
+//                        text = "Space Launch Now", // i18n-ignore: commented-out code
 //                        style = MaterialTheme.typography.headlineMedium,
 //                        fontWeight = FontWeight.Bold,
 //                        fontSize = 36.sp,

@@ -112,6 +112,18 @@ class LocalizedTimeTextTest {
     }
 
     @Test
+    fun launchDateLeadHasNoTimeInEnglish() = runTest {
+        Locale.setDefault(Locale.ENGLISH)
+        val now = Clock.System.now()
+        assertEquals("Today at", DateTimeUtil.relativeLaunchDateLead(now, useUtc = true).load().trim())
+        assertEquals("Tomorrow at", DateTimeUtil.relativeLaunchDateLead(now + 1.days, useUtc = true).load().trim())
+        assertEquals("Yesterday at", DateTimeUtil.relativeLaunchDateLead(now - 1.days, useUtc = true).load().trim())
+        val names = listOf("Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday")
+        val weekday = DateTimeUtil.relativeLaunchDateLead(now + 3.days, useUtc = true).load().trim()
+        assertEquals(true, names.any { weekday == "$it at" }, weekday)
+    }
+
+    @Test
     fun englishPrecisionLabelsAreUnchanged() = runTest {
         Locale.setDefault(Locale.ENGLISH)
         val net = Instant.parse("2026-08-15T12:00:00Z")

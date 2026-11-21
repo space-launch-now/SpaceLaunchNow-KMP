@@ -224,12 +224,12 @@ fun NextUpWidgetContent(
             ) {
                 Image(
                     provider = ImageProvider(R.mipmap.ic_launcher_monochrome),
-                    contentDescription = "Space Launch Now",
+                    contentDescription = context.getString(R.string.app_name),
                     modifier = GlanceModifier.size(32.dp)
                 )
                 Spacer(modifier = GlanceModifier.height(8.dp))
                 Text(
-                    text = "No upcoming launches",
+                    text = context.getString(R.string.widget_no_upcoming_launches),
                     style = TextStyle(
                         fontSize = 12.sp,
                         color = GlanceTheme.colors.onBackground
@@ -242,6 +242,7 @@ fun NextUpWidgetContent(
 
 @Composable
 private fun CountdownDisplay(launchTime: Instant) {
+    val context = LocalContext.current
     val now = Clock.System.now()
     val duration = launchTime - now
     val totalSeconds = duration.inWholeSeconds
@@ -254,7 +255,7 @@ private fun CountdownDisplay(launchTime: Instant) {
 
     if (isPast) {
         Text(
-            text = "Launched",
+            text = context.getString(R.string.widget_launched),
             style = TextStyle(
                 fontSize = 16.sp,
                 fontWeight = FontWeight.Bold,
@@ -266,11 +267,11 @@ private fun CountdownDisplay(launchTime: Instant) {
             modifier = GlanceModifier.fillMaxWidth(),
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
-            CountdownUnit(value = days, label = "Days")
+            CountdownUnit(value = days, label = context.getString(R.string.widget_unit_days))
             CountdownSeparator()
-            CountdownUnit(value = hours, label = "Hours")
+            CountdownUnit(value = hours, label = context.getString(R.string.widget_unit_hours))
             CountdownSeparator()
-            CountdownUnit(value = minutes, label = "Minutes")
+            CountdownUnit(value = minutes, label = context.getString(R.string.widget_unit_minutes))
         }
     }
 }

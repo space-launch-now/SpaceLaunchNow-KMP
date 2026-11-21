@@ -56,6 +56,9 @@ import me.calebjones.spacelaunchnow.getPlatform
 import me.calebjones.spacelaunchnow.util.logging.SpaceLogger
 import kotlin.time.Clock
 import me.calebjones.spacelaunchnow.ui.subscription.rememberHasFeature
+import org.jetbrains.compose.resources.stringResource
+import spacelaunchnow_kmp.composeapp.generated.resources.Res
+import spacelaunchnow_kmp.composeapp.generated.resources.ads_remove_ads_button
 
 /**
  * Android implementation of SmartBannerAd using BasicAds library.
@@ -324,7 +327,7 @@ actual fun SmartBannerAd(
                                     .padding(horizontal = 16.dp)
                             ) {
                                 Text(
-                                    text = "Remove Ads",
+                                    text = stringResource(Res.string.ads_remove_ads_button),
                                     style = MaterialTheme.typography.bodyMedium,
                                     color = MaterialTheme.colorScheme.primary
                                 )
