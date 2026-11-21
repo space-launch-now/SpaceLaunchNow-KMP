@@ -1005,75 +1005,7 @@ composeApp/src/commonMain/kotlin/me/calebjones/spacelaunchnow/ui/starship/compon
 composeApp/src/commonMain/kotlin/me/calebjones/spacelaunchnow/ui/starship/components/VehicleGrids.kt	Failed to load spacecraft
 composeApp/src/commonMain/kotlin/me/calebjones/spacelaunchnow/ui/starship/components/VehicleGrids.kt	No Starship spacecraft available
 composeApp/src/commonMain/kotlin/me/calebjones/spacelaunchnow/ui/starship/components/VehicleGrids.kt	No Super Heavy boosters available
-composeApp/src/commonMain/kotlin/me/calebjones/spacelaunchnow/ui/subscription/PremiumFeatureGate.kt	Advanced Filters
-composeApp/src/commonMain/kotlin/me/calebjones/spacelaunchnow/ui/subscription/PremiumFeatureGate.kt	Premium
-composeApp/src/commonMain/kotlin/me/calebjones/spacelaunchnow/ui/subscription/PremiumFeatureGate.kt	Premium
-composeApp/src/commonMain/kotlin/me/calebjones/spacelaunchnow/ui/subscription/PremiumFeatureGate.kt	Premium Feature
-composeApp/src/commonMain/kotlin/me/calebjones/spacelaunchnow/ui/subscription/PremiumFeatureGate.kt	Upgrade to Premium
-composeApp/src/commonMain/kotlin/me/calebjones/spacelaunchnow/ui/subscription/PremiumFeatureGate.kt	Upgrade to Premium
-composeApp/src/commonMain/kotlin/me/calebjones/spacelaunchnow/ui/subscription/SupportUsScreen.kt	  Or go lifetime  
-composeApp/src/commonMain/kotlin/me/calebjones/spacelaunchnow/ui/subscription/SupportUsScreen.kt	$freeTrialPeriodDisplay free trial
-composeApp/src/commonMain/kotlin/me/calebjones/spacelaunchnow/ui/subscription/SupportUsScreen.kt	Access to ICS Sync
-composeApp/src/commonMain/kotlin/me/calebjones/spacelaunchnow/ui/subscription/SupportUsScreen.kt	Access to ICS Sync
-composeApp/src/commonMain/kotlin/me/calebjones/spacelaunchnow/ui/subscription/SupportUsScreen.kt	Ad-free experience
-composeApp/src/commonMain/kotlin/me/calebjones/spacelaunchnow/ui/subscription/SupportUsScreen.kt	Ad-free experience
-composeApp/src/commonMain/kotlin/me/calebjones/spacelaunchnow/ui/subscription/SupportUsScreen.kt	BEST VALUE
-composeApp/src/commonMain/kotlin/me/calebjones/spacelaunchnow/ui/subscription/SupportUsScreen.kt	Back
-composeApp/src/commonMain/kotlin/me/calebjones/spacelaunchnow/ui/subscription/SupportUsScreen.kt	Buy once, own forever
-composeApp/src/commonMain/kotlin/me/calebjones/spacelaunchnow/ui/subscription/SupportUsScreen.kt	Calendar Sync
-composeApp/src/commonMain/kotlin/me/calebjones/spacelaunchnow/ui/subscription/SupportUsScreen.kt	Calendar Sync
-composeApp/src/commonMain/kotlin/me/calebjones/spacelaunchnow/ui/subscription/SupportUsScreen.kt	Choose a plan below to continue supporting development!
-composeApp/src/commonMain/kotlin/me/calebjones/spacelaunchnow/ui/subscription/SupportUsScreen.kt	Continue Your Support
-composeApp/src/commonMain/kotlin/me/calebjones/spacelaunchnow/ui/subscription/SupportUsScreen.kt	Copy User ID
-composeApp/src/commonMain/kotlin/me/calebjones/spacelaunchnow/ui/subscription/SupportUsScreen.kt	Current Plan
-composeApp/src/commonMain/kotlin/me/calebjones/spacelaunchnow/ui/subscription/SupportUsScreen.kt	Customize your app
-composeApp/src/commonMain/kotlin/me/calebjones/spacelaunchnow/ui/subscription/SupportUsScreen.kt	Enjoy an uninterrupted, ad-free experience throughout the entire app
-composeApp/src/commonMain/kotlin/me/calebjones/spacelaunchnow/ui/subscription/SupportUsScreen.kt	Help us continue improving the app and adding new features
-composeApp/src/commonMain/kotlin/me/calebjones/spacelaunchnow/ui/subscription/SupportUsScreen.kt	Join as a member to unlock premium features
-composeApp/src/commonMain/kotlin/me/calebjones/spacelaunchnow/ui/subscription/SupportUsScreen.kt	Let me know and I'll help you out
-composeApp/src/commonMain/kotlin/me/calebjones/spacelaunchnow/ui/subscription/SupportUsScreen.kt	Love Space Launch Now?
-composeApp/src/commonMain/kotlin/me/calebjones/spacelaunchnow/ui/subscription/SupportUsScreen.kt	Monthly
-composeApp/src/commonMain/kotlin/me/calebjones/spacelaunchnow/ui/subscription/SupportUsScreen.kt	Monthly
-composeApp/src/commonMain/kotlin/me/calebjones/spacelaunchnow/ui/subscription/SupportUsScreen.kt	No Ads
-composeApp/src/commonMain/kotlin/me/calebjones/spacelaunchnow/ui/subscription/SupportUsScreen.kt	No Ads
-composeApp/src/commonMain/kotlin/me/calebjones/spacelaunchnow/ui/subscription/SupportUsScreen.kt	No Ads
-composeApp/src/commonMain/kotlin/me/calebjones/spacelaunchnow/ui/subscription/SupportUsScreen.kt	Open form
-composeApp/src/commonMain/kotlin/me/calebjones/spacelaunchnow/ui/subscription/SupportUsScreen.kt	Premium Themes
-composeApp/src/commonMain/kotlin/me/calebjones/spacelaunchnow/ui/subscription/SupportUsScreen.kt	Premium Themes
-composeApp/src/commonMain/kotlin/me/calebjones/spacelaunchnow/ui/subscription/SupportUsScreen.kt	Premium Widget
-composeApp/src/commonMain/kotlin/me/calebjones/spacelaunchnow/ui/subscription/SupportUsScreen.kt	Premium Widget
-composeApp/src/commonMain/kotlin/me/calebjones/spacelaunchnow/ui/subscription/SupportUsScreen.kt	Premium Widget
-composeApp/src/commonMain/kotlin/me/calebjones/spacelaunchnow/ui/subscription/SupportUsScreen.kt	Pro Lifetime
-composeApp/src/commonMain/kotlin/me/calebjones/spacelaunchnow/ui/subscription/SupportUsScreen.kt	Product: ${getProductDisplayName(productId)}
 composeApp/src/commonMain/kotlin/me/calebjones/spacelaunchnow/ui/subscription/SupportUsScreen.kt	Space Launch Now
-composeApp/src/commonMain/kotlin/me/calebjones/spacelaunchnow/ui/subscription/SupportUsScreen.kt	Space Launch Now
-composeApp/src/commonMain/kotlin/me/calebjones/spacelaunchnow/ui/subscription/SupportUsScreen.kt	Support Development
-composeApp/src/commonMain/kotlin/me/calebjones/spacelaunchnow/ui/subscription/SupportUsScreen.kt	Supporting Development
-composeApp/src/commonMain/kotlin/me/calebjones/spacelaunchnow/ui/subscription/SupportUsScreen.kt	Supporting Development
-composeApp/src/commonMain/kotlin/me/calebjones/spacelaunchnow/ui/subscription/SupportUsScreen.kt	Thank You! 🎉
-composeApp/src/commonMain/kotlin/me/calebjones/spacelaunchnow/ui/subscription/SupportUsScreen.kt	Thank You, Early Supporter!
-composeApp/src/commonMain/kotlin/me/calebjones/spacelaunchnow/ui/subscription/SupportUsScreen.kt	Thank you!
-composeApp/src/commonMain/kotlin/me/calebjones/spacelaunchnow/ui/subscription/SupportUsScreen.kt	Thank you!
-composeApp/src/commonMain/kotlin/me/calebjones/spacelaunchnow/ui/subscription/SupportUsScreen.kt	Unable to Restore Purchase?
-composeApp/src/commonMain/kotlin/me/calebjones/spacelaunchnow/ui/subscription/SupportUsScreen.kt	Unlock Pro Forever
-composeApp/src/commonMain/kotlin/me/calebjones/spacelaunchnow/ui/subscription/SupportUsScreen.kt	Upgrade to unlock premium features and support development
-composeApp/src/commonMain/kotlin/me/calebjones/spacelaunchnow/ui/subscription/SupportUsScreen.kt	User ID
-composeApp/src/commonMain/kotlin/me/calebjones/spacelaunchnow/ui/subscription/SupportUsScreen.kt	Utilize premium themes to customize your app experience
-composeApp/src/commonMain/kotlin/me/calebjones/spacelaunchnow/ui/subscription/SupportUsScreen.kt	Yearly
-composeApp/src/commonMain/kotlin/me/calebjones/spacelaunchnow/ui/subscription/SupportUsScreen.kt	Yearly
-composeApp/src/commonMain/kotlin/me/calebjones/spacelaunchnow/ui/subscription/SupportUsScreen.kt	Yearly
-composeApp/src/commonMain/kotlin/me/calebjones/spacelaunchnow/ui/subscription/SupportUsScreen.kt	You're Making a Difference!
-composeApp/src/commonMain/kotlin/me/calebjones/spacelaunchnow/ui/subscription/SupportUsScreen.kt	You're a ${subscriptionType.name.lowercase()} member!
-composeApp/src/commonMain/kotlin/me/calebjones/spacelaunchnow/ui/subscription/SupportUsScreen.kt	Your legacy purchase helped build Space Launch Now into what it is today. I am incredibly grateful for your early support!
-composeApp/src/commonMain/kotlin/me/calebjones/spacelaunchnow/ui/subscription/SupportUsScreen.kt	one time
-composeApp/src/commonMain/kotlin/me/calebjones/spacelaunchnow/ui/subscription/SupportUsScreen.kt	then $price$period after trial
-composeApp/src/commonMain/kotlin/me/calebjones/spacelaunchnow/ui/subscription/SupportUsScreen.kt	✨ MAX SUPPORT ✨
-composeApp/src/commonMain/kotlin/me/calebjones/spacelaunchnow/ui/subscription/SupportUsScreen.kt	💰 Loading pricing from store...
-composeApp/src/commonMain/kotlin/me/calebjones/spacelaunchnow/ui/subscription/TemporaryPremiumCard.kt	Extend All Access (+24h)
-composeApp/src/commonMain/kotlin/me/calebjones/spacelaunchnow/ui/subscription/TemporaryPremiumCard.kt	Loading ad…
-composeApp/src/commonMain/kotlin/me/calebjones/spacelaunchnow/ui/subscription/TemporaryPremiumCard.kt	Loading ad…
-composeApp/src/commonMain/kotlin/me/calebjones/spacelaunchnow/ui/subscription/TemporaryPremiumCard.kt	Time remaining: ${formatTimeRemaining(earliestExpiration?.timeRemaining)}
-composeApp/src/commonMain/kotlin/me/calebjones/spacelaunchnow/ui/subscription/TemporaryPremiumCard.kt	Watch Ad for 24h Premium Access
 composeApp/src/commonMain/kotlin/me/calebjones/spacelaunchnow/ui/video/FullscreenVideoScreen.kt	Back
 composeApp/src/commonMain/kotlin/me/calebjones/spacelaunchnow/ui/video/FullscreenVideoScreen.kt	Back
 composeApp/src/commonMain/kotlin/me/calebjones/spacelaunchnow/ui/video/FullscreenVideoScreen.kt	LIVE
