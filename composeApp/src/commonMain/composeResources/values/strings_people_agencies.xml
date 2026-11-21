@@ -206,10 +206,11 @@
     <string name="astronaut_card_unknown_name">Unknown Astronaut</string>
     <!-- Astronaut detail screen, flight history card, heading. Heading text, one line, max 20 characters. -->
     <string name="astronaut_flight_history_title">Flight History</string>
-    <!-- Astronaut detail screen, flight history card, count of flights when there is exactly one. %1$d is the number of flights. Label text, one line, max 16 characters. -->
-    <string name="astronaut_flight_history_mission_count_one">%1$d Mission</string>
-    <!-- Astronaut detail screen, flight history card, count of flights when there is not exactly one. %1$d is the number of flights. Label text, one line, max 16 characters. -->
-    <string name="astronaut_flight_history_mission_count_other">%1$d Missions</string>
+    <!-- Astronaut detail screen, flight history card, count of flights. %1$d is the number of flights. Label text, one line, max 16 characters. -->
+    <plurals name="astronaut_flight_history_mission_count">
+        <item quantity="one">%1$d Mission</item>
+        <item quantity="other">%1$d Missions</item>
+    </plurals>
     <!-- Astronaut detail screen, biography card, heading. Heading text, one line, max 20 characters. -->
     <string name="astronaut_info_title">Biography</string>
     <!-- Astronaut detail screen, biography card, button that collapses a long biography. Button label, one line, max 16 characters. -->

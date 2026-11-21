@@ -21,10 +21,10 @@ import me.calebjones.spacelaunchnow.domain.model.Launch
 import me.calebjones.spacelaunchnow.ui.schedule.components.ScheduleLaunchView
 import me.calebjones.spacelaunchnow.ui.theme.SpaceLaunchNowPreviewTheme
 import org.jetbrains.compose.ui.tooling.preview.Preview
+import org.jetbrains.compose.resources.pluralStringResource
 import org.jetbrains.compose.resources.stringResource
 import spacelaunchnow_kmp.composeapp.generated.resources.Res
-import spacelaunchnow_kmp.composeapp.generated.resources.astronaut_flight_history_mission_count_one
-import spacelaunchnow_kmp.composeapp.generated.resources.astronaut_flight_history_mission_count_other
+import spacelaunchnow_kmp.composeapp.generated.resources.astronaut_flight_history_mission_count
 import spacelaunchnow_kmp.composeapp.generated.resources.astronaut_flight_history_title
 
 /**
@@ -66,11 +66,7 @@ fun AstronautFlightHistoryCard(
                     color = MaterialTheme.colorScheme.onSurfaceVariant
                 )
                 Text(
-                    text = if (flights.size == 1) {
-                        stringResource(Res.string.astronaut_flight_history_mission_count_one, flights.size)
-                    } else {
-                        stringResource(Res.string.astronaut_flight_history_mission_count_other, flights.size)
-                    },
+                    text = pluralStringResource(Res.plurals.astronaut_flight_history_mission_count, flights.size, flights.size),
                     style = MaterialTheme.typography.bodyMedium,
                     color = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.7f)
                 )
