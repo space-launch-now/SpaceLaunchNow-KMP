@@ -42,6 +42,14 @@ import compose.icons.fontawesomeicons.solid.CalendarAlt
 import me.calebjones.spacelaunchnow.LocalUseUtc
 import me.calebjones.spacelaunchnow.domain.model.Event
 import me.calebjones.spacelaunchnow.util.DateTimeUtil
+import org.jetbrains.compose.resources.stringResource
+import spacelaunchnow_kmp.composeapp.generated.resources.Res
+import spacelaunchnow_kmp.composeapp.generated.resources.launch_detail_event_icon_description
+import spacelaunchnow_kmp.composeapp.generated.resources.launch_detail_event_image_description
+import spacelaunchnow_kmp.composeapp.generated.resources.launch_detail_events_empty
+import spacelaunchnow_kmp.composeapp.generated.resources.launch_detail_events_load_more
+import spacelaunchnow_kmp.composeapp.generated.resources.launch_detail_events_loading
+import spacelaunchnow_kmp.composeapp.generated.resources.launch_detail_show_less
 
 /**
  * Card component for displaying related events to a launch.
@@ -92,7 +100,7 @@ fun RelatedEventsCard(
                             .padding(horizontal = 16.dp, vertical = 8.dp)
                     ) {
                         Text(
-                            text = "Load More (${events.size - 5} more)",
+                            text = stringResource(Res.string.launch_detail_events_load_more, events.size - 5),
                             style = MaterialTheme.typography.labelLarge
                         )
                     }
@@ -107,7 +115,7 @@ fun RelatedEventsCard(
                             .padding(horizontal = 16.dp, vertical = 8.dp)
                     ) {
                         Text(
-                            text = "Show Less",
+                            text = stringResource(Res.string.launch_detail_show_less),
                             style = MaterialTheme.typography.labelLarge
                         )
                     }
@@ -144,7 +152,7 @@ fun RelatedEventItem(
             val imageUrl = event.imageUrl
             SubcomposeAsyncImage(
                 model = imageUrl,
-                contentDescription = "Event Image",
+                contentDescription = stringResource(Res.string.launch_detail_event_image_description),
                 modifier = Modifier
                     .size(96.dp)
                     .clip(shape = RoundedCornerShape(2.dp)),
@@ -172,7 +180,7 @@ fun RelatedEventItem(
                     ) {
                         Icon(
                             imageVector = FontAwesomeIcons.Solid.CalendarAlt,
-                            contentDescription = "Event Icon",
+                            contentDescription = stringResource(Res.string.launch_detail_event_icon_description),
                             modifier = Modifier.size(48.dp),
                             tint = MaterialTheme.colorScheme.primary.copy(alpha = 0.6f)
                         )
@@ -250,7 +258,7 @@ fun RelatedEventsLoadingState() {
         )
         Spacer(modifier = Modifier.height(8.dp))
         Text(
-            text = "Loading related events...",
+            text = stringResource(Res.string.launch_detail_events_loading),
             style = MaterialTheme.typography.bodyMedium,
             color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.6f)
         )
@@ -278,7 +286,7 @@ fun RelatedEventsErrorState(error: String) {
             verticalArrangement = Arrangement.spacedBy(4.dp)
         ) {
             Text(
-                text = "No related events available",
+                text = stringResource(Res.string.launch_detail_events_empty),
                 style = MaterialTheme.typography.bodyMedium,
                 color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.7f)
             )

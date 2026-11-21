@@ -40,6 +40,10 @@ import me.calebjones.spacelaunchnow.util.SharingFormatUtil
 import me.calebjones.spacelaunchnow.util.StatusColorUtil.getLaunchStatusColor
 import me.calebjones.spacelaunchnow.util.sharePlainText
 import org.koin.compose.koinInject
+import org.jetbrains.compose.resources.stringResource
+import spacelaunchnow_kmp.composeapp.generated.resources.Res
+import spacelaunchnow_kmp.composeapp.generated.resources.launch_detail_share_description
+import spacelaunchnow_kmp.composeapp.generated.resources.launch_detail_share_title
 
 // Height constants for spacing adjustments
 private val CompactHeight = 40.dp
@@ -255,6 +259,7 @@ private fun PhoneLaunchDetailView(
 ) {
     val useUtc = LocalUseUtc.current
     val analyticsManager: AnalyticsManager = koinInject()
+    val shareTitle = stringResource(Res.string.launch_detail_share_title)
     HeroDetailScaffold(
         titleText = launch.name,
         taglineText = launch.provider?.name ?: "",
@@ -267,7 +272,7 @@ private fun PhoneLaunchDetailView(
                     analyticsManager.track(AnalyticsEvent.LaunchShared(launch.id.toString(), "share_sheet"))
                     sharePlainText(
                         SharingFormatUtil.formatLaunchShareText(launch, useUtc),
-                        "Space Launch Information"
+                        shareTitle
                     )
                 },
                 modifier = Modifier
@@ -277,7 +282,7 @@ private fun PhoneLaunchDetailView(
             ) {
                 Icon(
                     imageVector = Icons.Filled.Share,
-                    contentDescription = "Share",
+                    contentDescription = stringResource(Res.string.launch_detail_share_description),
                     tint = Color.White,
                     modifier = Modifier.size(24.dp)
                 )

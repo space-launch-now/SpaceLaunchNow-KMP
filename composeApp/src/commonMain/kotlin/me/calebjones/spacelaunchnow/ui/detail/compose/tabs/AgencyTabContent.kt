@@ -15,6 +15,10 @@ import me.calebjones.spacelaunchnow.ui.ads.AdPlacementType
 import me.calebjones.spacelaunchnow.ui.ads.SmartBannerAd
 import me.calebjones.spacelaunchnow.ui.detail.compose.components.AgencyDetailsCard
 import me.calebjones.spacelaunchnow.ui.detail.compose.components.AgencyLaunchStatistics
+import org.jetbrains.compose.resources.stringResource
+import spacelaunchnow_kmp.composeapp.generated.resources.Res
+import spacelaunchnow_kmp.composeapp.generated.resources.launch_detail_section_launch_service_provider
+import spacelaunchnow_kmp.composeapp.generated.resources.launch_detail_section_launch_service_provider_statistics
 
 /**
  * Agency tab content for launch detail view.
@@ -32,7 +36,7 @@ fun AgencyTabContent(
     ) {
         // Agency Card
         Text(
-            text = "Launch Service Provider",
+            text = stringResource(Res.string.launch_detail_section_launch_service_provider),
             style = MaterialTheme.typography.titleLarge,
             fontWeight = FontWeight.Bold
         )
@@ -40,7 +44,7 @@ fun AgencyTabContent(
         AgencyDetailsCard(provider = launch.provider, providerDetail = launch.providerDetail, openUrl = openUrl)
         Spacer(Modifier.height(16.dp))
         Text(
-            text = "Launch Service Provider Statistics",
+            text = stringResource(Res.string.launch_detail_section_launch_service_provider_statistics),
             style = MaterialTheme.typography.titleLarge,
             fontWeight = FontWeight.Bold
         )

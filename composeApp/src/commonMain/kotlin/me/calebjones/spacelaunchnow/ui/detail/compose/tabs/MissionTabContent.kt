@@ -17,6 +17,11 @@ import me.calebjones.spacelaunchnow.ui.detail.compose.components.LandingDetailsC
 import me.calebjones.spacelaunchnow.ui.detail.compose.components.LaunchLocationCard
 import me.calebjones.spacelaunchnow.ui.detail.compose.components.MissionDetailsCard
 import me.calebjones.spacelaunchnow.ui.detail.compose.components.PadQuickStatsRow
+import org.jetbrains.compose.resources.stringResource
+import spacelaunchnow_kmp.composeapp.generated.resources.Res
+import spacelaunchnow_kmp.composeapp.generated.resources.launch_detail_section_landing_details
+import spacelaunchnow_kmp.composeapp.generated.resources.launch_detail_section_launch_location
+import spacelaunchnow_kmp.composeapp.generated.resources.launch_detail_section_mission_details
 
 /**
  * Mission tab content for launch detail view.
@@ -35,7 +40,7 @@ fun MissionTabContent(
         // Mission Details Card
         launch.mission?.let { mission ->
             Text(
-                text = "Mission Details",
+                text = stringResource(Res.string.launch_detail_section_mission_details),
                 style = MaterialTheme.typography.titleLarge,
                 fontWeight = FontWeight.Bold
             )
@@ -50,7 +55,7 @@ fun MissionTabContent(
         // Launch Location
         launch.pad?.let { pad ->
             Text(
-                text = "Launch Location",
+                text = stringResource(Res.string.launch_detail_section_launch_location),
                 style = MaterialTheme.typography.titleLarge,
                 fontWeight = FontWeight.Bold
             )
@@ -69,7 +74,7 @@ fun MissionTabContent(
         val landingStages = launch.rocketDetail?.stages ?: emptyList()
         if (landingStages.any { it.landingAttempt != null }) {
             Text(
-                text = "Landing Details",
+                text = stringResource(Res.string.launch_detail_section_landing_details),
                 style = MaterialTheme.typography.titleLarge,
                 fontWeight = FontWeight.Bold
             )

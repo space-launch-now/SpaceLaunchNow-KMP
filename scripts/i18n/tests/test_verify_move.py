@@ -99,6 +99,17 @@ class VerifyMoveTest(unittest.TestCase):
         added = ['val d = stringResource(Res.string.version, a ?: "", b)']
         self.assertEqual([], self.run_diff(removed, added))
 
+    def test_literal_nested_in_template_expression_matches(self):
+        removed = ['Text("${a ?: "About"} km")']
+        self.assertEqual([], self.run_diff(removed, ["Text(stringResource(Res.string.about_title))"]))
+
+    def test_template_expression_across_lines_matches(self):
+        removed = ['"Version: ${', "    f", '}"', ]
+        added = ["stringResource(Res.string.version, f, g)"]
+        self.assertEqual(1, len(self.run_diff(removed, added)))  # needs 2 placeholders
+        removed = ['"Version: ${', "    f", '} (${g})"']
+        self.assertEqual([], self.run_diff(removed, added))
+
     def test_hoisted_literal_in_another_hunk_matches(self):
         self.assertEqual([], verify_move.verify(self.hoisted_diff("About"), self.strings, self.other))
 
