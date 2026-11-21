@@ -230,22 +230,19 @@ class RemoteConfigRepositoryImpl(
         }
     }
 
-    override suspend fun getNotificationRatingPromptEnabled(): Boolean {
-        val config = remoteConfig ?: return false
-        return try {
-            config.getValue(NOTIFICATION_RATING_PROMPT_KEY).asString().trim().equals("true", ignoreCase = true)
-        } catch (e: Exception) {
-            log.w(e) { "Failed to read notification rating prompt flag - defaulting to off" }
-            false
-        }
-    }
+    override suspend fun getNotificationRatingPromptEnabled(): Boolean =
+        readBooleanFlag(NOTIFICATION_RATING_PROMPT_KEY, "notification rating prompt")
 
-    override suspend fun getHomeUpgradeRowEnabled(): Boolean {
+    override suspend fun getHomeUpgradeRowEnabled(): Boolean =
+        readBooleanFlag(HOME_UPGRADE_ROW_KEY, "home upgrade row")
+
+    /** True only for the string "true"; false when unset, unavailable or unreadable. */
+    private fun readBooleanFlag(key: String, label: String): Boolean {
         val config = remoteConfig ?: return false
         return try {
-            config.getValue(HOME_UPGRADE_ROW_KEY).asString().trim().equals("true", ignoreCase = true)
+            config.getValue(key).asString().trim().equals("true", ignoreCase = true)
         } catch (e: Exception) {
-            log.w(e) { "Failed to read home upgrade row flag - defaulting to off" }
+            log.w(e) { "Failed to read $label flag - defaulting to off" }
             false
         }
     }
