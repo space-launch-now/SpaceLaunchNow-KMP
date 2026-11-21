@@ -192,10 +192,15 @@ actual fun SmartBannerAd(
     val reservedSize = if (availableAd.state == AdState.NONE) actualAdSize else availableAd.adSize
     val bannerHeight = if (reservedSize.height > 0) reservedSize.height.dp else 50.dp
 
-    // Inline slot handlers are not preloaded, so they reload here on a display change
-    // (preloaded handlers reload in WithPreloadedAds)
-    ReloadOnDisplayChange {
-        if (slotHandler != null && isBannerLoaded(slotHandler.state)) {
+    // Inline slot handlers are not preloaded, so they reload here when their loaded display
+    // config differs from the current one (preloaded handlers reload in WithPreloadedAds). The
+    // record covers a display change while this host was out of composition (scrolled away).
+    val displayKey = rememberDisplayConfigKey()
+    LaunchedEffect(slotHandler, displayKey) {
+        if (slotHandler != null && isBannerLoaded(slotHandler.state) &&
+            LoadedDisplayKeys.shared.isStale(slotHandler, displayKey)
+        ) {
+            LoadedDisplayKeys.shared.markLoaded(slotHandler, displayKey)
             slotHandler.reloadBannerView(placementType.name, actualAdSize)
         }
     }
@@ -216,6 +221,7 @@ actual fun SmartBannerAd(
             )
         ) {
             log.d { "New screen for placement $placementType - loading a fresh banner" }
+            slotHandler?.let { LoadedDisplayKeys.shared.markLoaded(it, displayKey) }
             availableAd.reloadBannerView(placementType.name)
         }
         refreshChecked = true
@@ -241,6 +247,7 @@ actual fun SmartBannerAd(
             // Preloaded handlers load themselves; a slot handler starts empty (at the library's
             // FULL_BANNER default size), so load it now at the slot's size
             AdState.NONE -> if (slotHandler != null) {
+                LoadedDisplayKeys.shared.markLoaded(slotHandler, displayKey)
                 availableAd.reloadBannerView(placementType.name, actualAdSize)
             }
 
@@ -249,6 +256,7 @@ actual fun SmartBannerAd(
                 log.d { "Ad failed, retrying in ${delayMs}ms for placement $placementType" }
                 delay(delayMs)
                 retryPolicy.recordAttempt(availableAd)
+                slotHandler?.let { LoadedDisplayKeys.shared.markLoaded(it, displayKey) }
                 availableAd.reloadBannerView(placementType.name)
                 retryRound++
             }

@@ -63,4 +63,29 @@ class BannerDisplayChecksTest {
         assertTrue(AdFrameCheck.mismatch(880 to 138, 880 to 138, clipped))
         assertFalse(AdFrameCheck.mismatch(880 to 138, 880 to 138, 880 to 138))
     }
+
+    @Test
+    fun handlerLoadedAtAnotherConfigIsStale() {
+        val keys = LoadedDisplayKeys()
+        val handler = Any()
+        keys.markLoaded(handler, base)
+        assertFalse(keys.isStale(handler, base.copy()))
+        assertTrue(keys.isStale(handler, base.copy(density = 3.5f)))
+        keys.markLoaded(handler, base.copy(density = 3.5f))
+        assertFalse(keys.isStale(handler, base.copy(density = 3.5f)))
+    }
+
+    @Test
+    fun unknownHandlerIsNotStale() {
+        assertFalse(LoadedDisplayKeys().isStale(Any(), base))
+    }
+
+    @Test
+    fun reloadSwapsOnlyWhenANewViewIsSet() {
+        val old = Any()
+        assertTrue(bannerViewSwapped(old, Any()))
+        assertTrue(bannerViewSwapped(null, Any()))
+        assertFalse(bannerViewSwapped(old, old))
+        assertFalse(bannerViewSwapped(old, null))
+    }
 }

@@ -9,6 +9,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberUpdatedState
 import androidx.compose.ui.platform.LocalDensity
 import app.lexilabs.basic.ads.AdState
+import java.util.WeakHashMap
 
 /**
  * What decides the pixel size of a banner. An AdView loaded at 320x50 dp is a fixed number of
@@ -26,6 +27,34 @@ internal data class DisplayConfigKey(
 /** A banner that has an AdView worth replacing: it loaded, or it is on screen. */
 internal fun isBannerLoaded(state: AdState): Boolean =
     state == AdState.READY || state == AdState.SHOWING || state == AdState.SHOWN
+
+/**
+ * The display config each handler was last loaded at. A handler whose host left composition
+ * while the display changed is not reloaded by [ReloadOnDisplayChange] (it only sees changes
+ * while composed), so the host compares this record with the current key when it comes back.
+ * Weak keys: a dropped handler leaves no entry.
+ */
+internal class LoadedDisplayKeys {
+    private val loadedAt = WeakHashMap<Any, DisplayConfigKey>()
+
+    fun markLoaded(handler: Any, key: DisplayConfigKey) {
+        loadedAt[handler] = key
+    }
+
+    /** True when [handler] was loaded at a different display config than [key]. Unknown: false. */
+    fun isStale(handler: Any, key: DisplayConfigKey): Boolean = loadedAt[handler]?.let { it != key } == true
+
+    companion object {
+        val shared = LoadedDisplayKeys()
+    }
+}
+
+/**
+ * True when a reload put a new view on the handler. reloadBannerView relies on load() swapping
+ * the handler's bannerView at once (true in basic-ads 1.1.1): if it did not, the replaced
+ * AdView is never retired, so the caller logs it.
+ */
+internal fun bannerViewSwapped(previous: Any?, current: Any?): Boolean = current != null && current !== previous
 
 /** "portrait" or "landscape" for the field report. */
 internal fun orientationLabel(orientation: Int): String = when (orientation) {
@@ -54,7 +83,7 @@ internal fun visibleSizeForCheck(
 }
 
 @Composable
-private fun rememberDisplayConfigKey(): DisplayConfigKey {
+internal fun rememberDisplayConfigKey(): DisplayConfigKey {
     val density = LocalDensity.current
     val widthClass = currentWindowAdaptiveInfo().windowSizeClass.windowWidthSizeClass
     return DisplayConfigKey(density.density, density.fontScale, widthClass.toString())
