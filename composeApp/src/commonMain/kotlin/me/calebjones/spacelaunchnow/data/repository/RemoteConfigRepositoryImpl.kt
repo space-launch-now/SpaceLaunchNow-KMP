@@ -68,6 +68,7 @@ class RemoteConfigRepositoryImpl(
         private const val USE_LEGACY_BACKEND_KEY = "use_legacy_backend"
         private const val INTERSTITIAL_VISITS_KEY = "ads_interstitial_visits"
         private const val NOTIFICATION_RATING_PROMPT_KEY = "rating_prompt_after_notification_enabled"
+        private const val LOCKED_NOTIFICATION_TAP_PAYWALL_KEY = "paywall_locked_notification_tap_enabled"
         private const val INTERSTITIAL_MIN_INTERVAL_KEY = "ads_interstitial_min_interval_s"
         const val DEFAULT_INTERSTITIAL_VISITS = 4
         const val DEFAULT_INTERSTITIAL_MIN_INTERVAL_S = 120L
@@ -179,7 +180,8 @@ class RemoteConfigRepositoryImpl(
                 USE_LEGACY_BACKEND_KEY to "false",
                 INTERSTITIAL_VISITS_KEY to DEFAULT_INTERSTITIAL_VISITS.toString(),
                 INTERSTITIAL_MIN_INTERVAL_KEY to DEFAULT_INTERSTITIAL_MIN_INTERVAL_S.toString(),
-                NOTIFICATION_RATING_PROMPT_KEY to "false"
+                NOTIFICATION_RATING_PROMPT_KEY to "false",
+                LOCKED_NOTIFICATION_TAP_PAYWALL_KEY to "false"
             )
         } catch (e: Exception) {
             // Log warning but don't fail - defaults are optional
@@ -229,12 +231,19 @@ class RemoteConfigRepositoryImpl(
         }
     }
 
-    override suspend fun getNotificationRatingPromptEnabled(): Boolean {
+    override suspend fun getNotificationRatingPromptEnabled(): Boolean =
+        readBooleanFlag(NOTIFICATION_RATING_PROMPT_KEY, "notification rating prompt")
+
+    override suspend fun getLockedNotificationTapPaywallEnabled(): Boolean =
+        readBooleanFlag(LOCKED_NOTIFICATION_TAP_PAYWALL_KEY, "locked notification tap paywall")
+
+    /** A boolean flag that is off when unset, unrecognized, or unreadable. */
+    private fun readBooleanFlag(key: String, label: String): Boolean {
         val config = remoteConfig ?: return false
         return try {
-            config.getValue(NOTIFICATION_RATING_PROMPT_KEY).asString().trim().equals("true", ignoreCase = true)
+            config.getValue(key).asString().trim().equals("true", ignoreCase = true)
         } catch (e: Exception) {
-            log.w(e) { "Failed to read notification rating prompt flag - defaulting to off" }
+            log.w(e) { "Failed to read $label flag - defaulting to off" }
             false
         }
     }
