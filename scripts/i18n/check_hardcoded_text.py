@@ -2,8 +2,8 @@
 """Stop new hard-coded English UI text in Kotlin sources (spec 017, section 6.3).
 
 Finds the string literals of Appendix A (a literal with a letter inside Text(...) or
-in a named argument such as title =, label =, contentDescription =) in composeApp
-and wearApp Kotlin sources. Debug files and test folders are skipped. Each finding
+in a named argument such as title =, label =, contentDescription =) in composeApp,
+wearApp and androidApp Kotlin sources. Debug files and test folders are skipped. Each finding
 is compared with scripts/i18n/hardcoded-baseline.txt, one line per finding:
 "<file><TAB><literal>". The comparison ignores line numbers; a literal that appears
 twice in a file needs two baseline lines. A finding with no baseline line fails the build.
@@ -36,7 +36,7 @@ PATTERNS = [
     re.compile(r"\b" + KEYS + r"\s*=\s*" + LIT),
 ]
 SKIP_DIRS = ("/build", "/openApi", "/.git", "Test/", "/test/")
-SOURCE_ROOT = re.compile(r"(composeApp|wearApp)/src/[^/]+/")
+SOURCE_ROOT = re.compile(r"(composeApp|wearApp|androidApp)/src/[^/]+/")
 IGNORE = re.compile(r"//\s*i18n-ignore:\s*\S")
 DEFAULT_BASELINE = Path(__file__).resolve().parent / "hardcoded-baseline.txt"
 HEADER = (

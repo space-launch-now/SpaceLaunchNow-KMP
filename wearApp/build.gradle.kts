@@ -28,7 +28,6 @@ fun wearVersionName(): String {
 
 plugins {
     alias(libs.plugins.androidApplication)
-    id("org.jetbrains.kotlin.android")
     alias(libs.plugins.compose.compiler)
     alias(libs.plugins.kotlinSerialization)
 }
@@ -88,7 +87,6 @@ android {
 
     buildFeatures {
         buildConfig = true
-        compose = true
     }
 }
 

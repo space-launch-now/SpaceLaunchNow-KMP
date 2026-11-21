@@ -2,7 +2,7 @@ package me.calebjones.spacelaunchnow.util
 
 import android.content.Context
 import android.content.Intent
-import me.calebjones.spacelaunchnow.R
+import me.calebjones.spacelaunchnow.shared.R
 import me.calebjones.spacelaunchnow.domain.model.Launch
 
 /**

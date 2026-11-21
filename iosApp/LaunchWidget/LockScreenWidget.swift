@@ -10,8 +10,8 @@ struct LockScreenWidget: Widget {
             LockScreenWidgetEntryView(entry: entry)
                 .containerBackground(.clear, for: .widget)
         }
-        .configurationDisplayName("Lock Screen Launch")
-        .description("Premium · Shows next launch on your Lock Screen")
+        .configurationDisplayName("widget_lock_screen_name")
+        .description("widget_lock_screen_description")
         .supportedFamilies([.accessoryRectangular, .accessoryInline, .accessoryCircular])
     }
 }
@@ -33,7 +33,7 @@ struct LockScreenWidgetEntryView: View {
             case .accessoryCircular:
                 AccessoryCircularView(entry: entry)
             default:
-                Text("Unsupported")
+                Text("widget_lock_screen_unsupported")
             }
         }
     }
@@ -47,17 +47,17 @@ struct LockScreenWidgetEntryView: View {
                     HStack(spacing: 4) {
                         Image(systemName: "lock.fill")
                             .font(.caption)
-                        Text("Premium")
+                        Text("widget_premium_badge")
                             .font(.caption)
                             .fontWeight(.semibold)
                     }
-                    Text("Upgrade to unlock")
+                    Text("widget_lock_screen_upgrade_short")
                         .font(.caption2)
                         .foregroundStyle(.secondary)
                 }
                 .widgetURL(URL(string: "spacelaunchnow://subscription"))
             case .accessoryInline:
-                Label("Upgrade to Premium", systemImage: "lock.fill")
+                Label("widget_lock_screen_upgrade_label", systemImage: "lock.fill")
                     .widgetURL(URL(string: "spacelaunchnow://subscription"))
             case .accessoryCircular:
                 ZStack {
@@ -67,7 +67,7 @@ struct LockScreenWidgetEntryView: View {
                 }
                 .widgetURL(URL(string: "spacelaunchnow://subscription"))
             default:
-                Text("Premium")
+                Text("widget_premium_badge")
             }
         }
     }
@@ -115,10 +115,10 @@ struct AccessoryRectangularView: View {
 
     private var placeholderView: some View {
         VStack(alignment: .leading, spacing: 2) {
-            Text("Loading launch...")
+            Text("widget_lock_screen_loading_launch")
                 .font(.headline)
                 .redacted(reason: .placeholder)
-            Text("Countdown here")
+            Text(verbatim: "Countdown here")
                 .font(.caption)
                 .redacted(reason: .placeholder)
         }
@@ -130,11 +130,11 @@ struct AccessoryRectangularView: View {
             HStack(spacing: 4) {
                 Image(systemName: "paperplane.fill")
                     .font(.caption)
-                Text("No Launches")
+                Text("widget_no_launches")
                     .font(.caption)
                     .fontWeight(.semibold)
             }
-            Text("Check back later")
+            Text("widget_lock_screen_check_back")
                 .font(.caption2)
                 .foregroundStyle(.secondary)
         }
@@ -148,7 +148,7 @@ struct AccessoryInlineView: View {
 
     var body: some View {
         if entry.isPlaceholder {
-            Text("Loading...")
+            Text("widget_loading")
         } else if let launch = entry.launches.first {
             let shortName =
                 launch.name.components(separatedBy: "|").first?.trimmingCharacters(in: .whitespaces)
@@ -158,7 +158,7 @@ struct AccessoryInlineView: View {
                 Text("\(shortName) \(hoursUntilLaunch(launch: launch))")
             }
         } else {
-            Label("No Launches", systemImage: "paperplane.fill")
+            Label("widget_no_launches", systemImage: "paperplane.fill")
         }
     }
 

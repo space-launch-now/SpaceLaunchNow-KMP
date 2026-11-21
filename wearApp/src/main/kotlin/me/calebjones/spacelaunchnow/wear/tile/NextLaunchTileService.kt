@@ -188,7 +188,7 @@ class NextLaunchTileService : TileService() {
         bottomSlot = {
             textEdgeButton(
                 onClick = launchDetailClickable(launch.id),
-                labelContent = { text("Details".layoutString) },
+                labelContent = { text(getString(R.string.wear_tile_details).layoutString) },
             )
         },
     )
@@ -354,9 +354,9 @@ class NextLaunchTileService : TileService() {
         // At compact, render labels as null so each segment shrinks to a single digit
         // line. That collapses the card vertically, freeing room for the status/location
         // row that primaryLayout otherwise clips at large font.
-        val daysLabel = if (useCompactCountdown) null else "DAYS"
-        val hoursLabel = if (useCompactCountdown) null else "HOURS"
-        val minutesLabel = if (useCompactCountdown) null else "MIN"
+        val daysLabel = if (useCompactCountdown) null else getString(R.string.wear_countdown_label_days)
+        val hoursLabel = if (useCompactCountdown) null else getString(R.string.wear_countdown_label_hours)
+        val minutesLabel = if (useCompactCountdown) null else getString(R.string.wear_countdown_label_minutes)
         return LayoutElementBuilders.Row.Builder()
             .setVerticalAlignment(LayoutElementBuilders.VERTICAL_ALIGN_CENTER)
             .addContent(countdownSegment(twoDigit(segments.days), daysLabel))
@@ -496,14 +496,14 @@ class NextLaunchTileService : TileService() {
     private fun MaterialScope.buildNoDataLayout() = primaryLayout(
         titleSlot = {
             text(
-                text = "Space Launch Now".layoutString,
+                text = getString(R.string.app_name).layoutString,
                 typography = Typography.TITLE_SMALL,
                 maxLines = 1,
             )
         },
         mainSlot = {
             text(
-                text = "No upcoming launches".layoutString,
+                text = getString(R.string.no_upcoming_launches).layoutString,
                 typography = Typography.BODY_LARGE,
                 color = colorScheme.onSurfaceVariant,
                 maxLines = 2,
@@ -512,7 +512,7 @@ class NextLaunchTileService : TileService() {
         bottomSlot = {
             textEdgeButton(
                 onClick = openAppClickable(),
-                labelContent = { text("Open".layoutString) },
+                labelContent = { text(getString(R.string.wear_tile_open).layoutString) },
             )
         },
     )
@@ -521,14 +521,14 @@ class NextLaunchTileService : TileService() {
     private fun MaterialScope.buildFreeUserLayout() = primaryLayout(
         titleSlot = {
             text(
-                text = "Space Launch Now".layoutString,
+                text = getString(R.string.app_name).layoutString,
                 typography = Typography.TITLE_SMALL,
                 maxLines = 1,
             )
         },
         mainSlot = {
             text(
-                text = "Upgrade on phone\nto see launches".layoutString,
+                text = getString(R.string.wear_tile_upgrade_prompt).layoutString,
                 typography = Typography.BODY_LARGE,
                 color = colorScheme.onSurfaceVariant,
                 maxLines = 2,
@@ -537,7 +537,7 @@ class NextLaunchTileService : TileService() {
         bottomSlot = {
             textEdgeButton(
                 onClick = openAppClickable(),
-                labelContent = { text("Open".layoutString) },
+                labelContent = { text(getString(R.string.wear_tile_open).layoutString) },
             )
         },
     )
@@ -546,14 +546,14 @@ class NextLaunchTileService : TileService() {
     private fun MaterialScope.buildErrorLayout() = primaryLayout(
         titleSlot = {
             text(
-                text = "Couldn't load".layoutString,
+                text = getString(R.string.wear_tile_error_title).layoutString,
                 typography = Typography.TITLE_SMALL,
                 maxLines = 1,
             )
         },
         mainSlot = {
             text(
-                text = "Tap to retry".layoutString,
+                text = getString(R.string.wear_tile_error_retry).layoutString,
                 typography = Typography.BODY_LARGE,
                 color = colorScheme.onSurfaceVariant,
             )
@@ -561,7 +561,7 @@ class NextLaunchTileService : TileService() {
         bottomSlot = {
             textEdgeButton(
                 onClick = openAppClickable(),
-                labelContent = { text("Open".layoutString) },
+                labelContent = { text(getString(R.string.wear_tile_open).layoutString) },
             )
         },
     )

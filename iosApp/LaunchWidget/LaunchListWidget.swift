@@ -10,8 +10,8 @@ struct LaunchListWidget: Widget {
         StaticConfiguration(kind: kind, provider: LaunchProvider()) { entry in
             LaunchListWidgetView(entry: entry)
         }
-        .configurationDisplayName("Launch List")
-        .description("Premium · Shows upcoming space launches")
+        .configurationDisplayName("widget_launch_list_name")
+        .description("widget_launch_list_description")
         .supportedFamilies([.systemMedium, .systemLarge, .systemExtraLarge])
     }
 }
@@ -51,7 +51,7 @@ struct LaunchListWidgetView: View {
             HStack {
                 Image(systemName: "list.bullet.rectangle")
                     .foregroundStyle(.orange)
-                Text("UPCOMING LAUNCHES")
+                Text("widget_launch_list_header")
                     .font(.caption2)
                     .fontWeight(.bold)
                     .foregroundStyle(.secondary)
@@ -123,7 +123,7 @@ struct LaunchListWidgetView: View {
             HStack {
                 Image(systemName: "list.bullet.rectangle")
                     .foregroundStyle(.orange)
-                Text("UPCOMING LAUNCHES")
+                Text("widget_launch_list_header")
                     .font(.caption2)
                     .fontWeight(.bold)
                     .foregroundStyle(.secondary)
@@ -150,7 +150,7 @@ struct LaunchListWidgetView: View {
                 .font(.largeTitle)
                 .foregroundStyle(.secondary)
 
-            Text("No Upcoming Launches")
+            Text("widget_launch_list_empty_title")
                 .font(.caption)
                 .foregroundStyle(.secondary)
         }
@@ -164,7 +164,7 @@ struct LaunchListWidgetView: View {
                 .font(.largeTitle)
                 .foregroundStyle(.red)
 
-            Text("Widget Error")
+            Text("widget_error_title")
                 .font(.headline)
                 .foregroundStyle(.primary)
 
@@ -180,12 +180,12 @@ struct LaunchListWidgetView: View {
             HStack(spacing: 4) {
                 Image(systemName: "arrow.clockwise")
                     .font(.caption2)
-                Text("Tap to refresh or wait 15 min")
+                Text("widget_error_hint")
                     .font(.caption2)
             }
             .foregroundStyle(.blue)
 
-            Text("Last tried: \(entry.date.formatted(date: .omitted, time: .shortened))")
+            Text(String(format: String(localized: "widget_error_last_tried"), entry.date.formatted(date: .omitted, time: .shortened)))
                 .font(.caption2)
                 .foregroundStyle(.tertiary)
         }
@@ -199,12 +199,12 @@ struct LaunchListWidgetView: View {
                 .font(.system(size: 40))
                 .foregroundStyle(.orange)
 
-            Text("Premium Widget")
+            Text("widget_premium_title")
                 .font(.headline)
                 .fontWeight(.bold)
                 .foregroundStyle(.primary)
 
-            Text("Upgrade to Premium to unlock the Launch List widget")
+            Text("widget_premium_launch_list_body")
                 .font(.caption)
                 .foregroundStyle(.secondary)
                 .multilineTextAlignment(.center)
@@ -216,7 +216,7 @@ struct LaunchListWidgetView: View {
             HStack(spacing: 4) {
                 Image(systemName: "arrow.up.circle.fill")
                     .font(.caption2)
-                Text("Tap to upgrade")
+                Text("widget_premium_cta")
                     .font(.caption2)
                     .fontWeight(.medium)
             }
