@@ -231,22 +231,19 @@ class RemoteConfigRepositoryImpl(
         }
     }
 
-    override suspend fun getNotificationRatingPromptEnabled(): Boolean {
-        val config = remoteConfig ?: return false
-        return try {
-            config.getValue(NOTIFICATION_RATING_PROMPT_KEY).asString().trim().equals("true", ignoreCase = true)
-        } catch (e: Exception) {
-            log.w(e) { "Failed to read notification rating prompt flag - defaulting to off" }
-            false
-        }
-    }
+    override suspend fun getNotificationRatingPromptEnabled(): Boolean =
+        readBooleanFlag(NOTIFICATION_RATING_PROMPT_KEY, "notification rating prompt")
 
-    override suspend fun getLockedNotificationTapPaywallEnabled(): Boolean {
+    override suspend fun getLockedNotificationTapPaywallEnabled(): Boolean =
+        readBooleanFlag(LOCKED_NOTIFICATION_TAP_PAYWALL_KEY, "locked notification tap paywall")
+
+    /** A boolean flag that is off when unset, unrecognized, or unreadable. */
+    private fun readBooleanFlag(key: String, label: String): Boolean {
         val config = remoteConfig ?: return false
         return try {
-            config.getValue(LOCKED_NOTIFICATION_TAP_PAYWALL_KEY).asString().trim().equals("true", ignoreCase = true)
+            config.getValue(key).asString().trim().equals("true", ignoreCase = true)
         } catch (e: Exception) {
-            log.w(e) { "Failed to read locked notification tap paywall flag - defaulting to off" }
+            log.w(e) { "Failed to read $label flag - defaulting to off" }
             false
         }
     }

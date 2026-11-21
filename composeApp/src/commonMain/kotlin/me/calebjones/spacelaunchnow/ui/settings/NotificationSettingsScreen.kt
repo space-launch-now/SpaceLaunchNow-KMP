@@ -485,7 +485,7 @@ fun NotificationSettingsScreen(
                                 modifier = Modifier
                                     .fillMaxWidth()
                                     .then(
-                                        if (onLockedControlClick != null && !uiState.hasNotificationCustomization) {
+                                        if (onLockedControlClick != null) {
                                             Modifier.clickable(onClick = onLockedControlClick)
                                         } else {
                                             Modifier
