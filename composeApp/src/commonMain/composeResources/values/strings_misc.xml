@@ -17,7 +17,7 @@
     <!-- Body of the feedback dialog above the buttons. Two to four lines. -->
     <string name="app_components_feedback_message">Your feedback helps me improve! How would you like to share your thoughts?</string>
     <!-- Title of the feedback dialog. One or two lines, headline size. -->
-    <string name="app_components_feedback_title">I\'d Love Your Feedback</string>
+    <string name="app_components_feedback_title">I'd Love Your Feedback</string>
     <!-- Content description of the close icon on a filter chip. %1$s is the filter label. Read by screen readers. -->
     <string name="app_components_filter_chip_remove_description">Remove %1$s filter</string>
     <!-- Banner text next to the cloud-off icon when data comes from the cache. One line, may truncate. -->
@@ -29,7 +29,7 @@
     <!-- Filled button in the rating dialog, one line, max 16 chars. Half the dialog width. -->
     <string name="app_components_rating_button_yes">Yes, I love it!</string>
     <!-- Dialog body under the rating title. Two or three lines. -->
-    <string name="app_components_rating_message">I\'d love to hear your feedback! Are you enjoying using the app?</string>
+    <string name="app_components_rating_message">I'd love to hear your feedback! Are you enjoying using the app?</string>
     <!-- Dialog title asking if the user likes the app. One or two lines, headline size. -->
     <string name="app_components_rating_title">Enjoying Space Launch Now?</string>
     <!-- Content description of the clear button in the search field. Read by screen readers. -->

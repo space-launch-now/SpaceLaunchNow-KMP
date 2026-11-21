@@ -236,11 +236,11 @@
     <!-- Astronaut detail screen, personal info and overview cards, tile label above the nationality chips. Label text, one line, max 20 characters. -->
     <string name="astronaut_info_nationality">Nationality</string>
     <!-- Mission screen, crew member card, accessibility action label of the card. %1$s is the astronaut name. Screen reader text, not shown, max 48 characters. -->
-    <string name="astronaut_profile_click_label">View %1$s\'s profile</string>
+    <string name="astronaut_profile_click_label">View %1$s's profile</string>
     <!-- Mission screen, crew member card, accessibility description of the card. %1$s is the astronaut name, %2$s the role. Screen reader text, not shown, max 80 characters. -->
     <string name="astronaut_profile_description">%1$s, %2$s. Tap to view profile</string>
     <!-- Mission screen, crew member card, accessibility description of the astronaut photo. %1$s is the astronaut name. Screen reader text, not shown, max 48 characters. -->
-    <string name="astronaut_profile_photo_description">%1$s\'s profile photo</string>
+    <string name="astronaut_profile_photo_description">%1$s's profile photo</string>
     <!-- Mission screen, crew member card, accessibility description of the agency logo. Screen reader text, not shown, max 20 characters. -->
     <string name="astronaut_profile_agency_logo_description">Agency logo</string>
     <!-- Astronaut detail screen, overview card, heading. Heading text, one line, max 20 characters. -->
