@@ -95,34 +95,19 @@ def load_strings(paths):
     """Return ({key: raw value} for <string>, {names of plurals and arrays})."""
     strings, other = {}, set()
     for path in paths:
-        for el in ET.parse(path).getroot():
-            if not isinstance(el.tag, str) or "name" not in el.attrib:
-                continue
-            if el.tag == "string":
-                strings[el.get("name")] = "".join(el.itertext())
-            else:
-                other.add(el.get("name"))
+        parse_strings(ET.parse(path).getroot(), strings, other)
     return strings, other
 
 
-REMOVED_XML_RE = re.compile(r'<string\s+name="([^"]+)"[^>]*>(.*?)</string>')
-
-
-def removed_xml_strings(diff: str):
-    """{key: raw value} for single-line <string> entries removed from a strings*.xml in the diff."""
-    out, path = {}, None
-    for line in diff.splitlines():
-        if line.startswith("--- "):
-            path = line[4:].removeprefix("a/")
-        elif line.startswith("-") and not line.startswith("---") and re.search(r"strings[^/]*\.xml$", path or ""):
-            for m in REMOVED_XML_RE.finditer(line):
-                out[m.group(1)] = xml_unescape(m.group(2))
-    return out
-
-
-def xml_unescape(text: str) -> str:
-    """Resolve XML entities in a raw <string> body the way ElementTree does."""
-    return "".join(ET.fromstring(f"<s>{text}</s>").itertext())
+def parse_strings(root, strings, other):
+    """Add the <string> entries of one resources element to `strings` and other names to `other`."""
+    for el in root:
+        if not isinstance(el.tag, str) or "name" not in el.attrib:
+            continue
+        if el.tag == "string":
+            strings[el.get("name")] = "".join(el.itertext())
+        else:
+            other.add(el.get("name"))
 
 
 def parse_hunks(diff: str):
@@ -147,6 +132,19 @@ def parse_hunks(diff: str):
             added.append(line[1:])
     if flush():
         yield path, removed, added
+
+
+REMOVED_XML_RE = re.compile(r'<string\s+name="([^"]+)"[^>]*>(.*?)</string>')
+
+
+def removed_xml_strings(diff: str):
+    """{key: raw value} for single-line <string> entries removed from a strings*.xml in the diff."""
+    out = {}
+    for path, removed, _ in parse_hunks(diff):
+        if re.search(r"strings[^/]*\.xml$", path or ""):
+            for m in REMOVED_XML_RE.finditer("\n".join(removed)):
+                out[m.group(1)] = "".join(ET.fromstring(f"<s>{m.group(2)}</s>").itertext())
+    return out
 
 
 def removed_literals(removed):
@@ -191,15 +189,15 @@ def new_files(diff: str):
     return set(re.findall(r"^--- /dev/null\n\+\+\+ b/(\S+)", diff, re.M))
 
 
-def verify(diff: str, strings, other, base_strings=None):
+def verify(diff: str, strings, other, base=None):
     """Return (failures, new_text). Keys added in a file that is new in the diff go to
     `new_text`: no text was removed from such a file, so there is nothing to compare. They
     count as new text, not as a move, and do not fail. Elsewhere, match added keys to
     removed literals per file, so a literal hoisted into a `val` in another hunk of the
     same file still counts. A removed `Res.string.<old>` adds its English value to the pool,
     so a swap between keys with equal text passes; the value is read from the removed XML
-    lines, then `base_strings` (the base revision), then `strings`."""
-    old_strings = {**strings, **(base_strings or {}), **removed_xml_strings(diff)}
+    lines, then `base` (the base revision strings), then `strings`."""
+    old_strings = {**strings, **(base or {}), **removed_xml_strings(diff)}
     created = new_files(diff)
     by_file = {}
     for path, removed, added in parse_hunks(diff):
@@ -222,7 +220,7 @@ def git_diff(base: str) -> str:
     return subprocess.run(cmd, check=True, capture_output=True, text=True, encoding="utf-8").stdout
 
 
-def base_strings(base: str, paths):
+def load_base_strings(base: str, paths):
     """{key: raw value} from the strings files at the merge base; files absent there are skipped."""
     merge_base = subprocess.run(["git", "merge-base", base, "HEAD"], capture_output=True, text=True)
     if merge_base.returncode:
@@ -232,8 +230,7 @@ def base_strings(base: str, paths):
         shown = subprocess.run(["git", "show", f"{merge_base.stdout.strip()}:{Path(path).as_posix()}"],
                                capture_output=True, text=True, encoding="utf-8")
         if shown.returncode == 0:
-            out.update({el.get("name"): "".join(el.itertext())
-                        for el in ET.fromstring(shown.stdout) if el.tag == "string" and "name" in el.attrib})
+            parse_strings(ET.fromstring(shown.stdout), out, set())
     return out
 
 
@@ -260,8 +257,9 @@ def main(argv=None) -> int:
 
     paths = args.strings or default_strings()
     strings, other = load_strings(paths)
-    old = {} if args.diff else base_strings(args.base, paths)
-    failures, new_text = verify(diff, strings, other, old)
+    # With --diff there is no git base to read, so only the diff and HEAD strings are used.
+    base = {} if args.diff else load_base_strings(args.base, paths)
+    failures, new_text = verify(diff, strings, other, base)
     for f in failures:
         print(f"FAIL {f}")
     if new_text:
