@@ -21,6 +21,11 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import me.calebjones.spacelaunchnow.domain.model.ArticleSummary
 import me.calebjones.spacelaunchnow.ui.detail.compose.components.RelatedNewsItem
+import spacelaunchnow_kmp.composeapp.generated.resources.Res
+import org.jetbrains.compose.resources.stringResource
+import spacelaunchnow_kmp.composeapp.generated.resources.station_reports_load_more
+import spacelaunchnow_kmp.composeapp.generated.resources.station_reports_show_less
+import spacelaunchnow_kmp.composeapp.generated.resources.station_reports_title
 
 /**
  * Card displaying station-related news reports from SNAPI
@@ -38,7 +43,7 @@ fun StationReportsCard(
     var showAll by remember { mutableStateOf(false) }
 
     Text(
-        text = "News and Reports",
+        text = stringResource(Res.string.station_reports_title),
         fontWeight = FontWeight.Bold,
         fontSize = 20.sp
     )
@@ -67,7 +72,7 @@ fun StationReportsCard(
                     modifier = Modifier.fillMaxWidth()
                 ) {
                     Text(
-                        text = "Load More (${articles.size - 5} more)",
+                        text = stringResource(Res.string.station_reports_load_more, articles.size - 5),
                         style = MaterialTheme.typography.labelLarge
                     )
                 }
@@ -80,7 +85,7 @@ fun StationReportsCard(
                     modifier = Modifier.fillMaxWidth()
                 ) {
                     Text(
-                        text = "Show Less",
+                        text = stringResource(Res.string.station_reports_show_less),
                         style = MaterialTheme.typography.labelLarge
                     )
                 }

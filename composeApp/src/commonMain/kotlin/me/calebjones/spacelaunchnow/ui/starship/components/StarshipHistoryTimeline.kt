@@ -43,6 +43,13 @@ import me.calebjones.spacelaunchnow.ui.viewmodel.ViewState
 import me.calebjones.spacelaunchnow.util.DateTimeUtil.formatLaunchDate
 import me.calebjones.spacelaunchnow.util.LaunchFormatUtil
 import me.calebjones.spacelaunchnow.util.StatusColorUtil.getLaunchStatusColor
+import spacelaunchnow_kmp.composeapp.generated.resources.Res
+import org.jetbrains.compose.resources.stringResource
+import spacelaunchnow_kmp.composeapp.generated.resources.starship_launch_fail_reason
+import spacelaunchnow_kmp.composeapp.generated.resources.starship_launch_image_description
+import spacelaunchnow_kmp.composeapp.generated.resources.starship_timeline_error
+import spacelaunchnow_kmp.composeapp.generated.resources.starship_timeline_title
+import spacelaunchnow_kmp.composeapp.generated.resources.starship_timeline_upcoming
 
 /**
  * Timeline view displaying the complete Starship program history
@@ -74,7 +81,7 @@ fun StarshipHistoryTimeline(
         ) {
         // Section header
         Text(
-            text = "Program Timeline",
+            text = stringResource(Res.string.starship_timeline_title),
             style = MaterialTheme.typography.headlineSmall,
             fontWeight = FontWeight.Bold,
             modifier = Modifier.padding(bottom = 16.dp)
@@ -111,7 +118,7 @@ fun StarshipHistoryTimeline(
         // Error state
         if (historyLaunchesState.error != null && historyLaunchesState.data.isEmpty()) {
             Text(
-                text = "Error loading history: ${historyLaunchesState.error}",
+                text = stringResource(Res.string.starship_timeline_error, historyLaunchesState.error.orEmpty()),
                 color = MaterialTheme.colorScheme.error,
                 style = MaterialTheme.typography.bodyMedium,
                 modifier = Modifier.padding(16.dp)
@@ -193,7 +200,7 @@ private fun NextLaunchTimelineCard(
         ) {
             // "UPCOMING" badge
             StatusChip(
-                text = "UPCOMING",
+                text = stringResource(Res.string.starship_timeline_upcoming),
                 color = MaterialTheme.colorScheme.primary
             )
 
@@ -201,7 +208,7 @@ private fun NextLaunchTimelineCard(
             if (launch.imageUrl != null) {
                 AsyncImage(
                     model = launch.imageUrl,
-                    contentDescription = "Launch image",
+                    contentDescription = stringResource(Res.string.starship_launch_image_description),
                     modifier = Modifier
                         .fillMaxWidth()
                         .height(160.dp)
@@ -286,7 +293,7 @@ private fun HistoryTimelineCard(
             if (launch.imageUrl != null) {
                 AsyncImage(
                     model = launch.imageUrl,
-                    contentDescription = "Launch image",
+                    contentDescription = stringResource(Res.string.starship_launch_image_description),
                     modifier = Modifier
                         .fillMaxWidth()
                         .height(140.dp)
@@ -325,7 +332,7 @@ private fun HistoryTimelineCard(
             // Failure reason (if applicable)
             if (!launch.failreason.isNullOrBlank()) {
                 Text(
-                    text = "⚠ ${launch.failreason}",
+                    text = stringResource(Res.string.starship_launch_fail_reason, launch.failreason),
                     style = MaterialTheme.typography.bodySmall,
                     color = MaterialTheme.colorScheme.error.copy(alpha = 0.9f),
                     overflow = TextOverflow.Ellipsis,

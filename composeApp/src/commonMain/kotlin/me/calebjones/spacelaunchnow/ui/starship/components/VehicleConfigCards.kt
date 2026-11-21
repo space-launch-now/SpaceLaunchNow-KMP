@@ -32,6 +32,9 @@ import me.calebjones.spacelaunchnow.domain.model.SpacecraftConfig
 import me.calebjones.spacelaunchnow.domain.model.VehicleConfig
 import me.calebjones.spacelaunchnow.ui.icons.CustomIcons
 import me.calebjones.spacelaunchnow.ui.icons.RocketLaunch
+import spacelaunchnow_kmp.composeapp.generated.resources.Res
+import org.jetbrains.compose.resources.stringResource
+import spacelaunchnow_kmp.composeapp.generated.resources.starship_vehicle_launch_count
 
 /**
  * Card for spacecraft configuration (category level)
@@ -196,7 +199,7 @@ internal fun LauncherConfigCard(
                     // Launch count badge
                     config.totalLaunchCount?.let { count ->
                         Text(
-                            text = "$count launches",
+                            text = stringResource(Res.string.starship_vehicle_launch_count, count),
                             style = MaterialTheme.typography.labelSmall,
                             color = Color.White.copy(alpha = 0.7f)
                         )
