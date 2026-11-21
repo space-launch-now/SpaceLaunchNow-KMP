@@ -24,7 +24,8 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.suspendCancellableCoroutine
 import kotlinx.datetime.Instant
-import me.calebjones.spacelaunchnow.BuildConfig
+import me.calebjones.spacelaunchnow.platform.AndroidBuildConfig
+import me.calebjones.spacelaunchnow.platform.AndroidEnvConfig
 import me.calebjones.spacelaunchnow.analytics.DatadogRUM
 import me.calebjones.spacelaunchnow.data.model.ProductInfo
 import me.calebjones.spacelaunchnow.data.model.PurchaseState
@@ -63,12 +64,12 @@ class AndroidBillingManager(
 
     override suspend fun initialize(appUserId: String?): Result<Unit> {
         return try {
-            log.d { "Initializing RevenueCat for Android - debug: ${BuildConfig.IS_DEBUG}, appUserId: $appUserId" }
+            log.d { "Initializing RevenueCat for Android - debug: ${AndroidBuildConfig.IS_DEBUG}, appUserId: $appUserId" }
 
             // Configure RevenueCat
-            Purchases.logLevel = if (BuildConfig.IS_DEBUG) LogLevel.DEBUG else LogLevel.WARN
+            Purchases.logLevel = if (AndroidBuildConfig.IS_DEBUG) LogLevel.DEBUG else LogLevel.WARN
 
-            Purchases.configure(apiKey = BuildConfig.REVENUECAT_ANDROID_KEY) {
+            Purchases.configure(apiKey = AndroidEnvConfig.REVENUECAT_ANDROID_KEY) {
                 this.appUserId = appUserId
             }
 

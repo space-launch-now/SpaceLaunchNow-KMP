@@ -9,8 +9,8 @@ import android.os.Build
 import androidx.core.app.NotificationCompat
 import androidx.work.CoroutineWorker
 import androidx.work.WorkerParameters
-import me.calebjones.spacelaunchnow.MainActivity
-import me.calebjones.spacelaunchnow.R
+import me.calebjones.spacelaunchnow.platform.mainActivityIntent
+import me.calebjones.spacelaunchnow.shared.R
 import me.calebjones.spacelaunchnow.util.logging.logger
 
 class LaunchNotificationWorker(
@@ -61,7 +61,7 @@ class LaunchNotificationWorker(
     }
 
     private fun showLaunchNotification(launchName: String, launchTime: String, launchId: String?) {
-        val intent = Intent(context, MainActivity::class.java).apply {
+        val intent = mainActivityIntent(context).apply {
             flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
             launchId?.let { putExtra("launch_id", it) }
         }
@@ -76,7 +76,7 @@ class LaunchNotificationWorker(
         val notification = NotificationCompat.Builder(context, CHANNEL_ID)
             .setContentTitle(context.getString(R.string.launch_alert_title))
             .setContentText(context.getString(R.string.launch_alert_text, launchName, launchTime))
-            .setSmallIcon(me.calebjones.spacelaunchnow.R.mipmap.ic_launcher_monochrome)
+            .setSmallIcon(me.calebjones.spacelaunchnow.shared.R.mipmap.ic_launcher_monochrome)
             .setContentIntent(pendingIntent)
             .setAutoCancel(true)
             .setPriority(NotificationCompat.PRIORITY_HIGH)

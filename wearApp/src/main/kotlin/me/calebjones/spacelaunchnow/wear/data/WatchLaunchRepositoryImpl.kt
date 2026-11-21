@@ -74,7 +74,8 @@ class WatchLaunchRepositoryImpl(
         return if (cached != null) {
             Result.success(cached)
         } else {
-            Result.failure(Exception("No launch data available from any source"))
+            // No message on purpose: the UI shows a localized "Failed to refresh" for a null message.
+            Result.failure(Exception())
         }
     }
 

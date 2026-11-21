@@ -17,6 +17,7 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.launch
+import me.calebjones.spacelaunchnow.wear.R
 import me.calebjones.spacelaunchnow.wear.WearActivity
 import me.calebjones.spacelaunchnow.wear.data.EntitlementSyncManager
 import me.calebjones.spacelaunchnow.wear.data.WatchLaunchRepository
@@ -112,12 +113,11 @@ class NextLaunchComplicationService : ComplicationDataSourceService() {
 
     override fun getPreviewData(type: ComplicationType): ComplicationData? {
 
-        val countdownShort = "1D 13H"
-        val countdownLong = "T-1D 13H"
-        val vehicleText = "Falcon 9"
-        val agencyAbbrev = "SpX"
-        val contentDescription =
-            PlainComplicationText.Builder("Next launch: $vehicleText in $countdownLong").build()
+        val countdownShort = getString(R.string.wear_complication_countdown_short_days_hours, 1, 13)
+        val countdownLong = getString(R.string.wear_complication_countdown_long_days_hours, 1, 13)
+        val vehicleText = getString(R.string.wear_complication_preview_vehicle)
+        val agencyAbbrev = getString(R.string.wear_complication_preview_agency)
+        val contentDescription = nextLaunchDescription(vehicleText, countdownLong)
 
         return when (type) {
             ComplicationType.SHORT_TEXT -> ShortTextComplicationData.Builder(
@@ -128,7 +128,7 @@ class NextLaunchComplicationService : ComplicationDataSourceService() {
                 .build()
 
             ComplicationType.LONG_TEXT -> LongTextComplicationData.Builder(
-                text = PlainComplicationText.Builder("$vehicleText — $countdownLong").build(),
+                text = PlainComplicationText.Builder(getString(R.string.wear_complication_long_text, vehicleText, countdownLong)).build(),
                 contentDescription = contentDescription,
             ).build()
 
@@ -154,9 +154,7 @@ class NextLaunchComplicationService : ComplicationDataSourceService() {
         val countdownLong = formatCountdown(launch)
         val vehicleName = formatVehicleName(launch)
         val agencyTitle = formatAgencyTitle(launch)
-        val contentDescription = PlainComplicationText.Builder(
-            "Next launch: $vehicleName in $countdownLong"
-        ).build()
+        val contentDescription = nextLaunchDescription(vehicleName, countdownLong)
         val tapAction = launchDetailPendingIntent(launch.id)
 
         return when (type) {
@@ -169,7 +167,7 @@ class NextLaunchComplicationService : ComplicationDataSourceService() {
                 .build()
 
             ComplicationType.LONG_TEXT -> LongTextComplicationData.Builder(
-                text = PlainComplicationText.Builder("$vehicleName — $countdownLong").build(),
+                text = PlainComplicationText.Builder(getString(R.string.wear_complication_long_text, vehicleName, countdownLong)).build(),
                 contentDescription = contentDescription,
             )
                 .setTapAction(tapAction)
@@ -208,9 +206,9 @@ class NextLaunchComplicationService : ComplicationDataSourceService() {
     }
 
     private fun buildFreeUserData(type: ComplicationType): ComplicationData? {
-        val subscribeText = PlainComplicationText.Builder("Subscribe").build()
+        val subscribeText = PlainComplicationText.Builder(getString(R.string.wear_complication_subscribe)).build()
         val contentDescription =
-            PlainComplicationText.Builder("Subscribe to see launch countdown").build()
+            PlainComplicationText.Builder(getString(R.string.wear_complication_subscribe_description)).build()
 
         return when (type) {
             ComplicationType.SHORT_TEXT -> ShortTextComplicationData.Builder(
@@ -237,8 +235,8 @@ class NextLaunchComplicationService : ComplicationDataSourceService() {
     }
 
     private fun buildNoDataComplication(type: ComplicationType): ComplicationData? {
-        val noLaunchText = PlainComplicationText.Builder("No launches").build()
-        val contentDescription = PlainComplicationText.Builder("No upcoming launches").build()
+        val noLaunchText = PlainComplicationText.Builder(getString(R.string.wear_complication_no_launches)).build()
+        val contentDescription = PlainComplicationText.Builder(getString(R.string.wear_complication_no_launches_description)).build()
 
         return when (type) {
             ComplicationType.SHORT_TEXT -> ShortTextComplicationData.Builder(
@@ -268,17 +266,17 @@ class NextLaunchComplicationService : ComplicationDataSourceService() {
     private fun formatCountdown(launch: CachedLaunch): String {
         val now = Clock.System.now()
         val duration = launch.net - now
-        if (duration.isNegative()) return "Launched"
+        if (duration.isNegative()) return getString(R.string.wear_countdown_launched)
 
         val totalMinutes = duration.inWholeMinutes
         val hours = totalMinutes / 60
         val mins = totalMinutes % 60
 
         return when {
-            hours >= 24 -> "T-${hours / 24}D ${hours % 24}H"
-            hours > 0 -> "T-${hours}H ${mins}M"
-            mins > 0 -> "T-${mins}M"
-            else -> "T-0"
+            hours >= 24 -> getString(R.string.wear_complication_countdown_long_days_hours, hours / 24, hours % 24)
+            hours > 0 -> getString(R.string.wear_complication_countdown_long_hours_minutes, hours, mins)
+            mins > 0 -> getString(R.string.wear_complication_countdown_long_minutes, mins)
+            else -> getString(R.string.wear_complication_countdown_long_zero)
         }
     }
 
@@ -290,17 +288,17 @@ class NextLaunchComplicationService : ComplicationDataSourceService() {
     private fun formatCountdownShort(launch: CachedLaunch): String {
         val now = Clock.System.now()
         val duration = launch.net - now
-        if (duration.isNegative()) return "Done"
+        if (duration.isNegative()) return getString(R.string.wear_complication_countdown_done)
 
         val totalMinutes = duration.inWholeMinutes
         val hours = totalMinutes / 60
         val mins = totalMinutes % 60
 
         return when {
-            hours >= 24 -> "${hours / 24}D ${hours % 24}H"
-            hours > 0 -> "${hours}H ${mins}M"
-            mins > 0 -> "${mins}M"
-            else -> "Now"
+            hours >= 24 -> getString(R.string.wear_complication_countdown_short_days_hours, hours / 24, hours % 24)
+            hours > 0 -> getString(R.string.wear_complication_countdown_short_hours_minutes, hours, mins)
+            mins > 0 -> getString(R.string.wear_complication_countdown_short_minutes, mins)
+            else -> getString(R.string.wear_complication_countdown_now)
         }
     }
 
@@ -312,8 +310,13 @@ class NextLaunchComplicationService : ComplicationDataSourceService() {
     private fun formatAgencyTitle(launch: CachedLaunch): String {
         if (!launch.lspAbbrev.isNullOrBlank()) return launch.lspAbbrev
         if (!launch.lspName.isNullOrBlank()) return launch.lspName.take(6)
-        return "T-"
+        return getString(R.string.wear_complication_agency_fallback)
     }
+
+    private fun nextLaunchDescription(vehicle: String, countdown: String) =
+        PlainComplicationText.Builder(
+            getString(R.string.wear_complication_next_launch_description, vehicle, countdown)
+        ).build()
 
     private fun formatVehicleName(launch: CachedLaunch): String {
         val lspDisplay = launch.lspName?.let { name ->

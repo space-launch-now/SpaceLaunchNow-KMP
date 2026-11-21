@@ -26,7 +26,7 @@ worktree_root="$(cd "$worktree_root" && pwd -P)"
 
 files=(
     ".env"
-    "composeApp/google-services.json"
+    "androidApp/google-services.json"
     "iosApp/iosApp/GoogleService-Info.plist"
     "iosApp/iosApp/Secrets.plist"
     "composeApp/src/desktopMain/kotlin/me/calebjones/spacelaunchnow/util/DesktopSecret.kt"

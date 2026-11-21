@@ -1,0 +1,29 @@
+name: Crowdin Assign TM
+
+# One-off: assign translation memory 406219 (old project, 606 segments) to Crowdin project 948217,
+# then read it back. Spec: specs/017-app-text-translation/spec.md (7.4). Steps: scripts/i18n/README.md.
+# Task: https://github.com/ItsCalebJones/SpaceLaunchNow-Tasks/issues/1265
+# Secret CROWDIN_PERSONAL_TOKEN comes from the repo secrets; the script never prints it.
+on:
+  workflow_dispatch:
+    inputs:
+      assign:
+        description: 'Assign the TM. Untick to only read the project and the TM back.'
+        type: boolean
+        default: true
+
+permissions:
+  contents: read
+
+jobs:
+  assign:
+    name: Assign TM and read it back
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    env:
+      CROWDIN_PERSONAL_TOKEN: ${{ secrets.CROWDIN_PERSONAL_TOKEN }}
+    steps:
+      - uses: actions/checkout@v5
+
+      - name: Assign and verify
+        run: python3 scripts/i18n/crowdin_assign_tm.py ${{ inputs.assign && '--assign' || '' }}
