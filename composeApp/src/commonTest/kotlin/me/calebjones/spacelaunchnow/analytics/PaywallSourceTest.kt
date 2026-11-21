@@ -22,7 +22,7 @@ class PaywallSourceTest {
             listOf(
                 "support_us", "onboarding", "home_heart", "home_remove_ads", "launch_detail_remove_ads",
                 "theme_prompt", "theme_widget_apply", "theme_reset", "notification_settings",
-                "calendar_sync", "settings_row", "widget_lock", "winback"
+                "calendar_sync", "settings_row", "widget_lock", "locked_notification_control", "winback"
             ),
             PaywallSource.entries.map { it.value }
         )

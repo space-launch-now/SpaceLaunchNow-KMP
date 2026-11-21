@@ -21,9 +21,6 @@ composeApp/src/androidMain/kotlin/me/calebjones/spacelaunchnow/widgets/NextUpWid
 composeApp/src/commonMain/kotlin/me/calebjones/spacelaunchnow/App.kt	Use rememberAdaptiveLayoutState() from ui.layout instead
 composeApp/src/commonMain/kotlin/me/calebjones/spacelaunchnow/Platform.kt	Use rememberAdaptiveLayoutState() from ui.layout instead
 composeApp/src/commonMain/kotlin/me/calebjones/spacelaunchnow/data/model/V5FilterPreferences.kt	V5 now uses NotificationState directly instead of V5FilterPreferences. 
-composeApp/src/commonMain/kotlin/me/calebjones/spacelaunchnow/ui/components/FinePrint.kt	Any purchase unlocks all premium features. 
-composeApp/src/commonMain/kotlin/me/calebjones/spacelaunchnow/ui/components/FinePrint.kt	Free trial will automatically convert to a paid subscription 
-composeApp/src/commonMain/kotlin/me/calebjones/spacelaunchnow/ui/components/FinePrint.kt	Secure Billing
 composeApp/src/commonMain/kotlin/me/calebjones/spacelaunchnow/ui/compose/CountdownWidget.kt	Description
 composeApp/src/commonMain/kotlin/me/calebjones/spacelaunchnow/ui/compose/CountdownWidget.kt	Launch Status
 composeApp/src/commonMain/kotlin/me/calebjones/spacelaunchnow/ui/compose/CountdownWidget.kt	NET Feb 15, 2026

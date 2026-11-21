@@ -104,4 +104,10 @@ interface RemoteConfigRepository {
      * Default 120.
      */
     suspend fun getInterstitialMinIntervalSeconds(): Long
+
+    /**
+     * Whether a tap on a locked notification control opens the paywall, from
+     * 'paywall_locked_notification_tap_enabled'. Default false; false on read failure.
+     */
+    suspend fun getLockedNotificationTapPaywallEnabled(): Boolean
 }
