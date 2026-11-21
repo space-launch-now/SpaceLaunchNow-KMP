@@ -51,6 +51,9 @@ import androidx.navigation.compose.rememberNavController
 import coil3.compose.SubcomposeAsyncImage
 import com.valentinilk.shimmer.shimmer
 import kotlinx.coroutines.launch
+import me.calebjones.spacelaunchnow.domain.mapper.launchStatusAbbrevLabel
+import me.calebjones.spacelaunchnow.domain.mapper.launchStatusLabel
+import me.calebjones.spacelaunchnow.domain.mapper.missionTypeLabel
 import me.calebjones.spacelaunchnow.domain.model.Launch
 import me.calebjones.spacelaunchnow.domain.model.LaunchStatus
 import me.calebjones.spacelaunchnow.domain.model.Mission
@@ -364,7 +367,8 @@ fun LaunchStatusChip(
             contentColor = Color.White
         ) {
             Text(
-                text = status.abbrev?.uppercase() ?: status.name.uppercase(),
+                text = (status.abbrev?.let { launchStatusAbbrevLabel(status.id, it) }
+                    ?: launchStatusLabel(status.id, status.name)).uppercase(),
                 modifier = Modifier.padding(horizontal = 8.dp, vertical = 4.dp),
                 style = MaterialTheme.typography.labelSmall.copy(
                     fontWeight = FontWeight.Medium
@@ -388,7 +392,7 @@ fun MissionTypeChip(
             contentColor = MaterialTheme.colorScheme.onSecondaryContainer
         ) {
             Text(
-                text = mission.type ?: "Mission",
+                text = mission.type?.let { missionTypeLabel(it) } ?: "Mission",
                 modifier = Modifier.padding(horizontal = 8.dp, vertical = 4.dp),
                 style = MaterialTheme.typography.labelSmall.copy(
                     fontWeight = FontWeight.Medium

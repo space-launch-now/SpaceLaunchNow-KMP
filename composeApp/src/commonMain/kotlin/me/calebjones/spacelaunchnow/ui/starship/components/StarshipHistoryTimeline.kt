@@ -35,6 +35,7 @@ import androidx.compose.ui.unit.dp
 import coil3.compose.AsyncImage
 import kotlinx.datetime.TimeZone
 import kotlinx.datetime.toLocalDateTime
+import me.calebjones.spacelaunchnow.domain.mapper.launchStatusLabel
 import me.calebjones.spacelaunchnow.domain.model.Launch
 import me.calebjones.spacelaunchnow.LocalUseUtc
 import me.calebjones.spacelaunchnow.ui.components.StatusChip
@@ -234,7 +235,7 @@ private fun NextLaunchTimelineCard(
             // Status
             launch.status?.let { status ->
                 StatusChip(
-                    text = status.name,
+                    text = launchStatusLabel(status.id, status.name),
                     color = getLaunchStatusColor(status.id)
                 )
             }
@@ -317,7 +318,7 @@ private fun HistoryTimelineCard(
             // Status chip
             launch.status?.let { status ->
                 StatusChip(
-                    text = status.name,
+                    text = launchStatusLabel(status.id, status.name),
                     color = getLaunchStatusColor(status.id)
                 )
             }

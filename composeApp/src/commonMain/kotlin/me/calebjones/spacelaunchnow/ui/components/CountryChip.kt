@@ -15,6 +15,7 @@ import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import coil3.compose.AsyncImage
+import me.calebjones.spacelaunchnow.domain.mapper.countryLabel
 import me.calebjones.spacelaunchnow.domain.model.Country
 import org.jetbrains.compose.ui.tooling.preview.Preview
 
@@ -25,7 +26,7 @@ import org.jetbrains.compose.ui.tooling.preview.Preview
  */
 @Composable
 fun CountryChip(country: Country) {
-    val label = country.name ?: country.alpha2Code ?: "Unknown"
+    val label = country.name?.let { countryLabel(country.alpha2Code, it) } ?: country.alpha2Code ?: "Unknown"
     val flagUrl = country.alpha2Code?.let { code ->
         "https://flagcdn.com/w40/${code.lowercase()}.png"
     }

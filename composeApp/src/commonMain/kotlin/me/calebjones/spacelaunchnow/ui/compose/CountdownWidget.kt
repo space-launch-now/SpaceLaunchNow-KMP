@@ -1,5 +1,6 @@
 package me.calebjones.spacelaunchnow.ui.compose
 
+import me.calebjones.spacelaunchnow.domain.mapper.launchStatusLabel
 import me.calebjones.spacelaunchnow.ui.ads.AdCoveringAlertDialog
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -118,9 +119,9 @@ fun LaunchCountdown(
                     .shadow(8.dp, RoundedCornerShape(25.dp)),
                 colors = StatusColorUtil.getLaunchStatusButtonColors(status?.id)
             ) {
-                status?.name?.let {
+                status?.name?.let { apiName ->
                     Text(
-                        text = it,
+                        text = launchStatusLabel(status?.id, apiName),
                         style = MaterialTheme.typography.titleMedium,
                         color = Color.White,
                         fontWeight = FontWeight.Bold
