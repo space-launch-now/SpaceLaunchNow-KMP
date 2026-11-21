@@ -38,10 +38,10 @@ jobs:
           python3 scripts/i18n/sync_shared_keys.py --check
           python3 -m unittest discover -s scripts/i18n/tests -p 'test_sync_shared_keys.py'
 
-      - name: Set up JDK 23
+      - name: Set up JDK 26
         uses: actions/setup-java@v5
         with:
-          java-version: '23'
+          java-version: '26'
           distribution: 'temurin'
 
       - name: Setup Gradle
@@ -95,9 +95,15 @@ jobs:
       - name: Grant execute permission for gradlew
         run: chmod +x gradlew
 
-      - name: Check code formatting & Run tests
-        run: ./gradlew :androidApp:lint test --parallel --continue
+      # Lint stays advisory.
+      - name: Run lint
+        run: ./gradlew :androidApp:lint --parallel --continue
         continue-on-error: true
+
+      # Same command as the release workflow's "Run unit tests" step, and it blocks the PR.
+      # basic-ads 1.2.x ships Java 26 bytecode, so the JDK above must stay at 26 or newer.
+      - name: Run unit tests
+        run: ./gradlew test --parallel --continue --build-cache
 
       - name: Generate test report
         if: always()
