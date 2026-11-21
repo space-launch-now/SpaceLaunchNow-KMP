@@ -1,0 +1,285 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- Top bar title of the Settings screen. One line, large heading. -->
+    <string name="settings_main_title">Settings</string>
+    <!-- Section heading in Settings. One line. -->
+    <string name="settings_main_section_general">General</string>
+    <!-- Switch title in Settings. One line. -->
+    <string name="settings_main_utc_title">Use UTC time</string>
+    <!-- Switch description under "Use UTC time". One or two lines. -->
+    <string name="settings_main_utc_subtitle">Show dates/times in UTC instead of local timezone</string>
+    <!-- Switch title in Settings. One line. -->
+    <string name="settings_main_hide_tbd_title">Hide TBD Launches</string>
+    <!-- Switch description under "Hide TBD Launches". One or two lines. -->
+    <string name="settings_main_hide_tbd_subtitle">Hide launches without confirmed dates</string>
+    <!-- Row title in Settings and top bar title of the theme screen. One line. -->
+    <string name="settings_theme_title">Theme Settings</string>
+    <!-- Row description under "Theme Settings". One or two lines. -->
+    <string name="settings_main_theme_subtitle">Appearance, colors, and palette customization</string>
+    <!-- Row title in Settings and top bar title of the calendar screen. One line. -->
+    <string name="settings_calendar_title">Calendar Sync</string>
+    <!-- Row description under "Calendar Sync". One or two lines. -->
+    <string name="settings_main_calendar_subtitle">Sync Launches and Events to your calendar</string>
+    <!-- Section heading in Settings. One line. -->
+    <string name="settings_main_section_notifications">Notifications</string>
+    <!-- Warning title when the app has no notification permission. One line. -->
+    <string name="settings_main_notifications_disabled_title">Notifications Disabled</string>
+    <!-- Description under "Notifications Disabled". One or two lines. -->
+    <string name="settings_main_notifications_disabled_subtitle">Permission required to send notifications</string>
+    <!-- Text button. Asks the system for notification permission. One word. -->
+    <string name="settings_main_notifications_enable">Enable</string>
+    <!-- Text button. Opens the system app settings to grant notification permission. Two words. -->
+    <string name="settings_main_notifications_open_settings">Open Settings</string>
+    <!-- Switch title for notifications. One line. -->
+    <string name="settings_main_notifications_enabled_title">Notifications Enabled</string>
+    <!-- Switch description under "Notifications Enabled". One or two lines. -->
+    <string name="settings_main_notifications_enabled_subtitle">Allow notifications for news, launches and events</string>
+    <!-- Row title. Opens the notification filter screen. One line. -->
+    <string name="settings_main_notification_filters_title">Notification Filters</string>
+    <!-- Row description under "Notification Filters". One or two lines. -->
+    <string name="settings_main_notification_filters_subtitle">Filter launches shown in app and notifications</string>
+    <!-- Row title. Opens the system notification settings. One line. -->
+    <string name="settings_main_system_settings_title">System Settings</string>
+    <!-- Row description under "System Settings". One or two lines. -->
+    <string name="settings_main_system_settings_subtitle">Manage notification channels, sounds, and do-not-disturb</string>
+    <!-- Section heading in Settings. One line. -->
+    <string name="settings_main_section_premium">Premium</string>
+    <!-- Row title with a sparkles symbol at the end. Keep the symbol. One line. -->
+    <string name="settings_main_go_premium_title">Go Premium ✨</string>
+    <!-- Row description under "Go Premium". One or two lines. -->
+    <string name="settings_main_go_premium_subtitle">Ad-free, widgets, themes &amp; more</string>
+    <!-- Section heading for the Wear OS watch app. One line. Wear OS is a product name. -->
+    <string name="settings_main_section_wear_os">Wear OS</string>
+    <!-- Card title when the watch app is not installed. One line. -->
+    <string name="settings_main_wear_available_title">Wear OS App Available</string>
+    <!-- Card text under "Wear OS App Available". One or two lines. -->
+    <string name="settings_main_wear_available_body">Space Launch Now is also available on Wear OS.</string>
+    <!-- Badge title for the watch app. One line. -->
+    <string name="settings_main_wear_early_release">Early Release</string>
+    <!-- Small status line. Starts with a bullet symbol; keep it. One line. -->
+    <string name="settings_main_wear_connected">● Watch connected</string>
+    <!-- Card text. Two or three lines. -->
+    <string name="settings_main_wear_early_release_body">Wear OS support is in early release. More features, polish, and improvements are on the way.</string>
+    <!-- Card heading about how often watch data refreshes. One line. -->
+    <string name="settings_main_wear_data_updates_title">Data updates</string>
+    <!-- Card text. Several lines. Tile and complication are Wear OS terms. -->
+    <string name="settings_main_wear_data_updates_body">Launch data on your watch is refreshed every 5 minutes when a launch is under 1 hour away, and every 30 minutes otherwise. The tile and complication follow the same filter preferences you set here in the app.</string>
+    <!-- Section heading in Settings above the logging card. One line. -->
+    <string name="settings_main_section_diagnostic">Diagnostic</string>
+    <!-- Section heading in Settings above the debug row. One line. -->
+    <string name="settings_main_section_developer">Developer</string>
+    <!-- Row title. Opens developer options. One line. -->
+    <string name="settings_main_debug_title">Debug Settings</string>
+    <!-- Row description under "Debug Settings". One or two lines. -->
+    <string name="settings_main_debug_subtitle">API URL switching, topic testing, and developer options</string>
+    <!-- Section heading in Settings. One line. -->
+    <string name="settings_main_section_about">About</string>
+    <!-- Row title. Opens the roadmap. One line. -->
+    <string name="settings_main_roadmap_title">Roadmap</string>
+    <!-- Row description under "Roadmap". One or two lines. -->
+    <string name="settings_main_roadmap_subtitle">View planned features and development timeline</string>
+    <!-- Row title. Opens a feedback form or email. One line. -->
+    <string name="settings_main_feedback_title">Send Feedback</string>
+    <!-- Row description under "Send Feedback". One or two lines. -->
+    <string name="settings_main_feedback_subtitle">Report issues or suggest improvements</string>
+    <!-- Row title. Opens the About screen. One line. -->
+    <string name="settings_main_about_details">About Details</string>
+    <!-- Row title. Opens the merchandise shop. One line. -->
+    <string name="settings_main_shop_title">Shop</string>
+    <!-- Row description under "Shop". One line. -->
+    <string name="settings_main_shop_subtitle">Space Launch Now merch</string>
+    <!-- Row title. Opens the ad consent form. One line. -->
+    <string name="settings_main_ad_privacy">Ad privacy settings</string>
+    <!-- Row title. Opens the privacy policy web page. One line. -->
+    <string name="settings_main_privacy_policy">Privacy policy</string>
+    <!-- Row title. Opens the terms web page. One line. -->
+    <string name="settings_main_terms_of_service">Terms of service</string>
+    <!-- Footer line. %1$s is the app version name such as 5.31.2. One line. -->
+    <string name="settings_main_version">Version %1$s</string>
+    <!-- Developer unlock dialog title. Used only by developers. One line. -->
+    <string name="settings_main_debug_dialog_title_totp">Enter TOTP Code</string>
+    <!-- Developer unlock dialog title. Used only by developers. One line. -->
+    <string name="settings_main_debug_dialog_title_password">Enter Debug Password</string>
+    <!-- Developer unlock dialog text. Used only by developers. One or two lines. -->
+    <string name="settings_main_debug_dialog_message_totp">Enter the 6-digit code from your authenticator app:</string>
+    <!-- Developer unlock dialog text. Used only by developers. One or two lines. -->
+    <string name="settings_main_debug_dialog_message_password">Enter the password to unlock developer settings:</string>
+    <!-- Text field label in the developer unlock dialog. One line. -->
+    <string name="settings_main_debug_dialog_field_totp">TOTP Code</string>
+    <!-- Text field label in the developer unlock dialog. One line. -->
+    <string name="settings_main_debug_dialog_field_password">Password</string>
+    <!-- Content description of the eye icon button. Read by screen readers. -->
+    <string name="settings_main_debug_dialog_hide_password">Hide password</string>
+    <!-- Content description of the eye icon button. Read by screen readers. -->
+    <string name="settings_main_debug_dialog_show_password">Show password</string>
+    <!-- Error under the text field in the developer unlock dialog. One line. -->
+    <string name="settings_main_debug_dialog_error_totp">Invalid TOTP code</string>
+    <!-- Error under the text field in the developer unlock dialog. One line. -->
+    <string name="settings_main_debug_dialog_error_password">Incorrect password</string>
+    <!-- Text button in the developer unlock dialog. One line. -->
+    <string name="settings_main_debug_dialog_use_password">Use Password Instead</string>
+    <!-- Text button in the developer unlock dialog. One line. -->
+    <string name="settings_main_debug_dialog_use_totp">Use TOTP Instead</string>
+    <!-- Button in the developer unlock dialog. One word. -->
+    <string name="settings_main_debug_dialog_unlock">Unlock</string>
+    <!-- Button in the developer unlock dialog. One word. -->
+    <string name="settings_main_debug_dialog_cancel">Cancel</string>
+    <!-- Content description of a lock icon, and a card heading, for features that need Premium. One line. -->
+    <string name="settings_main_premium_feature">Premium Feature</string>
+    <!-- Locked-state card title on the calendar screen. One line. -->
+    <string name="settings_calendar_unlock_title">Unlock Calendar Sync</string>
+    <!-- Locked-state card text. One or two lines. -->
+    <string name="settings_calendar_unlock_body">Upgrade to Premium to sync launches and events to your calendar.</string>
+    <!-- Snackbar after the user copies a feed URL. One line. -->
+    <string name="settings_calendar_url_copied">URL copied to clipboard!</string>
+    <!-- Heading of the info card. One line. -->
+    <string name="settings_calendar_how_title">How it works</string>
+    <!-- Info card text. Several lines. ICS is a calendar file format. -->
+    <string name="settings_calendar_how_body">Use the Calendar ICS URLs below to subscribe to Space Launch Now events and launches in your calendar app. Your calendar will automatically update with the latest information.</string>
+    <!-- Info card note. One or two lines. -->
+    <string name="settings_calendar_how_note">These links will work on any calendar that supports ICS URL feeds.</string>
+    <!-- Section heading above the two feed URLs. One line. -->
+    <string name="settings_calendar_feeds_title">Calendar Feed URLs</string>
+    <!-- Feed name. One word. -->
+    <string name="settings_calendar_feed_launches_title">Launches</string>
+    <!-- Feed description under "Launches". One line. -->
+    <string name="settings_calendar_feed_launches_description">Subscribe to upcoming space launches</string>
+    <!-- Feed name. One word. -->
+    <string name="settings_calendar_feed_events_title">Events</string>
+    <!-- Feed description under "Events". One line. -->
+    <string name="settings_calendar_feed_events_description">Subscribe to space-related events</string>
+    <!-- Content description of the copy icon button. Read by screen readers. -->
+    <string name="settings_calendar_copy_url">Copy URL</string>
+    <!-- Heading of the setup card. One line. -->
+    <string name="settings_calendar_setup_title">Google Calendar Setup</string>
+    <!-- Text above the numbered steps. One line. -->
+    <string name="settings_calendar_setup_intro">To add these feeds to Google Calendar:</string>
+    <!-- Setup step 1. One or two lines. -->
+    <string name="settings_calendar_setup_step_copy">Copy the calendar feed URL above</string>
+    <!-- Setup step 2. One or two lines. -->
+    <string name="settings_calendar_setup_step_open">Open Google Calendar on your computer</string>
+    <!-- Setup step 3. The quoted words are labels in Google Calendar: translate them as Google shows them. One or two lines. -->
+    <string name="settings_calendar_setup_step_add">Click the \"+\" next to \"Other calendars\"</string>
+    <!-- Setup step 4. The quoted words are a label in Google Calendar. One or two lines. -->
+    <string name="settings_calendar_setup_step_from_url">Select \"From URL\"</string>
+    <!-- Setup step 5. The quoted words are a label in Google Calendar. One or two lines. -->
+    <string name="settings_calendar_setup_step_paste">Paste the copied URL and click \"Add calendar\"</string>
+    <!-- Setup step 6. One or two lines. -->
+    <string name="settings_calendar_setup_step_repeat">Repeat for both Launches and Events feeds</string>
+    <!-- Closing note of the setup card. One or two lines. -->
+    <string name="settings_calendar_setup_done">Your calendar will automatically update with new launches and events!</string>
+    <!-- Locked-state card title. One line. -->
+    <string name="settings_theme_unlock_title">Unlock Custom Themes</string>
+    <!-- Locked-state card text. One or two lines. -->
+    <string name="settings_theme_unlock_body">Customize your app's theme with custom colors and palette styles</string>
+    <!-- Card title for the rewarded-ad offer. One line. -->
+    <string name="settings_theme_trial_title">24h Premium Access</string>
+    <!-- Card text for the rewarded-ad offer. One or two lines. -->
+    <string name="settings_theme_trial_body">Watch an ad to unlock premium theme features for 24 hours</string>
+    <!-- Section heading. One line. -->
+    <string name="settings_theme_section_appearance">Appearance</string>
+    <!-- Text under "Appearance". One line. -->
+    <string name="settings_theme_appearance_subtitle">Choose between light, dark, or system theme</string>
+    <!-- Section heading. One line. -->
+    <string name="settings_theme_section_preview">Live preview</string>
+    <!-- Text under "Live preview". One or two lines. -->
+    <string name="settings_theme_preview_subtitle">See how your selected color and palette style look together.</string>
+    <!-- Section heading for the base colour picker. One line. -->
+    <string name="settings_theme_section_seed">Seed Color</string>
+    <!-- Text under "Seed Color". One line. -->
+    <string name="settings_theme_seed_subtitle">Choose the seed color for your theme.</string>
+    <!-- Section heading. One line. -->
+    <string name="settings_theme_section_palette">Palette Style</string>
+    <!-- Text under "Palette Style". One or two lines. -->
+    <string name="settings_theme_palette_subtitle">Choose how colors are generated from your primary color</string>
+    <!-- Section heading for home screen widget options. One line. -->
+    <string name="settings_theme_section_widget">Widget Appearance</string>
+    <!-- Text under "Widget Appearance". One line. -->
+    <string name="settings_theme_widget_subtitle">Customize the look of your home screen widgets</string>
+    <!-- Slider title. One line. -->
+    <string name="settings_theme_widget_transparency_title">Background Transparency</string>
+    <!-- Hint under the slider. One line. -->
+    <string name="settings_theme_widget_transparency_hint">0% = Fully transparent, 100% = Fully opaque</string>
+    <!-- Slider title. One line. -->
+    <string name="settings_theme_widget_radius_title">Corner Radius</string>
+    <!-- Hint under the slider. One or two lines. dp is a unit. -->
+    <string name="settings_theme_widget_radius_hint">Rounded corners for widget background (0-40dp, increments of 4dp)</string>
+    <!-- Card title for premium users. One line. -->
+    <string name="settings_theme_widget_changes_title">Widget Appearance Changes</string>
+    <!-- Card text. One or two lines. -->
+    <string name="settings_theme_widget_changes_pending">You have unapplied changes. Tap below to update your widgets.</string>
+    <!-- Card text. One line. -->
+    <string name="settings_theme_widget_changes_applied">Your widgets are up to date.</string>
+    <!-- Card text for non-premium users. One or two lines. -->
+    <string name="settings_theme_widget_locked_body">Upgrade to premium to customize widget appearance and apply changes.</string>
+    <!-- Button. One line, max 24 chars. -->
+    <string name="settings_theme_widget_apply">Apply to Widgets</string>
+    <!-- Disabled button. One line, max 24 chars. -->
+    <string name="settings_theme_widget_applied">Already Applied</string>
+    <!-- Button. Opens the premium screen. One line, max 24 chars. -->
+    <string name="settings_theme_upgrade_to_premium">Upgrade to Premium</string>
+    <!-- Button. Resets all theme choices. One line. -->
+    <string name="settings_theme_reset">Reset to Defaults</string>
+    <!-- Disabled button for non-premium users. One line. -->
+    <string name="settings_theme_reset_premium">Reset to Defaults (Premium)</string>
+    <!-- Navigation bar label. One word. -->
+    <string name="settings_theme_tab_label">Theme</string>
+    <!-- Label under a colour swatch. One word. -->
+    <string name="settings_theme_role_primary">Primary</string>
+    <!-- Label under a colour swatch. One word. -->
+    <string name="settings_theme_role_secondary">Secondary</string>
+    <!-- Label under a colour swatch. One word. -->
+    <string name="settings_theme_role_tertiary">Tertiary</string>
+    <!-- Label of the hue slider. One word. -->
+    <string name="settings_theme_hue">Hue</string>
+    <!-- Label of the hex colour text field. One word. -->
+    <string name="settings_theme_hex">Hex</string>
+    <!-- Content description of a check mark on the chosen option. Read by screen readers. -->
+    <string name="settings_theme_selected">Selected</string>
+    <!-- Description of a palette style. One line. -->
+    <string name="settings_theme_palette_tonal_spot">Balanced and harmonious, default style</string>
+    <!-- Description of a palette style. One line. -->
+    <string name="settings_theme_palette_neutral">Subtle and muted tones</string>
+    <!-- Description of a palette style. One line. -->
+    <string name="settings_theme_palette_vibrant">Bold and saturated colors</string>
+    <!-- Description of a palette style. One line. -->
+    <string name="settings_theme_palette_expressive">Creative and dynamic palette</string>
+    <!-- Description of a palette style. One line. -->
+    <string name="settings_theme_palette_rainbow">Playful and colorful</string>
+    <!-- Description of a palette style. One line. -->
+    <string name="settings_theme_palette_fruit_salad">Fresh and varied hues</string>
+    <!-- Description of a palette style. One line. -->
+    <string name="settings_theme_palette_monochrome">Single hue variations</string>
+    <!-- Description of a palette style. One line. -->
+    <string name="settings_theme_palette_fidelity">True to your selected color</string>
+    <!-- Description of a palette style. One line. -->
+    <string name="settings_theme_palette_content">Adaptive to content</string>
+    <!-- Description of a palette style. One line. -->
+    <string name="settings_theme_palette_scheme_content">Content-based color scheme</string>
+    <!-- Description of an unknown palette style. One line. -->
+    <string name="settings_theme_palette_custom">Custom palette style</string>
+    <!-- Switch title. One line. -->
+    <string name="settings_theme_widget_follow_app_title">Follow App Theme</string>
+    <!-- Switch description. One or two lines. -->
+    <string name="settings_theme_widget_follow_app_subtitle">Use your custom app theme colors in widgets</string>
+    <!-- Switch title. One line. -->
+    <string name="settings_theme_widget_follow_system_title">Follow System Theme</string>
+    <!-- Switch description. One or two lines. -->
+    <string name="settings_theme_widget_follow_system_subtitle">Auto light/dark based on system settings</string>
+    <!-- Switch title. One line. -->
+    <string name="settings_theme_widget_dynamic_title">Dynamic Colors</string>
+    <!-- Switch description. One or two lines. -->
+    <string name="settings_theme_widget_dynamic_subtitle">Match wallpaper colors (Android 12+)</string>
+    <!-- Top bar title of the diagnostics screen. One line. -->
+    <string name="settings_diagnostics_title">Diagnostics</string>
+    <!-- Button. One or two lines. -->
+    <string name="settings_diagnostics_reset_button">Reset push subscriptions (resubscribe from scratch)</string>
+    <!-- Text under the reset button. Two or three lines. -->
+    <string name="settings_diagnostics_reset_hint">Unsubscribes every push topic this install has a record of, then resubscribes from your settings. Notifications may pause briefly while it runs.</string>
+    <!-- Card title. One line. -->
+    <string name="settings_logging_title">Diagnostic Logging</string>
+    <!-- Card text under the title. Several lines. Standard and Verbose are the names of two log levels on the chips below; Off is the third. -->
+    <string name="settings_logging_description">Help us debug issues by sharing diagnostic logs. Standard sends warnings and notification delivery decisions; Verbose sends detailed logs. Off keeps logs on this device only. Verbose switches back automatically after 72 hours.</string>
+    <!-- Text button. Opens the diagnostics screen. One line. -->
+    <string name="settings_logging_open_diagnostics">Open Diagnostics</string>
+</resources>

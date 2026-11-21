@@ -40,6 +40,10 @@ class VerifyMoveTest(unittest.TestCase):
     def test_equal_text_passes(self):
         self.assertEqual([], self.run_diff(['Text("About")'], ["Text(stringResource(Res.string.about_title))"]))
 
+    def test_joined_literals_over_several_lines_pass(self):
+        removed = ['    "One" +', '    "\\nTwo",']
+        self.assertEqual(self.run_diff(removed, ["    stringResource(Res.string.two_lines),"]), [])
+
     def test_different_text_fails(self):
         out = self.run_diff(['Text("About us")'], ["Text(stringResource(Res.string.about_title))"])
         self.assertEqual(1, len(out))

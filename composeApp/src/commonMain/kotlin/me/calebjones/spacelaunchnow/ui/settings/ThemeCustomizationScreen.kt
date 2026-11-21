@@ -95,6 +95,62 @@ import me.calebjones.spacelaunchnow.ui.subscription.PremiumPromptCard
 import me.calebjones.spacelaunchnow.ui.subscription.TemporaryPremiumCard
 import me.calebjones.spacelaunchnow.ui.viewmodel.ThemeOption
 import org.koin.compose.viewmodel.koinViewModel
+import org.jetbrains.compose.resources.stringResource
+import spacelaunchnow_kmp.composeapp.generated.resources.Res
+import spacelaunchnow_kmp.composeapp.generated.resources.common_back
+import spacelaunchnow_kmp.composeapp.generated.resources.settings_main_premium_feature
+import spacelaunchnow_kmp.composeapp.generated.resources.settings_theme_appearance_subtitle
+import spacelaunchnow_kmp.composeapp.generated.resources.settings_theme_hex
+import spacelaunchnow_kmp.composeapp.generated.resources.settings_theme_hue
+import spacelaunchnow_kmp.composeapp.generated.resources.settings_theme_palette_content
+import spacelaunchnow_kmp.composeapp.generated.resources.settings_theme_palette_custom
+import spacelaunchnow_kmp.composeapp.generated.resources.settings_theme_palette_expressive
+import spacelaunchnow_kmp.composeapp.generated.resources.settings_theme_palette_fidelity
+import spacelaunchnow_kmp.composeapp.generated.resources.settings_theme_palette_fruit_salad
+import spacelaunchnow_kmp.composeapp.generated.resources.settings_theme_palette_monochrome
+import spacelaunchnow_kmp.composeapp.generated.resources.settings_theme_palette_neutral
+import spacelaunchnow_kmp.composeapp.generated.resources.settings_theme_palette_rainbow
+import spacelaunchnow_kmp.composeapp.generated.resources.settings_theme_palette_scheme_content
+import spacelaunchnow_kmp.composeapp.generated.resources.settings_theme_palette_subtitle
+import spacelaunchnow_kmp.composeapp.generated.resources.settings_theme_palette_tonal_spot
+import spacelaunchnow_kmp.composeapp.generated.resources.settings_theme_palette_vibrant
+import spacelaunchnow_kmp.composeapp.generated.resources.settings_theme_preview_subtitle
+import spacelaunchnow_kmp.composeapp.generated.resources.settings_theme_reset
+import spacelaunchnow_kmp.composeapp.generated.resources.settings_theme_reset_premium
+import spacelaunchnow_kmp.composeapp.generated.resources.settings_theme_role_primary
+import spacelaunchnow_kmp.composeapp.generated.resources.settings_theme_role_secondary
+import spacelaunchnow_kmp.composeapp.generated.resources.settings_theme_role_tertiary
+import spacelaunchnow_kmp.composeapp.generated.resources.settings_theme_section_appearance
+import spacelaunchnow_kmp.composeapp.generated.resources.settings_theme_section_palette
+import spacelaunchnow_kmp.composeapp.generated.resources.settings_theme_section_preview
+import spacelaunchnow_kmp.composeapp.generated.resources.settings_theme_section_seed
+import spacelaunchnow_kmp.composeapp.generated.resources.settings_theme_section_widget
+import spacelaunchnow_kmp.composeapp.generated.resources.settings_theme_seed_subtitle
+import spacelaunchnow_kmp.composeapp.generated.resources.settings_theme_selected
+import spacelaunchnow_kmp.composeapp.generated.resources.settings_theme_tab_label
+import spacelaunchnow_kmp.composeapp.generated.resources.settings_theme_title
+import spacelaunchnow_kmp.composeapp.generated.resources.settings_theme_trial_body
+import spacelaunchnow_kmp.composeapp.generated.resources.settings_theme_trial_title
+import spacelaunchnow_kmp.composeapp.generated.resources.settings_theme_unlock_body
+import spacelaunchnow_kmp.composeapp.generated.resources.settings_theme_unlock_title
+import spacelaunchnow_kmp.composeapp.generated.resources.settings_theme_upgrade_to_premium
+import spacelaunchnow_kmp.composeapp.generated.resources.settings_theme_widget_applied
+import spacelaunchnow_kmp.composeapp.generated.resources.settings_theme_widget_apply
+import spacelaunchnow_kmp.composeapp.generated.resources.settings_theme_widget_changes_applied
+import spacelaunchnow_kmp.composeapp.generated.resources.settings_theme_widget_changes_pending
+import spacelaunchnow_kmp.composeapp.generated.resources.settings_theme_widget_changes_title
+import spacelaunchnow_kmp.composeapp.generated.resources.settings_theme_widget_dynamic_subtitle
+import spacelaunchnow_kmp.composeapp.generated.resources.settings_theme_widget_dynamic_title
+import spacelaunchnow_kmp.composeapp.generated.resources.settings_theme_widget_follow_app_subtitle
+import spacelaunchnow_kmp.composeapp.generated.resources.settings_theme_widget_follow_app_title
+import spacelaunchnow_kmp.composeapp.generated.resources.settings_theme_widget_follow_system_subtitle
+import spacelaunchnow_kmp.composeapp.generated.resources.settings_theme_widget_follow_system_title
+import spacelaunchnow_kmp.composeapp.generated.resources.settings_theme_widget_locked_body
+import spacelaunchnow_kmp.composeapp.generated.resources.settings_theme_widget_radius_hint
+import spacelaunchnow_kmp.composeapp.generated.resources.settings_theme_widget_radius_title
+import spacelaunchnow_kmp.composeapp.generated.resources.settings_theme_widget_subtitle
+import spacelaunchnow_kmp.composeapp.generated.resources.settings_theme_widget_transparency_hint
+import spacelaunchnow_kmp.composeapp.generated.resources.settings_theme_widget_transparency_title
 
 /**
  * Platform-specific widget update composable.
@@ -133,7 +189,7 @@ fun ThemeCustomizationScreen(
             TopAppBar(
                 title = {
                     Text(
-                        text = "Theme Settings",
+                        text = stringResource(Res.string.settings_theme_title),
                         style = MaterialTheme.typography.headlineMedium,
                         fontWeight = FontWeight.Bold,
                         fontSize = 24.sp,
@@ -141,14 +197,14 @@ fun ThemeCustomizationScreen(
                 },
                 navigationIcon = {
                     IconButton(onClick = { navController.popBackStack() }) {
-                        Icon(Icons.AutoMirrored.Filled.ArrowBack, "Back")
+                        Icon(Icons.AutoMirrored.Filled.ArrowBack, stringResource(Res.string.common_back))
                     }
                 },
                 actions = {
                     if (!hasCustomTheme) {
                         Icon(
                             Icons.Default.Lock,
-                            contentDescription = "Premium Feature",
+                            contentDescription = stringResource(Res.string.settings_main_premium_feature),
                             tint = MaterialTheme.colorScheme.primary,
                             modifier = Modifier.padding(end = 16.dp)
                         )
@@ -165,8 +221,8 @@ fun ThemeCustomizationScreen(
         ) {
             // Theme Selection (FREE - Available to all users)
             item {
-                SectionHeaderText("Appearance")
-                SectionSubHeaderText("Choose between light, dark, or system theme")
+                SectionHeaderText(stringResource(Res.string.settings_theme_section_appearance))
+                SectionSubHeaderText(stringResource(Res.string.settings_theme_appearance_subtitle))
                 SettingsCardRow {
                     ThemeSettingRow(
                         selected = selectedTheme,
@@ -180,8 +236,8 @@ fun ThemeCustomizationScreen(
             if (!hasCustomTheme) {
                 item {
                     PremiumPromptCard(
-                        title = "Unlock Custom Themes",
-                        description = "Customize your app's theme with custom colors and palette styles",
+                        title = stringResource(Res.string.settings_theme_unlock_title),
+                        description = stringResource(Res.string.settings_theme_unlock_body),
                         icon = Icons.Default.Palette,
                         onUpgradeClick = {
                             navController.navigate(SupportUs)
@@ -200,8 +256,8 @@ fun ThemeCustomizationScreen(
                         PremiumFeature.ADVANCED_WIDGETS,
                         PremiumFeature.WIDGETS_CUSTOMIZATION
                     ),
-                    title = "24h Premium Access",
-                    description = "Watch an ad to unlock premium theme features for 24 hours",
+                    title = stringResource(Res.string.settings_theme_trial_title),
+                    description = stringResource(Res.string.settings_theme_trial_body),
                     icon = Icons.Default.LockClock,
                     hasPermanentPremium = hasPermanentPremium
                 )
@@ -212,8 +268,8 @@ fun ThemeCustomizationScreen(
             // the saved primary color + palette style, this preview updates the moment
             // the user picks a different swatch or palette.
             item {
-                SectionHeaderText("Live preview")
-                SectionSubHeaderText("See how your selected color and palette style look together.")
+                SectionHeaderText(stringResource(Res.string.settings_theme_section_preview))
+                SectionSubHeaderText(stringResource(Res.string.settings_theme_preview_subtitle))
                 SettingsCardRow {
                     LiveThemePreview(modifier = Modifier.fillMaxWidth())
                 }
@@ -226,14 +282,14 @@ fun ThemeCustomizationScreen(
                         modifier = Modifier.fillMaxWidth().padding(end = 16.dp),
                         verticalAlignment = Alignment.CenterVertically
                     ) {
-                        SectionHeaderText("Seed Color")
+                        SectionHeaderText(stringResource(Res.string.settings_theme_section_seed))
                         Spacer(Modifier.weight(1f))
                         Spacer(Modifier.width(4.dp))
                         if (!hasCustomTheme) {
                             PremiumBadge()
                         }
                     }
-                    SectionSubHeaderText("Choose the seed color for your theme.")
+                    SectionSubHeaderText(stringResource(Res.string.settings_theme_seed_subtitle))
                 }
                 SettingsCardRow {
                     Column(modifier = Modifier.fillMaxWidth()) {
@@ -259,9 +315,9 @@ fun ThemeCustomizationScreen(
             }
 
             item {
-                SectionHeaderText("Palette Style")
+                SectionHeaderText(stringResource(Res.string.settings_theme_section_palette))
                 SectionSubHeaderText(
-                    "Choose how colors are generated from your primary color"
+                    stringResource(Res.string.settings_theme_palette_subtitle)
                 )
                 SettingsCardRow {
                     Column(
@@ -304,14 +360,14 @@ fun ThemeCustomizationScreen(
                         modifier = Modifier.fillMaxWidth().padding(end = 16.dp),
                         verticalAlignment = Alignment.CenterVertically
                     ) {
-                        SectionHeaderText("Widget Appearance")
+                        SectionHeaderText(stringResource(Res.string.settings_theme_section_widget))
                         Spacer(Modifier.weight(1f))
                         Spacer(Modifier.width(4.dp))
                         if (!hasWidgetCustomization) {
                             PremiumBadge()
                         }
                     }
-                    SectionSubHeaderText("Customize the look of your home screen widgets")
+                    SectionSubHeaderText(stringResource(Res.string.settings_theme_widget_subtitle))
                 }
             }
 
@@ -346,7 +402,7 @@ fun ThemeCustomizationScreen(
                                 verticalAlignment = Alignment.CenterVertically
                             ) {
                                 Text(
-                                    "Background Transparency",
+                                    stringResource(Res.string.settings_theme_widget_transparency_title),
                                     style = MaterialTheme.typography.titleMedium,
                                     color = if (hasWidgetCustomization) {
                                         MaterialTheme.colorScheme.onSurfaceVariant
@@ -356,6 +412,7 @@ fun ThemeCustomizationScreen(
                                     fontWeight = FontWeight.Bold
                                 )
                                 Text(
+                                    // i18n-ignore: number with a unit, no words
                                     "${(widgetBackgroundAlpha * 100).toInt()}%",
                                     style = MaterialTheme.typography.bodyMedium,
                                     color = if (hasWidgetCustomization) {
@@ -367,7 +424,7 @@ fun ThemeCustomizationScreen(
                                 )
                             }
                             Text(
-                                "0% = Fully transparent, 100% = Fully opaque",
+                                stringResource(Res.string.settings_theme_widget_transparency_hint),
                                 style = MaterialTheme.typography.bodySmall,
                                 color = if (hasWidgetCustomization) {
                                     MaterialTheme.colorScheme.onSurfaceVariant
@@ -402,7 +459,7 @@ fun ThemeCustomizationScreen(
                                 verticalAlignment = Alignment.CenterVertically
                             ) {
                                 Text(
-                                    "Corner Radius",
+                                    stringResource(Res.string.settings_theme_widget_radius_title),
                                     style = MaterialTheme.typography.titleMedium,
                                     color = if (hasWidgetCustomization) {
                                         MaterialTheme.colorScheme.onSurfaceVariant
@@ -412,6 +469,7 @@ fun ThemeCustomizationScreen(
                                     fontWeight = FontWeight.Bold
                                 )
                                 Text(
+                                    // i18n-ignore: number with a unit, no words
                                     "${widgetCornerRadius}dp",
                                     style = MaterialTheme.typography.bodyMedium,
                                     color = if (hasWidgetCustomization) {
@@ -423,7 +481,7 @@ fun ThemeCustomizationScreen(
                                 )
                             }
                             Text(
-                                "Rounded corners for widget background (0-40dp, increments of 4dp)",
+                                stringResource(Res.string.settings_theme_widget_radius_hint),
                                 style = MaterialTheme.typography.bodySmall,
                                 color = if (hasWidgetCustomization) {
                                     MaterialTheme.colorScheme.onSurfaceVariant
@@ -484,9 +542,9 @@ fun ThemeCustomizationScreen(
                         Spacer(Modifier.height(8.dp))
                         Text(
                             if (hasWidgetCustomization) {
-                                "Widget Appearance Changes"
+                                stringResource(Res.string.settings_theme_widget_changes_title)
                             } else {
-                                "Premium Feature"
+                                stringResource(Res.string.settings_main_premium_feature)
                             },
                             style = MaterialTheme.typography.titleMedium,
                             fontWeight = FontWeight.Bold,
@@ -496,12 +554,12 @@ fun ThemeCustomizationScreen(
                         Text(
                             if (hasWidgetCustomization) {
                                 if (hasUnappliedWidgetChanges) {
-                                    "You have unapplied changes. Tap below to update your widgets."
+                                    stringResource(Res.string.settings_theme_widget_changes_pending)
                                 } else {
-                                    "Your widgets are up to date."
+                                    stringResource(Res.string.settings_theme_widget_changes_applied)
                                 }
                             } else {
-                                "Upgrade to premium to customize widget appearance and apply changes."
+                                stringResource(Res.string.settings_theme_widget_locked_body)
                             },
                             style = MaterialTheme.typography.bodySmall,
                             color = MaterialTheme.colorScheme.onSurfaceVariant,
@@ -528,12 +586,12 @@ fun ThemeCustomizationScreen(
                             Text(
                                 if (hasWidgetCustomization) {
                                     if (hasUnappliedWidgetChanges) {
-                                        "Apply to Widgets"
+                                        stringResource(Res.string.settings_theme_widget_apply)
                                     } else {
-                                        "Already Applied"
+                                        stringResource(Res.string.settings_theme_widget_applied)
                                     }
                                 } else {
-                                    "Upgrade to Premium"
+                                    stringResource(Res.string.settings_theme_upgrade_to_premium)
                                 }
                             )
                         }
@@ -564,7 +622,7 @@ fun ThemeCustomizationScreen(
                         )
                         Spacer(Modifier.width(8.dp))
                     }
-                    Text(if (hasCustomTheme) "Reset to Defaults" else "Reset to Defaults (Premium)")
+                    Text(if (hasCustomTheme) stringResource(Res.string.settings_theme_reset) else stringResource(Res.string.settings_theme_reset_premium))
                 }
                 Spacer(Modifier.height(8.dp))
             }
@@ -590,7 +648,7 @@ private fun ThemeSettingRow(
             value = selected.label,
             onValueChange = {},
             readOnly = true,
-            label = { Text("Theme") },
+            label = { Text(stringResource(Res.string.settings_theme_tab_label)) },
             trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expanded = expanded) },
             modifier = Modifier
                 .menuAnchor(ExposedDropdownMenuAnchorType.PrimaryNotEditable)
@@ -633,20 +691,20 @@ private fun PremiumFeaturePrompt(
         )
         Spacer(Modifier.height(24.dp))
         Text(
-            "Premium Feature",
+            stringResource(Res.string.settings_main_premium_feature),
             style = MaterialTheme.typography.headlineMedium,
             fontWeight = FontWeight.Bold
         )
         Spacer(Modifier.height(8.dp))
         Text(
-            "Customize your app's theme with custom colors and palette styles",
+            stringResource(Res.string.settings_theme_unlock_body),
             style = MaterialTheme.typography.bodyMedium,
             color = MaterialTheme.colorScheme.onSurfaceVariant,
             textAlign = androidx.compose.ui.text.style.TextAlign.Center
         )
         Spacer(Modifier.height(24.dp))
         Button(onClick = onUpgradeClick) {
-            Text("Upgrade to Premium")
+            Text(stringResource(Res.string.settings_theme_upgrade_to_premium))
         }
     }
 }
@@ -712,9 +770,9 @@ private fun LiveThemePreview(modifier: Modifier = Modifier) {
             modifier = Modifier.fillMaxWidth(),
             horizontalArrangement = Arrangement.spacedBy(12.dp)
         ) {
-            ThemeRoleSwatch(label = "Primary", color = cs.primary, modifier = Modifier.weight(1f))
-            ThemeRoleSwatch(label = "Secondary", color = cs.secondary, modifier = Modifier.weight(1f))
-            ThemeRoleSwatch(label = "Tertiary", color = cs.tertiary, modifier = Modifier.weight(1f))
+            ThemeRoleSwatch(label = stringResource(Res.string.settings_theme_role_primary), color = cs.primary, modifier = Modifier.weight(1f))
+            ThemeRoleSwatch(label = stringResource(Res.string.settings_theme_role_secondary), color = cs.secondary, modifier = Modifier.weight(1f))
+            ThemeRoleSwatch(label = stringResource(Res.string.settings_theme_role_tertiary), color = cs.tertiary, modifier = Modifier.weight(1f))
         }
     }
 }
@@ -800,7 +858,7 @@ private fun SeedColorPicker(
 
         Spacer(Modifier.height(16.dp))
         Text(
-            "Hue",
+            stringResource(Res.string.settings_theme_hue),
             style = MaterialTheme.typography.labelMedium,
             color = MaterialTheme.colorScheme.onSurfaceVariant
         )
@@ -821,7 +879,7 @@ private fun SeedColorPicker(
 
         Spacer(Modifier.height(16.dp))
         Text(
-            "Hex",
+            stringResource(Res.string.settings_theme_hex),
             style = MaterialTheme.typography.labelMedium,
             color = MaterialTheme.colorScheme.onSurfaceVariant
         )
@@ -1034,7 +1092,7 @@ private fun ColorCircle(
         if (isSelected) {
             Icon(
                 Icons.Default.Check,
-                contentDescription = "Selected",
+                contentDescription = stringResource(Res.string.settings_theme_selected),
                 tint = Color.White,
                 modifier = Modifier.size(24.dp)
             )
@@ -1120,7 +1178,7 @@ private fun PaletteStyleItem(
             if (isSelected) {
                 Icon(
                     Icons.Default.Check,
-                    contentDescription = "Selected",
+                    contentDescription = stringResource(Res.string.settings_theme_selected),
                     tint = MaterialTheme.colorScheme.primary
                 )
             }
@@ -1128,18 +1186,19 @@ private fun PaletteStyleItem(
     }
 }
 
+@Composable
 private fun getPaletteStyleDescription(style: String): String = when (style) {
-    "TonalSpot" -> "Balanced and harmonious, default style"
-    "Neutral" -> "Subtle and muted tones"
-    "Vibrant" -> "Bold and saturated colors"
-    "Expressive" -> "Creative and dynamic palette"
-    "Rainbow" -> "Playful and colorful"
-    "FruitSalad" -> "Fresh and varied hues"
-    "Monochrome" -> "Single hue variations"
-    "Fidelity" -> "True to your selected color"
-    "Content" -> "Adaptive to content"
-    "SchemeContent" -> "Content-based color scheme"
-    else -> "Custom palette style"
+    "TonalSpot" -> stringResource(Res.string.settings_theme_palette_tonal_spot)
+    "Neutral" -> stringResource(Res.string.settings_theme_palette_neutral)
+    "Vibrant" -> stringResource(Res.string.settings_theme_palette_vibrant)
+    "Expressive" -> stringResource(Res.string.settings_theme_palette_expressive)
+    "Rainbow" -> stringResource(Res.string.settings_theme_palette_rainbow)
+    "FruitSalad" -> stringResource(Res.string.settings_theme_palette_fruit_salad)
+    "Monochrome" -> stringResource(Res.string.settings_theme_palette_monochrome)
+    "Fidelity" -> stringResource(Res.string.settings_theme_palette_fidelity)
+    "Content" -> stringResource(Res.string.settings_theme_palette_content)
+    "SchemeContent" -> stringResource(Res.string.settings_theme_palette_scheme_content)
+    else -> stringResource(Res.string.settings_theme_palette_custom)
 }
 
 class ThemeCustomizationViewModel(
@@ -1381,8 +1440,8 @@ private fun WidgetThemeSourceSelector(
     Column(modifier = modifier.fillMaxWidth()) {
         // Follow App Theme
         ThemeSourceOption(
-            title = "Follow App Theme",
-            description = "Use your custom app theme colors in widgets",
+            title = stringResource(Res.string.settings_theme_widget_follow_app_title),
+            description = stringResource(Res.string.settings_theme_widget_follow_app_subtitle),
             icon = "🎨",
             isSelected = selectedSource == WidgetThemeSource.FOLLOW_APP_THEME,
             onClick = { onSourceSelected(WidgetThemeSource.FOLLOW_APP_THEME) },
@@ -1393,8 +1452,8 @@ private fun WidgetThemeSourceSelector(
 
         // Follow System Theme
         ThemeSourceOption(
-            title = "Follow System Theme",
-            description = "Auto light/dark based on system settings",
+            title = stringResource(Res.string.settings_theme_widget_follow_system_title),
+            description = stringResource(Res.string.settings_theme_widget_follow_system_subtitle),
             icon = "⚙️",
             isSelected = selectedSource == WidgetThemeSource.FOLLOW_SYSTEM,
             onClick = { onSourceSelected(WidgetThemeSource.FOLLOW_SYSTEM) },
@@ -1405,8 +1464,8 @@ private fun WidgetThemeSourceSelector(
 
         // Dynamic Colors (Material You)
         ThemeSourceOption(
-            title = "Dynamic Colors",
-            description = "Match wallpaper colors (Android 12+)",
+            title = stringResource(Res.string.settings_theme_widget_dynamic_title),
+            description = stringResource(Res.string.settings_theme_widget_dynamic_subtitle),
             icon = "🌈",
             isSelected = selectedSource == WidgetThemeSource.DYNAMIC_COLORS,
             onClick = { onSourceSelected(WidgetThemeSource.DYNAMIC_COLORS) },
@@ -1493,14 +1552,14 @@ private fun ThemeSourceOption(
             if (isSelected && enabled) {
                 Icon(
                     Icons.Default.Check,
-                    contentDescription = "Selected",
+                    contentDescription = stringResource(Res.string.settings_theme_selected),
                     tint = MaterialTheme.colorScheme.primary,
                     modifier = Modifier.size(24.dp)
                 )
             } else if (!enabled) {
                 Icon(
                     Icons.Default.Lock,
-                    contentDescription = "Premium Feature",
+                    contentDescription = stringResource(Res.string.settings_main_premium_feature),
                     tint = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.6f),
                     modifier = Modifier.size(20.dp)
                 )

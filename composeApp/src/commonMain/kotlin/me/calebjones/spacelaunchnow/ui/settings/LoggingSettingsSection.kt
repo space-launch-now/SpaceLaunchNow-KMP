@@ -24,6 +24,11 @@ import me.calebjones.spacelaunchnow.util.logging.DiagnosticLevel
 import me.calebjones.spacelaunchnow.util.logging.DiagnosticLevelController
 import me.calebjones.spacelaunchnow.util.logging.LoggingPreferences
 import me.calebjones.spacelaunchnow.util.logging.displayLabel
+import org.jetbrains.compose.resources.stringResource
+import spacelaunchnow_kmp.composeapp.generated.resources.Res
+import spacelaunchnow_kmp.composeapp.generated.resources.settings_logging_description
+import spacelaunchnow_kmp.composeapp.generated.resources.settings_logging_open_diagnostics
+import spacelaunchnow_kmp.composeapp.generated.resources.settings_logging_title
 
 /**
  * Single diagnostic-logging control (replaces the old enable toggle + console
@@ -49,13 +54,10 @@ fun LoggingSettingsSection(
         colors = CardDefaults.cardColors(MaterialTheme.colorScheme.surfaceContainer)
     ) {
         Column(modifier = Modifier.padding(16.dp)) {
-            Text("Diagnostic Logging", style = MaterialTheme.typography.titleMedium)
+            Text(stringResource(Res.string.settings_logging_title), style = MaterialTheme.typography.titleMedium)
             Spacer(modifier = Modifier.height(8.dp))
             Text(
-                "Help us debug issues by sharing diagnostic logs. Standard sends warnings " +
-                    "and notification delivery decisions; Verbose sends detailed logs. " +
-                    "Off keeps logs on this device only." +
-                    " Verbose switches back automatically after 72 hours.",
+                stringResource(Res.string.settings_logging_description),
                 style = MaterialTheme.typography.bodySmall,
                 color = MaterialTheme.colorScheme.onSurfaceVariant
             )
@@ -79,7 +81,7 @@ fun LoggingSettingsSection(
                 }
             }
             TextButton(onClick = onOpenDiagnostics) {
-                Text("Open Diagnostics")
+                Text(stringResource(Res.string.settings_logging_open_diagnostics))
             }
         }
     }
