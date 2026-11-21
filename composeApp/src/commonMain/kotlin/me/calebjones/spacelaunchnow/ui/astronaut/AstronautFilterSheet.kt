@@ -47,6 +47,38 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import me.calebjones.spacelaunchnow.data.model.FilterOption
 import me.calebjones.spacelaunchnow.ui.viewmodel.AstronautSortOrder
+import org.jetbrains.compose.resources.stringResource
+import spacelaunchnow_kmp.composeapp.generated.resources.Res
+import spacelaunchnow_kmp.composeapp.generated.resources.astronaut_filter_clear_all
+import spacelaunchnow_kmp.composeapp.generated.resources.astronaut_filter_done
+import spacelaunchnow_kmp.composeapp.generated.resources.astronaut_filter_filters_title
+import spacelaunchnow_kmp.composeapp.generated.resources.astronaut_filter_has_flown_title
+import spacelaunchnow_kmp.composeapp.generated.resources.astronaut_filter_in_space_title
+import spacelaunchnow_kmp.composeapp.generated.resources.astronaut_filter_name_label
+import spacelaunchnow_kmp.composeapp.generated.resources.astronaut_filter_name_placeholder
+import spacelaunchnow_kmp.composeapp.generated.resources.astronaut_filter_option_all
+import spacelaunchnow_kmp.composeapp.generated.resources.astronaut_filter_option_no
+import spacelaunchnow_kmp.composeapp.generated.resources.astronaut_filter_option_yes
+import spacelaunchnow_kmp.composeapp.generated.resources.astronaut_filter_order_label
+import spacelaunchnow_kmp.composeapp.generated.resources.astronaut_filter_reload_button
+import spacelaunchnow_kmp.composeapp.generated.resources.astronaut_filter_reload_dialog_cancel
+import spacelaunchnow_kmp.composeapp.generated.resources.astronaut_filter_reload_dialog_confirm
+import spacelaunchnow_kmp.composeapp.generated.resources.astronaut_filter_reload_dialog_message
+import spacelaunchnow_kmp.composeapp.generated.resources.astronaut_filter_reload_dialog_title
+import spacelaunchnow_kmp.composeapp.generated.resources.astronaut_filter_search_apply
+import spacelaunchnow_kmp.composeapp.generated.resources.astronaut_filter_search_clear
+import spacelaunchnow_kmp.composeapp.generated.resources.astronaut_filter_search_title
+import spacelaunchnow_kmp.composeapp.generated.resources.astronaut_filter_selected_description
+import spacelaunchnow_kmp.composeapp.generated.resources.astronaut_filter_sort_title
+import spacelaunchnow_kmp.composeapp.generated.resources.astronaut_filter_status_add_more
+import spacelaunchnow_kmp.composeapp.generated.resources.astronaut_filter_status_all
+import spacelaunchnow_kmp.composeapp.generated.resources.astronaut_filter_status_hint
+import spacelaunchnow_kmp.composeapp.generated.resources.astronaut_filter_status_remove_description
+import spacelaunchnow_kmp.composeapp.generated.resources.astronaut_filter_status_title
+import spacelaunchnow_kmp.composeapp.generated.resources.astronaut_filter_title
+import spacelaunchnow_kmp.composeapp.generated.resources.astronaut_filter_type_human
+import spacelaunchnow_kmp.composeapp.generated.resources.astronaut_filter_type_non_human
+import spacelaunchnow_kmp.composeapp.generated.resources.astronaut_filter_type_title
 
 /**
  * Filter and sort bottom sheet content for astronaut list.
@@ -87,9 +119,9 @@ fun AstronautFilterSheet(
     if (showReloadConfirmDialog) {
         AdCoveringAlertDialog(
             onDismissRequest = { showReloadConfirmDialog = false },
-            title = { Text("Reload Filter Options?") },
+            title = { Text(stringResource(Res.string.astronaut_filter_reload_dialog_title)) },
             text = {
-                Text("This will re-download status options from the server. This may take a few moments.")
+                Text(stringResource(Res.string.astronaut_filter_reload_dialog_message))
             },
             confirmButton = {
                 TextButton(
@@ -98,12 +130,12 @@ fun AstronautFilterSheet(
                         onReloadOptions?.invoke()
                     }
                 ) {
-                    Text("Reload")
+                    Text(stringResource(Res.string.astronaut_filter_reload_dialog_confirm))
                 }
             },
             dismissButton = {
                 TextButton(onClick = { showReloadConfirmDialog = false }) {
-                    Text("Cancel")
+                    Text(stringResource(Res.string.astronaut_filter_reload_dialog_cancel))
                 }
             }
         )
@@ -122,12 +154,12 @@ fun AstronautFilterSheet(
                 verticalAlignment = Alignment.CenterVertically
             ) {
                 Text(
-                    text = "Filter & Sort",
+                    text = stringResource(Res.string.astronaut_filter_title),
                     style = MaterialTheme.typography.titleLarge,
                     fontWeight = FontWeight.Bold
                 )
                 TextButton(onClick = onClearAll) {
-                    Text("Clear All")
+                    Text(stringResource(Res.string.astronaut_filter_clear_all))
                 }
             }
         }
@@ -142,7 +174,7 @@ fun AstronautFilterSheet(
             ) {
                 Column(modifier = Modifier.padding(16.dp)) {
                     Text(
-                        text = "Search",
+                        text = stringResource(Res.string.astronaut_filter_search_title),
                         style = MaterialTheme.typography.titleMedium,
                         fontWeight = FontWeight.SemiBold,
                         modifier = Modifier.padding(bottom = 8.dp)
@@ -150,8 +182,8 @@ fun AstronautFilterSheet(
                     OutlinedTextField(
                         value = localSearchQuery,
                         onValueChange = { localSearchQuery = it },
-                        label = { Text("Astronaut name") },
-                        placeholder = { Text("e.g., Armstrong, Aldrin") },
+                        label = { Text(stringResource(Res.string.astronaut_filter_name_label)) },
+                        placeholder = { Text(stringResource(Res.string.astronaut_filter_name_placeholder)) },
                         modifier = Modifier.fillMaxWidth(),
                         singleLine = true,
                         shape = RoundedCornerShape(12.dp)
@@ -168,13 +200,13 @@ fun AstronautFilterSheet(
                             },
                             modifier = Modifier.weight(1f)
                         ) {
-                            Text("Clear")
+                            Text(stringResource(Res.string.astronaut_filter_search_clear))
                         }
                         Button(
                             onClick = { onSearchQueryChange(localSearchQuery) },
                             modifier = Modifier.weight(1f)
                         ) {
-                            Text("Apply")
+                            Text(stringResource(Res.string.astronaut_filter_search_apply))
                         }
                     }
                 }
@@ -191,7 +223,7 @@ fun AstronautFilterSheet(
             ) {
                 Column(modifier = Modifier.padding(16.dp)) {
                     Text(
-                        text = "Sort By",
+                        text = stringResource(Res.string.astronaut_filter_sort_title),
                         style = MaterialTheme.typography.titleMedium,
                         fontWeight = FontWeight.SemiBold,
                         modifier = Modifier.padding(bottom = 8.dp)
@@ -205,7 +237,7 @@ fun AstronautFilterSheet(
                             value = selectedSortOrder.displayName,
                             onValueChange = {},
                             readOnly = true,
-                            label = { Text("Order") },
+                            label = { Text(stringResource(Res.string.astronaut_filter_order_label)) },
                             trailingIcon = {
                                 ExposedDropdownMenuDefaults.TrailingIcon(expanded = sortExpanded)
                             },
@@ -232,7 +264,7 @@ fun AstronautFilterSheet(
                                             if (sortOrder == selectedSortOrder) {
                                                 Icon(
                                                     imageVector = Icons.Default.Check,
-                                                    contentDescription = "Selected",
+                                                    contentDescription = stringResource(Res.string.astronaut_filter_selected_description),
                                                     tint = MaterialTheme.colorScheme.primary
                                                 )
                                             }
@@ -263,7 +295,7 @@ fun AstronautFilterSheet(
                     verticalArrangement = Arrangement.spacedBy(12.dp)
                 ) {
                     Text(
-                        text = "Filters",
+                        text = stringResource(Res.string.astronaut_filter_filters_title),
                         style = MaterialTheme.typography.titleMedium,
                         fontWeight = FontWeight.SemiBold
                     )
@@ -271,7 +303,7 @@ fun AstronautFilterSheet(
                     // Has Flown Filter
                     Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
                         Text(
-                            text = "Has Flown to Space",
+                            text = stringResource(Res.string.astronaut_filter_has_flown_title),
                             style = MaterialTheme.typography.bodyMedium,
                             fontWeight = FontWeight.Medium
                         )
@@ -280,19 +312,19 @@ fun AstronautFilterSheet(
                                 selected = hasFlownFilter == null,
                                 onClick = { onHasFlownChange(null) },
                                 shape = SegmentedButtonDefaults.itemShape(index = 0, count = 3),
-                                label = { Text("All") }
+                                label = { Text(stringResource(Res.string.astronaut_filter_option_all)) }
                             )
                             SegmentedButton(
                                 selected = hasFlownFilter == true,
                                 onClick = { onHasFlownChange(true) },
                                 shape = SegmentedButtonDefaults.itemShape(index = 1, count = 3),
-                                label = { Text("Yes") }
+                                label = { Text(stringResource(Res.string.astronaut_filter_option_yes)) }
                             )
                             SegmentedButton(
                                 selected = hasFlownFilter == false,
                                 onClick = { onHasFlownChange(false) },
                                 shape = SegmentedButtonDefaults.itemShape(index = 2, count = 3),
-                                label = { Text("No") }
+                                label = { Text(stringResource(Res.string.astronaut_filter_option_no)) }
                             )
                         }
                     }
@@ -300,7 +332,7 @@ fun AstronautFilterSheet(
                     // In Space Filter
                     Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
                         Text(
-                            text = "Currently in Space",
+                            text = stringResource(Res.string.astronaut_filter_in_space_title),
                             style = MaterialTheme.typography.bodyMedium,
                             fontWeight = FontWeight.Medium
                         )
@@ -309,19 +341,19 @@ fun AstronautFilterSheet(
                                 selected = inSpaceFilter == null,
                                 onClick = { onInSpaceChange(null) },
                                 shape = SegmentedButtonDefaults.itemShape(index = 0, count = 3),
-                                label = { Text("All") }
+                                label = { Text(stringResource(Res.string.astronaut_filter_option_all)) }
                             )
                             SegmentedButton(
                                 selected = inSpaceFilter == true,
                                 onClick = { onInSpaceChange(true) },
                                 shape = SegmentedButtonDefaults.itemShape(index = 1, count = 3),
-                                label = { Text("Yes") }
+                                label = { Text(stringResource(Res.string.astronaut_filter_option_yes)) }
                             )
                             SegmentedButton(
                                 selected = inSpaceFilter == false,
                                 onClick = { onInSpaceChange(false) },
                                 shape = SegmentedButtonDefaults.itemShape(index = 2, count = 3),
-                                label = { Text("No") }
+                                label = { Text(stringResource(Res.string.astronaut_filter_option_no)) }
                             )
                         }
                     }
@@ -329,7 +361,7 @@ fun AstronautFilterSheet(
                     // Is Human Filter
                     Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
                         Text(
-                            text = "Type",
+                            text = stringResource(Res.string.astronaut_filter_type_title),
                             style = MaterialTheme.typography.bodyMedium,
                             fontWeight = FontWeight.Medium
                         )
@@ -338,19 +370,19 @@ fun AstronautFilterSheet(
                                 selected = isHumanFilter == null,
                                 onClick = { onIsHumanChange(null) },
                                 shape = SegmentedButtonDefaults.itemShape(index = 0, count = 3),
-                                label = { Text("All") }
+                                label = { Text(stringResource(Res.string.astronaut_filter_option_all)) }
                             )
                             SegmentedButton(
                                 selected = isHumanFilter == true,
                                 onClick = { onIsHumanChange(true) },
                                 shape = SegmentedButtonDefaults.itemShape(index = 1, count = 3),
-                                label = { Text("Human") }
+                                label = { Text(stringResource(Res.string.astronaut_filter_type_human)) }
                             )
                             SegmentedButton(
                                 selected = isHumanFilter == false,
                                 onClick = { onIsHumanChange(false) },
                                 shape = SegmentedButtonDefaults.itemShape(index = 2, count = 3),
-                                label = { Text("Non-Human") }
+                                label = { Text(stringResource(Res.string.astronaut_filter_type_non_human)) }
                             )
                         }
                     }
@@ -372,13 +404,13 @@ fun AstronautFilterSheet(
                         verticalArrangement = Arrangement.spacedBy(12.dp)
                     ) {
                         Text(
-                            text = "Status",
+                            text = stringResource(Res.string.astronaut_filter_status_title),
                             style = MaterialTheme.typography.titleMedium,
                             fontWeight = FontWeight.SemiBold
                         )
 
                         Text(
-                            text = "Select one or more statuses to filter by",
+                            text = stringResource(Res.string.astronaut_filter_status_hint),
                             style = MaterialTheme.typography.bodySmall,
                             color = MaterialTheme.colorScheme.onSurfaceVariant
                         )
@@ -409,7 +441,7 @@ fun AstronautFilterSheet(
                                         trailingIcon = {
                                             Icon(
                                                 imageVector = Icons.Default.Close,
-                                                contentDescription = "Remove filter",
+                                                contentDescription = stringResource(Res.string.astronaut_filter_status_remove_description),
                                                 modifier = Modifier.size(16.dp)
                                             )
                                         }
@@ -420,7 +452,7 @@ fun AstronautFilterSheet(
 
                         // All available status chips
                         Text(
-                            text = if (selectedStatusIds.isEmpty()) "All Statuses" else "Add More",
+                            text = if (selectedStatusIds.isEmpty()) stringResource(Res.string.astronaut_filter_status_all) else stringResource(Res.string.astronaut_filter_status_add_more),
                             style = MaterialTheme.typography.bodyMedium,
                             fontWeight = FontWeight.Medium
                         )
@@ -460,7 +492,7 @@ fun AstronautFilterSheet(
                     onClick = { showReloadConfirmDialog = true },
                     modifier = Modifier.fillMaxWidth()
                 ) {
-                    Text("Reload Filter Options")
+                    Text(stringResource(Res.string.astronaut_filter_reload_button))
                 }
             }
         }
@@ -478,7 +510,7 @@ fun AstronautFilterSheet(
                         containerColor = MaterialTheme.colorScheme.primary
                     )
                 ) {
-                    Text("Done")
+                    Text(stringResource(Res.string.astronaut_filter_done))
                 }
             }
         }

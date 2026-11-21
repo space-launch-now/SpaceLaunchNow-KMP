@@ -120,4 +120,154 @@
     <string name="agency_detail_error_title">Oops! Something went wrong</string>
     <!-- Agency detail screen, error card, full width button that reloads the agency. Button label, one line, max 16 characters. -->
     <string name="agency_detail_error_retry">Try Again</string>
+    <!-- Astronaut detail screen, error screen, message shown when the error has no text. Message text, may wrap, max 32 characters. -->
+    <string name="astronaut_detail_unknown_error">Unknown error</string>
+    <!-- Astronaut detail screen, top bar title when the astronaut has no name. Title text, one line, max 16 characters. -->
+    <string name="astronaut_detail_unknown_name">Unknown</string>
+    <!-- Astronaut detail screen, error screen, bold heading above the error message. Heading text, may wrap, max 32 characters. -->
+    <string name="astronaut_detail_error_title">Failed to load astronaut</string>
+    <!-- Astronaut filter sheet, reload dialog, title. Title text, may wrap, max 28 characters. -->
+    <string name="astronaut_filter_reload_dialog_title">Reload Filter Options?</string>
+    <!-- Astronaut filter sheet, reload dialog, body message. Body text, may wrap, max 100 characters. -->
+    <string name="astronaut_filter_reload_dialog_message">This will re-download status options from the server. This may take a few moments.</string>
+    <!-- Astronaut filter sheet, reload dialog, confirm button. Button label, one line, max 12 characters. -->
+    <string name="astronaut_filter_reload_dialog_confirm">Reload</string>
+    <!-- Astronaut filter sheet, reload dialog, cancel button. Button label, one line, max 12 characters. -->
+    <string name="astronaut_filter_reload_dialog_cancel">Cancel</string>
+    <!-- Astronaut filter sheet, header at top. Title text, one line, max 20 characters. -->
+    <string name="astronaut_filter_title">Filter &amp; Sort</string>
+    <!-- Astronaut filter sheet, header, text button that resets all filters. Button label, one line, max 12 characters. -->
+    <string name="astronaut_filter_clear_all">Clear All</string>
+    <!-- Astronaut filter sheet, title of the search card. Title text, one line, max 16 characters. -->
+    <string name="astronaut_filter_search_title">Search</string>
+    <!-- Astronaut filter sheet, label of the astronaut name text field. Field label, one line, max 20 characters. -->
+    <string name="astronaut_filter_name_label">Astronaut name</string>
+    <!-- Astronaut filter sheet, placeholder inside the astronaut name text field. Placeholder text, one line, max 28 characters. -->
+    <string name="astronaut_filter_name_placeholder">e.g., Armstrong, Aldrin</string>
+    <!-- Astronaut filter sheet, search card, button that clears the search text. Button label, one line, max 10 characters. -->
+    <string name="astronaut_filter_search_clear">Clear</string>
+    <!-- Astronaut filter sheet, search card, button that applies the search text. Button label, one line, max 10 characters. -->
+    <string name="astronaut_filter_search_apply">Apply</string>
+    <!-- Astronaut filter sheet, title of the sort card. Title text, one line, max 16 characters. -->
+    <string name="astronaut_filter_sort_title">Sort By</string>
+    <!-- Astronaut filter sheet, label of the sort order dropdown field. Field label, one line, max 16 characters. -->
+    <string name="astronaut_filter_order_label">Order</string>
+    <!-- Astronaut filter sheet, sort order menu, accessibility description of the check mark on the chosen item. Screen reader text, not shown, max 20 characters. -->
+    <string name="astronaut_filter_selected_description">Selected</string>
+    <!-- Astronaut filter sheet, title of the filters card. Title text, one line, max 16 characters. -->
+    <string name="astronaut_filter_filters_title">Filters</string>
+    <!-- Astronaut filter sheet, filters card, heading above the has flown choice buttons. Heading text, one line, max 28 characters. -->
+    <string name="astronaut_filter_has_flown_title">Has Flown to Space</string>
+    <!-- Astronaut filter sheet, filters card, heading above the currently in space choice buttons. Heading text, one line, max 28 characters. -->
+    <string name="astronaut_filter_in_space_title">Currently in Space</string>
+    <!-- Astronaut filter sheet, filters card, heading above the astronaut type choice buttons. Heading text, one line, max 16 characters. -->
+    <string name="astronaut_filter_type_title">Type</string>
+    <!-- Astronaut filter sheet, filters card, segmented button that applies no filter. Segment label, one line, max 10 characters. -->
+    <string name="astronaut_filter_option_all">All</string>
+    <!-- Astronaut filter sheet, filters card, segmented button for yes. Segment label, one line, max 10 characters. -->
+    <string name="astronaut_filter_option_yes">Yes</string>
+    <!-- Astronaut filter sheet, filters card, segmented button for no. Segment label, one line, max 10 characters. -->
+    <string name="astronaut_filter_option_no">No</string>
+    <!-- Astronaut filter sheet, filters card, type choice, segmented button that shows human astronauts. Segment label, one line, max 12 characters. -->
+    <string name="astronaut_filter_type_human">Human</string>
+    <!-- Astronaut filter sheet, filters card, type choice, segmented button that shows non-human astronauts. Segment label, one line, max 16 characters. -->
+    <string name="astronaut_filter_type_non_human">Non-Human</string>
+    <!-- Astronaut filter sheet, filters card, heading above the status chips. Heading text, one line, max 16 characters. -->
+    <string name="astronaut_filter_status_title">Status</string>
+    <!-- Astronaut filter sheet, filters card, status section, hint under the heading. Hint text, may wrap, max 48 characters. -->
+    <string name="astronaut_filter_status_hint">Select one or more statuses to filter by</string>
+    <!-- Astronaut filter sheet, filters card, status section, accessibility description of the close icon on a chosen status chip. Screen reader text, not shown, max 20 characters. -->
+    <string name="astronaut_filter_status_remove_description">Remove filter</string>
+    <!-- Astronaut filter sheet, filters card, status section, label above the status chips when none is chosen. Label text, one line, max 20 characters. -->
+    <string name="astronaut_filter_status_all">All Statuses</string>
+    <!-- Astronaut filter sheet, filters card, status section, label above the status chips when some are chosen. Label text, one line, max 20 characters. -->
+    <string name="astronaut_filter_status_add_more">Add More</string>
+    <!-- Astronaut filter sheet, bottom, button that opens the reload dialog. Button label, one line, max 28 characters. -->
+    <string name="astronaut_filter_reload_button">Reload Filter Options</string>
+    <!-- Astronaut filter sheet, bottom, button that closes the sheet. Button label, one line, max 12 characters. -->
+    <string name="astronaut_filter_done">Done</string>
+    <!-- Astronaut list screen, top bar title. Title text, one line, max 24 characters. -->
+    <string name="astronaut_list_title">Astronauts</string>
+    <!-- Astronaut list screen, top bar title when filters are active. %1$d is the number of astronauts found. Title text, one line, max 24 characters. -->
+    <string name="astronaut_list_title_with_count">Astronauts (%1$d)</string>
+    <!-- Astronaut list screen, top bar, accessibility description of the filter button. Screen reader text, not shown, max 24 characters. -->
+    <string name="astronaut_list_filter_description">Filter &amp; Sort</string>
+    <!-- Astronaut list screen, error state, message shown when the error has no text. Message text, may wrap, max 32 characters. -->
+    <string name="astronaut_list_unknown_error">Unknown error</string>
+    <!-- Astronaut list screen, loading state, text under the progress indicator. Status text, one line, max 28 characters. -->
+    <string name="astronaut_list_loading">Loading astronauts...</string>
+    <!-- Astronaut list screen, error state, bold heading above the error message. Heading text, may wrap, max 32 characters. -->
+    <string name="astronaut_list_error_title">Failed to load astronauts</string>
+    <!-- Astronaut list screen, empty state, bold heading. Heading text, may wrap, max 32 characters. -->
+    <string name="astronaut_list_empty_title">No astronauts found</string>
+    <!-- Astronaut list screen, empty state, hint under the heading. Hint text, may wrap, max 40 characters. -->
+    <string name="astronaut_list_empty_hint">Check back later for updates</string>
+    <!-- Astronaut list item, accessibility description, used for a missing name, status or agency. Screen reader text, not shown, max 16 characters. -->
+    <string name="astronaut_card_unknown">Unknown</string>
+    <!-- Astronaut list item, accessibility description of the whole card. %1$s is the astronaut name, %2$s the status, %3$s the agency. Screen reader text, not shown, max 120 characters. -->
+    <string name="astronaut_card_description">Astronaut card for %1$s. Status: %2$s. Agency: %3$s. Tap to view details.</string>
+    <!-- Astronaut list item, name line when the astronaut has no name. Title text, one line, max 24 characters. -->
+    <string name="astronaut_card_unknown_name">Unknown Astronaut</string>
+    <!-- Astronaut detail screen, flight history card, heading. Heading text, one line, max 20 characters. -->
+    <string name="astronaut_flight_history_title">Flight History</string>
+    <!-- Astronaut detail screen, flight history card, count of flights when there is exactly one. %1$d is the number of flights. Label text, one line, max 16 characters. -->
+    <string name="astronaut_flight_history_mission_count_one">%1$d Mission</string>
+    <!-- Astronaut detail screen, flight history card, count of flights when there is not exactly one. %1$d is the number of flights. Label text, one line, max 16 characters. -->
+    <string name="astronaut_flight_history_mission_count_other">%1$d Missions</string>
+    <!-- Astronaut detail screen, biography card, heading. Heading text, one line, max 20 characters. -->
+    <string name="astronaut_info_title">Biography</string>
+    <!-- Astronaut detail screen, biography card, button that collapses a long biography. Button label, one line, max 16 characters. -->
+    <string name="astronaut_info_show_less">Show Less</string>
+    <!-- Astronaut detail screen, biography card, button that expands a long biography. Button label, one line, max 16 characters. -->
+    <string name="astronaut_info_show_more">Show More</string>
+    <!-- Astronaut detail screen, links card, heading. Heading text, one line, max 20 characters. -->
+    <string name="astronaut_links_title">Links</string>
+    <!-- Astronaut detail screen, links card, row that opens the Wikipedia page. Row label, one line, max 20 characters. -->
+    <string name="astronaut_links_wikipedia">Wikipedia</string>
+    <!-- Astronaut detail screen, links card, row label used when a social media link has no platform name. Row label, one line, max 20 characters. -->
+    <string name="astronaut_links_social_media">Social Media</string>
+    <!-- Astronaut detail screen, links card, link row, accessibility description of the open icon. Screen reader text, not shown, max 20 characters. -->
+    <string name="astronaut_links_open_description">Open link</string>
+    <!-- Astronaut detail screen, links card, social media row, accessibility description of the platform logo. %1$s is the platform name. Screen reader text, not shown, max 32 characters. -->
+    <string name="astronaut_links_logo_description">%1$s logo</string>
+    <!-- Astronaut detail screen, personal info card, tile label above the status chip. Label text, one line, max 16 characters. -->
+    <string name="astronaut_personal_info_status">Status</string>
+    <!-- Astronaut detail screen, personal info card, tile label above the date of death. Label text, one line, max 16 characters. -->
+    <string name="astronaut_personal_info_died">Died</string>
+    <!-- Astronaut detail screen, personal info card, tile label above the age. Label text, one line, max 16 characters. -->
+    <string name="astronaut_personal_info_age">Age</string>
+    <!-- Astronaut detail screen, personal info card, age tile, value. %1$s is the age in years. Value text, one line, max 16 characters. -->
+    <string name="astronaut_personal_info_age_value">%1$s years</string>
+    <!-- Astronaut detail screen, personal info card, tile label above the nationality chips. Label text, one line, max 20 characters. -->
+    <string name="astronaut_personal_info_nationality">Nationality</string>
+    <!-- Mission screen, crew member card, accessibility action label of the card. %1$s is the astronaut name. Screen reader text, not shown, max 48 characters. -->
+    <string name="astronaut_profile_click_label">View %1$s\'s profile</string>
+    <!-- Mission screen, crew member card, accessibility description of the card. %1$s is the astronaut name, %2$s the role. Screen reader text, not shown, max 80 characters. -->
+    <string name="astronaut_profile_description">%1$s, %2$s. Tap to view profile</string>
+    <!-- Mission screen, crew member card, accessibility description of the astronaut photo. %1$s is the astronaut name. Screen reader text, not shown, max 48 characters. -->
+    <string name="astronaut_profile_photo_description">%1$s\'s profile photo</string>
+    <!-- Mission screen, crew member card, accessibility description of the agency logo. Screen reader text, not shown, max 20 characters. -->
+    <string name="astronaut_profile_agency_logo_description">Agency logo</string>
+    <!-- Astronaut detail screen, overview card, heading. Heading text, one line, max 20 characters. -->
+    <string name="astronaut_stats_title">Overview</string>
+    <!-- Astronaut detail screen, overview card, tile label above the status chip. Label text, one line, max 16 characters. -->
+    <string name="astronaut_stats_status">Status</string>
+    <!-- Astronaut detail screen, overview card, tile label above the date of death. Label text, one line, max 16 characters. -->
+    <string name="astronaut_stats_died">Died</string>
+    <!-- Astronaut detail screen, overview card, tile label above the age. Label text, one line, max 16 characters. -->
+    <string name="astronaut_stats_age">Age</string>
+    <!-- Astronaut detail screen, overview card, age tile, value. %1$s is the age in years. Value text, one line, max 16 characters. -->
+    <string name="astronaut_stats_age_value">%1$s years</string>
+    <!-- Astronaut detail screen, overview card, tile label above the nationality chips. Label text, one line, max 20 characters. -->
+    <string name="astronaut_stats_nationality">Nationality</string>
+    <!-- Astronaut detail screen, overview card, tile label above the number of flights. Label text, one line, max 16 characters. -->
+    <string name="astronaut_stats_flights">Flights</string>
+    <!-- Astronaut detail screen, overview card, tile label above the total time in space. Label text, one line, max 20 characters. -->
+    <string name="astronaut_stats_time_in_space">Time in Space</string>
+    <!-- Astronaut detail screen, overview card, tile label above the number of spacewalks. Label text, one line, max 16 characters. -->
+    <string name="astronaut_stats_evas">EVAs</string>
+    <!-- Astronaut detail screen, overview card, tile label above the total spacewalk time. Label text, one line, max 16 characters. -->
+    <string name="astronaut_stats_eva_time">EVA Time</string>
+    <!-- Astronaut detail screen, overview card, tile value when the time is not known. Value text, one line, max 8 characters. -->
+    <string name="astronaut_stats_not_available">N/A</string>
 </resources>

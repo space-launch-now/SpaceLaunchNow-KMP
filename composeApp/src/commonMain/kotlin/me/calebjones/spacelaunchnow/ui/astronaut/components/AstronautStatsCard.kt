@@ -34,6 +34,19 @@ import me.calebjones.spacelaunchnow.ui.components.StatusChip
 import me.calebjones.spacelaunchnow.ui.theme.SpaceLaunchNowPreviewTheme
 import me.calebjones.spacelaunchnow.util.parseIsoDurationToHumanReadable
 import org.jetbrains.compose.ui.tooling.preview.Preview
+import org.jetbrains.compose.resources.stringResource
+import spacelaunchnow_kmp.composeapp.generated.resources.Res
+import spacelaunchnow_kmp.composeapp.generated.resources.astronaut_stats_age
+import spacelaunchnow_kmp.composeapp.generated.resources.astronaut_stats_age_value
+import spacelaunchnow_kmp.composeapp.generated.resources.astronaut_stats_died
+import spacelaunchnow_kmp.composeapp.generated.resources.astronaut_stats_eva_time
+import spacelaunchnow_kmp.composeapp.generated.resources.astronaut_stats_evas
+import spacelaunchnow_kmp.composeapp.generated.resources.astronaut_stats_flights
+import spacelaunchnow_kmp.composeapp.generated.resources.astronaut_stats_nationality
+import spacelaunchnow_kmp.composeapp.generated.resources.astronaut_stats_not_available
+import spacelaunchnow_kmp.composeapp.generated.resources.astronaut_stats_status
+import spacelaunchnow_kmp.composeapp.generated.resources.astronaut_stats_time_in_space
+import spacelaunchnow_kmp.composeapp.generated.resources.astronaut_stats_title
 
 /**
  * Card displaying astronaut career statistics.
@@ -62,7 +75,7 @@ fun AstronautStatsCard(
             verticalArrangement = Arrangement.spacedBy(12.dp)
         ) {
             Text(
-                text = "Overview",
+                text = stringResource(Res.string.astronaut_stats_title),
                 style = MaterialTheme.typography.titleMedium,
                 fontWeight = FontWeight.Bold,
                 color = MaterialTheme.colorScheme.onSurfaceVariant
@@ -77,7 +90,7 @@ fun AstronautStatsCard(
                 astronaut.statusName?.let { statusName ->
                     InfoTile(
                         icon = Icons.Default.EmojiEvents,
-                        label = "Status",
+                        label = stringResource(Res.string.astronaut_stats_status),
                         modifier = Modifier.weight(1f),
                         color = color,
                         customComposable = {
@@ -93,7 +106,7 @@ fun AstronautStatsCard(
                 if (astronaut.dateOfDeath != null) {
                     InfoTile(
                         icon = Icons.Default.LocalFlorist,
-                        label = "Died",
+                        label = stringResource(Res.string.astronaut_stats_died),
                         value = formatDate(astronaut.dateOfDeath),
                         color = Color.Red.copy(alpha = 0.7f),
                         modifier = Modifier.weight(1f)
@@ -101,8 +114,8 @@ fun AstronautStatsCard(
                 } else if (astronaut.age != null) {
                     InfoTile(
                         icon = Icons.Default.Cake,
-                        label = "Age",
-                        value = "${astronaut.age} years",
+                        label = stringResource(Res.string.astronaut_stats_age),
+                        value = stringResource(Res.string.astronaut_stats_age_value, astronaut.age.toString()),
                         modifier = Modifier.weight(1f),
                         color = color
                     )
@@ -113,7 +126,7 @@ fun AstronautStatsCard(
             if (astronaut.nationality.isNotEmpty()) {
                 InfoTile(
                     icon = Icons.Default.Public,
-                    label = "Nationality",
+                    label = stringResource(Res.string.astronaut_stats_nationality),
                     color = color,
                     customComposable = {
                         FlowRow(
@@ -137,7 +150,7 @@ fun AstronautStatsCard(
                 // Flights Count
                 InfoTile(
                     icon = Icons.Default.FlightTakeoff,
-                    label = "Flights",
+                    label = stringResource(Res.string.astronaut_stats_flights),
                     value = astronaut.flightsCount?.toString() ?: "0",
                     modifier = Modifier.weight(1f),
                     color = color
@@ -146,10 +159,10 @@ fun AstronautStatsCard(
                 // Time in Space
                 InfoTile(
                     icon = Icons.Default.Timer,
-                    label = "Time in Space",
+                    label = stringResource(Res.string.astronaut_stats_time_in_space),
                     value = astronaut.timeInSpace?.let { 
                         parseIsoDurationToHumanReadable(it)
-                    } ?: "N/A",
+                    } ?: stringResource(Res.string.astronaut_stats_not_available),
                     modifier = Modifier.weight(1f),
                     color = color
                 )
@@ -163,7 +176,7 @@ fun AstronautStatsCard(
                 // EVA Count
                 InfoTile(
                     icon = Icons.Default.Recycling,
-                    label = "EVAs",
+                    label = stringResource(Res.string.astronaut_stats_evas),
                     value = astronaut.spacewalksCount?.toString() ?: "0",
                     modifier = Modifier.weight(1f),
                     color = color
@@ -172,10 +185,10 @@ fun AstronautStatsCard(
                 // EVA Time
                 InfoTile(
                     icon = Icons.Default.Timer,
-                    label = "EVA Time",
+                    label = stringResource(Res.string.astronaut_stats_eva_time),
                     value = astronaut.evaTime?.let {
                         parseIsoDurationToHumanReadable(it)
-                    } ?: "N/A",
+                    } ?: stringResource(Res.string.astronaut_stats_not_available),
                     modifier = Modifier.weight(1f),
                     color = color
                 )
