@@ -159,11 +159,11 @@
     <!-- Setup step 2. One or two lines. -->
     <string name="settings_calendar_setup_step_open">Open Google Calendar on your computer</string>
     <!-- Setup step 3. The quoted words are labels in Google Calendar: translate them as Google shows them. One or two lines. -->
-    <string name="settings_calendar_setup_step_add">Click the \"+\" next to \"Other calendars\"</string>
+    <string name="settings_calendar_setup_step_add">Click the "+" next to "Other calendars"</string>
     <!-- Setup step 4. The quoted words are a label in Google Calendar. One or two lines. -->
-    <string name="settings_calendar_setup_step_from_url">Select \"From URL\"</string>
+    <string name="settings_calendar_setup_step_from_url">Select "From URL"</string>
     <!-- Setup step 5. The quoted words are a label in Google Calendar. One or two lines. -->
-    <string name="settings_calendar_setup_step_paste">Paste the copied URL and click \"Add calendar\"</string>
+    <string name="settings_calendar_setup_step_paste">Paste the copied URL and click "Add calendar"</string>
     <!-- Setup step 6. One or two lines. -->
     <string name="settings_calendar_setup_step_repeat">Repeat for both Launches and Events feeds</string>
     <!-- Closing note of the setup card. One or two lines. -->
