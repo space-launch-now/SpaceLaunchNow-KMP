@@ -41,6 +41,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.produceState
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
@@ -65,10 +66,12 @@ import me.calebjones.spacelaunchnow.data.repository.getPlatformNotificationPermi
 import me.calebjones.spacelaunchnow.data.repository.openPlatformNotificationSettings
 import me.calebjones.spacelaunchnow.data.repository.remedy
 import me.calebjones.spacelaunchnow.data.repository.requestPlatformNotificationPermission
+import me.calebjones.spacelaunchnow.data.repository.RemoteConfigRepository
 import me.calebjones.spacelaunchnow.navigation.SupportUs
 import me.calebjones.spacelaunchnow.ui.subscription.PremiumBadge
 import me.calebjones.spacelaunchnow.ui.subscription.PremiumPromptCard
 import me.calebjones.spacelaunchnow.ui.viewmodel.SettingsViewModel
+import org.koin.compose.koinInject
 import org.koin.compose.viewmodel.koinViewModel
 
 @OptIn(ExperimentalMaterial3Api::class, ExperimentalMaterial3ExpressiveApi::class)
@@ -86,6 +89,18 @@ fun NotificationSettingsScreen(
     LaunchedEffect(Unit) {
         permissionStatus = getPlatformNotificationPermissionStatus()
     }
+
+    // Locked controls open the paywall only while the Remote Config flag is on (default off).
+    val remoteConfig = koinInject<RemoteConfigRepository>()
+    val lockedTapFlag by produceState(initialValue = false, remoteConfig) {
+        value = remoteConfig.getLockedNotificationTapPaywallEnabled()
+    }
+    val onLockedControlClick: (() -> Unit)? =
+        if (shouldOpenPaywallOnLockedTap(lockedTapFlag, uiState.hasNotificationCustomization)) {
+            { navController.navigate(SupportUs(PaywallSource.LOCKED_NOTIFICATION_CONTROL.value)) }
+        } else {
+            null
+        }
 
     // Re-check permission when returning from system permission dialog
     val lifecycleOwner = LocalLifecycleOwner.current
@@ -467,7 +482,15 @@ fun NotificationSettingsScreen(
                         if (spaceXFollowed) {
                             HorizontalDivider(modifier = Modifier.padding(vertical = 8.dp))
                             Row(
-                                modifier = Modifier.fillMaxWidth(),
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .then(
+                                        if (onLockedControlClick != null && !uiState.hasNotificationCustomization) {
+                                            Modifier.clickable(onClick = onLockedControlClick)
+                                        } else {
+                                            Modifier
+                                        }
+                                    ),
                                 verticalAlignment = Alignment.CenterVertically,
                                 horizontalArrangement = Arrangement.spacedBy(12.dp)
                             ) {
@@ -651,7 +674,8 @@ fun NotificationSettingsScreen(
                             description = "When launch times are updated",
                             checked = uiState.notificationSettings.isTopicEnabled(NotificationTopic.NETSTAMP_CHANGED),
                             onCheckedChange = viewModel::updateNetstampChanged,
-                            enabled = uiState.hasNotificationCustomization
+                            enabled = uiState.hasNotificationCustomization,
+                            onLockedClick = onLockedControlClick
                         )
 
                         NotificationTopicToggle(
@@ -666,7 +690,8 @@ fun NotificationSettingsScreen(
                             description = "1 hour before launch",
                             checked = uiState.notificationSettings.isTopicEnabled(NotificationTopic.ONE_HOUR),
                             onCheckedChange = viewModel::updateOneHour,
-                            enabled = uiState.hasNotificationCustomization
+                            enabled = uiState.hasNotificationCustomization,
+                            onLockedClick = onLockedControlClick
                         )
 
                         NotificationTopicToggle(
@@ -681,7 +706,8 @@ fun NotificationSettingsScreen(
                             description = "1 minute before launch - for the most dedicated!",
                             checked = uiState.notificationSettings.isTopicEnabled(NotificationTopic.ONE_MINUTE),
                             onCheckedChange = viewModel::updateOneMinute,
-                            enabled = uiState.hasNotificationCustomization
+                            enabled = uiState.hasNotificationCustomization,
+                            onLockedClick = onLockedControlClick
                         )
                     }
                 }
@@ -724,7 +750,8 @@ fun NotificationSettingsScreen(
                             description = "Launches that have live video streams",
                             checked = uiState.notificationSettings.isTopicEnabled(NotificationTopic.WEBCAST_ONLY),
                             onCheckedChange = viewModel::updateWebcastOnly,
-                            enabled = uiState.hasNotificationCustomization
+                            enabled = uiState.hasNotificationCustomization,
+                            onLockedClick = onLockedControlClick
                         )
 
                         NotificationTopicToggle(
@@ -732,7 +759,8 @@ fun NotificationSettingsScreen(
                             description = "Real-time updates during launch",
                             checked = uiState.notificationSettings.isTopicEnabled(NotificationTopic.IN_FLIGHT),
                             onCheckedChange = viewModel::updateInFlight,
-                            enabled = uiState.hasNotificationCustomization
+                            enabled = uiState.hasNotificationCustomization,
+                            onLockedClick = onLockedControlClick
                         )
 
                         NotificationTopicToggle(
@@ -821,7 +849,9 @@ fun NotificationTopicToggle(
     checked: Boolean,
     onCheckedChange: (Boolean) -> Unit,
     enabled: Boolean = true,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
+    /** When set, a tap on this locked (disabled) control calls it, e.g. to open the paywall. */
+    onLockedClick: (() -> Unit)? = null
 ) {
     Row(
         modifier = modifier
@@ -829,6 +859,8 @@ fun NotificationTopicToggle(
             .then(
                 if (enabled) {
                     Modifier.clickable { onCheckedChange(!checked) }
+                } else if (onLockedClick != null) {
+                    Modifier.clickable(onClick = onLockedClick)
                 } else {
                     Modifier
                 }
@@ -861,10 +893,8 @@ fun NotificationTopicToggle(
         }
         Switch(
             checked = checked,
-            onCheckedChange = {
-                if (enabled) onCheckedChange(it) else {
-                }
-            },
+            // A locked switch is not interactive itself; the row handles the tap.
+            onCheckedChange = if (enabled) onCheckedChange else null,
             enabled = enabled
         )
     }
