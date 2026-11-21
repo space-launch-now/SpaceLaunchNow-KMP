@@ -119,9 +119,9 @@ fun LaunchCountdown(
                     .shadow(8.dp, RoundedCornerShape(25.dp)),
                 colors = StatusColorUtil.getLaunchStatusButtonColors(status?.id)
             ) {
-                status?.name?.let { apiName ->
+                status?.let {
                     Text(
-                        text = launchStatusLabel(status?.id, apiName),
+                        text = launchStatusLabel(it),
                         style = MaterialTheme.typography.titleMedium,
                         color = Color.White,
                         fontWeight = FontWeight.Bold

@@ -367,8 +367,7 @@ fun LaunchStatusChip(
             contentColor = Color.White
         ) {
             Text(
-                text = (status.abbrev?.let { launchStatusAbbrevLabel(status.id, it) }
-                    ?: launchStatusLabel(status.id, status.name)).uppercase(),
+                text = (launchStatusAbbrevLabel(status) ?: launchStatusLabel(status)).uppercase(),
                 modifier = Modifier.padding(horizontal = 8.dp, vertical = 4.dp),
                 style = MaterialTheme.typography.labelSmall.copy(
                     fontWeight = FontWeight.Medium

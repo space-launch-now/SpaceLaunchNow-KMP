@@ -235,7 +235,7 @@ private fun NextLaunchTimelineCard(
             // Status
             launch.status?.let { status ->
                 StatusChip(
-                    text = launchStatusLabel(status.id, status.name),
+                    text = launchStatusLabel(status),
                     color = getLaunchStatusColor(status.id)
                 )
             }
@@ -318,7 +318,7 @@ private fun HistoryTimelineCard(
             // Status chip
             launch.status?.let { status ->
                 StatusChip(
-                    text = launchStatusLabel(status.id, status.name),
+                    text = launchStatusLabel(status),
                     color = getLaunchStatusColor(status.id)
                 )
             }

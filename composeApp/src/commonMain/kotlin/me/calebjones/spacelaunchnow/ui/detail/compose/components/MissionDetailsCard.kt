@@ -122,7 +122,7 @@ fun MissionDetailsCard(mission: Mission, missionPatchUrl: String?) {
                         item { InfoChip(icon = Icons.Filled.Category, text = missionTypeLabel(type)) }
                     }
                     mission.orbit?.takeIf { it.name.isNotBlank() }?.let { orbit ->
-                        item { InfoChip(icon = Icons.Filled.Public, text = orbitLabel(orbit.id, orbit.name)) }
+                        item { InfoChip(icon = Icons.Filled.Public, text = orbitLabel(orbit)) }
                     }
                 }
 

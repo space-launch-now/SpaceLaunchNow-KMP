@@ -26,7 +26,7 @@ import org.jetbrains.compose.ui.tooling.preview.Preview
  */
 @Composable
 fun CountryChip(country: Country) {
-    val label = country.name?.let { countryLabel(country.alpha2Code, it) } ?: country.alpha2Code ?: "Unknown"
+    val label = countryLabel(country) ?: country.alpha2Code ?: "Unknown"
     val flagUrl = country.alpha2Code?.let { code ->
         "https://flagcdn.com/w40/${code.lowercase()}.png"
     }

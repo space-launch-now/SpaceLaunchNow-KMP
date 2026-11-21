@@ -564,7 +564,7 @@ private fun RelatedLaunchesCard(
             launches.forEach { l ->
                 RowWithImage(
                     title = l.name,
-                    subtitle = l.status?.let { launchStatusLabel(it.id, it.name) } ?: "",
+                    subtitle = l.status?.let { launchStatusLabel(it) } ?: "",
                     imageUrl = l.imageUrl,
                     fallbackText = l.name.firstOrNull()?.uppercase() ?: "",
                     onClick = { onLaunchClick?.invoke(l.id) }

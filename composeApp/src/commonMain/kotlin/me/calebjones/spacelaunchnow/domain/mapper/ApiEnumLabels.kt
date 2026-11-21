@@ -1,6 +1,9 @@
 package me.calebjones.spacelaunchnow.domain.mapper
 
 import androidx.compose.runtime.Composable
+import me.calebjones.spacelaunchnow.domain.model.Country
+import me.calebjones.spacelaunchnow.domain.model.LaunchStatus
+import me.calebjones.spacelaunchnow.domain.model.Orbit
 import org.jetbrains.compose.resources.StringResource
 import org.jetbrains.compose.resources.stringResource
 import spacelaunchnow_kmp.composeapp.generated.resources.Res
@@ -237,3 +240,19 @@ fun missionTypeLabel(apiText: String): String = ApiEnumLabels.missionType(apiTex
 /** Country name in the device language; [apiText] is the fallback for an unknown code. */
 @Composable
 fun countryLabel(alpha2Code: String?, apiText: String): String = ApiEnumLabels.countryName(alpha2Code).orApi(apiText)
+
+/** Launch status name in the device language. */
+@Composable
+fun launchStatusLabel(status: LaunchStatus): String = launchStatusLabel(status.id, status.name)
+
+/** Launch status short form in the device language, or null when the API sent none. */
+@Composable
+fun launchStatusAbbrevLabel(status: LaunchStatus): String? = status.abbrev?.let { launchStatusAbbrevLabel(status.id, it) }
+
+/** Orbit name in the device language. */
+@Composable
+fun orbitLabel(orbit: Orbit): String = orbitLabel(orbit.id, orbit.name)
+
+/** Country name in the device language, or null when the API sent none. */
+@Composable
+fun countryLabel(country: Country): String? = country.name?.let { countryLabel(country.alpha2Code, it) }

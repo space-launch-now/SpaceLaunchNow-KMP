@@ -76,7 +76,7 @@ fun LiveLaunchCard(
     val title by remember(launch) {
         mutableStateOf(LaunchFormatUtil.formatLaunchTitle(launch))
     }
-    val statusText = launch.status?.let { launchStatusLabel(it.id, it.name) } ?: "In Flight"
+    val statusText = launch.status?.let { launchStatusLabel(it) } ?: "In Flight"
     val statusColor = getLaunchStatusColor(launch.status?.id)
     val isWebcastLive = launch.webcastLive
 
@@ -268,7 +268,7 @@ private fun LiveLaunchCardPreviewContent(
     val title by remember(launch) {
         mutableStateOf(LaunchFormatUtil.formatLaunchTitle(launch))
     }
-    val statusText = launch.status?.let { launchStatusLabel(it.id, it.name) } ?: "In Flight"
+    val statusText = launch.status?.let { launchStatusLabel(it) } ?: "In Flight"
     val statusColor = getLaunchStatusColor(launch.status?.id)
 
     Card(

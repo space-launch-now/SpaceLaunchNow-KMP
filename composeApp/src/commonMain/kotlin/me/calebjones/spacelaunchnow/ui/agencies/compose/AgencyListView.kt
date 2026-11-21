@@ -219,7 +219,7 @@ fun AgencyListItem(
                                 onClick = { },
                                 label = {
                                     Text(
-                                        text = country.name?.let { countryLabel(country.alpha2Code, it) } ?: "Unknown",
+                                        text = countryLabel(country) ?: "Unknown",
                                         style = MaterialTheme.typography.labelSmall
                                     )
                                 }

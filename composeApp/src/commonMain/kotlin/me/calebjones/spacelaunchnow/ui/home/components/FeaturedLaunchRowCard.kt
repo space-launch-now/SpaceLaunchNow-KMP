@@ -253,7 +253,7 @@ fun FeaturedLaunchRowCard(
                             contentColor = Color.White
                         ) {
                             Text(
-                                text = launchStatusLabel(status.id, status.name).uppercase(),
+                                text = launchStatusLabel(status).uppercase(),
                                 modifier = Modifier.padding(horizontal = 6.dp, vertical = 2.dp),
                                 style = MaterialTheme.typography.labelSmall.copy(
                                     fontWeight = FontWeight.Medium,
