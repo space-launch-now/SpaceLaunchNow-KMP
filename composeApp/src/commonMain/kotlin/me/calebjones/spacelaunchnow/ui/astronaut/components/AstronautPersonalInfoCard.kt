@@ -30,11 +30,11 @@ import me.calebjones.spacelaunchnow.ui.theme.SpaceLaunchNowPreviewTheme
 import org.jetbrains.compose.ui.tooling.preview.Preview
 import org.jetbrains.compose.resources.stringResource
 import spacelaunchnow_kmp.composeapp.generated.resources.Res
-import spacelaunchnow_kmp.composeapp.generated.resources.astronaut_personal_info_age
-import spacelaunchnow_kmp.composeapp.generated.resources.astronaut_personal_info_age_value
-import spacelaunchnow_kmp.composeapp.generated.resources.astronaut_personal_info_died
-import spacelaunchnow_kmp.composeapp.generated.resources.astronaut_personal_info_nationality
-import spacelaunchnow_kmp.composeapp.generated.resources.astronaut_personal_info_status
+import spacelaunchnow_kmp.composeapp.generated.resources.astronaut_info_age
+import spacelaunchnow_kmp.composeapp.generated.resources.astronaut_info_age_value
+import spacelaunchnow_kmp.composeapp.generated.resources.astronaut_info_died
+import spacelaunchnow_kmp.composeapp.generated.resources.astronaut_info_nationality
+import spacelaunchnow_kmp.composeapp.generated.resources.astronaut_info_status
 
 /**
  * Card displaying astronaut personal information including status, age, nationality, and death date if applicable.
@@ -63,7 +63,7 @@ fun AstronautPersonalInfoCard(
             astronaut.statusName?.let { statusName ->
                 InfoTile(
                     icon = Icons.Default.EmojiEvents,
-                    label = stringResource(Res.string.astronaut_personal_info_status),
+                    label = stringResource(Res.string.astronaut_info_status),
                     modifier = Modifier.weight(1f),
                     customComposable = {
                         StatusChip(
@@ -78,7 +78,7 @@ fun AstronautPersonalInfoCard(
             if (astronaut.dateOfDeath != null) {
                 InfoTile(
                     icon = Icons.Default.LocalFlorist,
-                    label = stringResource(Res.string.astronaut_personal_info_died),
+                    label = stringResource(Res.string.astronaut_info_died),
                     value = formatDate(astronaut.dateOfDeath),
                     color = Color.Red.copy(alpha = 0.7f),
                     modifier = Modifier.weight(1f)
@@ -86,8 +86,8 @@ fun AstronautPersonalInfoCard(
             } else if (astronaut.age != null) {
                 InfoTile(
                     icon = Icons.Default.Cake,
-                    label = stringResource(Res.string.astronaut_personal_info_age),
-                    value = stringResource(Res.string.astronaut_personal_info_age_value, astronaut.age.toString()),
+                    label = stringResource(Res.string.astronaut_info_age),
+                    value = stringResource(Res.string.astronaut_info_age_value, astronaut.age.toString()),
                     modifier = Modifier.weight(1f)
                 )
             }
@@ -103,7 +103,7 @@ fun AstronautPersonalInfoCard(
             ) {
                 InfoTile(
                     icon = Icons.Default.Public,
-                    label = stringResource(Res.string.astronaut_personal_info_nationality),
+                    label = stringResource(Res.string.astronaut_info_nationality),
                     customComposable = {
                         FlowRow(
                             modifier = Modifier.fillMaxWidth(),

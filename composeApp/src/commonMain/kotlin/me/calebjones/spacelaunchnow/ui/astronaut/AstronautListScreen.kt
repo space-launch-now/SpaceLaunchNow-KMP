@@ -58,7 +58,7 @@ import spacelaunchnow_kmp.composeapp.generated.resources.astronaut_list_filter_d
 import spacelaunchnow_kmp.composeapp.generated.resources.astronaut_list_loading
 import spacelaunchnow_kmp.composeapp.generated.resources.astronaut_list_title
 import spacelaunchnow_kmp.composeapp.generated.resources.astronaut_list_title_with_count
-import spacelaunchnow_kmp.composeapp.generated.resources.astronaut_list_unknown_error
+import spacelaunchnow_kmp.composeapp.generated.resources.astronaut_unknown_error
 import spacelaunchnow_kmp.composeapp.generated.resources.common_back
 import spacelaunchnow_kmp.composeapp.generated.resources.common_retry
 
@@ -179,7 +179,7 @@ fun AstronautListScreen(
                 // Error state
                 uiState.error != null && uiState.astronauts.isEmpty() -> {
                     ErrorContent(
-                        errorMessage = uiState.error ?: stringResource(Res.string.astronaut_list_unknown_error),
+                        errorMessage = uiState.error ?: stringResource(Res.string.astronaut_unknown_error),
                         onRetry = { viewModel.refresh() }
                     )
                 }

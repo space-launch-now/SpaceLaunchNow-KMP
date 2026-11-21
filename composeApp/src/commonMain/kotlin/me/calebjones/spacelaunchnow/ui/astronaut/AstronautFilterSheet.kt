@@ -74,7 +74,7 @@ import spacelaunchnow_kmp.composeapp.generated.resources.astronaut_filter_status
 import spacelaunchnow_kmp.composeapp.generated.resources.astronaut_filter_status_all
 import spacelaunchnow_kmp.composeapp.generated.resources.astronaut_filter_status_hint
 import spacelaunchnow_kmp.composeapp.generated.resources.astronaut_filter_status_remove_description
-import spacelaunchnow_kmp.composeapp.generated.resources.astronaut_filter_status_title
+import spacelaunchnow_kmp.composeapp.generated.resources.astronaut_info_status
 import spacelaunchnow_kmp.composeapp.generated.resources.astronaut_filter_title
 import spacelaunchnow_kmp.composeapp.generated.resources.astronaut_filter_type_human
 import spacelaunchnow_kmp.composeapp.generated.resources.astronaut_filter_type_non_human
@@ -404,7 +404,7 @@ fun AstronautFilterSheet(
                         verticalArrangement = Arrangement.spacedBy(12.dp)
                     ) {
                         Text(
-                            text = stringResource(Res.string.astronaut_filter_status_title),
+                            text = stringResource(Res.string.astronaut_info_status),
                             style = MaterialTheme.typography.titleMedium,
                             fontWeight = FontWeight.SemiBold
                         )

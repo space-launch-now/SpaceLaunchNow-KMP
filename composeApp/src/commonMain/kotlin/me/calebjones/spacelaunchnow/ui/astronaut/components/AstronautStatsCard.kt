@@ -36,15 +36,15 @@ import me.calebjones.spacelaunchnow.util.parseIsoDurationToHumanReadable
 import org.jetbrains.compose.ui.tooling.preview.Preview
 import org.jetbrains.compose.resources.stringResource
 import spacelaunchnow_kmp.composeapp.generated.resources.Res
-import spacelaunchnow_kmp.composeapp.generated.resources.astronaut_stats_age
-import spacelaunchnow_kmp.composeapp.generated.resources.astronaut_stats_age_value
-import spacelaunchnow_kmp.composeapp.generated.resources.astronaut_stats_died
+import spacelaunchnow_kmp.composeapp.generated.resources.astronaut_info_age
+import spacelaunchnow_kmp.composeapp.generated.resources.astronaut_info_age_value
+import spacelaunchnow_kmp.composeapp.generated.resources.astronaut_info_died
 import spacelaunchnow_kmp.composeapp.generated.resources.astronaut_stats_eva_time
 import spacelaunchnow_kmp.composeapp.generated.resources.astronaut_stats_evas
 import spacelaunchnow_kmp.composeapp.generated.resources.astronaut_stats_flights
-import spacelaunchnow_kmp.composeapp.generated.resources.astronaut_stats_nationality
+import spacelaunchnow_kmp.composeapp.generated.resources.astronaut_info_nationality
 import spacelaunchnow_kmp.composeapp.generated.resources.astronaut_stats_not_available
-import spacelaunchnow_kmp.composeapp.generated.resources.astronaut_stats_status
+import spacelaunchnow_kmp.composeapp.generated.resources.astronaut_info_status
 import spacelaunchnow_kmp.composeapp.generated.resources.astronaut_stats_time_in_space
 import spacelaunchnow_kmp.composeapp.generated.resources.astronaut_stats_title
 
@@ -90,7 +90,7 @@ fun AstronautStatsCard(
                 astronaut.statusName?.let { statusName ->
                     InfoTile(
                         icon = Icons.Default.EmojiEvents,
-                        label = stringResource(Res.string.astronaut_stats_status),
+                        label = stringResource(Res.string.astronaut_info_status),
                         modifier = Modifier.weight(1f),
                         color = color,
                         customComposable = {
@@ -106,7 +106,7 @@ fun AstronautStatsCard(
                 if (astronaut.dateOfDeath != null) {
                     InfoTile(
                         icon = Icons.Default.LocalFlorist,
-                        label = stringResource(Res.string.astronaut_stats_died),
+                        label = stringResource(Res.string.astronaut_info_died),
                         value = formatDate(astronaut.dateOfDeath),
                         color = Color.Red.copy(alpha = 0.7f),
                         modifier = Modifier.weight(1f)
@@ -114,8 +114,8 @@ fun AstronautStatsCard(
                 } else if (astronaut.age != null) {
                     InfoTile(
                         icon = Icons.Default.Cake,
-                        label = stringResource(Res.string.astronaut_stats_age),
-                        value = stringResource(Res.string.astronaut_stats_age_value, astronaut.age.toString()),
+                        label = stringResource(Res.string.astronaut_info_age),
+                        value = stringResource(Res.string.astronaut_info_age_value, astronaut.age.toString()),
                         modifier = Modifier.weight(1f),
                         color = color
                     )
@@ -126,7 +126,7 @@ fun AstronautStatsCard(
             if (astronaut.nationality.isNotEmpty()) {
                 InfoTile(
                     icon = Icons.Default.Public,
-                    label = stringResource(Res.string.astronaut_stats_nationality),
+                    label = stringResource(Res.string.astronaut_info_nationality),
                     color = color,
                     customComposable = {
                         FlowRow(
