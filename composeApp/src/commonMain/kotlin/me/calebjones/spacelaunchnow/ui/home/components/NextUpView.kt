@@ -52,11 +52,11 @@ import me.calebjones.spacelaunchnow.ui.icons.RocketLaunch
 import me.calebjones.spacelaunchnow.ui.viewmodel.ViewState
 import org.jetbrains.compose.resources.stringResource
 import spacelaunchnow_kmp.composeapp.generated.resources.Res
+import spacelaunchnow_kmp.composeapp.generated.resources.common_explore
+import spacelaunchnow_kmp.composeapp.generated.resources.common_launch_placeholder
+import spacelaunchnow_kmp.composeapp.generated.resources.common_share
 import spacelaunchnow_kmp.composeapp.generated.resources.home_launch_image_description
-import spacelaunchnow_kmp.composeapp.generated.resources.home_launch_placeholder_description
 import spacelaunchnow_kmp.composeapp.generated.resources.home_next_up_error_title
-import spacelaunchnow_kmp.composeapp.generated.resources.home_next_up_explore
-import spacelaunchnow_kmp.composeapp.generated.resources.home_next_up_share
 
 @Composable
 fun NextLaunchView(
@@ -168,7 +168,7 @@ fun NextLaunchItemView(
                                 ) {
                                     Icon(
                                         imageVector = CustomIcons.RocketLaunch,
-                                        contentDescription = stringResource(Res.string.home_launch_placeholder_description),
+                                        contentDescription = stringResource(Res.string.common_launch_placeholder),
                                         modifier = Modifier.size(96.dp),
                                         tint = MaterialTheme.colorScheme.primary.copy(alpha = 0.6f)
                                     )
@@ -185,7 +185,7 @@ fun NextLaunchItemView(
                         ) {
                             Icon(
                                 imageVector = CustomIcons.RocketLaunch,
-                                contentDescription = stringResource(Res.string.home_launch_placeholder_description),
+                                contentDescription = stringResource(Res.string.common_launch_placeholder),
                                 modifier = Modifier.size(96.dp),
                                 tint = MaterialTheme.colorScheme.primary.copy(alpha = 0.6f)
                             )
@@ -264,12 +264,12 @@ fun NextLaunchItemView(
                     ) {
                         Icon(
                             imageVector = Icons.Filled.Explore,
-                            contentDescription = stringResource(Res.string.home_next_up_explore),
+                            contentDescription = stringResource(Res.string.common_explore),
                             tint = Color.White
                         )
                         Spacer(modifier = Modifier.width(8.dp))
                         Text(
-                            text = stringResource(Res.string.home_next_up_explore),
+                            text = stringResource(Res.string.common_explore),
                             color = MaterialTheme.colorScheme.onPrimaryContainer,
                             fontWeight = FontWeight.Medium
                         )
@@ -287,12 +287,12 @@ fun NextLaunchItemView(
                     ) {
                         Icon(
                             imageVector = Icons.Filled.Share,
-                            contentDescription = stringResource(Res.string.home_next_up_share),
+                            contentDescription = stringResource(Res.string.common_share),
                             tint = Color.White
                         )
                         Spacer(modifier = Modifier.width(8.dp))
                         Text(
-                            text = stringResource(Res.string.home_next_up_share),
+                            text = stringResource(Res.string.common_share),
                             color = MaterialTheme.colorScheme.onErrorContainer,
                             fontWeight = FontWeight.Medium
                         )

@@ -49,36 +49,36 @@ import me.calebjones.spacelaunchnow.data.model.FilterOption
 import me.calebjones.spacelaunchnow.ui.viewmodel.AstronautSortOrder
 import org.jetbrains.compose.resources.stringResource
 import spacelaunchnow_kmp.composeapp.generated.resources.Res
-import spacelaunchnow_kmp.composeapp.generated.resources.astronaut_filter_clear_all
-import spacelaunchnow_kmp.composeapp.generated.resources.astronaut_filter_done
-import spacelaunchnow_kmp.composeapp.generated.resources.astronaut_filter_filters_title
+import spacelaunchnow_kmp.composeapp.generated.resources.common_clear_all
+import spacelaunchnow_kmp.composeapp.generated.resources.common_done
+import spacelaunchnow_kmp.composeapp.generated.resources.common_filters
 import spacelaunchnow_kmp.composeapp.generated.resources.astronaut_filter_has_flown_title
 import spacelaunchnow_kmp.composeapp.generated.resources.astronaut_filter_in_space_title
 import spacelaunchnow_kmp.composeapp.generated.resources.astronaut_filter_name_label
 import spacelaunchnow_kmp.composeapp.generated.resources.astronaut_filter_name_placeholder
 import spacelaunchnow_kmp.composeapp.generated.resources.astronaut_filter_option_all
-import spacelaunchnow_kmp.composeapp.generated.resources.astronaut_filter_option_no
-import spacelaunchnow_kmp.composeapp.generated.resources.astronaut_filter_option_yes
-import spacelaunchnow_kmp.composeapp.generated.resources.astronaut_filter_order_label
-import spacelaunchnow_kmp.composeapp.generated.resources.astronaut_filter_reload_button
-import spacelaunchnow_kmp.composeapp.generated.resources.astronaut_filter_reload_dialog_cancel
-import spacelaunchnow_kmp.composeapp.generated.resources.astronaut_filter_reload_dialog_confirm
+import spacelaunchnow_kmp.composeapp.generated.resources.common_no
+import spacelaunchnow_kmp.composeapp.generated.resources.common_yes
+import spacelaunchnow_kmp.composeapp.generated.resources.common_order
+import spacelaunchnow_kmp.composeapp.generated.resources.common_reload_filter_options
+import spacelaunchnow_kmp.composeapp.generated.resources.common_cancel
+import spacelaunchnow_kmp.composeapp.generated.resources.common_reload
 import spacelaunchnow_kmp.composeapp.generated.resources.astronaut_filter_reload_dialog_message
-import spacelaunchnow_kmp.composeapp.generated.resources.astronaut_filter_reload_dialog_title
-import spacelaunchnow_kmp.composeapp.generated.resources.astronaut_filter_search_apply
-import spacelaunchnow_kmp.composeapp.generated.resources.astronaut_filter_search_clear
-import spacelaunchnow_kmp.composeapp.generated.resources.astronaut_filter_search_title
-import spacelaunchnow_kmp.composeapp.generated.resources.astronaut_filter_selected_description
-import spacelaunchnow_kmp.composeapp.generated.resources.astronaut_filter_sort_title
+import spacelaunchnow_kmp.composeapp.generated.resources.common_reload_filter_options_title
+import spacelaunchnow_kmp.composeapp.generated.resources.common_apply
+import spacelaunchnow_kmp.composeapp.generated.resources.common_clear
+import spacelaunchnow_kmp.composeapp.generated.resources.common_search_title
+import spacelaunchnow_kmp.composeapp.generated.resources.common_selected
+import spacelaunchnow_kmp.composeapp.generated.resources.common_sort_by
 import spacelaunchnow_kmp.composeapp.generated.resources.astronaut_filter_status_add_more
 import spacelaunchnow_kmp.composeapp.generated.resources.astronaut_filter_status_all
 import spacelaunchnow_kmp.composeapp.generated.resources.astronaut_filter_status_hint
-import spacelaunchnow_kmp.composeapp.generated.resources.astronaut_filter_status_remove_description
-import spacelaunchnow_kmp.composeapp.generated.resources.astronaut_info_status
-import spacelaunchnow_kmp.composeapp.generated.resources.astronaut_filter_title
+import spacelaunchnow_kmp.composeapp.generated.resources.common_remove_filter
+import spacelaunchnow_kmp.composeapp.generated.resources.common_status
+import spacelaunchnow_kmp.composeapp.generated.resources.common_filter_and_sort
 import spacelaunchnow_kmp.composeapp.generated.resources.astronaut_filter_type_human
 import spacelaunchnow_kmp.composeapp.generated.resources.astronaut_filter_type_non_human
-import spacelaunchnow_kmp.composeapp.generated.resources.astronaut_filter_type_title
+import spacelaunchnow_kmp.composeapp.generated.resources.common_type
 
 /**
  * Filter and sort bottom sheet content for astronaut list.
@@ -119,7 +119,7 @@ fun AstronautFilterSheet(
     if (showReloadConfirmDialog) {
         AdCoveringAlertDialog(
             onDismissRequest = { showReloadConfirmDialog = false },
-            title = { Text(stringResource(Res.string.astronaut_filter_reload_dialog_title)) },
+            title = { Text(stringResource(Res.string.common_reload_filter_options_title)) },
             text = {
                 Text(stringResource(Res.string.astronaut_filter_reload_dialog_message))
             },
@@ -130,12 +130,12 @@ fun AstronautFilterSheet(
                         onReloadOptions?.invoke()
                     }
                 ) {
-                    Text(stringResource(Res.string.astronaut_filter_reload_dialog_confirm))
+                    Text(stringResource(Res.string.common_reload))
                 }
             },
             dismissButton = {
                 TextButton(onClick = { showReloadConfirmDialog = false }) {
-                    Text(stringResource(Res.string.astronaut_filter_reload_dialog_cancel))
+                    Text(stringResource(Res.string.common_cancel))
                 }
             }
         )
@@ -154,12 +154,12 @@ fun AstronautFilterSheet(
                 verticalAlignment = Alignment.CenterVertically
             ) {
                 Text(
-                    text = stringResource(Res.string.astronaut_filter_title),
+                    text = stringResource(Res.string.common_filter_and_sort),
                     style = MaterialTheme.typography.titleLarge,
                     fontWeight = FontWeight.Bold
                 )
                 TextButton(onClick = onClearAll) {
-                    Text(stringResource(Res.string.astronaut_filter_clear_all))
+                    Text(stringResource(Res.string.common_clear_all))
                 }
             }
         }
@@ -174,7 +174,7 @@ fun AstronautFilterSheet(
             ) {
                 Column(modifier = Modifier.padding(16.dp)) {
                     Text(
-                        text = stringResource(Res.string.astronaut_filter_search_title),
+                        text = stringResource(Res.string.common_search_title),
                         style = MaterialTheme.typography.titleMedium,
                         fontWeight = FontWeight.SemiBold,
                         modifier = Modifier.padding(bottom = 8.dp)
@@ -200,13 +200,13 @@ fun AstronautFilterSheet(
                             },
                             modifier = Modifier.weight(1f)
                         ) {
-                            Text(stringResource(Res.string.astronaut_filter_search_clear))
+                            Text(stringResource(Res.string.common_clear))
                         }
                         Button(
                             onClick = { onSearchQueryChange(localSearchQuery) },
                             modifier = Modifier.weight(1f)
                         ) {
-                            Text(stringResource(Res.string.astronaut_filter_search_apply))
+                            Text(stringResource(Res.string.common_apply))
                         }
                     }
                 }
@@ -223,7 +223,7 @@ fun AstronautFilterSheet(
             ) {
                 Column(modifier = Modifier.padding(16.dp)) {
                     Text(
-                        text = stringResource(Res.string.astronaut_filter_sort_title),
+                        text = stringResource(Res.string.common_sort_by),
                         style = MaterialTheme.typography.titleMedium,
                         fontWeight = FontWeight.SemiBold,
                         modifier = Modifier.padding(bottom = 8.dp)
@@ -237,7 +237,7 @@ fun AstronautFilterSheet(
                             value = stringResource(selectedSortOrder.label),
                             onValueChange = {},
                             readOnly = true,
-                            label = { Text(stringResource(Res.string.astronaut_filter_order_label)) },
+                            label = { Text(stringResource(Res.string.common_order)) },
                             trailingIcon = {
                                 ExposedDropdownMenuDefaults.TrailingIcon(expanded = sortExpanded)
                             },
@@ -264,7 +264,7 @@ fun AstronautFilterSheet(
                                             if (sortOrder == selectedSortOrder) {
                                                 Icon(
                                                     imageVector = Icons.Default.Check,
-                                                    contentDescription = stringResource(Res.string.astronaut_filter_selected_description),
+                                                    contentDescription = stringResource(Res.string.common_selected),
                                                     tint = MaterialTheme.colorScheme.primary
                                                 )
                                             }
@@ -295,7 +295,7 @@ fun AstronautFilterSheet(
                     verticalArrangement = Arrangement.spacedBy(12.dp)
                 ) {
                     Text(
-                        text = stringResource(Res.string.astronaut_filter_filters_title),
+                        text = stringResource(Res.string.common_filters),
                         style = MaterialTheme.typography.titleMedium,
                         fontWeight = FontWeight.SemiBold
                     )
@@ -318,13 +318,13 @@ fun AstronautFilterSheet(
                                 selected = hasFlownFilter == true,
                                 onClick = { onHasFlownChange(true) },
                                 shape = SegmentedButtonDefaults.itemShape(index = 1, count = 3),
-                                label = { Text(stringResource(Res.string.astronaut_filter_option_yes)) }
+                                label = { Text(stringResource(Res.string.common_yes)) }
                             )
                             SegmentedButton(
                                 selected = hasFlownFilter == false,
                                 onClick = { onHasFlownChange(false) },
                                 shape = SegmentedButtonDefaults.itemShape(index = 2, count = 3),
-                                label = { Text(stringResource(Res.string.astronaut_filter_option_no)) }
+                                label = { Text(stringResource(Res.string.common_no)) }
                             )
                         }
                     }
@@ -347,13 +347,13 @@ fun AstronautFilterSheet(
                                 selected = inSpaceFilter == true,
                                 onClick = { onInSpaceChange(true) },
                                 shape = SegmentedButtonDefaults.itemShape(index = 1, count = 3),
-                                label = { Text(stringResource(Res.string.astronaut_filter_option_yes)) }
+                                label = { Text(stringResource(Res.string.common_yes)) }
                             )
                             SegmentedButton(
                                 selected = inSpaceFilter == false,
                                 onClick = { onInSpaceChange(false) },
                                 shape = SegmentedButtonDefaults.itemShape(index = 2, count = 3),
-                                label = { Text(stringResource(Res.string.astronaut_filter_option_no)) }
+                                label = { Text(stringResource(Res.string.common_no)) }
                             )
                         }
                     }
@@ -361,7 +361,7 @@ fun AstronautFilterSheet(
                     // Is Human Filter
                     Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
                         Text(
-                            text = stringResource(Res.string.astronaut_filter_type_title),
+                            text = stringResource(Res.string.common_type),
                             style = MaterialTheme.typography.bodyMedium,
                             fontWeight = FontWeight.Medium
                         )
@@ -404,7 +404,7 @@ fun AstronautFilterSheet(
                         verticalArrangement = Arrangement.spacedBy(12.dp)
                     ) {
                         Text(
-                            text = stringResource(Res.string.astronaut_info_status),
+                            text = stringResource(Res.string.common_status),
                             style = MaterialTheme.typography.titleMedium,
                             fontWeight = FontWeight.SemiBold
                         )
@@ -441,7 +441,7 @@ fun AstronautFilterSheet(
                                         trailingIcon = {
                                             Icon(
                                                 imageVector = Icons.Default.Close,
-                                                contentDescription = stringResource(Res.string.astronaut_filter_status_remove_description),
+                                                contentDescription = stringResource(Res.string.common_remove_filter),
                                                 modifier = Modifier.size(16.dp)
                                             )
                                         }
@@ -492,7 +492,7 @@ fun AstronautFilterSheet(
                     onClick = { showReloadConfirmDialog = true },
                     modifier = Modifier.fillMaxWidth()
                 ) {
-                    Text(stringResource(Res.string.astronaut_filter_reload_button))
+                    Text(stringResource(Res.string.common_reload_filter_options))
                 }
             }
         }
@@ -510,7 +510,7 @@ fun AstronautFilterSheet(
                         containerColor = MaterialTheme.colorScheme.primary
                     )
                 ) {
-                    Text(stringResource(Res.string.astronaut_filter_done))
+                    Text(stringResource(Res.string.common_done))
                 }
             }
         }

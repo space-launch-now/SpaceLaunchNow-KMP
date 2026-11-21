@@ -71,41 +71,40 @@ import me.calebjones.spacelaunchnow.ui.icons.CustomIcons
 import me.calebjones.spacelaunchnow.ui.icons.RocketLaunch
 import org.jetbrains.compose.resources.stringResource
 import spacelaunchnow_kmp.composeapp.generated.resources.Res
-import spacelaunchnow_kmp.composeapp.generated.resources.agency_detail_about_title
-import spacelaunchnow_kmp.composeapp.generated.resources.agency_detail_error_retry
-import spacelaunchnow_kmp.composeapp.generated.resources.agency_detail_error_title
-import spacelaunchnow_kmp.composeapp.generated.resources.agency_detail_landing_stats_title
-import spacelaunchnow_kmp.composeapp.generated.resources.agency_detail_launch_stats_title
-import spacelaunchnow_kmp.composeapp.generated.resources.agency_detail_logo_fallback_description
 import spacelaunchnow_kmp.composeapp.generated.resources.agency_detail_spacecraft_landing_stats_title
-import spacelaunchnow_kmp.composeapp.generated.resources.agency_detail_stat_attempted
-import spacelaunchnow_kmp.composeapp.generated.resources.agency_detail_stat_attempted_landings
-import spacelaunchnow_kmp.composeapp.generated.resources.agency_detail_stat_consecutive_success
-import spacelaunchnow_kmp.composeapp.generated.resources.agency_detail_stat_failed
-import spacelaunchnow_kmp.composeapp.generated.resources.agency_detail_stat_failed_landings
-import spacelaunchnow_kmp.composeapp.generated.resources.agency_detail_stat_failed_launches
-import spacelaunchnow_kmp.composeapp.generated.resources.agency_detail_stat_pending_launches
-import spacelaunchnow_kmp.composeapp.generated.resources.agency_detail_stat_success_rate
-import spacelaunchnow_kmp.composeapp.generated.resources.agency_detail_stat_successful
-import spacelaunchnow_kmp.composeapp.generated.resources.agency_detail_stat_successful_landings
-import spacelaunchnow_kmp.composeapp.generated.resources.agency_detail_stat_successful_launches
-import spacelaunchnow_kmp.composeapp.generated.resources.agency_detail_stat_total_launches
 import spacelaunchnow_kmp.composeapp.generated.resources.agency_detail_tile_abbreviation
-import spacelaunchnow_kmp.composeapp.generated.resources.agency_detail_tile_administrator
-import spacelaunchnow_kmp.composeapp.generated.resources.agency_detail_tile_country
-import spacelaunchnow_kmp.composeapp.generated.resources.agency_detail_tile_founded
-import spacelaunchnow_kmp.composeapp.generated.resources.agency_detail_tile_type
 import spacelaunchnow_kmp.composeapp.generated.resources.agency_detail_vehicles_launch_vehicles
-import spacelaunchnow_kmp.composeapp.generated.resources.agency_detail_vehicles_spacecraft
 import spacelaunchnow_kmp.composeapp.generated.resources.agency_detail_vehicles_title
 import spacelaunchnow_kmp.composeapp.generated.resources.agency_detail_view_launches
-import spacelaunchnow_kmp.composeapp.generated.resources.agency_detail_website_button
-import spacelaunchnow_kmp.composeapp.generated.resources.agency_detail_website_description
-import spacelaunchnow_kmp.composeapp.generated.resources.agency_detail_wikipedia_button
-import spacelaunchnow_kmp.composeapp.generated.resources.agency_detail_wikipedia_description
-import spacelaunchnow_kmp.composeapp.generated.resources.agency_list_logo_description
+import spacelaunchnow_kmp.composeapp.generated.resources.common_about
+import spacelaunchnow_kmp.composeapp.generated.resources.common_administrator
+import spacelaunchnow_kmp.composeapp.generated.resources.common_agency
+import spacelaunchnow_kmp.composeapp.generated.resources.common_agency_logo
+import spacelaunchnow_kmp.composeapp.generated.resources.common_attempted
+import spacelaunchnow_kmp.composeapp.generated.resources.common_attempted_landings
 import spacelaunchnow_kmp.composeapp.generated.resources.common_back
+import spacelaunchnow_kmp.composeapp.generated.resources.common_consecutive_success
+import spacelaunchnow_kmp.composeapp.generated.resources.common_country
+import spacelaunchnow_kmp.composeapp.generated.resources.common_failed
+import spacelaunchnow_kmp.composeapp.generated.resources.common_failed_landings
+import spacelaunchnow_kmp.composeapp.generated.resources.common_failed_launches
+import spacelaunchnow_kmp.composeapp.generated.resources.common_founded
+import spacelaunchnow_kmp.composeapp.generated.resources.common_information
+import spacelaunchnow_kmp.composeapp.generated.resources.common_landing_statistics
+import spacelaunchnow_kmp.composeapp.generated.resources.common_launch_statistics
 import spacelaunchnow_kmp.composeapp.generated.resources.common_loading
+import spacelaunchnow_kmp.composeapp.generated.resources.common_oops_something_went_wrong
+import spacelaunchnow_kmp.composeapp.generated.resources.common_pending_launches
+import spacelaunchnow_kmp.composeapp.generated.resources.common_spacecraft
+import spacelaunchnow_kmp.composeapp.generated.resources.common_success_rate
+import spacelaunchnow_kmp.composeapp.generated.resources.common_successful
+import spacelaunchnow_kmp.composeapp.generated.resources.common_successful_landings
+import spacelaunchnow_kmp.composeapp.generated.resources.common_successful_launches
+import spacelaunchnow_kmp.composeapp.generated.resources.common_total_launches
+import spacelaunchnow_kmp.composeapp.generated.resources.common_try_again
+import spacelaunchnow_kmp.composeapp.generated.resources.common_type
+import spacelaunchnow_kmp.composeapp.generated.resources.common_website
+import spacelaunchnow_kmp.composeapp.generated.resources.common_wikipedia
 
 private val TitleHeight = 110.dp
 
@@ -198,7 +197,7 @@ private fun AgencyDetailContentInBody(
         val totalLaunches = agency.totalLaunchCount ?: 0
         if (totalLaunches > 0) {
             Text(
-                text = stringResource(Res.string.agency_detail_launch_stats_title),
+                text = stringResource(Res.string.common_launch_statistics),
                 style = MaterialTheme.typography.titleLarge,
                 fontWeight = FontWeight.Bold
             )
@@ -214,7 +213,7 @@ private fun AgencyDetailContentInBody(
         val consecutiveSuccessfulLandings = agency.consecutiveSuccessfulLandings ?: 0
         if (attemptedLandings + successfulLandings + failedLandings + consecutiveSuccessfulLandings > 0) {
             Text(
-                text = stringResource(Res.string.agency_detail_landing_stats_title),
+                text = stringResource(Res.string.common_landing_statistics),
                 style = MaterialTheme.typography.titleLarge,
                 fontWeight = FontWeight.Bold
             )
@@ -278,7 +277,7 @@ private fun AgencyOverviewCard(
             ) {
                 SubcomposeAsyncImage(
                     model = agency.logoUrl ?: "",
-                    contentDescription = stringResource(Res.string.agency_list_logo_description),
+                    contentDescription = stringResource(Res.string.common_agency_logo),
                     modifier = Modifier
                         .fillMaxWidth()
                         .height(200.dp)
@@ -311,7 +310,7 @@ private fun AgencyOverviewCard(
                         ) {
                             Icon(
                                 imageVector = Icons.Default.Business,
-                                contentDescription = stringResource(Res.string.agency_detail_logo_fallback_description),
+                                contentDescription = stringResource(Res.string.common_agency),
                                 modifier = Modifier.size(64.dp),
                                 tint = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.4f)
                             )
@@ -323,22 +322,22 @@ private fun AgencyOverviewCard(
             // Grid of key details
             val infoTiles = buildList {
                 agency.typeName?.takeIf { it.isNotBlank() }?.let {
-                    add(InfoTileData(Icons.Filled.Business, stringResource(Res.string.agency_detail_tile_type), it))
+                    add(InfoTileData(Icons.Filled.Business, stringResource(Res.string.common_type), it))
                 }
                 agency.abbrev?.takeIf { it.isNotBlank() }?.let {
                     add(InfoTileData(Icons.Filled.Business, stringResource(Res.string.agency_detail_tile_abbreviation), it))
                 }
                 agency.foundingYear?.let { year ->
-                    add(InfoTileData(Icons.Filled.CalendarToday, stringResource(Res.string.agency_detail_tile_founded), year.toString()))
+                    add(InfoTileData(Icons.Filled.CalendarToday, stringResource(Res.string.common_founded), year.toString()))
                 }
                 agency.administrator?.takeIf { it.isNotBlank() }?.let { admin ->
-                    add(InfoTileData(Icons.Filled.Person, stringResource(Res.string.agency_detail_tile_administrator), admin))
+                    add(InfoTileData(Icons.Filled.Person, stringResource(Res.string.common_administrator), admin))
                 }
                 if (agency.countries.isNotEmpty() && agency.countries.size == 1) {
                     add(
                         InfoTileData(
                             icon = Icons.Filled.Flag,
-                            label = stringResource(Res.string.agency_detail_tile_country),
+                            label = stringResource(Res.string.common_country),
                             value = null,
                             customComposable = { CountryChip(agency.countries.first()) }
                         )
@@ -372,7 +371,7 @@ private fun AgencyOverviewCard(
             // Description
             agency.description?.let { description ->
                 Text(
-                    text = stringResource(Res.string.agency_detail_about_title),
+                    text = stringResource(Res.string.common_about),
                     style = MaterialTheme.typography.titleSmall,
                     fontWeight = FontWeight.Bold,
                     modifier = Modifier.padding(top = 8.dp)
@@ -393,11 +392,11 @@ private fun AgencyOverviewCard(
                     ) {
                         Icon(
                             imageVector = FontAwesomeIcons.Solid.InfoCircle,
-                            contentDescription = stringResource(Res.string.agency_detail_website_description),
+                            contentDescription = stringResource(Res.string.common_information),
                             modifier = Modifier.size(18.dp)
                         )
                         Spacer(modifier = Modifier.size(8.dp))
-                        Text(stringResource(Res.string.agency_detail_website_button))
+                        Text(stringResource(Res.string.common_website))
                     }
                 }
                 agency.wikiUrl?.let { url ->
@@ -408,11 +407,11 @@ private fun AgencyOverviewCard(
                     ) {
                         Icon(
                             imageVector = FontAwesomeIcons.Brands.WikipediaW,
-                            contentDescription = stringResource(Res.string.agency_detail_wikipedia_description),
+                            contentDescription = stringResource(Res.string.common_wikipedia),
                             modifier = Modifier.size(18.dp)
                         )
                         Spacer(modifier = Modifier.size(8.dp))
-                        Text(stringResource(Res.string.agency_detail_wikipedia_button))
+                        Text(stringResource(Res.string.common_wikipedia))
                     }
                 }
             }
@@ -440,14 +439,14 @@ private fun AgencyLaunchStatistics(agency: Agency) {
                 modifier = Modifier.weight(1f),
                 icon = Icons.Filled.TrendingUp,
                 value = "${successRate.toInt()}%",
-                label = stringResource(Res.string.agency_detail_stat_success_rate),
+                label = stringResource(Res.string.common_success_rate),
                 containerColor = MaterialTheme.colorScheme.surfaceVariant
             )
             StatCard(
                 modifier = Modifier.weight(1f),
                 icon = CustomIcons.RocketLaunch,
                 value = "$totalLaunches",
-                label = stringResource(Res.string.agency_detail_stat_total_launches),
+                label = stringResource(Res.string.common_total_launches),
                 containerColor = MaterialTheme.colorScheme.surfaceVariant
             )
         }
@@ -460,14 +459,14 @@ private fun AgencyLaunchStatistics(agency: Agency) {
                 modifier = Modifier.weight(1f),
                 icon = Icons.Filled.CheckCircle,
                 value = "$successfulLaunches",
-                label = stringResource(Res.string.agency_detail_stat_successful_launches),
+                label = stringResource(Res.string.common_successful_launches),
                 containerColor = MaterialTheme.colorScheme.surfaceVariant
             )
             StatCard(
                 modifier = Modifier.weight(1f),
                 icon = Icons.Filled.Cancel,
                 value = "$failedLaunches",
-                label = stringResource(Res.string.agency_detail_stat_failed_launches),
+                label = stringResource(Res.string.common_failed_launches),
                 containerColor = MaterialTheme.colorScheme.surfaceVariant
             )
         }
@@ -481,7 +480,7 @@ private fun AgencyLaunchStatistics(agency: Agency) {
                     modifier = Modifier.weight(1f),
                     icon = Icons.Filled.Public,
                     value = "$pendingLaunches",
-                    label = stringResource(Res.string.agency_detail_stat_pending_launches),
+                    label = stringResource(Res.string.common_pending_launches),
                     containerColor = MaterialTheme.colorScheme.surfaceVariant
                 )
             }
@@ -490,7 +489,7 @@ private fun AgencyLaunchStatistics(agency: Agency) {
                     modifier = Modifier.weight(1f),
                     icon = Icons.Filled.TrendingUp,
                     value = "$consecutiveSuccessful",
-                    label = stringResource(Res.string.agency_detail_stat_consecutive_success),
+                    label = stringResource(Res.string.common_consecutive_success),
                     containerColor = MaterialTheme.colorScheme.surfaceVariant
                 )
             }
@@ -517,7 +516,7 @@ private fun AgencyLandingStatistics(agency: Agency) {
                     modifier = Modifier.weight(1f),
                     icon = CustomIcons.RocketLaunch,
                     value = "$attemptedLandings",
-                    label = stringResource(Res.string.agency_detail_stat_attempted_landings),
+                    label = stringResource(Res.string.common_attempted_landings),
                     containerColor = MaterialTheme.colorScheme.surfaceVariant
                 )
             }
@@ -526,7 +525,7 @@ private fun AgencyLandingStatistics(agency: Agency) {
                     modifier = Modifier.weight(1f),
                     icon = Icons.Filled.CheckCircle,
                     value = "$successfulLandings",
-                    label = stringResource(Res.string.agency_detail_stat_successful_landings),
+                    label = stringResource(Res.string.common_successful_landings),
                     containerColor = MaterialTheme.colorScheme.surfaceVariant
                 )
             }
@@ -541,7 +540,7 @@ private fun AgencyLandingStatistics(agency: Agency) {
                     modifier = Modifier.weight(1f),
                     icon = Icons.Filled.Cancel,
                     value = "$failedLandings",
-                    label = stringResource(Res.string.agency_detail_stat_failed_landings),
+                    label = stringResource(Res.string.common_failed_landings),
                     containerColor = MaterialTheme.colorScheme.surfaceVariant
                 )
             }
@@ -550,7 +549,7 @@ private fun AgencyLandingStatistics(agency: Agency) {
                     modifier = Modifier.weight(1f),
                     icon = Icons.Filled.TrendingUp,
                     value = "$consecutiveSuccessfulLandings",
-                    label = stringResource(Res.string.agency_detail_stat_consecutive_success),
+                    label = stringResource(Res.string.common_consecutive_success),
                     containerColor = MaterialTheme.colorScheme.surfaceVariant
                 )
             }
@@ -573,7 +572,7 @@ private fun AgencySpacecraftLandingStatistics(agency: Agency) {
                 modifier = Modifier.weight(1f),
                 icon = Icons.Filled.Satellite,
                 value = "$attemptedLandings",
-                label = stringResource(Res.string.agency_detail_stat_attempted),
+                label = stringResource(Res.string.common_attempted),
                 containerColor = MaterialTheme.colorScheme.surfaceVariant
             )
         }
@@ -582,7 +581,7 @@ private fun AgencySpacecraftLandingStatistics(agency: Agency) {
                 modifier = Modifier.weight(1f),
                 icon = Icons.Filled.CheckCircle,
                 value = "$successfulLandings",
-                label = stringResource(Res.string.agency_detail_stat_successful),
+                label = stringResource(Res.string.common_successful),
                 containerColor = MaterialTheme.colorScheme.surfaceVariant
             )
         }
@@ -591,7 +590,7 @@ private fun AgencySpacecraftLandingStatistics(agency: Agency) {
                 modifier = Modifier.weight(1f),
                 icon = Icons.Filled.Cancel,
                 value = "$failedLandings",
-                label = stringResource(Res.string.agency_detail_stat_failed),
+                label = stringResource(Res.string.common_failed),
                 containerColor = MaterialTheme.colorScheme.surfaceVariant
             )
         }
@@ -629,7 +628,7 @@ private fun VehiclesCard(agency: Agency) {
             agency.spacecraftDescription?.takeIf { it.isNotBlank() }?.let { spacecraft ->
                 Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
                     Text(
-                        text = stringResource(Res.string.agency_detail_vehicles_spacecraft),
+                        text = stringResource(Res.string.common_spacecraft),
                         style = MaterialTheme.typography.titleSmall,
                         fontWeight = FontWeight.Bold
                     )
@@ -750,7 +749,7 @@ fun AgencyDetailErrorView(
                     modifier = Modifier.size(48.dp)
                 )
                 Text(
-                    text = stringResource(Res.string.agency_detail_error_title),
+                    text = stringResource(Res.string.common_oops_something_went_wrong),
                     style = MaterialTheme.typography.titleMedium,
                     fontWeight = FontWeight.Bold
                 )
@@ -770,7 +769,7 @@ fun AgencyDetailErrorView(
                         modifier = Modifier.size(18.dp)
                     )
                     Spacer(modifier = Modifier.size(8.dp))
-                    Text(stringResource(Res.string.agency_detail_error_retry))
+                    Text(stringResource(Res.string.common_try_again))
                 }
             }
         }

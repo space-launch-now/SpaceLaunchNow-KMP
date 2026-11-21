@@ -25,7 +25,7 @@ import org.jetbrains.compose.ui.tooling.preview.Preview
 import spacelaunchnow_kmp.composeapp.generated.resources.Res
 import spacelaunchnow_kmp.composeapp.generated.resources.app_components_search_bar_clear_description
 import spacelaunchnow_kmp.composeapp.generated.resources.app_components_search_bar_icon_description
-import spacelaunchnow_kmp.composeapp.generated.resources.app_components_search_bar_placeholder
+import spacelaunchnow_kmp.composeapp.generated.resources.common_search
 import org.jetbrains.compose.resources.stringResource
 
 /**
@@ -40,7 +40,7 @@ import org.jetbrains.compose.resources.stringResource
 fun SearchBar(
     query: String,
     onQueryChange: (String) -> Unit,
-    placeholder: String = stringResource(Res.string.app_components_search_bar_placeholder),
+    placeholder: String = stringResource(Res.string.common_search),
     modifier: Modifier = Modifier
 ) {
     val keyboardController = LocalSoftwareKeyboardController.current

@@ -306,7 +306,7 @@ object DateTimeUtil {
      * Read the result with [resolve] in a composable or [load] in a coroutine.
      */
     fun dateWithPrecisionFallback(launch: me.calebjones.spacelaunchnow.domain.model.Launch, useUtc: Boolean = false): LocalizedText {
-        val net = launch.net ?: return LocalizedText.Str(Res.string.time_tbd)
+        val net = launch.net ?: return LocalizedText.Str(Res.string.common_tbd)
         val precisionId = launch.netPrecision?.id
 
         return dateWithPrecisionFallback(net, precisionId, useUtc)

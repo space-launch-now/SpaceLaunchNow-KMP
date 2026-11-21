@@ -51,16 +51,16 @@ import me.calebjones.spacelaunchnow.ui.viewmodel.AgencySortOrder
 import org.koin.compose.viewmodel.koinViewModel
 import org.jetbrains.compose.resources.stringResource
 import spacelaunchnow_kmp.composeapp.generated.resources.Res
-import spacelaunchnow_kmp.composeapp.generated.resources.agency_list_empty_hint
 import spacelaunchnow_kmp.composeapp.generated.resources.agency_list_empty_title
 import spacelaunchnow_kmp.composeapp.generated.resources.agency_list_error_title
 import spacelaunchnow_kmp.composeapp.generated.resources.agency_list_filter_description
 import spacelaunchnow_kmp.composeapp.generated.resources.agency_list_loading
-import spacelaunchnow_kmp.composeapp.generated.resources.agency_list_title
 import spacelaunchnow_kmp.composeapp.generated.resources.agency_list_title_with_count
-import spacelaunchnow_kmp.composeapp.generated.resources.agency_list_unknown_error
+import spacelaunchnow_kmp.composeapp.generated.resources.common_agencies
 import spacelaunchnow_kmp.composeapp.generated.resources.common_back
 import spacelaunchnow_kmp.composeapp.generated.resources.common_retry
+import spacelaunchnow_kmp.composeapp.generated.resources.common_try_adjusting_your_filters
+import spacelaunchnow_kmp.composeapp.generated.resources.common_unknown_error
 
 /**
  * Main screen for browsing agencies.
@@ -126,7 +126,7 @@ fun AgencyListScreen(
                         text = if (uiState.totalCount > 0 && hasFilters) {
                             stringResource(Res.string.agency_list_title_with_count, uiState.totalCount)
                         } else {
-                            stringResource(Res.string.agency_list_title)
+                            stringResource(Res.string.common_agencies)
                         }
                     )
                 },
@@ -173,7 +173,7 @@ fun AgencyListScreen(
                 // Error state
                 uiState.error != null && uiState.agencies.isEmpty() -> {
                     ErrorContent(
-                        errorMessage = uiState.error ?: stringResource(Res.string.agency_list_unknown_error),
+                        errorMessage = uiState.error ?: stringResource(Res.string.common_unknown_error),
                         onRetry = { viewModel.refresh() }
                     )
                 }
@@ -341,7 +341,7 @@ private fun EmptyContent() {
                 textAlign = TextAlign.Center
             )
             Text(
-                text = stringResource(Res.string.agency_list_empty_hint),
+                text = stringResource(Res.string.common_try_adjusting_your_filters),
                 style = MaterialTheme.typography.bodyMedium,
                 color = MaterialTheme.colorScheme.onSurfaceVariant,
                 textAlign = TextAlign.Center

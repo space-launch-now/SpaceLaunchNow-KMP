@@ -92,50 +92,49 @@ import me.calebjones.spacelaunchnow.util.NumberFormatUtil
 import me.calebjones.spacelaunchnow.util.parseIsoDurationToHumanReadable
 import org.jetbrains.compose.resources.stringResource
 import spacelaunchnow_kmp.composeapp.generated.resources.Res
-import spacelaunchnow_kmp.composeapp.generated.resources.launch_detail_info_description
-import spacelaunchnow_kmp.composeapp.generated.resources.launch_detail_link_website
-import spacelaunchnow_kmp.composeapp.generated.resources.launch_detail_link_wikipedia
-import spacelaunchnow_kmp.composeapp.generated.resources.launch_detail_link_wikipedia_description
-import spacelaunchnow_kmp.composeapp.generated.resources.launch_detail_show_less_lower
-import spacelaunchnow_kmp.composeapp.generated.resources.launch_detail_show_more_lower
-import spacelaunchnow_kmp.composeapp.generated.resources.launch_detail_stat_attempted_landings
-import spacelaunchnow_kmp.composeapp.generated.resources.launch_detail_stat_consecutive_success
-import spacelaunchnow_kmp.composeapp.generated.resources.launch_detail_stat_failed_landings
-import spacelaunchnow_kmp.composeapp.generated.resources.launch_detail_stat_failed_launches
-import spacelaunchnow_kmp.composeapp.generated.resources.launch_detail_stat_pending_launches
-import spacelaunchnow_kmp.composeapp.generated.resources.launch_detail_stat_success_rate
-import spacelaunchnow_kmp.composeapp.generated.resources.launch_detail_stat_successful_landings
-import spacelaunchnow_kmp.composeapp.generated.resources.launch_detail_stat_successful_launches
-import spacelaunchnow_kmp.composeapp.generated.resources.launch_detail_stat_total_launches
-import spacelaunchnow_kmp.composeapp.generated.resources.launch_detail_vehicle_collapse_description
-import spacelaunchnow_kmp.composeapp.generated.resources.launch_detail_vehicle_expand_description
+import spacelaunchnow_kmp.composeapp.generated.resources.common_active
+import spacelaunchnow_kmp.composeapp.generated.resources.common_attempted_landings
+import spacelaunchnow_kmp.composeapp.generated.resources.common_collapse
+import spacelaunchnow_kmp.composeapp.generated.resources.common_consecutive_success
+import spacelaunchnow_kmp.composeapp.generated.resources.common_diameter
+import spacelaunchnow_kmp.composeapp.generated.resources.common_expand
+import spacelaunchnow_kmp.composeapp.generated.resources.common_expendable
+import spacelaunchnow_kmp.composeapp.generated.resources.common_failed_landings
+import spacelaunchnow_kmp.composeapp.generated.resources.common_failed_launches
+import spacelaunchnow_kmp.composeapp.generated.resources.common_families
+import spacelaunchnow_kmp.composeapp.generated.resources.common_geo
+import spacelaunchnow_kmp.composeapp.generated.resources.common_gto
+import spacelaunchnow_kmp.composeapp.generated.resources.common_inactive
+import spacelaunchnow_kmp.composeapp.generated.resources.common_information
+import spacelaunchnow_kmp.composeapp.generated.resources.common_landing_statistics
+import spacelaunchnow_kmp.composeapp.generated.resources.common_launch_cost
+import spacelaunchnow_kmp.composeapp.generated.resources.common_launch_mass
+import spacelaunchnow_kmp.composeapp.generated.resources.common_length
+import spacelaunchnow_kmp.composeapp.generated.resources.common_leo
+import spacelaunchnow_kmp.composeapp.generated.resources.common_maiden_flight
+import spacelaunchnow_kmp.composeapp.generated.resources.common_manufacturer
+import spacelaunchnow_kmp.composeapp.generated.resources.common_pending_launches
+import spacelaunchnow_kmp.composeapp.generated.resources.common_reusable
+import spacelaunchnow_kmp.composeapp.generated.resources.common_show_less_lower
+import spacelaunchnow_kmp.composeapp.generated.resources.common_show_more_lower
+import spacelaunchnow_kmp.composeapp.generated.resources.common_sso
+import spacelaunchnow_kmp.composeapp.generated.resources.common_stages
+import spacelaunchnow_kmp.composeapp.generated.resources.common_success_rate
+import spacelaunchnow_kmp.composeapp.generated.resources.common_successful_landings
+import spacelaunchnow_kmp.composeapp.generated.resources.common_successful_launches
+import spacelaunchnow_kmp.composeapp.generated.resources.common_total_launches
+import spacelaunchnow_kmp.composeapp.generated.resources.common_variant
+import spacelaunchnow_kmp.composeapp.generated.resources.common_website
+import spacelaunchnow_kmp.composeapp.generated.resources.common_wikipedia
 import spacelaunchnow_kmp.composeapp.generated.resources.launch_detail_vehicle_image_description
-import spacelaunchnow_kmp.composeapp.generated.resources.launch_detail_vehicle_landing_statistics_heading
 import spacelaunchnow_kmp.composeapp.generated.resources.launch_detail_vehicle_spec_apogee
-import spacelaunchnow_kmp.composeapp.generated.resources.launch_detail_vehicle_spec_diameter
-import spacelaunchnow_kmp.composeapp.generated.resources.launch_detail_vehicle_spec_geo
-import spacelaunchnow_kmp.composeapp.generated.resources.launch_detail_vehicle_spec_gto
-import spacelaunchnow_kmp.composeapp.generated.resources.launch_detail_vehicle_spec_launch_cost
-import spacelaunchnow_kmp.composeapp.generated.resources.launch_detail_vehicle_spec_launch_mass
-import spacelaunchnow_kmp.composeapp.generated.resources.launch_detail_vehicle_spec_length
-import spacelaunchnow_kmp.composeapp.generated.resources.launch_detail_vehicle_spec_leo
-import spacelaunchnow_kmp.composeapp.generated.resources.launch_detail_vehicle_spec_sso
 import spacelaunchnow_kmp.composeapp.generated.resources.launch_detail_vehicle_spec_thrust
 import spacelaunchnow_kmp.composeapp.generated.resources.launch_detail_vehicle_spec_thrust_value
 import spacelaunchnow_kmp.composeapp.generated.resources.launch_detail_vehicle_specifications_heading
 import spacelaunchnow_kmp.composeapp.generated.resources.launch_detail_vehicle_statistics_heading
-import spacelaunchnow_kmp.composeapp.generated.resources.launch_detail_vehicle_status_active
-import spacelaunchnow_kmp.composeapp.generated.resources.launch_detail_vehicle_status_expendable
-import spacelaunchnow_kmp.composeapp.generated.resources.launch_detail_vehicle_status_inactive
-import spacelaunchnow_kmp.composeapp.generated.resources.launch_detail_vehicle_status_reusable
 import spacelaunchnow_kmp.composeapp.generated.resources.launch_detail_vehicle_tile_alias
-import spacelaunchnow_kmp.composeapp.generated.resources.launch_detail_vehicle_tile_families
 import spacelaunchnow_kmp.composeapp.generated.resources.launch_detail_vehicle_tile_family
 import spacelaunchnow_kmp.composeapp.generated.resources.launch_detail_vehicle_tile_fastest_turnaround
-import spacelaunchnow_kmp.composeapp.generated.resources.launch_detail_vehicle_tile_maiden_flight
-import spacelaunchnow_kmp.composeapp.generated.resources.launch_detail_vehicle_tile_manufacturer
-import spacelaunchnow_kmp.composeapp.generated.resources.launch_detail_vehicle_tile_stages
-import spacelaunchnow_kmp.composeapp.generated.resources.launch_detail_vehicle_tile_variant
 import spacelaunchnow_kmp.composeapp.generated.resources.launch_detail_vehicle_unknown_name
 
 @Composable
@@ -220,15 +219,15 @@ fun LaunchVehicleDetailsCard(
                     horizontalArrangement = Arrangement.spacedBy(12.dp)
                 ) {
                     if (rocketConfig.active == true) {
-                        StatusChip(text = stringResource(Res.string.launch_detail_vehicle_status_active), color = Color(0xFF4CAF50))
+                        StatusChip(text = stringResource(Res.string.common_active), color = Color(0xFF4CAF50))
                     } else {
-                        StatusChip(text = stringResource(Res.string.launch_detail_vehicle_status_inactive), color = MaterialTheme.colorScheme.error)
+                        StatusChip(text = stringResource(Res.string.common_inactive), color = MaterialTheme.colorScheme.error)
                     }
 
                     if (rocketConfig.reusable == true) {
-                        StatusChip(text = stringResource(Res.string.launch_detail_vehicle_status_reusable), color = Color(0xFF2196F3))
+                        StatusChip(text = stringResource(Res.string.common_reusable), color = Color(0xFF2196F3))
                     } else {
-                        StatusChip(text = stringResource(Res.string.launch_detail_vehicle_status_expendable), color = MaterialTheme.colorScheme.secondary)
+                        StatusChip(text = stringResource(Res.string.common_expendable), color = MaterialTheme.colorScheme.secondary)
                     }
                 }
             }
@@ -256,7 +255,7 @@ fun LaunchVehicleDetailsCard(
                     )
                     if (hasOverflow || expanded) {
                         TextButton(onClick = { expanded = !expanded }) {
-                            Text(if (expanded) stringResource(Res.string.launch_detail_show_less_lower) else stringResource(Res.string.launch_detail_show_more_lower))
+                            Text(if (expanded) stringResource(Res.string.common_show_less_lower) else stringResource(Res.string.common_show_more_lower))
                         }
                     }
                 }
@@ -265,10 +264,10 @@ fun LaunchVehicleDetailsCard(
             // Build info tiles and render as two-column grid
             val infoTiles = buildList {
                 rocketConfig.manufacturer?.name?.takeIf { it.isNotBlank() }?.let {
-                    add(Triple(Icons.Filled.Factory, stringResource(Res.string.launch_detail_vehicle_tile_manufacturer), it))
+                    add(Triple(Icons.Filled.Factory, stringResource(Res.string.common_manufacturer), it))
                 }
                 rocketConfig.variant?.takeIf { it.isNotBlank() }?.let {
-                    add(Triple(Icons.Filled.Badge, stringResource(Res.string.launch_detail_vehicle_tile_variant), it))
+                    add(Triple(Icons.Filled.Badge, stringResource(Res.string.common_variant), it))
                 }
                 rocketConfig.alias?.takeIf { it.isNotBlank() }?.let {
                     add(Triple(Icons.Filled.Label, stringResource(Res.string.launch_detail_vehicle_tile_alias), it))
@@ -279,7 +278,7 @@ fun LaunchVehicleDetailsCard(
                         add(
                             Triple(
                                 Icons.Filled.Category,
-                                if (rocketConfig.families.size == 1) stringResource(Res.string.launch_detail_vehicle_tile_family) else stringResource(Res.string.launch_detail_vehicle_tile_families),
+                                if (rocketConfig.families.size == 1) stringResource(Res.string.launch_detail_vehicle_tile_family) else stringResource(Res.string.common_families),
                                 familyNames
                             )
                         )
@@ -290,13 +289,13 @@ fun LaunchVehicleDetailsCard(
                     val stageText =
                         if (rocketConfig.minStage != null && rocketConfig.maxStage != null && rocketConfig.minStage != rocketConfig.maxStage) "${rocketConfig.minStage}-${rocketConfig.maxStage}" else (rocketConfig.minStage
                             ?: rocketConfig.maxStage).toString()
-                    add(Triple(Icons.Filled.Stairs, stringResource(Res.string.launch_detail_vehicle_tile_stages), stageText))
+                    add(Triple(Icons.Filled.Stairs, stringResource(Res.string.common_stages), stageText))
                 }
                 rocketConfig.maidenFlight?.let {
                     add(
                         Triple(
                             Icons.Filled.CalendarMonth,
-                            stringResource(Res.string.launch_detail_vehicle_tile_maiden_flight),
+                            stringResource(Res.string.common_maiden_flight),
                             it.toString()
                         )
                     )
@@ -376,7 +375,7 @@ fun LaunchVehicleDetailsCard(
                                 )
                                 Icon(
                                     imageVector = if (specificationsExpanded) Icons.Filled.KeyboardArrowUp else Icons.Filled.KeyboardArrowDown,
-                                    contentDescription = if (specificationsExpanded) stringResource(Res.string.launch_detail_vehicle_collapse_description) else stringResource(Res.string.launch_detail_vehicle_expand_description),
+                                    contentDescription = if (specificationsExpanded) stringResource(Res.string.common_collapse) else stringResource(Res.string.common_expand),
                                     modifier = Modifier.size(24.dp),
                                     tint = MaterialTheme.colorScheme.onSurface
                                 )
@@ -385,15 +384,15 @@ fun LaunchVehicleDetailsCard(
                             // Build all specification items in a single list
                             val allSpecs = buildList {
                                 rocketConfig.length?.let { length ->
-                                    add(Triple(stringResource(Res.string.launch_detail_vehicle_spec_length), "${length}m", Icons.Filled.Height))
+                                    add(Triple(stringResource(Res.string.common_length), "${length}m", Icons.Filled.Height))
                                 }
                                 rocketConfig.diameter?.let { diameter ->
-                                    add(Triple(stringResource(Res.string.launch_detail_vehicle_spec_diameter), "${diameter}m", Icons.Filled.ViewColumn))
+                                    add(Triple(stringResource(Res.string.common_diameter), "${diameter}m", Icons.Filled.ViewColumn))
                                 }
                                 rocketConfig.launchMass?.let { mass ->
                                     add(
                                         Triple(
-                                            stringResource(Res.string.launch_detail_vehicle_spec_launch_mass),
+                                            stringResource(Res.string.common_launch_mass),
                                             NumberFormatUtil.formatNumberWithUnit(mass, "t"),
                                             Icons.Filled.Scale
                                         )
@@ -403,7 +402,7 @@ fun LaunchVehicleDetailsCard(
                                     // Dollar on the front for USD
                                     add(
                                         Triple(
-                                            stringResource(Res.string.launch_detail_vehicle_spec_launch_cost),
+                                            stringResource(Res.string.common_launch_cost),
                                             "$" + NumberFormatUtil.formatNumberWithUnit(cost, ""),
                                             Icons.Filled.AttachMoney
                                         )
@@ -412,7 +411,7 @@ fun LaunchVehicleDetailsCard(
                                 rocketConfig.leoCapacity?.let { leo ->
                                     add(
                                         Triple(
-                                            stringResource(Res.string.launch_detail_vehicle_spec_leo),
+                                            stringResource(Res.string.common_leo),
                                             NumberFormatUtil.formatNumberWithUnit(leo, "kg"),
                                             Icons.Filled.Public
                                         )
@@ -421,7 +420,7 @@ fun LaunchVehicleDetailsCard(
                                 rocketConfig.gtoCapacity?.let { gto ->
                                     add(
                                         Triple(
-                                            stringResource(Res.string.launch_detail_vehicle_spec_gto),
+                                            stringResource(Res.string.common_gto),
                                             NumberFormatUtil.formatNumberWithUnit(gto, "kg"),
                                             Icons.Filled.Satellite
                                         )
@@ -430,7 +429,7 @@ fun LaunchVehicleDetailsCard(
                                 rocketConfig.geoCapacity?.let { geo ->
                                     add(
                                         Triple(
-                                            stringResource(Res.string.launch_detail_vehicle_spec_geo),
+                                            stringResource(Res.string.common_geo),
                                             NumberFormatUtil.formatNumberWithUnit(geo, "kg"),
                                             Icons.Filled.SatelliteAlt
                                         )
@@ -439,7 +438,7 @@ fun LaunchVehicleDetailsCard(
                                 rocketConfig.ssoCapacity?.let { sso ->
                                     add(
                                         Triple(
-                                            stringResource(Res.string.launch_detail_vehicle_spec_sso),
+                                            stringResource(Res.string.common_sso),
                                             NumberFormatUtil.formatNumberWithUnit(sso, "kg"),
                                             Icons.AutoMirrored.Filled.AltRoute
                                         )
@@ -512,11 +511,11 @@ fun LaunchVehicleDetailsCard(
                         ) {
                             Icon(
                                 imageVector = Icons.Default.Info,
-                                contentDescription = stringResource(Res.string.launch_detail_info_description),
+                                contentDescription = stringResource(Res.string.common_information),
                                 modifier = Modifier.size(18.dp)
                             )
                             Spacer(modifier = Modifier.width(8.dp))
-                            Text(stringResource(Res.string.launch_detail_link_website))
+                            Text(stringResource(Res.string.common_website))
                         }
                     }
                     rocketConfig.wikiUrl?.let { url ->
@@ -527,11 +526,11 @@ fun LaunchVehicleDetailsCard(
                         ) {
                             Icon(
                                 imageVector = FontAwesomeIcons.Brands.WikipediaW,
-                                contentDescription = stringResource(Res.string.launch_detail_link_wikipedia_description),
+                                contentDescription = stringResource(Res.string.common_wikipedia),
                                 modifier = Modifier.size(18.dp)
                             )
                             Spacer(modifier = Modifier.width(8.dp))
-                            Text(stringResource(Res.string.launch_detail_link_wikipedia))
+                            Text(stringResource(Res.string.common_wikipedia))
                         }
                     }
                 }
@@ -569,14 +568,14 @@ fun LaunchVehicleDetailedStatistics(rocketConfig: RocketConfig) {
                     modifier = Modifier.weight(1f),
                     icon = Icons.Filled.TrendingUp,
                     value = "${successRate.toInt()}%",
-                    label = stringResource(Res.string.launch_detail_stat_success_rate),
+                    label = stringResource(Res.string.common_success_rate),
                     containerColor = MaterialTheme.colorScheme.surfaceVariant
                 )
                 StatCard(
                     modifier = Modifier.weight(1f),
                     icon = Icons.Filled.BarChart,
                     value = "$totalLaunches",
-                    label = stringResource(Res.string.launch_detail_stat_total_launches),
+                    label = stringResource(Res.string.common_total_launches),
                     containerColor = MaterialTheme.colorScheme.surfaceVariant
                 )
             }
@@ -588,14 +587,14 @@ fun LaunchVehicleDetailedStatistics(rocketConfig: RocketConfig) {
                     modifier = Modifier.weight(1f),
                     icon = Icons.Filled.CheckCircle,
                     value = "$successfulLaunches",
-                    label = stringResource(Res.string.launch_detail_stat_successful_launches),
+                    label = stringResource(Res.string.common_successful_launches),
                     containerColor = MaterialTheme.colorScheme.surfaceVariant
                 )
                 StatCard(
                     modifier = Modifier.weight(1f),
                     icon = Icons.Filled.Cancel,
                     value = "$failedLaunches",
-                    label = stringResource(Res.string.launch_detail_stat_failed_launches),
+                    label = stringResource(Res.string.common_failed_launches),
                     containerColor = MaterialTheme.colorScheme.surfaceVariant
                 )
             }
@@ -608,7 +607,7 @@ fun LaunchVehicleDetailedStatistics(rocketConfig: RocketConfig) {
                         modifier = Modifier.weight(1f),
                         icon = Icons.Filled.Pending,
                         value = "$pendingLaunches",
-                        label = stringResource(Res.string.launch_detail_stat_pending_launches),
+                        label = stringResource(Res.string.common_pending_launches),
                         containerColor = MaterialTheme.colorScheme.surfaceVariant
                     )
                 }
@@ -617,7 +616,7 @@ fun LaunchVehicleDetailedStatistics(rocketConfig: RocketConfig) {
                         modifier = Modifier.weight(1f),
                         icon = Icons.Filled.ThumbUp,
                         value = "$consecutiveSuccessful",
-                        label = stringResource(Res.string.launch_detail_stat_consecutive_success),
+                        label = stringResource(Res.string.common_consecutive_success),
                         containerColor = MaterialTheme.colorScheme.surfaceVariant
                     )
                 }
@@ -631,7 +630,7 @@ fun LaunchVehicleDetailedStatistics(rocketConfig: RocketConfig) {
         val consecutiveSuccessfulLandings = rocketConfig.consecutiveSuccessfulLandings ?: 0
         if (attemptedLandings + successfulLandings + failedLandings + consecutiveSuccessfulLandings > 0) {
             Text(
-                text = stringResource(Res.string.launch_detail_vehicle_landing_statistics_heading),
+                text = stringResource(Res.string.common_landing_statistics),
                 style = MaterialTheme.typography.titleLarge,
                 fontWeight = FontWeight.Bold
             )
@@ -644,7 +643,7 @@ fun LaunchVehicleDetailedStatistics(rocketConfig: RocketConfig) {
                         modifier = Modifier.weight(1f),
                         icon = Icons.Filled.Assessment,
                         value = "$attemptedLandings",
-                        label = stringResource(Res.string.launch_detail_stat_attempted_landings),
+                        label = stringResource(Res.string.common_attempted_landings),
                         containerColor = MaterialTheme.colorScheme.surfaceVariant
                     )
                 }
@@ -653,7 +652,7 @@ fun LaunchVehicleDetailedStatistics(rocketConfig: RocketConfig) {
                         modifier = Modifier.weight(1f),
                         icon = Icons.Filled.Check,
                         value = "$successfulLandings",
-                        label = stringResource(Res.string.launch_detail_stat_successful_landings),
+                        label = stringResource(Res.string.common_successful_landings),
                         containerColor = MaterialTheme.colorScheme.surfaceVariant
                     )
                 }
@@ -667,7 +666,7 @@ fun LaunchVehicleDetailedStatistics(rocketConfig: RocketConfig) {
                         modifier = Modifier.weight(1f),
                         icon = Icons.Filled.Close,
                         value = "$failedLandings",
-                        label = stringResource(Res.string.launch_detail_stat_failed_landings),
+                        label = stringResource(Res.string.common_failed_landings),
                         containerColor = MaterialTheme.colorScheme.surfaceVariant
                     )
                 }
@@ -676,7 +675,7 @@ fun LaunchVehicleDetailedStatistics(rocketConfig: RocketConfig) {
                         modifier = Modifier.weight(1f),
                         icon = Icons.Filled.ThumbUp,
                         value = "$consecutiveSuccessfulLandings",
-                        label = stringResource(Res.string.launch_detail_stat_consecutive_success),
+                        label = stringResource(Res.string.common_consecutive_success),
                         containerColor = MaterialTheme.colorScheme.surfaceVariant
                     )
                 }

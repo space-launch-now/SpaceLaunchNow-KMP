@@ -62,8 +62,8 @@ import kotlin.time.Duration.Companion.seconds
 import kotlin.time.Instant
 import spacelaunchnow_kmp.composeapp.generated.resources.launch_countdown_status_dialog_title
 import spacelaunchnow_kmp.composeapp.generated.resources.launch_countdown_status_info_description
-import spacelaunchnow_kmp.composeapp.generated.resources.launch_countdown_status_description_heading
-import spacelaunchnow_kmp.composeapp.generated.resources.launch_countdown_status_dialog_ok
+import spacelaunchnow_kmp.composeapp.generated.resources.common_description
+import spacelaunchnow_kmp.composeapp.generated.resources.common_ok
 
 @Preview
 @Composable
@@ -177,7 +177,7 @@ fun LaunchStatusDialog(
                         contentDescription = stringResource(Res.string.launch_countdown_status_info_description)
                     )
                     Text(
-                        text = stringResource(Res.string.launch_countdown_status_description_heading),
+                        text = stringResource(Res.string.common_description),
                         style = MaterialTheme.typography.bodyLarge,
                         fontWeight = FontWeight.Bold
                     )
@@ -193,7 +193,7 @@ fun LaunchStatusDialog(
         },
         confirmButton = {
             TextButton(onClick = onDismiss) {
-                Text(text = stringResource(Res.string.launch_countdown_status_dialog_ok))
+                Text(text = stringResource(Res.string.common_ok))
             }
         }
     )

@@ -18,8 +18,8 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import me.calebjones.spacelaunchnow.util.ExternalLinkHandler
 import spacelaunchnow_kmp.composeapp.generated.resources.Res
-import spacelaunchnow_kmp.composeapp.generated.resources.app_components_web_fallback_button
 import spacelaunchnow_kmp.composeapp.generated.resources.app_components_web_fallback_opening
+import spacelaunchnow_kmp.composeapp.generated.resources.common_open_in_browser
 import org.jetbrains.compose.resources.stringResource
 
 /**
@@ -62,7 +62,7 @@ fun WebViewBrowserFallback(
                 contentDescription = null,
             )
             Text(
-                text = stringResource(Res.string.app_components_web_fallback_button),
+                text = stringResource(Res.string.common_open_in_browser),
                 modifier = Modifier.padding(start = 8.dp),
             )
         }

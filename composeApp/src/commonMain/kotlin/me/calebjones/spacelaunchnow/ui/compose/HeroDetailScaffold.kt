@@ -41,8 +41,8 @@ import androidx.compose.ui.unit.dp
 import coil3.compose.SubcomposeAsyncImage
 import com.valentinilk.shimmer.shimmer
 import spacelaunchnow_kmp.composeapp.generated.resources.Res
-import spacelaunchnow_kmp.composeapp.generated.resources.app_compose_hero_detail_image_placeholder_description
 import spacelaunchnow_kmp.composeapp.generated.resources.common_back
+import spacelaunchnow_kmp.composeapp.generated.resources.common_image_placeholder
 import org.jetbrains.compose.resources.stringResource
 
 private val HeroImageHeight = 340.dp
@@ -197,7 +197,7 @@ private fun HeroImage(
                     ) {
                         Icon(
                             imageVector = Icons.Filled.Image,
-                            contentDescription = stringResource(Res.string.app_compose_hero_detail_image_placeholder_description),
+                            contentDescription = stringResource(Res.string.common_image_placeholder),
                             modifier = Modifier.size(64.dp),
                             tint = MaterialTheme.colorScheme.primary.copy(alpha = 0.6f)
                         )

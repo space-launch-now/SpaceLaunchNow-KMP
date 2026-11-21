@@ -23,10 +23,10 @@ import androidx.compose.ui.unit.dp
 import me.calebjones.spacelaunchnow.domain.model.NetPrecision
 import org.jetbrains.compose.resources.stringResource
 import spacelaunchnow_kmp.composeapp.generated.resources.Res
+import spacelaunchnow_kmp.composeapp.generated.resources.common_ok
+import spacelaunchnow_kmp.composeapp.generated.resources.common_unknown
 import spacelaunchnow_kmp.composeapp.generated.resources.launch_detail_precision_body
-import spacelaunchnow_kmp.composeapp.generated.resources.launch_detail_precision_ok
 import spacelaunchnow_kmp.composeapp.generated.resources.launch_detail_precision_title
-import spacelaunchnow_kmp.composeapp.generated.resources.launch_detail_value_unknown
 
 @Composable
 fun PrecisionInfoDialog(
@@ -37,7 +37,7 @@ fun PrecisionInfoDialog(
     AdCoveringAlertDialog(
         onDismissRequest = onDismiss,
         confirmButton = {
-            TextButton(onClick = onDismiss) { Text(stringResource(Res.string.launch_detail_precision_ok)) }
+            TextButton(onClick = onDismiss) { Text(stringResource(Res.string.common_ok)) }
         },
         title = {
             Row(
@@ -96,7 +96,7 @@ private fun mapNetPrecisionUi(netPrecision: NetPrecision?): PrecisionUi {
     // Defaults
     val defaultPrimary = netPrecision?.name?.takeIf { it.isNotBlank() }
         ?: netPrecision?.abbrev?.takeIf { it.isNotBlank() }
-        ?: stringResource(Res.string.launch_detail_value_unknown)
+        ?: stringResource(Res.string.common_unknown)
     val fallbackSecondary = netPrecision?.description?.takeIf { it.isNotBlank() }
 
     // Choose icon and concise secondary by id when available

@@ -39,7 +39,7 @@ import me.calebjones.spacelaunchnow.ui.theme.SpaceLaunchNowPreviewTheme
 import org.jetbrains.compose.ui.tooling.preview.Preview
 import org.jetbrains.compose.resources.stringResource
 import spacelaunchnow_kmp.composeapp.generated.resources.Res
-import spacelaunchnow_kmp.composeapp.generated.resources.onboarding_welcome_app_name
+import spacelaunchnow_kmp.composeapp.generated.resources.common_app_name
 import spacelaunchnow_kmp.composeapp.generated.resources.onboarding_welcome_explore
 import spacelaunchnow_kmp.composeapp.generated.resources.onboarding_welcome_greeting
 import spacelaunchnow_kmp.composeapp.generated.resources.onboarding_welcome_next_launch
@@ -165,7 +165,7 @@ private fun WelcomeCardContent(modifier: Modifier = Modifier) {
                 Spacer(modifier = Modifier.height(4.dp))
 
                 Text(
-                    text = stringResource(Res.string.onboarding_welcome_app_name),
+                    text = stringResource(Res.string.common_app_name),
                     style = MaterialTheme.typography.headlineLarge,
                     fontWeight = FontWeight.Bold,
                     color = MaterialTheme.colorScheme.onPrimary,

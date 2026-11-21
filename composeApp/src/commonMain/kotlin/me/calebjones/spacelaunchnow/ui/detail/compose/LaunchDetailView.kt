@@ -42,7 +42,7 @@ import me.calebjones.spacelaunchnow.util.sharePlainText
 import org.koin.compose.koinInject
 import org.jetbrains.compose.resources.stringResource
 import spacelaunchnow_kmp.composeapp.generated.resources.Res
-import spacelaunchnow_kmp.composeapp.generated.resources.launch_detail_share_description
+import spacelaunchnow_kmp.composeapp.generated.resources.common_share
 import spacelaunchnow_kmp.composeapp.generated.resources.launch_detail_share_title
 
 // Height constants for spacing adjustments
@@ -282,7 +282,7 @@ private fun PhoneLaunchDetailView(
             ) {
                 Icon(
                     imageVector = Icons.Filled.Share,
-                    contentDescription = stringResource(Res.string.launch_detail_share_description),
+                    contentDescription = stringResource(Res.string.common_share),
                     tint = Color.White,
                     modifier = Modifier.size(24.dp)
                 )

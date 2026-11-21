@@ -34,8 +34,8 @@ import me.calebjones.spacelaunchnow.domain.model.Agency
 import me.calebjones.spacelaunchnow.ui.detail.compose.components.CountryInfoRow
 import spacelaunchnow_kmp.composeapp.generated.resources.Res
 import org.jetbrains.compose.resources.stringResource
+import spacelaunchnow_kmp.composeapp.generated.resources.common_named_logo_description
 import spacelaunchnow_kmp.composeapp.generated.resources.station_agencies_title
-import spacelaunchnow_kmp.composeapp.generated.resources.station_agency_logo_description
 
 /**
  * Card displaying the agencies that own/operate the space station
@@ -94,7 +94,7 @@ private fun AgencyItem(
                 agency.socialLogoUrl?.let { logoUrl ->
                     AsyncImage(
                         model = logoUrl,
-                        contentDescription = stringResource(Res.string.station_agency_logo_description, agency.name),
+                        contentDescription = stringResource(Res.string.common_named_logo_description, agency.name),
                         modifier = Modifier.fillMaxSize(),
                         contentScale = ContentScale.Crop
                     )

@@ -561,8 +561,8 @@ class NewsEventsViewModel(
  * Tabs for the News and Events screen.
  */
 enum class NewsEventsTab(val label: StringResource) {
-    NEWS(Res.string.app_newsevents_tab_news),
-    EVENTS(Res.string.app_newsevents_tab_events)
+    NEWS(Res.string.common_news),
+    EVENTS(Res.string.common_events)
 }
 
 /**

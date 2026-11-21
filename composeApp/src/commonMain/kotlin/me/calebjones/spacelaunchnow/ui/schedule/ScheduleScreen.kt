@@ -83,16 +83,16 @@ import me.calebjones.spacelaunchnow.ui.viewmodel.ScheduleViewModel
 import org.koin.compose.viewmodel.koinViewModel
 import org.jetbrains.compose.resources.stringResource
 import spacelaunchnow_kmp.composeapp.generated.resources.Res
+import spacelaunchnow_kmp.composeapp.generated.resources.common_filter
+import spacelaunchnow_kmp.composeapp.generated.resources.common_previous
 import spacelaunchnow_kmp.composeapp.generated.resources.common_retry
+import spacelaunchnow_kmp.composeapp.generated.resources.common_search
+import spacelaunchnow_kmp.composeapp.generated.resources.common_upcoming
 import spacelaunchnow_kmp.composeapp.generated.resources.schedule_close_search
 import spacelaunchnow_kmp.composeapp.generated.resources.schedule_empty
 import spacelaunchnow_kmp.composeapp.generated.resources.schedule_error_loading
-import spacelaunchnow_kmp.composeapp.generated.resources.schedule_filter_button_description
-import spacelaunchnow_kmp.composeapp.generated.resources.schedule_search_button_description
 import spacelaunchnow_kmp.composeapp.generated.resources.schedule_search_placeholder
 import spacelaunchnow_kmp.composeapp.generated.resources.schedule_select_launch_prompt
-import spacelaunchnow_kmp.composeapp.generated.resources.schedule_tab_previous
-import spacelaunchnow_kmp.composeapp.generated.resources.schedule_tab_upcoming
 import spacelaunchnow_kmp.composeapp.generated.resources.schedule_title
 
 /** Page-end ad slots per tab: after rows 25, 50, 75 and 100. */
@@ -285,16 +285,16 @@ private fun ScheduleContent(
                                 }
                             ) {
                                 IconButton(onClick = { viewModel.openFilterSheet() }) {
-                                    Icon(Icons.Default.FilterList, contentDescription = stringResource(Res.string.schedule_filter_button_description))
+                                    Icon(Icons.Default.FilterList, contentDescription = stringResource(Res.string.common_filter))
                                 }
                             }
                         } else {
                             IconButton(onClick = { viewModel.openFilterSheet() }) {
-                                Icon(Icons.Default.FilterList, contentDescription = stringResource(Res.string.schedule_filter_button_description))
+                                Icon(Icons.Default.FilterList, contentDescription = stringResource(Res.string.common_filter))
                             }
                         }
                         IconButton(onClick = { viewModel.toggleSearchExpanded(true) }) {
-                            Icon(Icons.Default.Search, contentDescription = stringResource(Res.string.schedule_search_button_description))
+                            Icon(Icons.Default.Search, contentDescription = stringResource(Res.string.common_search))
                         }
                     }
                 }
@@ -315,7 +315,7 @@ private fun ScheduleContent(
                                 horizontalArrangement = Arrangement.Center,
                                 verticalAlignment = Alignment.CenterVertically
                             ) {
-                                Text(stringResource(Res.string.schedule_tab_upcoming))
+                                Text(stringResource(Res.string.common_upcoming))
                                 Spacer(modifier = Modifier.width(4.dp))
                                 Badge {
                                     Text(
@@ -325,7 +325,7 @@ private fun ScheduleContent(
                                 }
                             }
                         } else {
-                            Text(stringResource(Res.string.schedule_tab_upcoming))
+                            Text(stringResource(Res.string.common_upcoming))
                         }
                     }
                 )
@@ -340,7 +340,7 @@ private fun ScheduleContent(
                                 horizontalArrangement = Arrangement.Center,
                                 verticalAlignment = Alignment.CenterVertically
                             ) {
-                                Text(stringResource(Res.string.schedule_tab_previous))
+                                Text(stringResource(Res.string.common_previous))
                                 Spacer(modifier = Modifier.width(4.dp))
                                 Badge {
                                     Text(
@@ -350,7 +350,7 @@ private fun ScheduleContent(
                                 }
                             }
                         } else {
-                            Text(stringResource(Res.string.schedule_tab_previous))
+                            Text(stringResource(Res.string.common_previous))
                         }
                     }
                 )

@@ -23,8 +23,8 @@ import me.calebjones.spacelaunchnow.domain.model.ArticleSummary
 import me.calebjones.spacelaunchnow.ui.detail.compose.components.RelatedNewsItem
 import spacelaunchnow_kmp.composeapp.generated.resources.Res
 import org.jetbrains.compose.resources.stringResource
-import spacelaunchnow_kmp.composeapp.generated.resources.station_reports_load_more
-import spacelaunchnow_kmp.composeapp.generated.resources.station_reports_show_less
+import spacelaunchnow_kmp.composeapp.generated.resources.common_load_more_count
+import spacelaunchnow_kmp.composeapp.generated.resources.common_show_less
 import spacelaunchnow_kmp.composeapp.generated.resources.station_reports_title
 
 /**
@@ -72,7 +72,7 @@ fun StationReportsCard(
                     modifier = Modifier.fillMaxWidth()
                 ) {
                     Text(
-                        text = stringResource(Res.string.station_reports_load_more, articles.size - 5),
+                        text = stringResource(Res.string.common_load_more_count, articles.size - 5),
                         style = MaterialTheme.typography.labelLarge
                     )
                 }
@@ -85,7 +85,7 @@ fun StationReportsCard(
                     modifier = Modifier.fillMaxWidth()
                 ) {
                     Text(
-                        text = stringResource(Res.string.station_reports_show_less),
+                        text = stringResource(Res.string.common_show_less),
                         style = MaterialTheme.typography.labelLarge
                     )
                 }

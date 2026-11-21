@@ -25,9 +25,9 @@ import me.calebjones.spacelaunchnow.ui.theme.SpaceLaunchNowPreviewTheme
 import org.jetbrains.compose.ui.tooling.preview.Preview
 import org.jetbrains.compose.resources.stringResource
 import spacelaunchnow_kmp.composeapp.generated.resources.Res
-import spacelaunchnow_kmp.composeapp.generated.resources.astronaut_info_show_less
 import spacelaunchnow_kmp.composeapp.generated.resources.astronaut_info_show_more
 import spacelaunchnow_kmp.composeapp.generated.resources.astronaut_info_title
+import spacelaunchnow_kmp.composeapp.generated.resources.common_show_less
 
 /**
  * Card displaying astronaut biography.
@@ -76,7 +76,7 @@ fun AstronautInfoCard(
                     onClick = { isExpanded = !isExpanded }
                 ) {
                     Text(
-                        text = if (isExpanded) stringResource(Res.string.astronaut_info_show_less) else stringResource(Res.string.astronaut_info_show_more),
+                        text = if (isExpanded) stringResource(Res.string.common_show_less) else stringResource(Res.string.astronaut_info_show_more),
                         style = MaterialTheme.typography.labelLarge,
                         fontWeight = FontWeight.SemiBold
                     )

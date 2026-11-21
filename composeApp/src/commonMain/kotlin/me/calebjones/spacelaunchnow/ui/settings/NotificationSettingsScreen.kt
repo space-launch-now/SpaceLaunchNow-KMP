@@ -76,13 +76,15 @@ import org.koin.compose.viewmodel.koinViewModel
 import org.jetbrains.compose.resources.stringResource
 import spacelaunchnow_kmp.composeapp.generated.resources.Res
 import spacelaunchnow_kmp.composeapp.generated.resources.common_back
+import spacelaunchnow_kmp.composeapp.generated.resources.common_enable
+import spacelaunchnow_kmp.composeapp.generated.resources.common_notification_filters
+import spacelaunchnow_kmp.composeapp.generated.resources.common_notifications_disabled
+import spacelaunchnow_kmp.composeapp.generated.resources.common_open_settings
 import spacelaunchnow_kmp.composeapp.generated.resources.notification_settings_announcements_description
 import spacelaunchnow_kmp.composeapp.generated.resources.notification_settings_announcements_title
 import spacelaunchnow_kmp.composeapp.generated.resources.notification_settings_countdown_description
 import spacelaunchnow_kmp.composeapp.generated.resources.notification_settings_countdown_title
 import spacelaunchnow_kmp.composeapp.generated.resources.notification_settings_disabled_message
-import spacelaunchnow_kmp.composeapp.generated.resources.notification_settings_disabled_title
-import spacelaunchnow_kmp.composeapp.generated.resources.notification_settings_enable_button
 import spacelaunchnow_kmp.composeapp.generated.resources.notification_settings_event_description
 import spacelaunchnow_kmp.composeapp.generated.resources.notification_settings_event_title
 import spacelaunchnow_kmp.composeapp.generated.resources.notification_settings_flexible_bullets
@@ -116,7 +118,6 @@ import spacelaunchnow_kmp.composeapp.generated.resources.notification_settings_n
 import spacelaunchnow_kmp.composeapp.generated.resources.notification_settings_notice_1m_title
 import spacelaunchnow_kmp.composeapp.generated.resources.notification_settings_notice_24h_description
 import spacelaunchnow_kmp.composeapp.generated.resources.notification_settings_notice_24h_title
-import spacelaunchnow_kmp.composeapp.generated.resources.notification_settings_open_settings_button
 import spacelaunchnow_kmp.composeapp.generated.resources.notification_settings_premium_description
 import spacelaunchnow_kmp.composeapp.generated.resources.notification_settings_premium_title
 import spacelaunchnow_kmp.composeapp.generated.resources.notification_settings_providers_description
@@ -127,7 +128,6 @@ import spacelaunchnow_kmp.composeapp.generated.resources.notification_settings_s
 import spacelaunchnow_kmp.composeapp.generated.resources.notification_settings_strict_example
 import spacelaunchnow_kmp.composeapp.generated.resources.notification_settings_strict_matching_title
 import spacelaunchnow_kmp.composeapp.generated.resources.notification_settings_strict_summary
-import spacelaunchnow_kmp.composeapp.generated.resources.notification_settings_title
 import spacelaunchnow_kmp.composeapp.generated.resources.notification_settings_topics_title
 import spacelaunchnow_kmp.composeapp.generated.resources.notification_settings_webcast_description
 import spacelaunchnow_kmp.composeapp.generated.resources.notification_settings_webcast_title
@@ -199,7 +199,7 @@ fun NotificationSettingsScreen(
             TopAppBar(
                 title = {
                     Text(
-                        text = stringResource(Res.string.notification_settings_title),
+                        text = stringResource(Res.string.common_notification_filters),
                         style = MaterialTheme.typography.headlineMedium,
                         fontWeight = FontWeight.Bold,
                         fontSize = 24.sp,
@@ -246,7 +246,7 @@ fun NotificationSettingsScreen(
                             Spacer(modifier = Modifier.width(12.dp))
                             Column(modifier = Modifier.weight(1f)) {
                                 Text(
-                                    text = stringResource(Res.string.notification_settings_disabled_title),
+                                    text = stringResource(Res.string.common_notifications_disabled),
                                     style = MaterialTheme.typography.titleSmall,
                                     fontWeight = FontWeight.Bold,
                                     color = MaterialTheme.colorScheme.onErrorContainer
@@ -277,9 +277,9 @@ fun NotificationSettingsScreen(
                             ) {
                                 Text(
                                     if (permissionRemedy == NotificationPermissionRemedy.REQUEST_PERMISSION) {
-                                        stringResource(Res.string.notification_settings_enable_button)
+                                        stringResource(Res.string.common_enable)
                                     } else {
-                                        stringResource(Res.string.notification_settings_open_settings_button)
+                                        stringResource(Res.string.common_open_settings)
                                     }
                                 )
                             }

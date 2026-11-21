@@ -50,10 +50,10 @@ import me.calebjones.spacelaunchnow.ui.viewmodel.ViewState
 import me.calebjones.spacelaunchnow.util.DateTimeUtil.formatLaunchDateTime
 import org.jetbrains.compose.resources.stringResource
 import spacelaunchnow_kmp.composeapp.generated.resources.Res
+import spacelaunchnow_kmp.composeapp.generated.resources.common_event_icon
+import spacelaunchnow_kmp.composeapp.generated.resources.common_event_image
 import spacelaunchnow_kmp.composeapp.generated.resources.home_cached_data_notice
 import spacelaunchnow_kmp.composeapp.generated.resources.home_events_error
-import spacelaunchnow_kmp.composeapp.generated.resources.home_events_icon_description
-import spacelaunchnow_kmp.composeapp.generated.resources.home_events_image_description
 
 @Composable
 fun EventsView(
@@ -193,7 +193,7 @@ fun EventItem(event: Event, navController: NavController) {
                     val image = event.imageUrl
                     SubcomposeAsyncImage(
                         model = image,
-                        contentDescription = stringResource(Res.string.home_events_image_description),
+                        contentDescription = stringResource(Res.string.common_event_image),
                         modifier = Modifier
                             .fillMaxWidth()
                             .height(120.dp)
@@ -236,7 +236,7 @@ fun EventItem(event: Event, navController: NavController) {
                             ) {
                                 Icon(
                                     imageVector = FontAwesomeIcons.Solid.CalendarDay,
-                                    contentDescription = stringResource(Res.string.home_events_icon_description),
+                                    contentDescription = stringResource(Res.string.common_event_icon),
                                     modifier = Modifier.size(64.dp),
                                     tint = MaterialTheme.colorScheme.primary.copy(alpha = 0.6f)
                                 )
@@ -317,7 +317,7 @@ fun EventItem(event: Event, navController: NavController) {
             val image = event.imageUrl
             SubcomposeAsyncImage(
                 model = image,
-                contentDescription = stringResource(Res.string.home_events_image_description),
+                contentDescription = stringResource(Res.string.common_event_image),
                 modifier = Modifier
                     .fillMaxWidth()
                     .height(120.dp)
@@ -350,7 +350,7 @@ fun EventItem(event: Event, navController: NavController) {
                     ) {
                         Icon(
                             imageVector = FontAwesomeIcons.Solid.CalendarDay,
-                            contentDescription = stringResource(Res.string.home_events_icon_description),
+                            contentDescription = stringResource(Res.string.common_event_icon),
                             modifier = Modifier.size(64.dp),
                             tint = MaterialTheme.colorScheme.primary.copy(alpha = 0.6f)
                         )

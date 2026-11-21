@@ -45,8 +45,8 @@ import me.calebjones.spacelaunchnow.util.logging.SpaceLogger
 import org.koin.compose.koinInject
 import org.jetbrains.compose.resources.stringResource
 import spacelaunchnow_kmp.composeapp.generated.resources.Res
+import spacelaunchnow_kmp.composeapp.generated.resources.common_24h_premium_access
 import spacelaunchnow_kmp.composeapp.generated.resources.temp_premium_default_description
-import spacelaunchnow_kmp.composeapp.generated.resources.temp_premium_default_title
 import spacelaunchnow_kmp.composeapp.generated.resources.temp_premium_extend_button
 import spacelaunchnow_kmp.composeapp.generated.resources.temp_premium_loading_ad
 import spacelaunchnow_kmp.composeapp.generated.resources.temp_premium_time_hours
@@ -70,7 +70,7 @@ fun TemporaryPremiumCard(
         PremiumFeature.ADVANCED_WIDGETS,
         PremiumFeature.WIDGETS_CUSTOMIZATION
     ),
-    title: String = stringResource(Res.string.temp_premium_default_title),
+    title: String = stringResource(Res.string.common_24h_premium_access),
     description: String = stringResource(Res.string.temp_premium_default_description),
     icon: ImageVector,
     hasPermanentPremium: Boolean = false,

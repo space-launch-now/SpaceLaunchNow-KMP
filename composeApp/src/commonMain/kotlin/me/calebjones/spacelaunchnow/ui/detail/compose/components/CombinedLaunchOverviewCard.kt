@@ -45,15 +45,15 @@ import me.calebjones.spacelaunchnow.util.DateTimeUtil.formatLaunchTime
 import org.jetbrains.compose.resources.stringResource
 import org.jetbrains.compose.resources.pluralStringResource
 import spacelaunchnow_kmp.composeapp.generated.resources.Res
-import spacelaunchnow_kmp.composeapp.generated.resources.launch_detail_landing_attempt_single
+import spacelaunchnow_kmp.composeapp.generated.resources.common_attempt
 import spacelaunchnow_kmp.composeapp.generated.resources.launch_detail_landing_success_count
 import spacelaunchnow_kmp.composeapp.generated.resources.launch_detail_precision_info_description
 import spacelaunchnow_kmp.composeapp.generated.resources.launch_detail_tile_landing
 import spacelaunchnow_kmp.composeapp.generated.resources.launch_detail_tile_launch_site
-import spacelaunchnow_kmp.composeapp.generated.resources.launch_detail_tile_mission
+import spacelaunchnow_kmp.composeapp.generated.resources.common_mission
 import spacelaunchnow_kmp.composeapp.generated.resources.launch_detail_tile_weather
-import spacelaunchnow_kmp.composeapp.generated.resources.launch_detail_value_tbd
-import spacelaunchnow_kmp.composeapp.generated.resources.launch_detail_value_unknown
+import spacelaunchnow_kmp.composeapp.generated.resources.common_tbd
+import spacelaunchnow_kmp.composeapp.generated.resources.common_unknown
 import spacelaunchnow_kmp.composeapp.generated.resources.launch_detail_landing_attempts_count
 
 /**
@@ -139,7 +139,7 @@ fun CombinedLaunchOverviewCard(launch: Launch) {
                                         }
                                         Text(
                                             text = launch.net?.let { formatLaunchTime(it, useUtc) }
-                                                ?: stringResource(Res.string.launch_detail_value_tbd),
+                                                ?: stringResource(Res.string.common_tbd),
                                             style = MaterialTheme.typography.headlineLarge,
                                             fontWeight = FontWeight.Bold,
                                             maxLines = 1,
@@ -201,9 +201,9 @@ fun CombinedLaunchOverviewCard(launch: Launch) {
                 // Metrics grid below
                 val tiles = buildList {
                     launch.mission?.name?.takeIf { it.isNotBlank() }
-                        ?.let { add(Triple(Icons.Filled.Category, stringResource(Res.string.launch_detail_tile_mission), it)) }
+                        ?.let { add(Triple(Icons.Filled.Category, stringResource(Res.string.common_mission), it)) }
                     launch.pad?.let { pad ->
-                        val site = pad.location?.name ?: pad.name ?: stringResource(Res.string.launch_detail_value_unknown)
+                        val site = pad.location?.name ?: pad.name ?: stringResource(Res.string.common_unknown)
                         add(
                             Triple(
                                 Icons.Filled.LocationOn,
@@ -225,7 +225,7 @@ fun CombinedLaunchOverviewCard(launch: Launch) {
                             if (successfulLandings > 0) {
                                 append(stringResource(Res.string.launch_detail_landing_success_count, successfulLandings, totalAttempts))
                             } else if (totalAttempts == 1) {
-                                append(stringResource(Res.string.launch_detail_landing_attempt_single))
+                                append(stringResource(Res.string.common_attempt))
                             } else {
                                 append(pluralStringResource(Res.plurals.launch_detail_landing_attempts_count, totalAttempts, totalAttempts))
                             }

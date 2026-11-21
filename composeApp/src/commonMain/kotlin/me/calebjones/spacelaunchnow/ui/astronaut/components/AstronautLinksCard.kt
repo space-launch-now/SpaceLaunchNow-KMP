@@ -37,11 +37,11 @@ import me.calebjones.spacelaunchnow.ui.theme.SpaceLaunchNowPreviewTheme
 import org.jetbrains.compose.ui.tooling.preview.Preview
 import org.jetbrains.compose.resources.stringResource
 import spacelaunchnow_kmp.composeapp.generated.resources.Res
-import spacelaunchnow_kmp.composeapp.generated.resources.astronaut_links_logo_description
 import spacelaunchnow_kmp.composeapp.generated.resources.astronaut_links_open_description
 import spacelaunchnow_kmp.composeapp.generated.resources.astronaut_links_social_media
-import spacelaunchnow_kmp.composeapp.generated.resources.astronaut_links_title
-import spacelaunchnow_kmp.composeapp.generated.resources.astronaut_links_wikipedia
+import spacelaunchnow_kmp.composeapp.generated.resources.common_links
+import spacelaunchnow_kmp.composeapp.generated.resources.common_named_logo_description
+import spacelaunchnow_kmp.composeapp.generated.resources.common_wikipedia
 
 /**
  * Card displaying astronaut links including Wikipedia and social media accounts.
@@ -73,7 +73,7 @@ fun AstronautLinksCard(
             verticalArrangement = Arrangement.spacedBy(8.dp)
         ) {
             Text(
-                text = stringResource(Res.string.astronaut_links_title),
+                text = stringResource(Res.string.common_links),
                 style = MaterialTheme.typography.titleMedium,
                 fontWeight = FontWeight.Bold,
                 color = MaterialTheme.colorScheme.onSurfaceVariant
@@ -85,7 +85,7 @@ fun AstronautLinksCard(
             if (hasWiki) {
                 LinkItem(
                     icon = Icons.Default.Language,
-                    label = stringResource(Res.string.astronaut_links_wikipedia),
+                    label = stringResource(Res.string.common_wikipedia),
                     url = astronaut.wikiUrl!!,
                     onClick = { uriHandler.openUri(astronaut.wikiUrl!!) }
                 )
@@ -175,7 +175,7 @@ private fun SocialMediaLinkItem(
         if (logoUrl != null) {
             AsyncImage(
                 model = logoUrl,
-                contentDescription = stringResource(Res.string.astronaut_links_logo_description, platformName),
+                contentDescription = stringResource(Res.string.common_named_logo_description, platformName),
                 modifier = Modifier
                     .size(24.dp)
                     .clip(RoundedCornerShape(4.dp)),

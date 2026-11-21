@@ -73,29 +73,29 @@ import me.calebjones.spacelaunchnow.util.parseIsoDurationToHumanReadable
 import org.koin.compose.viewmodel.koinViewModel
 import org.jetbrains.compose.resources.stringResource
 import spacelaunchnow_kmp.composeapp.generated.resources.Res
+import spacelaunchnow_kmp.composeapp.generated.resources.common_agencies
+import spacelaunchnow_kmp.composeapp.generated.resources.common_agency
+import spacelaunchnow_kmp.composeapp.generated.resources.common_astronauts
 import spacelaunchnow_kmp.composeapp.generated.resources.common_back
+import spacelaunchnow_kmp.composeapp.generated.resources.common_description
+import spacelaunchnow_kmp.composeapp.generated.resources.common_duration
+import spacelaunchnow_kmp.composeapp.generated.resources.common_links
 import spacelaunchnow_kmp.composeapp.generated.resources.common_loading
-import spacelaunchnow_kmp.composeapp.generated.resources.event_detail_agencies
-import spacelaunchnow_kmp.composeapp.generated.resources.event_detail_agency
-import spacelaunchnow_kmp.composeapp.generated.resources.event_detail_astronauts
-import spacelaunchnow_kmp.composeapp.generated.resources.event_detail_description
-import spacelaunchnow_kmp.composeapp.generated.resources.event_detail_error_title
+import spacelaunchnow_kmp.composeapp.generated.resources.common_location
+import spacelaunchnow_kmp.composeapp.generated.resources.common_mission
+import spacelaunchnow_kmp.composeapp.generated.resources.common_oops_something_went_wrong
+import spacelaunchnow_kmp.composeapp.generated.resources.common_status
+import spacelaunchnow_kmp.composeapp.generated.resources.common_try_again
+import spacelaunchnow_kmp.composeapp.generated.resources.common_updates
 import spacelaunchnow_kmp.composeapp.generated.resources.event_detail_event_details
 import spacelaunchnow_kmp.composeapp.generated.resources.event_detail_expedition_fallback
 import spacelaunchnow_kmp.composeapp.generated.resources.event_detail_expeditions
 import spacelaunchnow_kmp.composeapp.generated.resources.event_detail_label_date
-import spacelaunchnow_kmp.composeapp.generated.resources.event_detail_label_duration
 import spacelaunchnow_kmp.composeapp.generated.resources.event_detail_label_last_updated
-import spacelaunchnow_kmp.composeapp.generated.resources.event_detail_label_location
-import spacelaunchnow_kmp.composeapp.generated.resources.event_detail_label_status
 import spacelaunchnow_kmp.composeapp.generated.resources.event_detail_link_fallback
-import spacelaunchnow_kmp.composeapp.generated.resources.event_detail_links
-import spacelaunchnow_kmp.composeapp.generated.resources.event_detail_mission_description
 import spacelaunchnow_kmp.composeapp.generated.resources.event_detail_related_launches
 import spacelaunchnow_kmp.composeapp.generated.resources.event_detail_space_stations
 import spacelaunchnow_kmp.composeapp.generated.resources.event_detail_status_live_now
-import spacelaunchnow_kmp.composeapp.generated.resources.event_detail_try_again
-import spacelaunchnow_kmp.composeapp.generated.resources.event_detail_updates
 import spacelaunchnow_kmp.composeapp.generated.resources.event_detail_updates_more
 
 private val TitleHeight = 110.dp
@@ -318,7 +318,7 @@ private fun EventInfoCard(event: Event) {
             event.description?.let { desc ->
                 Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
                     Text(
-                        text = stringResource(Res.string.event_detail_description),
+                        text = stringResource(Res.string.common_description),
                         style = MaterialTheme.typography.titleMedium,
                         fontWeight = FontWeight.Bold
                     )
@@ -342,15 +342,15 @@ private fun EventInfoCard(event: Event) {
                 }
 
                 event.location?.let { location ->
-                    InfoRow(label = stringResource(Res.string.event_detail_label_location), value = location)
+                    InfoRow(label = stringResource(Res.string.common_location), value = location)
                 }
 
                 event.duration?.let { duration ->
-                    InfoRow(label = stringResource(Res.string.event_detail_label_duration), value = parseIsoDurationToHumanReadable(duration))
+                    InfoRow(label = stringResource(Res.string.common_duration), value = parseIsoDurationToHumanReadable(duration))
                 }
 
                 if (event.webcastLive) {
-                    InfoRow(label = stringResource(Res.string.event_detail_label_status), value = stringResource(Res.string.event_detail_status_live_now))
+                    InfoRow(label = stringResource(Res.string.common_status), value = stringResource(Res.string.event_detail_status_live_now))
                 }
 
                 event.lastUpdated?.let { updated ->
@@ -375,7 +375,7 @@ private fun EventLinksCard(event: Event, onOpenUrl: (String) -> Unit = {}) {
     ) {
         Column(Modifier.padding(16.dp), verticalArrangement = Arrangement.spacedBy(8.dp)) {
             Text(
-                stringResource(Res.string.event_detail_links),
+                stringResource(Res.string.common_links),
                 style = MaterialTheme.typography.titleLarge,
                 fontWeight = FontWeight.Bold
             )
@@ -403,7 +403,7 @@ private fun AgenciesCard(agencies: List<Provider>, onAgencyClick: ((Int) -> Unit
     ) {
         Column(Modifier.padding(16.dp), verticalArrangement = Arrangement.spacedBy(8.dp)) {
             Text(
-                if (agencies.size == 1) stringResource(Res.string.event_detail_agency) else stringResource(Res.string.event_detail_agencies),
+                if (agencies.size == 1) stringResource(Res.string.common_agency) else stringResource(Res.string.common_agencies),
                 style = MaterialTheme.typography.titleLarge,
                 fontWeight = FontWeight.Bold
             )
@@ -490,7 +490,7 @@ private fun AstronautsCard(
     ) {
         Column(Modifier.padding(16.dp), verticalArrangement = Arrangement.spacedBy(8.dp)) {
             Text(
-                stringResource(Res.string.event_detail_astronauts),
+                stringResource(Res.string.common_astronauts),
                 style = MaterialTheme.typography.titleLarge,
                 fontWeight = FontWeight.Bold
             )
@@ -749,7 +749,7 @@ private fun ProgramsCard(programs: List<ProgramSummary>) {
                                         ) {
                                             Icon(
                                                 imageVector = Icons.Filled.Error,
-                                                contentDescription = stringResource(Res.string.event_detail_mission_description),
+                                                contentDescription = stringResource(Res.string.common_mission),
                                                 tint = MaterialTheme.colorScheme.onSurfaceVariant,
                                                 modifier = Modifier.size(32.dp)
                                             )
@@ -792,7 +792,7 @@ private fun UpdatesCard(updates: List<Update>) {
     ) {
         Column(Modifier.padding(16.dp), verticalArrangement = Arrangement.spacedBy(12.dp)) {
             Text(
-                stringResource(Res.string.event_detail_updates),
+                stringResource(Res.string.common_updates),
                 style = MaterialTheme.typography.titleLarge,
                 fontWeight = FontWeight.Bold
             )
@@ -925,7 +925,7 @@ fun EventDetailErrorView(
                     tint = MaterialTheme.colorScheme.error
                 )
                 Text(
-                    text = stringResource(Res.string.event_detail_error_title),
+                    text = stringResource(Res.string.common_oops_something_went_wrong),
                     style = MaterialTheme.typography.titleMedium,
                     fontWeight = FontWeight.Bold
                 )
@@ -936,7 +936,7 @@ fun EventDetailErrorView(
                     color = MaterialTheme.colorScheme.onSurfaceVariant
                 )
                 Button(onClick = onRetry) {
-                    Text(stringResource(Res.string.event_detail_try_again))
+                    Text(stringResource(Res.string.common_try_again))
                 }
             }
         }

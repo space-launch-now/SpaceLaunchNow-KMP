@@ -54,9 +54,9 @@ import spacelaunchnow_kmp.composeapp.generated.resources.Res
 import spacelaunchnow_kmp.composeapp.generated.resources.app_roadmap_error_title
 import spacelaunchnow_kmp.composeapp.generated.resources.app_roadmap_last_updated
 import spacelaunchnow_kmp.composeapp.generated.resources.app_roadmap_loading
-import spacelaunchnow_kmp.composeapp.generated.resources.app_roadmap_title
 import spacelaunchnow_kmp.composeapp.generated.resources.common_back
 import spacelaunchnow_kmp.composeapp.generated.resources.common_retry
+import spacelaunchnow_kmp.composeapp.generated.resources.common_roadmap
 import org.jetbrains.compose.resources.stringResource
 
 /**
@@ -83,7 +83,7 @@ fun RoadmapScreen(
             CenterAlignedTopAppBar(
                 title = {
                     Text(
-                        text = stringResource(Res.string.app_roadmap_title),
+                        text = stringResource(Res.string.common_roadmap),
                         style = MaterialTheme.typography.headlineMedium,
                         fontWeight = FontWeight.Bold,
                         fontSize = 36.sp

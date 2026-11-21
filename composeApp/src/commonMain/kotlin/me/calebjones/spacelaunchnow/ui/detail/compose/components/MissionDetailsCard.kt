@@ -44,8 +44,8 @@ import me.calebjones.spacelaunchnow.domain.model.Mission
 import me.calebjones.spacelaunchnow.ui.components.InfoChip
 import org.jetbrains.compose.resources.stringResource
 import spacelaunchnow_kmp.composeapp.generated.resources.Res
-import spacelaunchnow_kmp.composeapp.generated.resources.launch_detail_mission_icon_description
-import spacelaunchnow_kmp.composeapp.generated.resources.launch_detail_mission_patch_description
+import spacelaunchnow_kmp.composeapp.generated.resources.common_mission
+import spacelaunchnow_kmp.composeapp.generated.resources.common_mission_patch
 import spacelaunchnow_kmp.composeapp.generated.resources.launch_detail_mission_unknown_name
 import spacelaunchnow_kmp.composeapp.generated.resources.launch_detail_read_less
 import spacelaunchnow_kmp.composeapp.generated.resources.launch_detail_read_more
@@ -74,7 +74,7 @@ fun MissionDetailsCard(mission: Mission, missionPatchUrl: String?) {
                     missionPatchUrl?.let { imageUrl ->
                         SubcomposeAsyncImage(
                             model = imageUrl,
-                            contentDescription = stringResource(Res.string.launch_detail_mission_patch_description),
+                            contentDescription = stringResource(Res.string.common_mission_patch),
                             modifier = Modifier
                                 .size(200.dp)
                                 .padding(8.dp)
@@ -105,7 +105,7 @@ fun MissionDetailsCard(mission: Mission, missionPatchUrl: String?) {
                                 ) {
                                     Icon(
                                         imageVector = Icons.Filled.Error,
-                                        contentDescription = stringResource(Res.string.launch_detail_mission_icon_description),
+                                        contentDescription = stringResource(Res.string.common_mission),
                                         tint = MaterialTheme.colorScheme.onSurfaceVariant,
                                         modifier = Modifier.size(32.dp)
                                     )

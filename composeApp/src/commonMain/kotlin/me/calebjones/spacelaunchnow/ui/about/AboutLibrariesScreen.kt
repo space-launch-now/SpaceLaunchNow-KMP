@@ -52,7 +52,7 @@ import org.jetbrains.compose.ui.tooling.preview.Preview
 import me.calebjones.spacelaunchnow.ui.theme.SpaceLaunchNowPreviewTheme
 import spacelaunchnow_kmp.composeapp.generated.resources.Res
 import spacelaunchnow_kmp.composeapp.generated.resources.launcher
-import spacelaunchnow_kmp.composeapp.generated.resources.about_header_app_name
+import spacelaunchnow_kmp.composeapp.generated.resources.common_app_name
 import spacelaunchnow_kmp.composeapp.generated.resources.about_header_logo_description
 import spacelaunchnow_kmp.composeapp.generated.resources.about_header_version
 import spacelaunchnow_kmp.composeapp.generated.resources.about_libraries_heading
@@ -62,7 +62,7 @@ import spacelaunchnow_kmp.composeapp.generated.resources.about_link_github
 import spacelaunchnow_kmp.composeapp.generated.resources.about_sln_description
 import spacelaunchnow_kmp.composeapp.generated.resources.about_sln_link
 import spacelaunchnow_kmp.composeapp.generated.resources.about_sln_title
-import spacelaunchnow_kmp.composeapp.generated.resources.about_title
+import spacelaunchnow_kmp.composeapp.generated.resources.common_about
 import spacelaunchnow_kmp.composeapp.generated.resources.about_tsd_description
 import spacelaunchnow_kmp.composeapp.generated.resources.about_tsd_link
 import spacelaunchnow_kmp.composeapp.generated.resources.about_tsd_title
@@ -85,7 +85,7 @@ fun AboutLibrariesScreen(onNavigateBack: (() -> Unit)? = null) {
                 CenterAlignedTopAppBar(
                     title = {
                         Text(
-                            text = stringResource(Res.string.about_title),
+                            text = stringResource(Res.string.common_about),
                             style = MaterialTheme.typography.headlineMedium,
                             fontWeight = FontWeight.Bold,
                             fontSize = 36.sp
@@ -179,7 +179,7 @@ private fun AboutHeader(modifier: Modifier = Modifier) {
         }
 
         Spacer(modifier = Modifier.height(8.dp))
-        Text(stringResource(Res.string.about_header_app_name))
+        Text(stringResource(Res.string.common_app_name))
         Text(stringResource(Res.string.about_header_version, BuildConfig.VERSION_NAME, BuildConfig.VERSION_CODE))
         Row(
             modifier = Modifier.padding(vertical = 8.dp),

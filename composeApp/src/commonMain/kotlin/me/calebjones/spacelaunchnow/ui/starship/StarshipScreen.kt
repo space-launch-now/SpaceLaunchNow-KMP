@@ -47,10 +47,10 @@ import org.koin.compose.viewmodel.koinViewModel
 import spacelaunchnow_kmp.composeapp.generated.resources.Res
 import org.jetbrains.compose.resources.stringResource
 import spacelaunchnow_kmp.composeapp.generated.resources.common_back
-import spacelaunchnow_kmp.composeapp.generated.resources.starship_tab_events
-import spacelaunchnow_kmp.composeapp.generated.resources.starship_tab_overview
+import spacelaunchnow_kmp.composeapp.generated.resources.common_events
+import spacelaunchnow_kmp.composeapp.generated.resources.common_overview
+import spacelaunchnow_kmp.composeapp.generated.resources.common_starship
 import spacelaunchnow_kmp.composeapp.generated.resources.starship_tab_vehicles
-import spacelaunchnow_kmp.composeapp.generated.resources.starship_title
 
 /**
  * Main Starship Dashboard screen with three tabs: Overview, Events, and Vehicles
@@ -137,7 +137,7 @@ fun StarshipScreen(
                 },
                 title = {
                     Text(
-                        text = stringResource(Res.string.starship_title),
+                        text = stringResource(Res.string.common_starship),
                         style = MaterialTheme.typography.headlineMedium,
                         fontWeight = FontWeight.Bold,
                         fontSize = 36.sp
@@ -182,7 +182,7 @@ fun StarshipScreen(
                                 pagerState.animateScrollToPage(0)
                             }
                         },
-                        text = { Text(stringResource(Res.string.starship_tab_overview)) }
+                        text = { Text(stringResource(Res.string.common_overview)) }
                     )
                     Tab(
                         selected = pagerState.currentPage == 1,
@@ -191,7 +191,7 @@ fun StarshipScreen(
                                 pagerState.animateScrollToPage(1)
                             }
                         },
-                        text = { Text(stringResource(Res.string.starship_tab_events)) }
+                        text = { Text(stringResource(Res.string.common_events)) }
                     )
                     Tab(
                         selected = pagerState.currentPage == 2,

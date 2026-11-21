@@ -378,8 +378,8 @@ data class AstronautListUiState(
  * Sort order options for astronaut list.
  */
 enum class AstronautSortOrder(val apiValue: String, val label: StringResource) {
-    NAME_ASC("name", Res.string.astronauts_sort_name_asc),
-    NAME_DESC("-name", Res.string.astronauts_sort_name_desc),
+    NAME_ASC("name", Res.string.common_sort_name_asc),
+    NAME_DESC("-name", Res.string.common_sort_name_desc),
     FLIGHTS_ASC("flights_count", Res.string.astronauts_sort_flights_asc),
     FLIGHTS_DESC("-flights_count", Res.string.astronauts_sort_flights_desc),
     FIRST_FLIGHT_ASC("first_flight", Res.string.astronauts_sort_first_flight_asc),

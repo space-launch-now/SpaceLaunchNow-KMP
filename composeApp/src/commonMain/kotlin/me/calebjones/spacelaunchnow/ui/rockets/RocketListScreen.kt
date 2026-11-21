@@ -54,13 +54,13 @@ import org.jetbrains.compose.resources.stringResource
 import spacelaunchnow_kmp.composeapp.generated.resources.Res
 import spacelaunchnow_kmp.composeapp.generated.resources.common_back
 import spacelaunchnow_kmp.composeapp.generated.resources.common_retry
-import spacelaunchnow_kmp.composeapp.generated.resources.rockets_list_empty_message
+import spacelaunchnow_kmp.composeapp.generated.resources.common_rockets
+import spacelaunchnow_kmp.composeapp.generated.resources.common_try_adjusting_your_filters
+import spacelaunchnow_kmp.composeapp.generated.resources.common_unknown_error
 import spacelaunchnow_kmp.composeapp.generated.resources.rockets_list_empty_title
 import spacelaunchnow_kmp.composeapp.generated.resources.rockets_list_error_title
-import spacelaunchnow_kmp.composeapp.generated.resources.rockets_list_error_unknown
 import spacelaunchnow_kmp.composeapp.generated.resources.rockets_list_filter_description
 import spacelaunchnow_kmp.composeapp.generated.resources.rockets_list_loading
-import spacelaunchnow_kmp.composeapp.generated.resources.rockets_list_title
 import spacelaunchnow_kmp.composeapp.generated.resources.rockets_list_title_filtered
 
 /**
@@ -132,7 +132,7 @@ fun RocketListScreen(
                         text = if (uiState.totalCount > 0 && hasFilters) {
                             stringResource(Res.string.rockets_list_title_filtered, uiState.totalCount)
                         } else {
-                            stringResource(Res.string.rockets_list_title)
+                            stringResource(Res.string.common_rockets)
                         }
                     )
                 },
@@ -179,7 +179,7 @@ fun RocketListScreen(
                 // Error state
                 uiState.error != null && uiState.rockets.isEmpty() -> {
                     ErrorContent(
-                        errorMessage = uiState.error ?: stringResource(Res.string.rockets_list_error_unknown),
+                        errorMessage = uiState.error ?: stringResource(Res.string.common_unknown_error),
                         onRetry = { viewModel.refresh() }
                     )
                 }
@@ -365,7 +365,7 @@ private fun EmptyContent() {
                 textAlign = TextAlign.Center
             )
             Text(
-                text = stringResource(Res.string.rockets_list_empty_message),
+                text = stringResource(Res.string.common_try_adjusting_your_filters),
                 style = MaterialTheme.typography.bodyMedium,
                 color = MaterialTheme.colorScheme.onSurfaceVariant,
                 textAlign = TextAlign.Center
