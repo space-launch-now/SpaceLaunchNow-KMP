@@ -1,0 +1,123 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- Agency filter sheet, header at top. Title text, one line, max 20 characters. -->
+    <string name="agency_filter_title">Filter &amp; Sort</string>
+    <!-- Agency filter sheet, header, text button that resets all filters. Button label, one line, max 12 characters. -->
+    <string name="agency_filter_clear_all">Clear All</string>
+    <!-- Agency filter sheet, title of the search card. Title text, one line, max 16 characters. -->
+    <string name="agency_filter_search_title">Search</string>
+    <!-- Agency filter sheet, label of the agency name text field. Field label, one line, max 20 characters. -->
+    <string name="agency_filter_name_label">Agency Name</string>
+    <!-- Agency filter sheet, placeholder inside the agency name text field. Placeholder text, one line, max 28 characters. -->
+    <string name="agency_filter_name_placeholder">e.g., NASA, SpaceX</string>
+    <!-- Agency filter sheet, search card, button that clears the search text. Button label, one line, max 10 characters. -->
+    <string name="agency_filter_search_clear">Clear</string>
+    <!-- Agency filter sheet, search card, button that applies the search text. Button label, one line, max 10 characters. -->
+    <string name="agency_filter_search_apply">Apply</string>
+    <!-- Agency filter sheet, title of the sort card. Title text, one line, max 16 characters. -->
+    <string name="agency_filter_sort_title">Sort By</string>
+    <!-- Agency filter sheet, label of the sort order dropdown field. Field label, one line, max 16 characters. -->
+    <string name="agency_filter_order_label">Order</string>
+    <!-- Agency filter sheet, sort order menu, accessibility description of the check mark on the chosen item. Screen reader text, not shown, max 20 characters. -->
+    <string name="agency_filter_selected_description">Selected</string>
+    <!-- Agency filter sheet, title of the filters card. Title text, one line, max 16 characters. -->
+    <string name="agency_filter_filters_title">Filters</string>
+    <!-- Agency filter sheet, filters card, heading above the featured choice buttons. Heading text, one line, max 28 characters. -->
+    <string name="agency_filter_featured_title">Featured Agencies</string>
+    <!-- Agency filter sheet, featured choice, segmented button that shows all agencies. Segment label, one line, max 10 characters. -->
+    <string name="agency_filter_featured_all">All</string>
+    <!-- Agency filter sheet, featured choice, segmented button that shows only featured agencies. Segment label, one line, max 16 characters. -->
+    <string name="agency_filter_featured_only">Featured Only</string>
+    <!-- Agency filter sheet, featured choice, segmented button that shows only agencies that are not featured. Segment label, one line, max 16 characters. -->
+    <string name="agency_filter_featured_none">Non-Featured</string>
+    <!-- Agency filter sheet, full width button at bottom that closes the sheet. Button label, one line, max 12 characters. -->
+    <string name="agency_filter_done">Done</string>
+    <!-- Agency list screen and agency list view, top bar title. Title text, one line, max 20 characters. -->
+    <string name="agency_list_title">Agencies</string>
+    <!-- Agency list screen, top bar title when filters are active. %1$d is the number of agencies found. Title text, one line, max 24 characters. -->
+    <string name="agency_list_title_with_count">Agencies (%1$d)</string>
+    <!-- Agency list screen, top bar, accessibility description of the filter icon button. Screen reader text, not shown, max 24 characters. -->
+    <string name="agency_list_filter_description">Filter agencies</string>
+    <!-- Agency list screen, centre of screen, under the spinner during first load. Body text, one line, max 28 characters. -->
+    <string name="agency_list_loading">Loading agencies...</string>
+    <!-- Agency list screen, centre of screen, bold heading above the error message. Heading text, may wrap, max 32 characters. -->
+    <string name="agency_list_error_title">Failed to load agencies</string>
+    <!-- Agency list screen, centre of screen, error message shown when the error has no text. Body text, may wrap, max 32 characters. -->
+    <string name="agency_list_unknown_error">Unknown error</string>
+    <!-- Agency list screen and agency list view, centre of screen, heading when the list is empty. Heading text, may wrap, max 32 characters. -->
+    <string name="agency_list_empty_title">No agencies found</string>
+    <!-- Agency list screen, centre of screen, hint under the empty heading. Body text, may wrap, max 40 characters. -->
+    <string name="agency_list_empty_hint">Try adjusting your filters</string>
+    <!-- Agency list item and agency detail, accessibility description of the agency logo image. Screen reader text, not shown, max 24 characters. -->
+    <string name="agency_list_logo_description">Agency logo</string>
+    <!-- Agency list item, country chip text when the country has no name. Chip label, one line, max 16 characters. -->
+    <string name="agency_list_country_unknown">Unknown</string>
+    <!-- Agency list view, centre of screen, heading above the error message. Heading text, may wrap, max 32 characters. -->
+    <string name="agency_list_error_heading">Error loading agencies</string>
+    <!-- Agency list view, accessibility description of the icon above the empty heading. Screen reader text, not shown, max 20 characters. -->
+    <string name="agency_list_empty_description">No agencies</string>
+    <!-- Agency detail screen, full width button under the overview card. %1$d is the number of launches of the agency. Button label, one line, max 36 characters. -->
+    <string name="agency_detail_view_launches">View %1$d Launches in Schedule</string>
+    <!-- Agency detail screen, section heading above the launch statistic cards. Heading text, one line, max 24 characters. -->
+    <string name="agency_detail_launch_stats_title">Launch Statistics</string>
+    <!-- Agency detail screen, section heading above the landing statistic cards. Heading text, one line, max 24 characters. -->
+    <string name="agency_detail_landing_stats_title">Landing Statistics</string>
+    <!-- Agency detail screen, section heading above the spacecraft landing statistic cards. Heading text, may wrap, max 32 characters. -->
+    <string name="agency_detail_spacecraft_landing_stats_title">Spacecraft Landing Statistics</string>
+    <!-- Agency detail screen, section heading above the vehicles card. Heading text, one line, max 28 characters. -->
+    <string name="agency_detail_vehicles_title">Vehicles &amp; Spacecraft</string>
+    <!-- Agency detail screen, accessibility description of the placeholder icon shown when the logo fails to load. Screen reader text, not shown, max 16 characters. -->
+    <string name="agency_detail_logo_fallback_description">Agency</string>
+    <!-- Agency detail screen, overview card, small tile label above the agency type. Tile label, one line, max 16 characters. -->
+    <string name="agency_detail_tile_type">Type</string>
+    <!-- Agency detail screen, overview card, small tile label above the agency abbreviation. Tile label, one line, max 16 characters. -->
+    <string name="agency_detail_tile_abbreviation">Abbreviation</string>
+    <!-- Agency detail screen, overview card, small tile label above the founding year. Tile label, one line, max 16 characters. -->
+    <string name="agency_detail_tile_founded">Founded</string>
+    <!-- Agency detail screen, overview card, small tile label above the administrator name. Tile label, one line, max 16 characters. -->
+    <string name="agency_detail_tile_administrator">Administrator</string>
+    <!-- Agency detail screen, overview card, small tile label above the country chip. Tile label, one line, max 16 characters. -->
+    <string name="agency_detail_tile_country">Country</string>
+    <!-- Agency detail screen, overview card, heading above the agency description. Heading text, one line, max 16 characters. -->
+    <string name="agency_detail_about_title">About</string>
+    <!-- Agency detail screen, overview card, accessibility description of the info icon on the website button. Screen reader text, not shown, max 20 characters. -->
+    <string name="agency_detail_website_description">Information</string>
+    <!-- Agency detail screen, overview card, button that opens the agency website. Button label, one line, max 14 characters. -->
+    <string name="agency_detail_website_button">Website</string>
+    <!-- Agency detail screen, overview card, accessibility description of the Wikipedia icon on the Wikipedia button. Screen reader text, not shown, max 16 characters. -->
+    <string name="agency_detail_wikipedia_description">Wikipedia</string>
+    <!-- Agency detail screen, overview card, button that opens the Wikipedia page. Button label, one line, max 14 characters. -->
+    <string name="agency_detail_wikipedia_button">Wikipedia</string>
+    <!-- Agency detail screen, statistic card caption under the success rate percentage. Caption, two lines split by a line break, max 12 characters per line. -->
+    <string name="agency_detail_stat_success_rate">Success\nRate</string>
+    <!-- Agency detail screen, statistic card caption under the total launch count. Caption, two lines split by a line break, max 12 characters per line. -->
+    <string name="agency_detail_stat_total_launches">Total\nLaunches</string>
+    <!-- Agency detail screen, statistic card caption under the successful launch count. Caption, two lines split by a line break, max 12 characters per line. -->
+    <string name="agency_detail_stat_successful_launches">Successful\nLaunches</string>
+    <!-- Agency detail screen, statistic card caption under the failed launch count. Caption, two lines split by a line break, max 12 characters per line. -->
+    <string name="agency_detail_stat_failed_launches">Failed\nLaunches</string>
+    <!-- Agency detail screen, statistic card caption under the pending launch count. Caption, two lines split by a line break, max 12 characters per line. -->
+    <string name="agency_detail_stat_pending_launches">Pending\nLaunches</string>
+    <!-- Agency detail screen, statistic card caption under the count of consecutive successes, in the launch and landing sections. Caption, two lines split by a line break, max 12 characters per line. -->
+    <string name="agency_detail_stat_consecutive_success">Consecutive\nSuccess</string>
+    <!-- Agency detail screen, statistic card caption under the attempted landing count. Caption, two lines split by a line break, max 12 characters per line. -->
+    <string name="agency_detail_stat_attempted_landings">Attempted\nLandings</string>
+    <!-- Agency detail screen, statistic card caption under the successful landing count. Caption, two lines split by a line break, max 12 characters per line. -->
+    <string name="agency_detail_stat_successful_landings">Successful\nLandings</string>
+    <!-- Agency detail screen, statistic card caption under the failed landing count. Caption, two lines split by a line break, max 12 characters per line. -->
+    <string name="agency_detail_stat_failed_landings">Failed\nLandings</string>
+    <!-- Agency detail screen, spacecraft landing section, statistic card caption under the attempted count. Caption, one line, max 14 characters. -->
+    <string name="agency_detail_stat_attempted">Attempted</string>
+    <!-- Agency detail screen, spacecraft landing section, statistic card caption under the successful count. Caption, one line, max 14 characters. -->
+    <string name="agency_detail_stat_successful">Successful</string>
+    <!-- Agency detail screen, spacecraft landing section, statistic card caption under the failed count. Caption, one line, max 14 characters. -->
+    <string name="agency_detail_stat_failed">Failed</string>
+    <!-- Agency detail screen, vehicles card, heading above the launch vehicles text. Heading text, one line, max 20 characters. -->
+    <string name="agency_detail_vehicles_launch_vehicles">Launch Vehicles</string>
+    <!-- Agency detail screen, vehicles card, heading above the spacecraft text. Heading text, one line, max 16 characters. -->
+    <string name="agency_detail_vehicles_spacecraft">Spacecraft</string>
+    <!-- Agency detail screen, error card, bold heading above the error message. Heading text, may wrap, max 32 characters. -->
+    <string name="agency_detail_error_title">Oops! Something went wrong</string>
+    <!-- Agency detail screen, error card, full width button that reloads the agency. Button label, one line, max 16 characters. -->
+    <string name="agency_detail_error_retry">Try Again</string>
+</resources>
