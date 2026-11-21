@@ -52,6 +52,38 @@ import androidx.compose.ui.unit.dp
 import kotlinx.coroutines.delay
 import me.calebjones.spacelaunchnow.data.model.FilterOption
 import me.calebjones.spacelaunchnow.ui.viewmodel.RocketSortOrder
+import org.jetbrains.compose.resources.stringResource
+import spacelaunchnow_kmp.composeapp.generated.resources.Res
+import spacelaunchnow_kmp.composeapp.generated.resources.rockets_filter_active_only
+import spacelaunchnow_kmp.composeapp.generated.resources.rockets_filter_active_title
+import spacelaunchnow_kmp.composeapp.generated.resources.rockets_filter_clear_all
+import spacelaunchnow_kmp.composeapp.generated.resources.rockets_filter_close
+import spacelaunchnow_kmp.composeapp.generated.resources.rockets_filter_collapse_description
+import spacelaunchnow_kmp.composeapp.generated.resources.rockets_filter_expand_description
+import spacelaunchnow_kmp.composeapp.generated.resources.rockets_filter_expendable
+import spacelaunchnow_kmp.composeapp.generated.resources.rockets_filter_families_title
+import spacelaunchnow_kmp.composeapp.generated.resources.rockets_filter_loading
+import spacelaunchnow_kmp.composeapp.generated.resources.rockets_filter_no_results
+import spacelaunchnow_kmp.composeapp.generated.resources.rockets_filter_none_loaded
+import spacelaunchnow_kmp.composeapp.generated.resources.rockets_filter_option_all
+import spacelaunchnow_kmp.composeapp.generated.resources.rockets_filter_programs_title
+import spacelaunchnow_kmp.composeapp.generated.resources.rockets_filter_refresh
+import spacelaunchnow_kmp.composeapp.generated.resources.rockets_filter_reload
+import spacelaunchnow_kmp.composeapp.generated.resources.rockets_filter_remove_description
+import spacelaunchnow_kmp.composeapp.generated.resources.rockets_filter_retired
+import spacelaunchnow_kmp.composeapp.generated.resources.rockets_filter_reusable
+import spacelaunchnow_kmp.composeapp.generated.resources.rockets_filter_reusable_title
+import spacelaunchnow_kmp.composeapp.generated.resources.rockets_filter_search_apply
+import spacelaunchnow_kmp.composeapp.generated.resources.rockets_filter_search_clear
+import spacelaunchnow_kmp.composeapp.generated.resources.rockets_filter_search_label
+import spacelaunchnow_kmp.composeapp.generated.resources.rockets_filter_search_placeholder
+import spacelaunchnow_kmp.composeapp.generated.resources.rockets_filter_search_title
+import spacelaunchnow_kmp.composeapp.generated.resources.rockets_filter_section_title
+import spacelaunchnow_kmp.composeapp.generated.resources.rockets_filter_select_placeholder
+import spacelaunchnow_kmp.composeapp.generated.resources.rockets_filter_selected_count
+import spacelaunchnow_kmp.composeapp.generated.resources.rockets_filter_selected_description
+import spacelaunchnow_kmp.composeapp.generated.resources.rockets_filter_sort_title
+import spacelaunchnow_kmp.composeapp.generated.resources.rockets_filter_title
 
 /**
  * Filter and sort bottom sheet content for rocket list.
@@ -100,12 +132,12 @@ fun RocketFilterSheet(
                 verticalAlignment = Alignment.CenterVertically
             ) {
                 Text(
-                    text = "Filter & Sort",
+                    text = stringResource(Res.string.rockets_filter_title),
                     style = MaterialTheme.typography.titleLarge,
                     fontWeight = FontWeight.Bold
                 )
                 TextButton(onClick = onClearAll) {
-                    Text("Clear All")
+                    Text(stringResource(Res.string.rockets_filter_clear_all))
                 }
             }
         }
@@ -120,7 +152,7 @@ fun RocketFilterSheet(
             ) {
                 Column(modifier = Modifier.padding(16.dp)) {
                     Text(
-                        text = "Search",
+                        text = stringResource(Res.string.rockets_filter_search_title),
                         style = MaterialTheme.typography.titleMedium,
                         fontWeight = FontWeight.SemiBold,
                         modifier = Modifier.padding(bottom = 8.dp)
@@ -128,8 +160,8 @@ fun RocketFilterSheet(
                     OutlinedTextField(
                         value = localSearchQuery,
                         onValueChange = { localSearchQuery = it },
-                        label = { Text("Rocket Name") },
-                        placeholder = { Text("e.g., Falcon, Atlas, Starship") },
+                        label = { Text(stringResource(Res.string.rockets_filter_search_label)) },
+                        placeholder = { Text(stringResource(Res.string.rockets_filter_search_placeholder)) },
                         modifier = Modifier.fillMaxWidth(),
                         singleLine = true,
                         shape = RoundedCornerShape(12.dp)
@@ -146,13 +178,13 @@ fun RocketFilterSheet(
                             },
                             modifier = Modifier.weight(1f)
                         ) {
-                            Text("Clear")
+                            Text(stringResource(Res.string.rockets_filter_search_clear))
                         }
                         Button(
                             onClick = { onSearchQueryChange(localSearchQuery) },
                             modifier = Modifier.weight(1f)
                         ) {
-                            Text("Apply")
+                            Text(stringResource(Res.string.rockets_filter_search_apply))
                         }
                     }
                 }
@@ -169,7 +201,7 @@ fun RocketFilterSheet(
             ) {
                 Column(modifier = Modifier.padding(16.dp)) {
                     Text(
-                        text = "Sort By",
+                        text = stringResource(Res.string.rockets_filter_sort_title),
                         style = MaterialTheme.typography.titleMedium,
                         fontWeight = FontWeight.SemiBold,
                         modifier = Modifier.padding(bottom = 8.dp)
@@ -223,7 +255,7 @@ fun RocketFilterSheet(
                     verticalArrangement = Arrangement.spacedBy(12.dp)
                 ) {
                     Text(
-                        text = "Filters",
+                        text = stringResource(Res.string.rockets_filter_section_title),
                         style = MaterialTheme.typography.titleMedium,
                         fontWeight = FontWeight.SemiBold
                     )
@@ -231,7 +263,7 @@ fun RocketFilterSheet(
                     // Active Filter
                     Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
                         Text(
-                            text = "Active Status",
+                            text = stringResource(Res.string.rockets_filter_active_title),
                             style = MaterialTheme.typography.bodyMedium,
                             fontWeight = FontWeight.Medium
                         )
@@ -240,19 +272,19 @@ fun RocketFilterSheet(
                                 selected = activeFilter == null,
                                 onClick = { onActiveChange(null) },
                                 shape = SegmentedButtonDefaults.itemShape(index = 0, count = 3),
-                                label = { Text("All") }
+                                label = { Text(stringResource(Res.string.rockets_filter_option_all)) }
                             )
                             SegmentedButton(
                                 selected = activeFilter == true,
                                 onClick = { onActiveChange(true) },
                                 shape = SegmentedButtonDefaults.itemShape(index = 1, count = 3),
-                                label = { Text("Active Only") }
+                                label = { Text(stringResource(Res.string.rockets_filter_active_only)) }
                             )
                             SegmentedButton(
                                 selected = activeFilter == false,
                                 onClick = { onActiveChange(false) },
                                 shape = SegmentedButtonDefaults.itemShape(index = 2, count = 3),
-                                label = { Text("Retired") }
+                                label = { Text(stringResource(Res.string.rockets_filter_retired)) }
                             )
                         }
                     }
@@ -260,7 +292,7 @@ fun RocketFilterSheet(
                     // Reusable Filter
                     Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
                         Text(
-                            text = "Reusability",
+                            text = stringResource(Res.string.rockets_filter_reusable_title),
                             style = MaterialTheme.typography.bodyMedium,
                             fontWeight = FontWeight.Medium
                         )
@@ -269,19 +301,19 @@ fun RocketFilterSheet(
                                 selected = reusableFilter == null,
                                 onClick = { onReusableChange(null) },
                                 shape = SegmentedButtonDefaults.itemShape(index = 0, count = 3),
-                                label = { Text("All") }
+                                label = { Text(stringResource(Res.string.rockets_filter_option_all)) }
                             )
                             SegmentedButton(
                                 selected = reusableFilter == true,
                                 onClick = { onReusableChange(true) },
                                 shape = SegmentedButtonDefaults.itemShape(index = 1, count = 3),
-                                label = { Text("Reusable") }
+                                label = { Text(stringResource(Res.string.rockets_filter_reusable)) }
                             )
                             SegmentedButton(
                                 selected = reusableFilter == false,
                                 onClick = { onReusableChange(false) },
                                 shape = SegmentedButtonDefaults.itemShape(index = 2, count = 3),
-                                label = { Text("Expendable") }
+                                label = { Text(stringResource(Res.string.rockets_filter_expendable)) }
                             )
                         }
                     }
@@ -289,7 +321,7 @@ fun RocketFilterSheet(
                     // Program Filter
                     if (programOptions.isNotEmpty()) {
                         FilterSection(
-                            title = "Programs",
+                            title = stringResource(Res.string.rockets_filter_programs_title),
                             options = programOptions,
                             selectedIds = selectedProgramIds,
                             onSelectionChange = onProgramsChange
@@ -299,7 +331,7 @@ fun RocketFilterSheet(
                     // Family Filter
                     if (familyOptions.isNotEmpty()) {
                         FilterSectionByName(
-                            title = "Families",
+                            title = stringResource(Res.string.rockets_filter_families_title),
                             options = familyOptions,
                             selectedNames = selectedFamilies,
                             onSelectionChange = onFamiliesChange
@@ -308,7 +340,7 @@ fun RocketFilterSheet(
 
                     if (isLoadingFilterOptions) {
                         Text(
-                            text = "Loading filter options...",
+                            text = stringResource(Res.string.rockets_filter_loading),
                             style = MaterialTheme.typography.bodySmall,
                             color = MaterialTheme.colorScheme.onSurfaceVariant
                         )
@@ -317,21 +349,21 @@ fun RocketFilterSheet(
                             verticalArrangement = Arrangement.spacedBy(8.dp)
                         ) {
                             Text(
-                                text = "No filter options loaded",
+                                text = stringResource(Res.string.rockets_filter_none_loaded),
                                 style = MaterialTheme.typography.bodySmall,
                                 color = MaterialTheme.colorScheme.onSurfaceVariant
                             )
                             TextButton(
                                 onClick = onReloadOptions
                             ) {
-                                Text("Reload Options")
+                                Text(stringResource(Res.string.rockets_filter_reload))
                             }
                         }
                     } else {
                         TextButton(
                             onClick = onReloadOptions
                         ) {
-                            Text("Refresh Filter Options")
+                            Text(stringResource(Res.string.rockets_filter_refresh))
                         }
                     }
                 }
@@ -344,7 +376,7 @@ fun RocketFilterSheet(
                 onClick = onClose,
                 modifier = Modifier.fillMaxWidth()
             ) {
-                Text("Close")
+                Text(stringResource(Res.string.rockets_filter_close))
             }
         }
     }
@@ -420,7 +452,7 @@ private fun FilterSection(
                         trailingIcon = {
                             Icon(
                                 imageVector = Icons.Default.Close,
-                                contentDescription = "Remove filter",
+                                contentDescription = stringResource(Res.string.rockets_filter_remove_description),
                                 modifier = Modifier.size(16.dp)
                             )
                         }
@@ -437,14 +469,14 @@ private fun FilterSection(
                 modifier = Modifier.fillMaxWidth(),
                 placeholder = {
                     Text(
-                        if (selectedIds.isEmpty()) "Select options..."
-                        else "${selectedIds.size} selected"
+                        if (selectedIds.isEmpty()) stringResource(Res.string.rockets_filter_select_placeholder)
+                        else stringResource(Res.string.rockets_filter_selected_count, selectedIds.size)
                     )
                 },
                 trailingIcon = {
                     Icon(
                         imageVector = Icons.Default.ArrowDropDown,
-                        contentDescription = if (expanded) "Collapse" else "Expand",
+                        contentDescription = if (expanded) stringResource(Res.string.rockets_filter_collapse_description) else stringResource(Res.string.rockets_filter_expand_description),
                         modifier = Modifier.clickable { expanded = !expanded }
                     )
                 },
@@ -464,7 +496,7 @@ private fun FilterSection(
             ) {
                 if (filteredOptions.isEmpty()) {
                     DropdownMenuItem(
-                        text = { Text("No results found") },
+                        text = { Text(stringResource(Res.string.rockets_filter_no_results)) },
                         onClick = { },
                         enabled = false
                     )
@@ -485,7 +517,7 @@ private fun FilterSection(
                                     if (isSelected) {
                                         Icon(
                                             imageVector = Icons.Default.Check,
-                                            contentDescription = "Selected",
+                                            contentDescription = stringResource(Res.string.rockets_filter_selected_description),
                                             tint = MaterialTheme.colorScheme.primary
                                         )
                                     }
@@ -577,7 +609,7 @@ private fun FilterSectionByName(
                         trailingIcon = {
                             Icon(
                                 imageVector = Icons.Default.Close,
-                                contentDescription = "Remove filter",
+                                contentDescription = stringResource(Res.string.rockets_filter_remove_description),
                                 modifier = Modifier.size(16.dp)
                             )
                         }
@@ -594,14 +626,14 @@ private fun FilterSectionByName(
                 modifier = Modifier.fillMaxWidth(),
                 placeholder = {
                     Text(
-                        if (selectedNames.isEmpty()) "Select options..."
-                        else "${selectedNames.size} selected"
+                        if (selectedNames.isEmpty()) stringResource(Res.string.rockets_filter_select_placeholder)
+                        else stringResource(Res.string.rockets_filter_selected_count, selectedNames.size)
                     )
                 },
                 trailingIcon = {
                     Icon(
                         imageVector = Icons.Default.ArrowDropDown,
-                        contentDescription = if (expanded) "Collapse" else "Expand",
+                        contentDescription = if (expanded) stringResource(Res.string.rockets_filter_collapse_description) else stringResource(Res.string.rockets_filter_expand_description),
                         modifier = Modifier.clickable { expanded = !expanded }
                     )
                 },
@@ -621,7 +653,7 @@ private fun FilterSectionByName(
             ) {
                 if (filteredOptions.isEmpty()) {
                     DropdownMenuItem(
-                        text = { Text("No results found") },
+                        text = { Text(stringResource(Res.string.rockets_filter_no_results)) },
                         onClick = { },
                         enabled = false
                     )
@@ -642,7 +674,7 @@ private fun FilterSectionByName(
                                     if (isSelected) {
                                         Icon(
                                             imageVector = Icons.Default.Check,
-                                            contentDescription = "Selected",
+                                            contentDescription = stringResource(Res.string.rockets_filter_selected_description),
                                             tint = MaterialTheme.colorScheme.primary
                                         )
                                     }
