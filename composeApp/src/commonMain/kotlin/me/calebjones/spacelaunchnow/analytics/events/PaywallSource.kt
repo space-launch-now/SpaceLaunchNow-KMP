@@ -20,5 +20,6 @@ enum class PaywallSource(val value: String) {
     SETTINGS_ROW("settings_row"),
     WIDGET_LOCK("widget_lock"),
     /** A free user tapped a locked notification control (flag `paywall_locked_notification_tap_enabled`). */
-    LOCKED_NOTIFICATION_CONTROL("locked_notification_control");
+    LOCKED_NOTIFICATION_CONTROL("locked_notification_control"),
+    WINBACK("winback");
 }

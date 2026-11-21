@@ -19,6 +19,7 @@ class MockRemoteConfigRepository : RemoteConfigRepository {
     var onboardingVariant: OnboardingVariant = OnboardingVariant.CONTROL
     var dataBackend: DataBackend = DataBackend.DEFAULT
     var notificationRatingPromptEnabled = false
+    var winbackSheetEnabled = false
     var lockedNotificationTapPaywallEnabled = false
     var fetchAndActivateCalled = false
     var setDefaultsCalled = false
@@ -67,6 +68,8 @@ class MockRemoteConfigRepository : RemoteConfigRepository {
 
     override suspend fun getNotificationRatingPromptEnabled(): Boolean = notificationRatingPromptEnabled
 
+    override suspend fun getWinbackSheetEnabled(): Boolean = winbackSheetEnabled
+
     override suspend fun getInterstitialMinIntervalSeconds(): Long = 120L
 
     override suspend fun getLockedNotificationTapPaywallEnabled(): Boolean = lockedNotificationTapPaywallEnabled
@@ -79,6 +82,7 @@ class MockRemoteConfigRepository : RemoteConfigRepository {
         mockDiagnosticsConfigJson = null
         onboardingVariant = OnboardingVariant.CONTROL
         notificationRatingPromptEnabled = false
+        winbackSheetEnabled = false
         lockedNotificationTapPaywallEnabled = false
         fetchAndActivateCalled = false
         setDefaultsCalled = false

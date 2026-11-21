@@ -90,6 +90,7 @@ import me.calebjones.spacelaunchnow.ui.viewmodel.SpaceStationViewModel
 import me.calebjones.spacelaunchnow.ui.viewmodel.StarshipViewModel
 import me.calebjones.spacelaunchnow.ui.viewmodel.StatsViewModel
 import me.calebjones.spacelaunchnow.ui.viewmodel.SubscriptionViewModel
+import me.calebjones.spacelaunchnow.winback.WinbackSheetController
 import me.calebjones.spacelaunchnow.ui.viewmodel.UpdatesViewModel
 import me.calebjones.spacelaunchnow.util.BuildConfig
 import me.calebjones.spacelaunchnow.util.logging.LoggingPreferences
@@ -237,6 +238,19 @@ val appModule = module {
         )
     }
     single<NotificationRatingTrigger> { get<NotificationRatingPrompter>() }
+
+    // Day-7 win-back sheet after a dismissed onboarding paywall (Tasks#1175)
+    single {
+        val prefs = get<AppPreferences>()
+        val remoteConfig = get<RemoteConfigRepository>()
+        WinbackSheetController(
+            flagEnabled = { remoteConfig.getWinbackSheetEnabled() },
+            onboardingDismissedAtMs = { prefs.getOnboardingPaywallDismissedAtMs() },
+            alreadyShown = { prefs.isWinbackSheetShown() },
+            saveShown = { prefs.markWinbackSheetShown() },
+            nowMs = { kotlin.time.Clock.System.now().toEpochMilliseconds() },
+        )
+    }
 
     // Interstitial pacing gate - persisted counters, Remote Config thresholds
     single { createInterstitialGate(get<AppPreferences>(), get<RemoteConfigRepository>()) }

@@ -69,6 +69,7 @@ class RemoteConfigRepositoryImpl(
         private const val INTERSTITIAL_VISITS_KEY = "ads_interstitial_visits"
         private const val NOTIFICATION_RATING_PROMPT_KEY = "rating_prompt_after_notification_enabled"
         private const val LOCKED_NOTIFICATION_TAP_PAYWALL_KEY = "paywall_locked_notification_tap_enabled"
+        private const val WINBACK_SHEET_KEY = "winback_sheet_enabled"
         private const val INTERSTITIAL_MIN_INTERVAL_KEY = "ads_interstitial_min_interval_s"
         const val DEFAULT_INTERSTITIAL_VISITS = 4
         const val DEFAULT_INTERSTITIAL_MIN_INTERVAL_S = 120L
@@ -181,7 +182,8 @@ class RemoteConfigRepositoryImpl(
                 INTERSTITIAL_VISITS_KEY to DEFAULT_INTERSTITIAL_VISITS.toString(),
                 INTERSTITIAL_MIN_INTERVAL_KEY to DEFAULT_INTERSTITIAL_MIN_INTERVAL_S.toString(),
                 NOTIFICATION_RATING_PROMPT_KEY to "false",
-                LOCKED_NOTIFICATION_TAP_PAYWALL_KEY to "false"
+                LOCKED_NOTIFICATION_TAP_PAYWALL_KEY to "false",
+                WINBACK_SHEET_KEY to "false"
             )
         } catch (e: Exception) {
             // Log warning but don't fail - defaults are optional
@@ -236,6 +238,9 @@ class RemoteConfigRepositoryImpl(
 
     override suspend fun getLockedNotificationTapPaywallEnabled(): Boolean =
         readBooleanFlag(LOCKED_NOTIFICATION_TAP_PAYWALL_KEY, "locked notification tap paywall")
+
+    override suspend fun getWinbackSheetEnabled(): Boolean =
+        readBooleanFlag(WINBACK_SHEET_KEY, "win-back sheet")
 
     /** A boolean flag that is off when unset, unrecognized, or unreadable. */
     private fun readBooleanFlag(key: String, label: String): Boolean {
