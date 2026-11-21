@@ -27,7 +27,7 @@ def default_strings():
 
 KEY_RE = re.compile(r"\bRes\.string\.([A-Za-z0-9_]+)")
 # A string literal; `${...}` may hold quotes (`${a ?: ""}`) and stays inside the literal.
-LITERAL_RE = re.compile(r'(?<!")"((?:[^"\\\n$]|\\.|\$\{[^{}]*\}|\$)*)"(?!")')
+LITERAL_RE = re.compile(r'(?<!")"((?:[^"\\\n$]|\\.|\$\{[^{}\n]*\}|\$)*)"(?!")')
 # Two literals joined by `+` (same line or across lines) form one literal.
 CONCAT_RE = re.compile(r'"\s*\+\s*"')
 KT_VAR_RE = re.compile(r"\$(?:\{([^{}]*)\}|([A-Za-z_][A-Za-z0-9_]*))")
@@ -126,13 +126,7 @@ def parse_hunks(diff: str):
 def removed_literals(removed):
     """Normalized Kotlin literals in removed lines; `"a" +` newline `"b"` counts as one."""
     text = CONCAT_RE.sub("", "\n".join(removed))
-    out = []
-    for m in LITERAL_RE.finditer(text):
-        out.append(normalize_literal(m.group(1)))
-        # A literal inside `${...}` (`${a ?: "N/A"}`) can move to its own resource.
-        for expr in re.findall(r"\$\{([^{}]*)\}", m.group(1)):
-            out += [normalize_literal(n.group(1)) for n in LITERAL_RE.finditer(expr)]
-    return out
+    return [normalize_literal(m.group(1)) for m in LITERAL_RE.finditer(text)]
 
 
 def check_hunk(pool, added, strings, other):

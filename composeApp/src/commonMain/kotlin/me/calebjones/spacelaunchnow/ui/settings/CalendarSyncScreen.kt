@@ -58,6 +58,32 @@ import org.jetbrains.compose.resources.painterResource
 import org.koin.compose.viewmodel.koinViewModel
 import spacelaunchnow_kmp.composeapp.generated.resources.Res
 import spacelaunchnow_kmp.composeapp.generated.resources.launcher_monochrome
+import org.jetbrains.compose.resources.getString
+import org.jetbrains.compose.resources.stringResource
+import spacelaunchnow_kmp.composeapp.generated.resources.common_back
+import spacelaunchnow_kmp.composeapp.generated.resources.settings_calendar_copy_url
+import spacelaunchnow_kmp.composeapp.generated.resources.settings_calendar_feed_events_description
+import spacelaunchnow_kmp.composeapp.generated.resources.settings_calendar_feed_events_title
+import spacelaunchnow_kmp.composeapp.generated.resources.settings_calendar_feed_launches_description
+import spacelaunchnow_kmp.composeapp.generated.resources.settings_calendar_feed_launches_title
+import spacelaunchnow_kmp.composeapp.generated.resources.settings_calendar_feeds_title
+import spacelaunchnow_kmp.composeapp.generated.resources.settings_calendar_how_body
+import spacelaunchnow_kmp.composeapp.generated.resources.settings_calendar_how_note
+import spacelaunchnow_kmp.composeapp.generated.resources.settings_calendar_how_title
+import spacelaunchnow_kmp.composeapp.generated.resources.settings_calendar_setup_done
+import spacelaunchnow_kmp.composeapp.generated.resources.settings_calendar_setup_intro
+import spacelaunchnow_kmp.composeapp.generated.resources.settings_calendar_setup_step_add
+import spacelaunchnow_kmp.composeapp.generated.resources.settings_calendar_setup_step_copy
+import spacelaunchnow_kmp.composeapp.generated.resources.settings_calendar_setup_step_from_url
+import spacelaunchnow_kmp.composeapp.generated.resources.settings_calendar_setup_step_open
+import spacelaunchnow_kmp.composeapp.generated.resources.settings_calendar_setup_step_paste
+import spacelaunchnow_kmp.composeapp.generated.resources.settings_calendar_setup_step_repeat
+import spacelaunchnow_kmp.composeapp.generated.resources.settings_calendar_setup_title
+import spacelaunchnow_kmp.composeapp.generated.resources.settings_calendar_title
+import spacelaunchnow_kmp.composeapp.generated.resources.settings_calendar_unlock_body
+import spacelaunchnow_kmp.composeapp.generated.resources.settings_calendar_unlock_title
+import spacelaunchnow_kmp.composeapp.generated.resources.settings_calendar_url_copied
+import spacelaunchnow_kmp.composeapp.generated.resources.settings_main_premium_feature
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -75,7 +101,7 @@ fun CalendarSyncScreen(
             TopAppBar(
                 title = {
                     Text(
-                        text = "Calendar Sync",
+                        text = stringResource(Res.string.settings_calendar_title),
                         style = MaterialTheme.typography.headlineMedium,
                         fontWeight = FontWeight.Bold
                     )
@@ -84,7 +110,7 @@ fun CalendarSyncScreen(
                     IconButton(onClick = { navController.navigateUp() }) {
                         Icon(
                             imageVector = Icons.Default.ArrowBack,
-                            contentDescription = "Back"
+                            contentDescription = stringResource(Res.string.common_back)
                         )
                     }
                 },
@@ -92,7 +118,7 @@ fun CalendarSyncScreen(
                     if (!uiState.hasCalendarSync) {
                         Icon(
                             Icons.Default.Lock,
-                            contentDescription = "Premium Feature",
+                            contentDescription = stringResource(Res.string.settings_main_premium_feature),
                             tint = MaterialTheme.colorScheme.primary,
                             modifier = Modifier.padding(end = 16.dp)
                         )
@@ -113,8 +139,8 @@ fun CalendarSyncScreen(
             if (!uiState.hasCalendarSync) {
                 PremiumPromptCard(
                     modifier = Modifier.fillMaxWidth(),
-                    title = "Unlock Calendar Sync",
-                    description = "Upgrade to Premium to sync launches and events to your calendar.",
+                    title = stringResource(Res.string.settings_calendar_unlock_title),
+                    description = stringResource(Res.string.settings_calendar_unlock_body),
                     icon = Icons.Default.Star,
                     onUpgradeClick = {
                         navController.navigate(SupportUs(PaywallSource.CALENDAR_SYNC.value))
@@ -130,7 +156,7 @@ fun CalendarSyncScreen(
                 onCopyUrl = { url ->
                     clipboardManager.setText(AnnotatedString(url))
                     scope.launch {
-                        snackbarHostState.showSnackbar("URL copied to clipboard!")
+                        snackbarHostState.showSnackbar(getString(Res.string.settings_calendar_url_copied))
                     }
                 }
             )
@@ -166,18 +192,18 @@ private fun InstructionsCard() {
                     tint = MaterialTheme.colorScheme.primary
                 )
                 Text(
-                    text = "How it works",
+                    text = stringResource(Res.string.settings_calendar_how_title),
                     style = MaterialTheme.typography.titleMedium,
                     fontWeight = FontWeight.Bold
                 )
             }
             Text(
-                text = "Use the Calendar ICS URLs below to subscribe to Space Launch Now events and launches in your calendar app. Your calendar will automatically update with the latest information.",
+                text = stringResource(Res.string.settings_calendar_how_body),
                 style = MaterialTheme.typography.bodyMedium,
                 color = MaterialTheme.colorScheme.onSurfaceVariant
             )
             Text(
-                text = "These links will work on any calendar that supports ICS URL feeds.",
+                text = stringResource(Res.string.settings_calendar_how_note),
                 style = MaterialTheme.typography.bodySmall,
                 color = MaterialTheme.colorScheme.primary,
                 fontWeight = FontWeight.Medium
@@ -202,7 +228,7 @@ private fun CalendarUrlsSection(
                 verticalAlignment = Alignment.CenterVertically
             ) {
                 Text(
-                    text = "Calendar Feed URLs",
+                    text = stringResource(Res.string.settings_calendar_feeds_title),
                     style = MaterialTheme.typography.titleLarge,
                     fontWeight = FontWeight.Bold
                 )
@@ -216,8 +242,8 @@ private fun CalendarUrlsSection(
         }
 
         CalendarUrlCard(
-            title = "Launches",
-            description = "Subscribe to upcoming space launches",
+            title = stringResource(Res.string.settings_calendar_feed_launches_title),
+            description = stringResource(Res.string.settings_calendar_feed_launches_description),
             url = "https://spacelaunchnow.app/launches/latest/feed.ics",
             icon = null,
             showUrl = hasPerms,
@@ -225,8 +251,8 @@ private fun CalendarUrlsSection(
         )
 
         CalendarUrlCard(
-            title = "Events",
-            description = "Subscribe to space-related events",
+            title = stringResource(Res.string.settings_calendar_feed_events_title),
+            description = stringResource(Res.string.settings_calendar_feed_events_description),
             url = "https://spacelaunchnow.app/events/latest/feed.ics",
             icon = Icons.Default.Event,
             showUrl = hasPerms,
@@ -306,7 +332,7 @@ private fun CalendarUrlCard(
                 ) {
                     Icon(
                         imageVector = Icons.Default.ContentCopy,
-                        contentDescription = "Copy URL",
+                        contentDescription = stringResource(Res.string.settings_calendar_copy_url),
                         tint = MaterialTheme.colorScheme.primary
                     )
                 }
@@ -333,12 +359,12 @@ private fun GoogleCalendarSetupCard() {
 
             Column(modifier = Modifier.weight(1f)) {
                 Text(
-                    text = "Google Calendar Setup",
+                    text = stringResource(Res.string.settings_calendar_setup_title),
                     style = MaterialTheme.typography.titleMedium,
                     fontWeight = FontWeight.Bold
                 )
                 Text(
-                    text = "To add these feeds to Google Calendar:",
+                    text = stringResource(Res.string.settings_calendar_setup_intro),
                     style = MaterialTheme.typography.bodySmall,
                     color = MaterialTheme.colorScheme.onSurfaceVariant
                 )
@@ -359,19 +385,19 @@ private fun GoogleCalendarSetupCard() {
                 Column(
                     verticalArrangement = Arrangement.spacedBy(8.dp)
                 ) {
-                    SetupStep(number = "1", text = "Copy the calendar feed URL above")
-                    SetupStep(number = "2", text = "Open Google Calendar on your computer")
-                    SetupStep(number = "3", text = "Click the \"+\" next to \"Other calendars\"")
-                    SetupStep(number = "4", text = "Select \"From URL\"")
+                    SetupStep(number = "1", text = stringResource(Res.string.settings_calendar_setup_step_copy))
+                    SetupStep(number = "2", text = stringResource(Res.string.settings_calendar_setup_step_open))
+                    SetupStep(number = "3", text = stringResource(Res.string.settings_calendar_setup_step_add))
+                    SetupStep(number = "4", text = stringResource(Res.string.settings_calendar_setup_step_from_url))
                     SetupStep(
                         number = "5",
-                        text = "Paste the copied URL and click \"Add calendar\""
+                        text = stringResource(Res.string.settings_calendar_setup_step_paste)
                     )
-                    SetupStep(number = "6", text = "Repeat for both Launches and Events feeds")
+                    SetupStep(number = "6", text = stringResource(Res.string.settings_calendar_setup_step_repeat))
                 }
 
                 Text(
-                    text = "Your calendar will automatically update with new launches and events!",
+                    text = stringResource(Res.string.settings_calendar_setup_done),
                     style = MaterialTheme.typography.bodySmall,
                     color = MaterialTheme.colorScheme.primary,
                     fontWeight = FontWeight.Medium
