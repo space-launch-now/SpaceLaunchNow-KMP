@@ -89,7 +89,9 @@ private val LargeScreenImageSize = 80.dp
 private val CollapsedImageSize = 100.dp
 private val HzPadding = 24.dp
 private val LargeScreenActionButtonSize = 36.dp
-private val ActionsReservedWidth = LargeScreenActionButtonSize + 8.dp
+private val ActionsGap = 8.dp
+private val ActionsImageGap = 12.dp
+private val ActionsReservedWidth = LargeScreenActionButtonSize + ActionsGap
 
 
 /**
@@ -471,7 +473,7 @@ private fun SharedDetailUp(upPress: () -> Unit, forcePhoneLayout: Boolean = fals
                 .let {
                     if (isLargeScreen) {
                         // For landscape tablets, position relative to the compact title height
-                        it.offset(y = (CompactTitleHeight - 36.dp) / 2)
+                        it.offset(y = (CompactTitleHeight - LargeScreenActionButtonSize) / 2)
                     } else {
                         it
                     }
@@ -480,7 +482,7 @@ private fun SharedDetailUp(upPress: () -> Unit, forcePhoneLayout: Boolean = fals
                     horizontal = if (isLargeScreen) 12.dp else 16.dp,
                     vertical = if (isLargeScreen) 0.dp else 10.dp
                 )
-                .size(if (isLargeScreen) 36.dp else 48.dp)
+                .size(if (isLargeScreen) LargeScreenActionButtonSize else 48.dp)
                 .clip(CircleShape)
                 .background(
                     color = if (isLargeScreen)
@@ -514,7 +516,7 @@ private fun SharedDetailActions(
 ) {
     val isLargeScreen = rememberAdaptiveLayoutState().isMediumOrLarger && !forcePhoneLayout
     // Image sits at the end with HzPadding; keep the buttons clear of it
-    val endPadding = if (isLargeScreen) HzPadding + LargeScreenImageSize + 12.dp else 16.dp
+    val endPadding = if (isLargeScreen) HzPadding + LargeScreenImageSize + ActionsImageGap else 16.dp
     Row(
         modifier = Modifier
             .statusBarsPadding()
@@ -527,7 +529,7 @@ private fun SharedDetailActions(
                 }
             }
             .padding(end = endPadding),
-        horizontalArrangement = Arrangement.spacedBy(8.dp, Alignment.End),
+        horizontalArrangement = Arrangement.spacedBy(ActionsGap, Alignment.End),
         verticalAlignment = Alignment.CenterVertically,
         content = actions,
     )
