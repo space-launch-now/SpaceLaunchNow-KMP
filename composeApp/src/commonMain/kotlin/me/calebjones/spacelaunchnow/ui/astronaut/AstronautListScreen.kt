@@ -49,6 +49,18 @@ import me.calebjones.spacelaunchnow.ui.astronaut.components.AstronautCard
 import me.calebjones.spacelaunchnow.ui.viewmodel.AstronautListViewModel
 import me.calebjones.spacelaunchnow.ui.viewmodel.AstronautSortOrder
 import org.koin.compose.viewmodel.koinViewModel
+import org.jetbrains.compose.resources.stringResource
+import spacelaunchnow_kmp.composeapp.generated.resources.Res
+import spacelaunchnow_kmp.composeapp.generated.resources.astronaut_list_empty_hint
+import spacelaunchnow_kmp.composeapp.generated.resources.astronaut_list_empty_title
+import spacelaunchnow_kmp.composeapp.generated.resources.astronaut_list_error_title
+import spacelaunchnow_kmp.composeapp.generated.resources.astronaut_list_filter_description
+import spacelaunchnow_kmp.composeapp.generated.resources.astronaut_list_loading
+import spacelaunchnow_kmp.composeapp.generated.resources.astronaut_list_title
+import spacelaunchnow_kmp.composeapp.generated.resources.astronaut_list_title_with_count
+import spacelaunchnow_kmp.composeapp.generated.resources.astronaut_unknown_error
+import spacelaunchnow_kmp.composeapp.generated.resources.common_back
+import spacelaunchnow_kmp.composeapp.generated.resources.common_retry
 
 /**
  * Main screen for browsing astronauts.
@@ -118,9 +130,9 @@ fun AstronautListScreen(
                 title = {
                     Text(
                         text = if (activeFilterCount > 0) {
-                            "Astronauts (${uiState.totalCount})"
+                            stringResource(Res.string.astronaut_list_title_with_count, uiState.totalCount)
                         } else {
-                            "Astronauts"
+                            stringResource(Res.string.astronaut_list_title)
                         }
                     )
                 },
@@ -128,7 +140,7 @@ fun AstronautListScreen(
                     IconButton(onClick = onNavigateBack) {
                         Icon(
                             imageVector = Icons.AutoMirrored.Outlined.ArrowBack,
-                            contentDescription = "Back"
+                            contentDescription = stringResource(Res.string.common_back)
                         )
                     }
                 },
@@ -146,7 +158,7 @@ fun AstronautListScreen(
                         ) {
                             Icon(
                                 imageVector = Icons.Default.FilterList,
-                                contentDescription = "Filter & Sort"
+                                contentDescription = stringResource(Res.string.astronaut_list_filter_description)
                             )
                         }
                     }
@@ -167,7 +179,7 @@ fun AstronautListScreen(
                 // Error state
                 uiState.error != null && uiState.astronauts.isEmpty() -> {
                     ErrorContent(
-                        errorMessage = uiState.error ?: "Unknown error",
+                        errorMessage = uiState.error ?: stringResource(Res.string.astronaut_unknown_error),
                         onRetry = { viewModel.refresh() }
                     )
                 }
@@ -280,7 +292,7 @@ private fun LoadingContent() {
         ) {
             LoadingIndicator()
             Text(
-                text = "Loading astronauts...",
+                text = stringResource(Res.string.astronaut_list_loading),
                 style = MaterialTheme.typography.bodyLarge,
                 color = MaterialTheme.colorScheme.onSurfaceVariant
             )
@@ -309,7 +321,7 @@ private fun ErrorContent(
                 tint = MaterialTheme.colorScheme.error
             )
             Text(
-                text = "Failed to load astronauts",
+                text = stringResource(Res.string.astronaut_list_error_title),
                 style = MaterialTheme.typography.titleMedium,
                 fontWeight = FontWeight.Bold,
                 textAlign = TextAlign.Center
@@ -321,7 +333,7 @@ private fun ErrorContent(
                 textAlign = TextAlign.Center
             )
             Button(onClick = onRetry) {
-                Text("Retry")
+                Text(stringResource(Res.string.common_retry))
             }
         }
     }
@@ -345,13 +357,13 @@ private fun EmptyContent() {
                 tint = MaterialTheme.colorScheme.onSurfaceVariant
             )
             Text(
-                text = "No astronauts found",
+                text = stringResource(Res.string.astronaut_list_empty_title),
                 style = MaterialTheme.typography.titleMedium,
                 fontWeight = FontWeight.Bold,
                 textAlign = TextAlign.Center
             )
             Text(
-                text = "Check back later for updates",
+                text = stringResource(Res.string.astronaut_list_empty_hint),
                 style = MaterialTheme.typography.bodyMedium,
                 color = MaterialTheme.colorScheme.onSurfaceVariant,
                 textAlign = TextAlign.Center

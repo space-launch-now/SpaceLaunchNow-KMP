@@ -35,6 +35,13 @@ import me.calebjones.spacelaunchnow.domain.model.AstronautDetail
 import me.calebjones.spacelaunchnow.domain.model.SocialMediaLink
 import me.calebjones.spacelaunchnow.ui.theme.SpaceLaunchNowPreviewTheme
 import org.jetbrains.compose.ui.tooling.preview.Preview
+import org.jetbrains.compose.resources.stringResource
+import spacelaunchnow_kmp.composeapp.generated.resources.Res
+import spacelaunchnow_kmp.composeapp.generated.resources.astronaut_links_logo_description
+import spacelaunchnow_kmp.composeapp.generated.resources.astronaut_links_open_description
+import spacelaunchnow_kmp.composeapp.generated.resources.astronaut_links_social_media
+import spacelaunchnow_kmp.composeapp.generated.resources.astronaut_links_title
+import spacelaunchnow_kmp.composeapp.generated.resources.astronaut_links_wikipedia
 
 /**
  * Card displaying astronaut links including Wikipedia and social media accounts.
@@ -66,7 +73,7 @@ fun AstronautLinksCard(
             verticalArrangement = Arrangement.spacedBy(8.dp)
         ) {
             Text(
-                text = "Links",
+                text = stringResource(Res.string.astronaut_links_title),
                 style = MaterialTheme.typography.titleMedium,
                 fontWeight = FontWeight.Bold,
                 color = MaterialTheme.colorScheme.onSurfaceVariant
@@ -78,7 +85,7 @@ fun AstronautLinksCard(
             if (hasWiki) {
                 LinkItem(
                     icon = Icons.Default.Language,
-                    label = "Wikipedia",
+                    label = stringResource(Res.string.astronaut_links_wikipedia),
                     url = astronaut.wikiUrl!!,
                     onClick = { uriHandler.openUri(astronaut.wikiUrl!!) }
                 )
@@ -92,7 +99,7 @@ fun AstronautLinksCard(
                 
                 astronaut.socialMediaLinks.forEach { link ->
                     link.url?.let { url ->
-                        val platformName = link.platformName ?: "Social Media"
+                        val platformName = link.platformName ?: stringResource(Res.string.astronaut_links_social_media)
                         val logoUrl = link.platformLogoUrl
                         
                         SocialMediaLinkItem(
@@ -142,7 +149,7 @@ private fun LinkItem(
 
         Icon(
             imageVector = Icons.Default.OpenInNew,
-            contentDescription = "Open link",
+            contentDescription = stringResource(Res.string.astronaut_links_open_description),
             modifier = Modifier.size(18.dp),
             tint = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.6f)
         )
@@ -168,7 +175,7 @@ private fun SocialMediaLinkItem(
         if (logoUrl != null) {
             AsyncImage(
                 model = logoUrl,
-                contentDescription = "$platformName logo",
+                contentDescription = stringResource(Res.string.astronaut_links_logo_description, platformName),
                 modifier = Modifier
                     .size(24.dp)
                     .clip(RoundedCornerShape(4.dp)),
@@ -194,7 +201,7 @@ private fun SocialMediaLinkItem(
 
         Icon(
             imageVector = Icons.Default.OpenInNew,
-            contentDescription = "Open link",
+            contentDescription = stringResource(Res.string.astronaut_links_open_description),
             modifier = Modifier.size(18.dp),
             tint = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.6f)
         )
