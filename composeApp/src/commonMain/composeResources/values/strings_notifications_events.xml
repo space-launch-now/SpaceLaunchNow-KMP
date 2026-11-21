@@ -83,7 +83,7 @@
     <!-- Small button on the filter sheet next to the active filter count. Removes every selected filter. Max 14 chars. -->
     <string name="schedule_filter_clear_all">Clear All</string>
     <!-- Info note at the top of the filter sheet, shown next to an info icon. Two or three lines. Home page and Schedule are screen names. -->
-    <string name="schedule_filter_scope_note">These filters only affect the Schedule screen. They won\'t change what appears on the Home page or in notifications.</string>
+    <string name="schedule_filter_scope_note">These filters only affect the Schedule screen. They won't change what appears on the Home page or in notifications.</string>
     <!-- Banner text on the filter sheet. Starts with a construction emoji; keep it. One line. -->
     <string name="schedule_filter_work_in_progress">🚧 Work In Progress</string>
     <!-- Section heading on the filter sheet, above the crewed-only switch. One line. -->
@@ -151,7 +151,7 @@
     <!-- Description under the Follow All Launches switch. One or two lines. -->
     <string name="notification_settings_follow_all_description">Get notified for every launch across all agencies and locations</string>
     <!-- Note shown when Follow All Launches is on. Tells the user the agency and location choices below are ignored. Two lines. -->
-    <string name="notification_settings_follow_all_override_note">You\'re following all launches! Individual selections below are overridden.</string>
+    <string name="notification_settings_follow_all_override_note">You're following all launches! Individual selections below are overridden.</string>
     <!-- Section heading above the strict matching switch. One line. -->
     <string name="notification_settings_matching_title">Notification Matching</string>
     <!-- Description under the Notification Matching heading. One or two lines. -->
@@ -163,13 +163,13 @@
     <!-- Explains the strict matching mode. STRICT, BOTH and AND are in capitals for emphasis; keep the emphasis. Two lines. -->
     <string name="notification_settings_strict_summary">STRICT: Show launches that match BOTH agency AND location</string>
     <!-- Example for strict matching. SpaceX and Kennedy Space Center are proper names. KSC is the short form of Kennedy Space Center. ONLY is in capitals for emphasis. Two or three lines. -->
-    <string name="notification_settings_strict_example">Example: If you select SpaceX + Kennedy Space Center, you\'ll ONLY get SpaceX launches from KSC.</string>
+    <string name="notification_settings_strict_example">Example: If you select SpaceX + Kennedy Space Center, you'll ONLY get SpaceX launches from KSC.</string>
     <!-- Three bullet lines under the strict matching example. Each line starts with a bullet, a check or cross emoji. Keep the emoji and the line breaks. KSC is the short form of Kennedy Space Center. -->
     <string name="notification_settings_strict_bullets">• ✅ SpaceX from KSC\n• ❌ SpaceX from other locations\n• ❌ Other agencies from KSC</string>
     <!-- Explains the flexible matching mode. FLEXIBLE, ANY and OR are in capitals for emphasis; keep the emphasis. Two lines. -->
     <string name="notification_settings_flexible_summary">FLEXIBLE: Show launches that match ANY agency OR location</string>
     <!-- Example for flexible matching. SpaceX and Kennedy Space Center are proper names. KSC is the short form of Kennedy Space Center. ALL and AND are in capitals for emphasis. Two or three lines. -->
-    <string name="notification_settings_flexible_example">Example: If you select SpaceX + Kennedy Space Center, you\'ll get ALL SpaceX launches AND all KSC launches.</string>
+    <string name="notification_settings_flexible_example">Example: If you select SpaceX + Kennedy Space Center, you'll get ALL SpaceX launches AND all KSC launches.</string>
     <!-- Three bullet lines under the flexible matching example. Each line starts with a bullet and a check emoji. Keep the emoji and the line breaks. KSC is the short form of Kennedy Space Center. -->
     <string name="notification_settings_flexible_bullets">• ✅ SpaceX from anywhere\n• ✅ Any agency from KSC\n• ✅ Much more notifications</string>
     <!-- Section heading above the list of agency checkboxes. One line. -->
@@ -179,7 +179,7 @@
     <!-- Title of a switch. When on, Starlink launches send no notification. Starlink is a product name. One line. -->
     <string name="notification_settings_mute_starlink_title">Mute Starlink launches</string>
     <!-- Description under the Mute Starlink launches switch. Starlink is a product name. One or two lines. -->
-    <string name="notification_settings_mute_starlink_description">You\'ll still be notified if a Starlink launch fails.</string>
+    <string name="notification_settings_mute_starlink_description">You'll still be notified if a Starlink launch fails.</string>
     <!-- Section heading above the list of location checkboxes. One line. -->
     <string name="notification_settings_locations_title">Launch Locations</string>
     <!-- Description under the Launch Locations heading. One line. -->
