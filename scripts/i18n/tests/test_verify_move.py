@@ -1,3 +1,4 @@
+import os
 import sys
 import tempfile
 import unittest
@@ -82,6 +83,54 @@ class VerifyMoveTest(unittest.TestCase):
         self.assertTrue(verify_move.touches_strings(diff_of(["a"], ["b"], path="x/values/strings.xml")))
         self.assertTrue(verify_move.touches_strings(diff_of(["a"], ["b"], path="x/values-de/strings_extra.xml")))
         self.assertFalse(verify_move.touches_strings(diff_of(["a"], ["b"])))
+
+    def test_concatenated_literals_match_one_resource(self):
+        removed = ['Text("Version: " +', '     "$name ($build)")']
+        added = ["Text(stringResource(Res.string.version, name, build))"]
+        self.assertEqual([], self.run_diff(removed, added))
+
+    def test_concatenation_with_wrong_text_fails(self):
+        removed = ['Text("Version: " +', '     "$name")']
+        added = ["Text(stringResource(Res.string.version, name, build))"]
+        self.assertEqual(1, len(self.run_diff(removed, added)))
+
+    def test_template_with_nested_quotes_matches(self):
+        removed = ['Modifier.semantics { contentDescription = "Version: ${a ?: ""} ($b)" }']
+        added = ['val d = stringResource(Res.string.version, a ?: "", b)']
+        self.assertEqual([], self.run_diff(removed, added))
+
+    def test_hoisted_literal_in_another_hunk_matches(self):
+        self.assertEqual([], verify_move.verify(self.hoisted_diff("About"), self.strings, self.other))
+
+    def test_hoisted_literal_with_wrong_text_fails(self):
+        self.assertEqual(1, len(verify_move.verify(self.hoisted_diff("About us"), self.strings, self.other)))
+
+    def test_removed_literal_in_another_file_does_not_match(self):
+        diff = (diff_of(['Text("About")'], ["Text(1)"], path="composeApp/src/commonMain/kotlin/B.kt")
+                + diff_of([], ["Text(stringResource(Res.string.about_title))"]))
+        self.assertEqual(1, len(verify_move.verify(diff, self.strings, self.other)))
+
+    def test_default_strings_reads_every_strings_file(self):
+        root = Path(self.tmp.name) / "repo"
+        values = root / verify_move.VALUES_DIR
+        values.mkdir(parents=True)
+        for name in ("strings.xml", "strings_time.xml", "other.xml"):
+            (values / name).write_text(STRINGS_XML, encoding="utf-8")
+        cwd = Path.cwd()
+        try:
+            os.chdir(root)
+            found = [p.name for p in verify_move.default_strings()]
+        finally:
+            os.chdir(cwd)
+        self.assertEqual(["strings.xml", "strings_time.xml"], found)
+
+    @staticmethod
+    def hoisted_diff(removed_text):
+        """A key added in one hunk, its literal removed in a later hunk of the same file."""
+        path = "composeApp/src/commonMain/kotlin/A.kt"
+        return (f"diff --git a/{path} b/{path}\n--- a/{path}\n+++ b/{path}\n"
+                "@@ -5,0 +6 @@\n+val d = stringResource(Res.string.about_title)\n"
+                f'@@ -40 +41 @@\n-Text("{removed_text}")\n+Text(d)\n')
 
     def test_main_exit_codes(self):
         base = Path(self.tmp.name)

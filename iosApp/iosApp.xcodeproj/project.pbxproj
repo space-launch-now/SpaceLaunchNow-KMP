@@ -7,6 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		A11800000000000000000002 /* InfoPlist.xcstrings in Resources */ = {isa = PBXBuildFile; fileRef = A11800000000000000000001 /* InfoPlist.xcstrings */; };
 		058557BB273AAA24004C7B11 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 058557BA273AAA24004C7B11 /* Assets.xcassets */; };
 		058557D9273AAEEB004C7B11 /* Preview Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 058557D8273AAEEB004C7B11 /* Preview Assets.xcassets */; };
 		2152FB042600AC8F00CF470E /* iOSApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2152FB032600AC8F00CF470E /* iOSApp.swift */; };
@@ -94,6 +95,7 @@
 /* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
+		A11800000000000000000001 /* InfoPlist.xcstrings */ = {isa = PBXFileReference; lastKnownFileType = text.json.xcstrings; path = InfoPlist.xcstrings; sourceTree = "<group>"; };
 		058557BA273AAA24004C7B11 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		058557D8273AAEEB004C7B11 /* Preview Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = "Preview Assets.xcassets"; sourceTree = "<group>"; };
 		2152FB032600AC8F00CF470E /* iOSApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = iOSApp.swift; sourceTree = "<group>"; };
@@ -273,6 +275,7 @@
 				3C1B898B2EA985DB00FD4471 /* iosApp.entitlements */,
 				3CE684192E95BB4500AA177C /* iosAppDebug.entitlements */,
 				058557BA273AAA24004C7B11 /* Assets.xcassets */,
+				A11800000000000000000001 /* InfoPlist.xcstrings */,
 				7555FF82242A565900829871 /* ContentView.swift */,
 				7555FF8C242A565B00829871 /* Info.plist */,
 				2152FB032600AC8F00CF470E /* iOSApp.swift */,
@@ -445,6 +448,16 @@
 			knownRegions = (
 				en,
 				Base,
+				de,
+				es,
+				fr,
+				"zh-Hans",
+				nl,
+				uk,
+				it,
+				pl,
+				"pt-BR",
+				cs,
 			);
 			mainGroup = 7555FF72242A565900829871;
 			packageReferences = (
@@ -485,6 +498,7 @@
 				3C7AFD382EADC588002FEDEE /* GoogleService-Info.plist in Resources */,
 				3C9137E52E9008320095D5AB /* Secrets.plist in Resources */,
 				058557BB273AAA24004C7B11 /* Assets.xcassets in Resources */,
+				A11800000000000000000002 /* InfoPlist.xcstrings in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

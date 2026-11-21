@@ -1,0 +1,30 @@
+{
+  "sourceLanguage" : "en",
+  "strings" : {
+    "NSLocationWhenInUseUsageDescription" : {
+      "comment" : "Location permission prompt text shown by iOS",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Space Launch Now uses your location to show launches near you and relevant launch site information."
+          }
+        }
+      }
+    },
+    "NSUserTrackingUsageDescription" : {
+      "comment" : "App Tracking Transparency prompt text shown by iOS",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "This lets Space Launch Now show ads that are more relevant to you, which helps keep the app free."
+          }
+        }
+      }
+    }
+  },
+  "version" : "1.0"
+}

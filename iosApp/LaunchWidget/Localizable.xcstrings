@@ -1,0 +1,390 @@
+{
+  "sourceLanguage" : "en",
+  "strings" : {
+    "widget_error_hint" : {
+      "comment" : "Widget error state hint, one line",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Tap to refresh or wait 15 min"
+          }
+        }
+      }
+    },
+    "widget_error_last_tried" : {
+      "comment" : "Widget error state; %1$@ is the time of the last attempt",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Last tried: %@"
+          }
+        }
+      }
+    },
+    "widget_error_title" : {
+      "comment" : "Widget error state title",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Widget Error"
+          }
+        }
+      }
+    },
+    "widget_launch_list_description" : {
+      "comment" : "Widget gallery description of the Launch List widget",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Premium · Shows upcoming space launches"
+          }
+        }
+      }
+    },
+    "widget_launch_list_empty_title" : {
+      "comment" : "Launch List widget empty state title",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "No Upcoming Launches"
+          }
+        }
+      }
+    },
+    "widget_launch_list_header" : {
+      "comment" : "Header of the Launch List widget, upper case, one line",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "UPCOMING LAUNCHES"
+          }
+        }
+      }
+    },
+    "widget_launch_list_name" : {
+      "comment" : "Widget gallery name of the Launch List widget",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Launch List"
+          }
+        }
+      }
+    },
+    "widget_loading" : {
+      "comment" : "Widget placeholder while data loads",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Loading..."
+          }
+        }
+      }
+    },
+    "widget_lock_screen_check_back" : {
+      "comment" : "Lock Screen widget empty state hint",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Check back later"
+          }
+        }
+      }
+    },
+    "widget_lock_screen_description" : {
+      "comment" : "Widget gallery description of the Lock Screen widget",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Premium · Shows next launch on your Lock Screen"
+          }
+        }
+      }
+    },
+    "widget_lock_screen_loading_launch" : {
+      "comment" : "Lock Screen widget placeholder while the launch loads",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Loading launch..."
+          }
+        }
+      }
+    },
+    "widget_lock_screen_name" : {
+      "comment" : "Widget gallery name of the Lock Screen widget",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Lock Screen Launch"
+          }
+        }
+      }
+    },
+    "widget_lock_screen_unsupported" : {
+      "comment" : "Lock Screen widget shown for an unsupported family",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Unsupported"
+          }
+        }
+      }
+    },
+    "widget_lock_screen_upgrade_label" : {
+      "comment" : "Lock Screen widget upsell label next to a lock icon",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Upgrade to Premium"
+          }
+        }
+      }
+    },
+    "widget_lock_screen_upgrade_short" : {
+      "comment" : "Lock Screen widget short upsell, one line",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Upgrade to unlock"
+          }
+        }
+      }
+    },
+    "widget_next_up_description" : {
+      "comment" : "Widget gallery description of the Next Launch widget",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Shows the next upcoming space launch"
+          }
+        }
+      }
+    },
+    "widget_next_up_empty_body" : {
+      "comment" : "Next Launch widget empty state body",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "No upcoming launches found"
+          }
+        }
+      }
+    },
+    "widget_next_up_error_title" : {
+      "comment" : "Next Launch widget error state title",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Error"
+          }
+        }
+      }
+    },
+    "widget_next_up_header" : {
+      "comment" : "Header of the Next Launch widget, upper case, one line",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "NEXT LAUNCH"
+          }
+        }
+      }
+    },
+    "widget_next_up_in" : {
+      "comment" : "Label above the countdown in the Next Launch widget, one word",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "In"
+          }
+        }
+      }
+    },
+    "widget_next_up_label_agency" : {
+      "comment" : "Label above the agency in the Next Launch widget",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Agency"
+          }
+        }
+      }
+    },
+    "widget_next_up_label_location" : {
+      "comment" : "Label above the launch site in the Next Launch widget",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Launch Location"
+          }
+        }
+      }
+    },
+    "widget_next_up_label_space_agency" : {
+      "comment" : "Label above the agency in the Next Launch widget",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Space Agency"
+          }
+        }
+      }
+    },
+    "widget_next_up_loading_launch" : {
+      "comment" : "Next Launch widget placeholder while the launch loads",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Loading Launch..."
+          }
+        }
+      }
+    },
+    "widget_next_up_name" : {
+      "comment" : "Widget gallery name of the Next Launch widget",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Next Launch"
+          }
+        }
+      }
+    },
+    "widget_next_up_status_go" : {
+      "comment" : "Placeholder launch status in the Next Launch widget",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Go"
+          }
+        }
+      }
+    },
+    "widget_no_launches" : {
+      "comment" : "Widget empty state, one line",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "No Launches"
+          }
+        }
+      }
+    },
+    "widget_premium_badge" : {
+      "comment" : "Short premium label on the Lock Screen widget, one line",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Premium"
+          }
+        }
+      }
+    },
+    "widget_premium_cta" : {
+      "comment" : "Premium upsell call to action in a widget, one line",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Tap to upgrade"
+          }
+        }
+      }
+    },
+    "widget_premium_launch_list_body" : {
+      "comment" : "Premium upsell body in the Launch List widget",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Upgrade to Premium to unlock the Launch List widget"
+          }
+        }
+      }
+    },
+    "widget_premium_next_up_body" : {
+      "comment" : "Premium upsell body in the Next Launch widget",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Upgrade to Premium to unlock the Next Launch widget"
+          }
+        }
+      }
+    },
+    "widget_premium_title" : {
+      "comment" : "Title of the premium upsell shown in a widget",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Premium Widget"
+          }
+        }
+      }
+    }
+  },
+  "version" : "1.0"
+}
