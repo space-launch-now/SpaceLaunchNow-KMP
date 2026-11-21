@@ -20,6 +20,10 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import me.calebjones.spacelaunchnow.ui.theme.SpaceLaunchNowPreviewTheme
 import org.jetbrains.compose.ui.tooling.preview.Preview
+import spacelaunchnow_kmp.composeapp.generated.resources.Res
+import spacelaunchnow_kmp.composeapp.generated.resources.app_compose_live_indicator_description
+import spacelaunchnow_kmp.composeapp.generated.resources.common_live
+import org.jetbrains.compose.resources.stringResource
 
 /**
  * LIVE indicator badge with pulsing animation.
@@ -43,15 +47,16 @@ fun LiveIndicator(modifier: Modifier = Modifier) {
     // LIVE indicator red color
     val liveRed = Color(0xFFE53935)
 
+    val liveDescription = stringResource(Res.string.app_compose_live_indicator_description)
     Surface(
         modifier = modifier.semantics {
-            contentDescription = "Live broadcast indicator"
+            contentDescription = liveDescription
         },
         shape = RoundedCornerShape(4.dp),
         color = liveRed.copy(alpha = alpha)
     ) {
         Text(
-            text = "LIVE",
+            text = stringResource(Res.string.common_live),
             modifier = Modifier.padding(horizontal = 8.dp, vertical = 4.dp),
             style = MaterialTheme.typography.labelSmall,
             fontWeight = FontWeight.Bold,

@@ -14,6 +14,7 @@ import org.jetbrains.compose.ui.tooling.preview.Preview
 import kotlinx.coroutines.launch
 import me.calebjones.spacelaunchnow.ui.components.PlatformBackHandler
 import me.calebjones.spacelaunchnow.ui.theme.SpaceLaunchNowPreviewTheme
+import spacelaunchnow_kmp.composeapp.generated.resources.Res
 
 /**
  * Generic wrapper for list-detail two-pane layouts on tablets/desktop.
@@ -85,7 +86,7 @@ private fun ListDetailWrapperPreview() {
             listContent = { onSelect ->
                 Surface {
                     Text(
-                        text = "List Pane — tap an item",
+                        text = "List Pane — tap an item", // i18n-ignore: preview sample data
                         style = MaterialTheme.typography.bodyLarge
                     )
                 }
@@ -93,7 +94,7 @@ private fun ListDetailWrapperPreview() {
             detailContent = { item ->
                 Surface {
                     Text(
-                        text = "Detail Pane — $item",
+                        text = "Detail Pane — $item", // i18n-ignore: preview sample data
                         style = MaterialTheme.typography.bodyLarge
                     )
                 }
@@ -101,7 +102,7 @@ private fun ListDetailWrapperPreview() {
             emptyDetailContent = {
                 Surface {
                     Text(
-                        text = "Select an item to see details",
+                        text = "Select an item to see details", // i18n-ignore: preview sample data
                         style = MaterialTheme.typography.bodyMedium
                     )
                 }
@@ -119,7 +120,7 @@ private fun ListDetailWrapperDarkPreview() {
             listContent = { onSelect ->
                 Surface {
                     Text(
-                        text = "List Pane — tap an item",
+                        text = "List Pane — tap an item", // i18n-ignore: preview sample data
                         style = MaterialTheme.typography.bodyLarge
                     )
                 }
@@ -127,7 +128,7 @@ private fun ListDetailWrapperDarkPreview() {
             detailContent = { item ->
                 Surface {
                     Text(
-                        text = "Detail Pane — $item",
+                        text = "Detail Pane — $item", // i18n-ignore: preview sample data
                         style = MaterialTheme.typography.bodyLarge
                     )
                 }
@@ -135,7 +136,7 @@ private fun ListDetailWrapperDarkPreview() {
             emptyDetailContent = {
                 Surface {
                     Text(
-                        text = "Select an item to see details",
+                        text = "Select an item to see details", // i18n-ignore: preview sample data
                         style = MaterialTheme.typography.bodyMedium
                     )
                 }

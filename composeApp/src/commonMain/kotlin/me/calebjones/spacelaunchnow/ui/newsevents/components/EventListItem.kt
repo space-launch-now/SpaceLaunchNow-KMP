@@ -41,6 +41,11 @@ import me.calebjones.spacelaunchnow.domain.model.Event
 import me.calebjones.spacelaunchnow.ui.theme.SpaceLaunchNowPreviewTheme
 import me.calebjones.spacelaunchnow.util.DateTimeUtil
 import org.jetbrains.compose.ui.tooling.preview.Preview
+import spacelaunchnow_kmp.composeapp.generated.resources.Res
+import spacelaunchnow_kmp.composeapp.generated.resources.app_newsevents_event_item_description
+import spacelaunchnow_kmp.composeapp.generated.resources.app_newsevents_event_item_image_description
+import spacelaunchnow_kmp.composeapp.generated.resources.common_unknown
+import org.jetbrains.compose.resources.stringResource
 
 /**
  * A card component for displaying a space event in a list.
@@ -59,13 +64,14 @@ fun EventListItem(
 ) {
     val useUtc = LocalUseUtc.current
 
+    val cardDescription = stringResource(Res.string.app_newsevents_event_item_description, event.name.toString(), event.type.name.toString())
     Card(
         onClick = onClick,
         modifier = modifier
             .fillMaxWidth()
             .padding(horizontal = 16.dp, vertical = 4.dp)
             .semantics {
-                contentDescription = "Event: ${event.name}, Type: ${event.type.name}"
+                contentDescription = cardDescription
                 role = Role.Button
             },
         colors = CardDefaults.cardColors(
@@ -82,7 +88,7 @@ fun EventListItem(
             // Event image
             SubcomposeAsyncImage(
                 model = event.imageUrl,
-                contentDescription = "Event image for ${event.name}",
+                contentDescription = stringResource(Res.string.app_newsevents_event_item_image_description, event.name.toString()),
                 modifier = Modifier
                     .size(100.dp)
                     .clip(shape = RoundedCornerShape(8.dp)),
@@ -163,7 +169,7 @@ fun EventListItem(
                 ) {
                     // Event type
                     Text(
-                        text = event.type.name ?: "Unknown",
+                        text = event.type.name ?: stringResource(Res.string.common_unknown),
                         color = MaterialTheme.colorScheme.primary,
                         fontWeight = FontWeight.Medium,
                         style = MaterialTheme.typography.labelSmall,
@@ -219,7 +225,7 @@ private val previewEvent = Event(
         id = 1,
         name = "Spacewalk"
     ),
-    description = "Astronauts will perform a scheduled spacewalk to replace a faulty antenna on the International Space Station.",
+    description = "Astronauts will perform a scheduled spacewalk to replace a faulty antenna on the International Space Station.", // i18n-ignore: preview sample data
     date = null,
     location = null,
     imageUrl = null,

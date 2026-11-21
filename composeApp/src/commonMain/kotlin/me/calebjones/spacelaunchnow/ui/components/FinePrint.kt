@@ -24,6 +24,17 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import me.calebjones.spacelaunchnow.PlatformType
 import me.calebjones.spacelaunchnow.getPlatform
+import spacelaunchnow_kmp.composeapp.generated.resources.Res
+import spacelaunchnow_kmp.composeapp.generated.resources.app_components_fine_print_manage_app_store
+import spacelaunchnow_kmp.composeapp.generated.resources.app_components_fine_print_manage_google_play
+import spacelaunchnow_kmp.composeapp.generated.resources.app_components_fine_print_manage_other
+import spacelaunchnow_kmp.composeapp.generated.resources.app_components_fine_print_secure_app_store
+import spacelaunchnow_kmp.composeapp.generated.resources.app_components_fine_print_secure_google_play
+import spacelaunchnow_kmp.composeapp.generated.resources.app_components_fine_print_secure_other
+import spacelaunchnow_kmp.composeapp.generated.resources.app_components_fine_print_secure_title
+import spacelaunchnow_kmp.composeapp.generated.resources.app_components_fine_print_terms
+import spacelaunchnow_kmp.composeapp.generated.resources.app_components_fine_print_trial
+import org.jetbrains.compose.resources.stringResource
 
 /**
  * Standard subscription fine-print footer shown on subscription screens.
@@ -67,20 +78,18 @@ fun FinePrint(
         )
 
         Text(
-            text = "Secure Billing",
+            text = stringResource(Res.string.app_components_fine_print_secure_title),
             style = MaterialTheme.typography.labelMedium,
             fontWeight = FontWeight.Bold,
             color = dimColor.copy(alpha = (dimColor.alpha * 2f).coerceAtMost(1f))
         )
 
         Text(
-            text = "Purchases are processed securely through ${
-                when (platformType) {
-                    PlatformType.ANDROID -> "Google Play"
-                    PlatformType.IOS -> "the App Store"
-                    else -> "your platform's store"
-                }
-            }.",
+            text = when (platformType) {
+                PlatformType.ANDROID -> stringResource(Res.string.app_components_fine_print_secure_google_play)
+                PlatformType.IOS -> stringResource(Res.string.app_components_fine_print_secure_app_store)
+                else -> stringResource(Res.string.app_components_fine_print_secure_other)
+            },
             style = MaterialTheme.typography.bodySmall,
             textAlign = TextAlign.Center,
             color = dimColor
@@ -89,9 +98,7 @@ fun FinePrint(
         // Trial-specific disclosure (Google Play / App Store policy requirement)
         if (hasTrialOffer && trialPeriodDisplay != null && postTrialPrice != null) {
             Text(
-                text = "Free trial will automatically convert to a paid subscription " +
-                        "at $postTrialPrice unless canceled before the trial ends. " +
-                        "You won't be charged if you cancel during the $trialPeriodDisplay trial period.",
+                text = stringResource(Res.string.app_components_fine_print_trial, postTrialPrice, trialPeriodDisplay),
                 style = MaterialTheme.typography.bodySmall,
                 textAlign = TextAlign.Center,
                 fontWeight = FontWeight.Medium,
@@ -100,9 +107,7 @@ fun FinePrint(
         }
 
         Text(
-            text = "Any purchase unlocks all premium features. " +
-                    "Subscriptions auto-renew unless cancelled. " +
-                    "You can manage or cancel your subscription at any time by following the link below.",
+            text = stringResource(Res.string.app_components_fine_print_terms),
             style = MaterialTheme.typography.bodySmall,
             textAlign = TextAlign.Center,
             color = dimColor
@@ -130,9 +135,9 @@ fun FinePrint(
                 Spacer(Modifier.size(4.dp))
                 Text(
                     text = when (platformType) {
-                        PlatformType.ANDROID -> "Manage Subscriptions on Google Play"
-                        PlatformType.IOS -> "Manage Subscriptions in App Store"
-                        else -> "Manage Subscriptions"
+                        PlatformType.ANDROID -> stringResource(Res.string.app_components_fine_print_manage_google_play)
+                        PlatformType.IOS -> stringResource(Res.string.app_components_fine_print_manage_app_store)
+                        else -> stringResource(Res.string.app_components_fine_print_manage_other)
                     },
                     style = MaterialTheme.typography.labelMedium,
                     color = linkColor

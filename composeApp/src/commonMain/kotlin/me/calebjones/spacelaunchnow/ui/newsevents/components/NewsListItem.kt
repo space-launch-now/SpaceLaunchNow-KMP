@@ -43,6 +43,10 @@ import me.calebjones.spacelaunchnow.api.snapi.models.Article
 import me.calebjones.spacelaunchnow.ui.theme.SpaceLaunchNowPreviewTheme
 import me.calebjones.spacelaunchnow.util.DateTimeUtil
 import org.jetbrains.compose.ui.tooling.preview.Preview
+import spacelaunchnow_kmp.composeapp.generated.resources.Res
+import spacelaunchnow_kmp.composeapp.generated.resources.app_newsevents_news_item_description
+import spacelaunchnow_kmp.composeapp.generated.resources.app_newsevents_news_item_image_description
+import org.jetbrains.compose.resources.stringResource
 
 /**
  * A card component for displaying a news article in a list.
@@ -61,13 +65,14 @@ fun NewsListItem(
 ) {
     val useUtc = LocalUseUtc.current
 
+    val cardDescription = stringResource(Res.string.app_newsevents_news_item_description, article.title.toString(), article.newsSite.toString())
     Card(
         onClick = onClick,
         modifier = modifier
             .fillMaxWidth()
             .padding(horizontal = 16.dp, vertical = 4.dp)
             .semantics {
-                contentDescription = "News article: ${article.title} from ${article.newsSite}"
+                contentDescription = cardDescription
                 role = Role.Button
             },
         colors = CardDefaults.cardColors(
@@ -84,7 +89,7 @@ fun NewsListItem(
             // Article image
             SubcomposeAsyncImage(
                 model = article.imageUrl,
-                contentDescription = "Article image for ${article.title}",
+                contentDescription = stringResource(Res.string.app_newsevents_news_item_image_description, article.title.toString()),
                 modifier = Modifier
                     .size(100.dp)
                     .clip(shape = RoundedCornerShape(8.dp)),
@@ -212,12 +217,12 @@ private fun NewsListItemDarkPreview() {
  */
 private val previewArticle = Article(
     id = 1,
-    title = "SpaceX Successfully Launches Starship on 5th Integrated Flight Test",
+    title = "SpaceX Successfully Launches Starship on 5th Integrated Flight Test", // i18n-ignore: preview sample data
     authors = emptyList(),
     url = "https://example.com/article",
     imageUrl = "https://example.com/image.jpg",
     newsSite = "SpaceNews",
-    summary = "SpaceX has successfully completed its fifth integrated flight test of the Starship launch system, achieving several key milestones including a soft ocean splashdown.",
+    summary = "SpaceX has successfully completed its fifth integrated flight test of the Starship launch system, achieving several key milestones including a soft ocean splashdown.", // i18n-ignore: preview sample data
     publishedAt = Instant.parse("2024-01-15T10:30:00Z"),
     updatedAt = Instant.parse("2024-01-15T12:00:00Z"),
     launches = emptyList(),

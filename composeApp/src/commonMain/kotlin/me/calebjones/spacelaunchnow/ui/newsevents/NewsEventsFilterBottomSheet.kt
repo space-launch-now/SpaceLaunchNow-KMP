@@ -32,6 +32,17 @@ import me.calebjones.spacelaunchnow.domain.model.EventType
 import me.calebjones.spacelaunchnow.ui.theme.SpaceLaunchNowPreviewTheme
 import me.calebjones.spacelaunchnow.ui.viewmodel.NewsEventsTab
 import org.jetbrains.compose.ui.tooling.preview.Preview
+import spacelaunchnow_kmp.composeapp.generated.resources.Res
+import spacelaunchnow_kmp.composeapp.generated.resources.app_newsevents_filter_sheet_clear_all
+import spacelaunchnow_kmp.composeapp.generated.resources.app_newsevents_filter_sheet_close
+import spacelaunchnow_kmp.composeapp.generated.resources.app_newsevents_filter_sheet_event_types_heading
+import spacelaunchnow_kmp.composeapp.generated.resources.app_newsevents_filter_sheet_event_types_loading
+import spacelaunchnow_kmp.composeapp.generated.resources.app_newsevents_filter_sheet_remove_description
+import spacelaunchnow_kmp.composeapp.generated.resources.app_newsevents_filter_sheet_sources_heading
+import spacelaunchnow_kmp.composeapp.generated.resources.app_newsevents_filter_sheet_title_events
+import spacelaunchnow_kmp.composeapp.generated.resources.app_newsevents_filter_sheet_title_news
+import spacelaunchnow_kmp.composeapp.generated.resources.common_unknown
+import org.jetbrains.compose.resources.stringResource
 
 /**
  * Bottom sheet for filtering news articles by source or events by type.
@@ -70,12 +81,12 @@ fun NewsEventsFilterBottomSheet(
                     verticalAlignment = Alignment.CenterVertically
                 ) {
                     Text(
-                        text = if (selectedTab == NewsEventsTab.NEWS) "Filter by Source" else "Filter by Event Type",
+                        text = if (selectedTab == NewsEventsTab.NEWS) stringResource(Res.string.app_newsevents_filter_sheet_title_news) else stringResource(Res.string.app_newsevents_filter_sheet_title_events),
                         style = MaterialTheme.typography.headlineSmall,
                         fontWeight = FontWeight.Bold
                     )
                     TextButton(onClick = onDismiss) {
-                        Text("Close")
+                        Text(stringResource(Res.string.app_newsevents_filter_sheet_close))
                     }
                 }
 
@@ -115,7 +126,7 @@ fun NewsEventsFilterBottomSheet(
                             },
                             modifier = Modifier.fillMaxWidth()
                         ) {
-                            Text("Clear All Filters")
+                            Text(stringResource(Res.string.app_newsevents_filter_sheet_clear_all))
                         }
                     }
 
@@ -134,7 +145,7 @@ private fun NewsSiteFilterContent(
     onNewsSiteToggled: (String) -> Unit
 ) {
     Text(
-        text = "Select sources",
+        text = stringResource(Res.string.app_newsevents_filter_sheet_sources_heading),
         style = MaterialTheme.typography.titleSmall,
         modifier = Modifier.padding(bottom = 12.dp)
     )
@@ -154,7 +165,7 @@ private fun NewsSiteFilterContent(
                     {
                         Icon(
                             imageVector = Icons.Default.Close,
-                            contentDescription = "Remove filter",
+                            contentDescription = stringResource(Res.string.app_newsevents_filter_sheet_remove_description),
                             modifier = Modifier.size(16.dp)
                         )
                     }
@@ -172,14 +183,14 @@ private fun EventTypeFilterContent(
     onEventTypeToggled: (Int) -> Unit
 ) {
     Text(
-        text = "Select event types",
+        text = stringResource(Res.string.app_newsevents_filter_sheet_event_types_heading),
         style = MaterialTheme.typography.titleSmall,
         modifier = Modifier.padding(bottom = 12.dp)
     )
 
     if (availableEventTypes.isEmpty()) {
         Text(
-            text = "Loading event types...",
+            text = stringResource(Res.string.app_newsevents_filter_sheet_event_types_loading),
             style = MaterialTheme.typography.bodyMedium,
             color = MaterialTheme.colorScheme.onSurfaceVariant
         )
@@ -194,12 +205,12 @@ private fun EventTypeFilterContent(
                 FilterChip(
                     selected = isSelected,
                     onClick = { onEventTypeToggled(type.id) },
-                    label = { Text(type.name ?: "Unknown") },
+                    label = { Text(type.name ?: stringResource(Res.string.common_unknown)) },
                     trailingIcon = if (isSelected) {
                         {
                             Icon(
                                 imageVector = Icons.Default.Close,
-                                contentDescription = "Remove filter",
+                                contentDescription = stringResource(Res.string.app_newsevents_filter_sheet_remove_description),
                                 modifier = Modifier.size(16.dp)
                             )
                         }

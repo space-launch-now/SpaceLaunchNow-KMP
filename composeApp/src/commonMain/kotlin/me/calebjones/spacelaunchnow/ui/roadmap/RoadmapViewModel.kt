@@ -6,17 +6,15 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
-import me.calebjones.spacelaunchnow.data.model.RoadmapCategory
 import me.calebjones.spacelaunchnow.data.model.RoadmapData
-import me.calebjones.spacelaunchnow.data.model.RoadmapItem
-import me.calebjones.spacelaunchnow.data.model.RoadmapPriority
-import me.calebjones.spacelaunchnow.data.model.RoadmapStatus
 import me.calebjones.spacelaunchnow.data.repository.RemoteConfigRepository
 
 data class RoadmapUiState(
     val isLoading: Boolean = true,
     val roadmapData: RoadmapData? = null,
-    val errorMessage: String? = null
+    val errorMessage: String? = null,
+    /** True when the screen must show the built-in fallback roadmap (see placeholderRoadmapData). */
+    val usePlaceholder: Boolean = false
 )
 
 /**
@@ -42,7 +40,7 @@ class RoadmapViewModel(
 
     /**
      * Load roadmap data from Firebase Remote Config
-     * Falls back to placeholder data if remote config fails
+     * Falls back to the placeholder roadmap (usePlaceholder) if remote config fails
      */
     private suspend fun loadRoadmap(forceRefresh: Boolean) {
         _uiState.value = _uiState.value.copy(isLoading = true, errorMessage = null)
@@ -68,16 +66,13 @@ class RoadmapViewModel(
             
             val roadmapData = result.getOrNull()
             
-            // If remote data is empty or failed, use placeholder
-            val finalData = if (roadmapData == null || roadmapData.items.isEmpty()) {
-                loadPlaceholderData()
-            } else {
-                roadmapData
-            }
+            // If remote data is empty or failed, tell the screen to use the placeholder
+            val useFallback = roadmapData == null || roadmapData.items.isEmpty()
 
             _uiState.value = _uiState.value.copy(
                 isLoading = false,
-                roadmapData = finalData
+                roadmapData = if (useFallback) null else roadmapData,
+                usePlaceholder = useFallback
             )
         } catch (e: Exception) {
             handleError(e)
@@ -87,7 +82,8 @@ class RoadmapViewModel(
     private fun handleError(e: Throwable?) {
         _uiState.value = _uiState.value.copy(
             isLoading = false,
-            roadmapData = loadPlaceholderData(),
+            roadmapData = null,
+            usePlaceholder = true,
             errorMessage = "Using cached data: ${e?.message ?: "Unknown error"}"
         )
     }
@@ -100,82 +96,6 @@ class RoadmapViewModel(
         viewModelScope.launch {
             loadRoadmap(forceRefresh = true)
         }
-    }
-
-    /**
-     * Placeholder data for fallback when remote config is unavailable
-     * This data structure matches what Firebase Remote Config provides
-     */
-    private fun loadPlaceholderData(): RoadmapData {
-        return RoadmapData(
-            items = listOf(
-                RoadmapItem(
-                    id = "1",
-                    title = "Schedule page Sorting",
-                    description = "Customizable schedule page with advanced sorting options",
-                    status = RoadmapStatus.COMPLETED,
-                    quarter = "Early December 2025",
-                    category = RoadmapCategory.FEATURE,
-                    priority = RoadmapPriority.HIGH
-                ),
-                RoadmapItem(
-                    id = "2",
-                    title = "Starship | Rockets | Agencies | ISS Tracking",
-                    description = "New pages with additional content",
-                    status = RoadmapStatus.IN_TESTING,
-                    quarter = "February 2026",
-                    category = RoadmapCategory.FEATURE,
-                    priority = RoadmapPriority.MEDIUM
-                ),
-                RoadmapItem(
-                    id = "3",
-                    title = "Notification Filter Issues",
-                    description = "Users receiving notifications for locations they did not select",
-                    status = RoadmapStatus.IN_PROGRESS,
-                    quarter = "February 2026",
-                    category = RoadmapCategory.BUG_FIX,
-                    priority = RoadmapPriority.HIGH
-                ),
-                RoadmapItem(
-                    id = "4",
-                    title = "Initial iOS Launch",
-                    description = "MVP release of the all new Space Launch Now app for iOS devices",
-                    status = RoadmapStatus.IN_PROGRESS,
-                    quarter = "Q1 2026",
-                    category = RoadmapCategory.FEATURE,
-                    priority = RoadmapPriority.HIGH
-                ),
-                RoadmapItem(
-                    id = "5",
-                    title = "Astronauts Profiles",
-                    description = "Profiles for astronauts with mission history and biographies",
-                    status = RoadmapStatus.BACKLOG,
-                    quarter = "Q1 2026",
-                    category = RoadmapCategory.FEATURE,
-                    priority = RoadmapPriority.MEDIUM
-                ),
-                RoadmapItem(
-                    id = "6",
-                    title = "Launch Vehicles Page",
-                    description = "Detailed pages for launch vehicles with specifications and images",
-                    status = RoadmapStatus.BACKLOG,
-                    quarter = "Early 2026",
-                    category = RoadmapCategory.FEATURE,
-                    priority = RoadmapPriority.LOW
-                ),
-                RoadmapItem(
-                    id = "7",
-                    title = "Additional Widgets",
-                    description = "More home screen widgets with customizable themes",
-                    status = RoadmapStatus.BACKLOG,
-                    quarter = "Early 2026",
-                    category = RoadmapCategory.FEATURE,
-                    priority = RoadmapPriority.MEDIUM
-                )
-            ),
-            lastUpdated = "February 2026",
-            message = "This roadmap represents planned features and is subject to change based on user feedback and priorities."
-        )
     }
 
     /**

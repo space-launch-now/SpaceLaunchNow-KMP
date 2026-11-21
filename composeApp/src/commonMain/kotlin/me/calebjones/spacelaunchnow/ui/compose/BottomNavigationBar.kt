@@ -22,9 +22,10 @@ import me.calebjones.spacelaunchnow.navigation.Screen
 import me.calebjones.spacelaunchnow.navigation.Settings
 import me.calebjones.spacelaunchnow.ui.ads.SmartBannerAd
 import me.calebjones.spacelaunchnow.ui.ads.AdPlacementType
+import spacelaunchnow_kmp.composeapp.generated.resources.Res
 
 @Deprecated(
-    message = "Navigation is now handled by NavigationSuiteScaffold inside AdaptiveAppScaffold"
+    message = "Navigation is now handled by NavigationSuiteScaffold inside AdaptiveAppScaffold" // i18n-ignore: @Deprecated message, read by developers only
 )
 @Composable
 fun BottomNavigationBar(navController: NavHostController) {

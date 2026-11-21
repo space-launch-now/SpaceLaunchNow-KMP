@@ -30,6 +30,11 @@ import me.calebjones.spacelaunchnow.navigation.Rockets
 import me.calebjones.spacelaunchnow.ui.explore.ExploreSection
 import me.calebjones.spacelaunchnow.ui.theme.SpaceLaunchNowPreviewTheme
 import org.jetbrains.compose.ui.tooling.preview.Preview
+import spacelaunchnow_kmp.composeapp.generated.resources.Res
+import spacelaunchnow_kmp.composeapp.generated.resources.app_explore_card_rockets_content_description
+import spacelaunchnow_kmp.composeapp.generated.resources.app_explore_card_rockets_description
+import spacelaunchnow_kmp.composeapp.generated.resources.app_explore_card_rockets_title
+import org.jetbrains.compose.resources.stringResource
 
 /**
  * Card component for displaying a discoverable section in the Explore screen.
@@ -53,12 +58,13 @@ fun ExploreCard(
     val cardPadding = if (isLargeScreen) 16.dp else 12.dp
     val titleStyle = if (isLargeScreen) MaterialTheme.typography.titleMedium else MaterialTheme.typography.titleMedium
 
+    val cardContentDescription = stringResource(section.contentDescription)
     Card(
         modifier = modifier
             .fillMaxWidth()
             .height(cardHeight)
             .semantics {
-                contentDescription = section.contentDescription
+                contentDescription = cardContentDescription
             }
             .clickable(
                 enabled = true,
@@ -99,7 +105,7 @@ fun ExploreCard(
             ){
                 // Title
                 Text(
-                    text = section.title,
+                    text = stringResource(section.title),
                     style = titleStyle,
                     fontWeight = FontWeight.Bold,
                     textAlign = TextAlign.Center,
@@ -108,7 +114,7 @@ fun ExploreCard(
 
                 // Description
                 Text(
-                    text = section.description,
+                    text = stringResource(section.description),
                     style = MaterialTheme.typography.bodySmall,
                     textAlign = TextAlign.Center,
                     color = MaterialTheme.colorScheme.onSurfaceVariant,
@@ -126,11 +132,11 @@ private fun ExploreCardPreview() {
         ExploreCard(
             section = ExploreSection(
                 id = "rockets",
-                title = "Rockets",
-                description = "Browse launcher configurations and technical specifications",
+                title = Res.string.app_explore_card_rockets_title,
+                description = Res.string.app_explore_card_rockets_description,
                 icon = Icons.Filled.Rocket,
                 route = Rockets,
-                contentDescription = "Navigate to Rockets"
+                contentDescription = Res.string.app_explore_card_rockets_content_description
             ),
             onClick = {}
         )
@@ -144,11 +150,11 @@ private fun ExploreCardDarkPreview() {
         ExploreCard(
             section = ExploreSection(
                 id = "rockets",
-                title = "Rockets",
-                description = "Browse launcher configurations and technical specifications",
+                title = Res.string.app_explore_card_rockets_title,
+                description = Res.string.app_explore_card_rockets_description,
                 icon = Icons.Filled.Rocket,
                 route = Rockets,
-                contentDescription = "Navigate to Rockets"
+                contentDescription = Res.string.app_explore_card_rockets_content_description
             ),
             onClick = {}
         )
@@ -162,11 +168,11 @@ private fun ExploreCardLargeScreenPreview() {
         ExploreCard(
             section = ExploreSection(
                 id = "rockets",
-                title = "Rockets",
-                description = "Browse launcher configurations and technical specifications",
+                title = Res.string.app_explore_card_rockets_title,
+                description = Res.string.app_explore_card_rockets_description,
                 icon = Icons.Filled.Rocket,
                 route = Rockets,
-                contentDescription = "Navigate to Rockets"
+                contentDescription = Res.string.app_explore_card_rockets_content_description
             ),
             onClick = {},
             isLargeScreen = true
@@ -181,11 +187,11 @@ private fun ExploreCardLargeScreenDarkPreview() {
         ExploreCard(
             section = ExploreSection(
                 id = "rockets",
-                title = "Rockets",
-                description = "Browse launcher configurations and technical specifications",
+                title = Res.string.app_explore_card_rockets_title,
+                description = Res.string.app_explore_card_rockets_description,
                 icon = Icons.Filled.Rocket,
                 route = Rockets,
-                contentDescription = "Navigate to Rockets"
+                contentDescription = Res.string.app_explore_card_rockets_content_description
             ),
             onClick = {},
             isLargeScreen = true

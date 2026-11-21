@@ -27,6 +27,9 @@ import androidx.compose.ui.unit.dp
 import me.calebjones.spacelaunchnow.data.model.SortField
 import me.calebjones.spacelaunchnow.getPlatform
 import org.jetbrains.compose.ui.tooling.preview.Preview
+import spacelaunchnow_kmp.composeapp.generated.resources.Res
+import spacelaunchnow_kmp.composeapp.generated.resources.app_components_sort_menu_title
+import org.jetbrains.compose.resources.stringResource
 
 /**
  * Sort menu component that adapts to platform:
@@ -98,7 +101,7 @@ fun SortMenu(
                     .padding(bottom = 32.dp)
             ) {
                 Text(
-                    text = "Sort by",
+                    text = stringResource(Res.string.app_components_sort_menu_title),
                     style = MaterialTheme.typography.titleLarge,
                     fontWeight = FontWeight.Bold,
                     modifier = Modifier.padding(bottom = 16.dp)
@@ -140,7 +143,7 @@ private fun SortMenuPreview() {
                 currentSort = SortField.NAME_ASC,
                 onSortSelected = {},
                 onDismiss = {},
-                anchorView = { Text("Sort") }
+                anchorView = { Text("Sort") } // i18n-ignore: preview sample data
             )
         }
     }
