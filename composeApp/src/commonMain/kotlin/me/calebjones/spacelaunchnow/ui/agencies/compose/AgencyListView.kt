@@ -49,6 +49,17 @@ import coil3.compose.AsyncImage
 import me.calebjones.spacelaunchnow.domain.model.Agency
 import me.calebjones.spacelaunchnow.domain.model.Country
 import org.jetbrains.compose.ui.tooling.preview.Preview
+import org.jetbrains.compose.resources.stringResource
+import spacelaunchnow_kmp.composeapp.generated.resources.Res
+import spacelaunchnow_kmp.composeapp.generated.resources.agency_list_country_unknown
+import spacelaunchnow_kmp.composeapp.generated.resources.agency_list_empty_description
+import spacelaunchnow_kmp.composeapp.generated.resources.agency_list_empty_title
+import spacelaunchnow_kmp.composeapp.generated.resources.agency_list_error_heading
+import spacelaunchnow_kmp.composeapp.generated.resources.agency_list_logo_description
+import spacelaunchnow_kmp.composeapp.generated.resources.agency_list_title
+import spacelaunchnow_kmp.composeapp.generated.resources.common_back
+import spacelaunchnow_kmp.composeapp.generated.resources.common_error
+import spacelaunchnow_kmp.composeapp.generated.resources.common_retry
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -63,12 +74,12 @@ fun AgencyListView(
     Scaffold(
         topBar = {
             TopAppBar(
-                title = { Text("Agencies") },
+                title = { Text(stringResource(Res.string.agency_list_title)) },
                 navigationIcon = {
                     IconButton(onClick = onNavigateBack) {
                         Icon(
                             imageVector = Icons.AutoMirrored.Outlined.ArrowBack,
-                            contentDescription = "Back"
+                            contentDescription = stringResource(Res.string.common_back)
                         )
                     }
                 },
@@ -162,7 +173,7 @@ fun AgencyListItem(
                     ) {
                         AsyncImage(
                             model = logoUrl,
-                            contentDescription = "Agency logo",
+                            contentDescription = stringResource(Res.string.agency_list_logo_description),
                             contentScale = ContentScale.Crop,
                             modifier = Modifier
                                 .size(64.dp)
@@ -218,7 +229,7 @@ fun AgencyListItem(
                                 onClick = { },
                                 label = {
                                     Text(
-                                        text = country.name ?: "Unknown",
+                                        text = country.name ?: stringResource(Res.string.agency_list_country_unknown),
                                         style = MaterialTheme.typography.labelSmall
                                     )
                                 }
@@ -256,13 +267,13 @@ private fun ErrorContent(
     ) {
         Icon(
             imageVector = Icons.Default.Error,
-            contentDescription = "Error",
+            contentDescription = stringResource(Res.string.common_error),
             modifier = Modifier.size(64.dp),
             tint = MaterialTheme.colorScheme.error
         )
         Spacer(modifier = Modifier.height(16.dp))
         Text(
-            text = "Error loading agencies",
+            text = stringResource(Res.string.agency_list_error_heading),
             style = MaterialTheme.typography.titleLarge,
             textAlign = TextAlign.Center
         )
@@ -275,7 +286,7 @@ private fun ErrorContent(
         )
         Spacer(modifier = Modifier.height(16.dp))
         Button(onClick = onRetry) {
-            Text("Retry")
+            Text(stringResource(Res.string.common_retry))
         }
     }
 }
@@ -291,13 +302,13 @@ private fun EmptyContent() {
     ) {
         Icon(
             imageVector = Icons.Default.Business,
-            contentDescription = "No agencies",
+            contentDescription = stringResource(Res.string.agency_list_empty_description),
             modifier = Modifier.size(64.dp),
             tint = MaterialTheme.colorScheme.onSurfaceVariant
         )
         Spacer(modifier = Modifier.height(16.dp))
         Text(
-            text = "No agencies found",
+            text = stringResource(Res.string.agency_list_empty_title),
             style = MaterialTheme.typography.titleLarge,
             textAlign = TextAlign.Center
         )

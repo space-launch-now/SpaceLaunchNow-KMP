@@ -49,6 +49,18 @@ import me.calebjones.spacelaunchnow.ui.agencies.compose.AgencyListItem
 import me.calebjones.spacelaunchnow.ui.viewmodel.AgencyListViewModel
 import me.calebjones.spacelaunchnow.ui.viewmodel.AgencySortOrder
 import org.koin.compose.viewmodel.koinViewModel
+import org.jetbrains.compose.resources.stringResource
+import spacelaunchnow_kmp.composeapp.generated.resources.Res
+import spacelaunchnow_kmp.composeapp.generated.resources.agency_list_empty_hint
+import spacelaunchnow_kmp.composeapp.generated.resources.agency_list_empty_title
+import spacelaunchnow_kmp.composeapp.generated.resources.agency_list_error_title
+import spacelaunchnow_kmp.composeapp.generated.resources.agency_list_filter_description
+import spacelaunchnow_kmp.composeapp.generated.resources.agency_list_loading
+import spacelaunchnow_kmp.composeapp.generated.resources.agency_list_title
+import spacelaunchnow_kmp.composeapp.generated.resources.agency_list_title_with_count
+import spacelaunchnow_kmp.composeapp.generated.resources.agency_list_unknown_error
+import spacelaunchnow_kmp.composeapp.generated.resources.common_back
+import spacelaunchnow_kmp.composeapp.generated.resources.common_retry
 
 /**
  * Main screen for browsing agencies.
@@ -112,9 +124,9 @@ fun AgencyListScreen(
                     val hasFilters = activeFilterCount > 0
                     Text(
                         text = if (uiState.totalCount > 0 && hasFilters) {
-                            "Agencies (${uiState.totalCount})"
+                            stringResource(Res.string.agency_list_title_with_count, uiState.totalCount)
                         } else {
-                            "Agencies"
+                            stringResource(Res.string.agency_list_title)
                         }
                     )
                 },
@@ -122,7 +134,7 @@ fun AgencyListScreen(
                     IconButton(onClick = onNavigateBack) {
                         Icon(
                             imageVector = Icons.AutoMirrored.Outlined.ArrowBack,
-                            contentDescription = "Back"
+                            contentDescription = stringResource(Res.string.common_back)
                         )
                     }
                 },
@@ -140,7 +152,7 @@ fun AgencyListScreen(
                         ) {
                             Icon(
                                 imageVector = Icons.Default.FilterList,
-                                contentDescription = "Filter agencies"
+                                contentDescription = stringResource(Res.string.agency_list_filter_description)
                             )
                         }
                     }
@@ -161,7 +173,7 @@ fun AgencyListScreen(
                 // Error state
                 uiState.error != null && uiState.agencies.isEmpty() -> {
                     ErrorContent(
-                        errorMessage = uiState.error ?: "Unknown error",
+                        errorMessage = uiState.error ?: stringResource(Res.string.agency_list_unknown_error),
                         onRetry = { viewModel.refresh() }
                     )
                 }
@@ -258,7 +270,7 @@ private fun LoadingContent() {
         ) {
             LoadingIndicator()
             Text(
-                text = "Loading agencies...",
+                text = stringResource(Res.string.agency_list_loading),
                 style = MaterialTheme.typography.bodyLarge,
                 color = MaterialTheme.colorScheme.onSurfaceVariant
             )
@@ -287,7 +299,7 @@ private fun ErrorContent(
                 tint = MaterialTheme.colorScheme.error
             )
             Text(
-                text = "Failed to load agencies",
+                text = stringResource(Res.string.agency_list_error_title),
                 style = MaterialTheme.typography.titleMedium,
                 fontWeight = FontWeight.Bold,
                 textAlign = TextAlign.Center
@@ -299,7 +311,7 @@ private fun ErrorContent(
                 textAlign = TextAlign.Center
             )
             Button(onClick = onRetry) {
-                Text("Retry")
+                Text(stringResource(Res.string.common_retry))
             }
         }
     }
@@ -323,13 +335,13 @@ private fun EmptyContent() {
                 tint = MaterialTheme.colorScheme.onSurfaceVariant
             )
             Text(
-                text = "No agencies found",
+                text = stringResource(Res.string.agency_list_empty_title),
                 style = MaterialTheme.typography.titleMedium,
                 fontWeight = FontWeight.Bold,
                 textAlign = TextAlign.Center
             )
             Text(
-                text = "Try adjusting your filters",
+                text = stringResource(Res.string.agency_list_empty_hint),
                 style = MaterialTheme.typography.bodyMedium,
                 color = MaterialTheme.colorScheme.onSurfaceVariant,
                 textAlign = TextAlign.Center

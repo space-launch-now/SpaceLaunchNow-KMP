@@ -23,6 +23,11 @@ import kotlinx.datetime.LocalDate
 import me.calebjones.spacelaunchnow.domain.model.AstronautDetail
 import me.calebjones.spacelaunchnow.ui.theme.SpaceLaunchNowPreviewTheme
 import org.jetbrains.compose.ui.tooling.preview.Preview
+import org.jetbrains.compose.resources.stringResource
+import spacelaunchnow_kmp.composeapp.generated.resources.Res
+import spacelaunchnow_kmp.composeapp.generated.resources.astronaut_info_show_less
+import spacelaunchnow_kmp.composeapp.generated.resources.astronaut_info_show_more
+import spacelaunchnow_kmp.composeapp.generated.resources.astronaut_info_title
 
 /**
  * Card displaying astronaut biography.
@@ -51,7 +56,7 @@ fun AstronautInfoCard(
             verticalArrangement = Arrangement.spacedBy(12.dp)
         ) {
             Text(
-                text = "Biography",
+                text = stringResource(Res.string.astronaut_info_title),
                 style = MaterialTheme.typography.titleMedium,
                 fontWeight = FontWeight.Bold,
                 color = MaterialTheme.colorScheme.onSurfaceVariant
@@ -71,7 +76,7 @@ fun AstronautInfoCard(
                     onClick = { isExpanded = !isExpanded }
                 ) {
                     Text(
-                        text = if (isExpanded) "Show Less" else "Show More",
+                        text = if (isExpanded) stringResource(Res.string.astronaut_info_show_less) else stringResource(Res.string.astronaut_info_show_more),
                         style = MaterialTheme.typography.labelLarge,
                         fontWeight = FontWeight.SemiBold
                     )
