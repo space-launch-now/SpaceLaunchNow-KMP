@@ -25,16 +25,16 @@ import androidx.compose.ui.unit.dp
 import me.calebjones.spacelaunchnow.PlatformType
 import me.calebjones.spacelaunchnow.getPlatform
 import org.jetbrains.compose.resources.stringResource
-import spacelaunchnow.composeapp.generated.resources.Res
-import spacelaunchnow.composeapp.generated.resources.fine_print_auto_renew_notice
-import spacelaunchnow.composeapp.generated.resources.fine_print_billing_note_android
-import spacelaunchnow.composeapp.generated.resources.fine_print_billing_note_ios
-import spacelaunchnow.composeapp.generated.resources.fine_print_billing_note_other
-import spacelaunchnow.composeapp.generated.resources.fine_print_manage_app_store
-import spacelaunchnow.composeapp.generated.resources.fine_print_manage_generic
-import spacelaunchnow.composeapp.generated.resources.fine_print_manage_google_play
-import spacelaunchnow.composeapp.generated.resources.fine_print_secure_billing_title
-import spacelaunchnow.composeapp.generated.resources.fine_print_trial_disclosure
+import spacelaunchnow_kmp.composeapp.generated.resources.Res
+import spacelaunchnow_kmp.composeapp.generated.resources.fine_print_auto_renew_notice
+import spacelaunchnow_kmp.composeapp.generated.resources.fine_print_billing_note_android
+import spacelaunchnow_kmp.composeapp.generated.resources.fine_print_billing_note_ios
+import spacelaunchnow_kmp.composeapp.generated.resources.fine_print_billing_note_other
+import spacelaunchnow_kmp.composeapp.generated.resources.fine_print_manage_app_store
+import spacelaunchnow_kmp.composeapp.generated.resources.fine_print_manage_generic
+import spacelaunchnow_kmp.composeapp.generated.resources.fine_print_manage_google_play
+import spacelaunchnow_kmp.composeapp.generated.resources.fine_print_secure_billing_title
+import spacelaunchnow_kmp.composeapp.generated.resources.fine_print_trial_disclosure
 
 /**
  * Standard subscription fine-print footer shown on subscription screens.
