@@ -120,6 +120,7 @@ import spacelaunchnow_kmp.composeapp.generated.resources.support_us_lifetime_tit
 import spacelaunchnow_kmp.composeapp.generated.resources.support_us_loading_pricing
 import spacelaunchnow_kmp.composeapp.generated.resources.support_us_logo_description
 import spacelaunchnow_kmp.composeapp.generated.resources.support_us_making_difference
+import spacelaunchnow_kmp.composeapp.generated.resources.support_us_member_plan
 import spacelaunchnow_kmp.composeapp.generated.resources.support_us_open_form_description
 import spacelaunchnow_kmp.composeapp.generated.resources.support_us_or_go_lifetime
 import spacelaunchnow_kmp.composeapp.generated.resources.support_us_period_month
@@ -1407,7 +1408,10 @@ private fun CurrentPlanCard(
                             }
                         }
 
-                        subscriptionState.isSubscribed -> "${subscriptionState.subscriptionType.name.replaceFirstChar { it.uppercase() }} Member"
+                        subscriptionState.isSubscribed -> stringResource(
+                            Res.string.support_us_member_plan,
+                            subscriptionState.subscriptionType.name.replaceFirstChar { it.uppercase() }
+                        )
                         else -> stringResource(Res.string.support_us_free_user)
                     },
                     style = MaterialTheme.typography.headlineSmall,

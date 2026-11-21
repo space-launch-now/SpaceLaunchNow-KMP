@@ -183,6 +183,8 @@
     </plurals>
     <!-- Plan status for a person who is not a member. -->
     <string name="support_us_free_user">Free User</string>
+    <!-- Plan status for a subscriber. %1$s is the plan name, such as Pro or Lifetime. -->
+    <string name="support_us_member_plan">%1$s Member</string>
     <!-- Line on the current plan card. %1$s is the store product name. -->
     <string name="support_us_product_line">Product: %1$s</string>
     <!-- Line on the current plan card for a person who is not a member. One or two lines. -->
