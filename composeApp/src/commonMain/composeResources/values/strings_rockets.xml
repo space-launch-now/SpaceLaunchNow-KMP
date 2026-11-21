@@ -1,0 +1,161 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- Rocket list top bar title, no filters active. One line. -->
+    <string name="rockets_list_title">Rockets</string>
+    <!-- Rocket list top bar title when filters are active. %1$d is the number of matching rockets. One line. -->
+    <string name="rockets_list_title_filtered">Rockets (%1$d)</string>
+    <!-- Content description of the filter icon button in the rocket list top bar. Read by screen readers. -->
+    <string name="rockets_list_filter_description">Filter rockets</string>
+    <!-- Error message on the rocket list when the load failed and no message came from the server. One line. -->
+    <string name="rockets_list_error_unknown">Unknown error</string>
+    <!-- Text under the spinner while the rocket list loads the first time. One line. -->
+    <string name="rockets_list_loading">Loading rockets...</string>
+    <!-- Heading of the rocket list error state, above the error message. One or two lines, bold. -->
+    <string name="rockets_list_error_title">Failed to load rockets</string>
+    <!-- Heading of the empty rocket list, above the hint. One or two lines, bold. -->
+    <string name="rockets_list_empty_title">No rockets found</string>
+    <!-- Hint under the empty rocket list heading. One or two lines. -->
+    <string name="rockets_list_empty_message">Try adjusting your filters</string>
+    <!-- Content description of a rocket picture in the list. %1$s is the rocket name. Read by screen readers. -->
+    <string name="rockets_list_item_image_description">%1$s image</string>
+    <!-- Small badge on a rocket list card. One word. Shown when the rocket is in service. -->
+    <string name="rockets_status_active">Active</string>
+    <!-- Value of the Status row on the rocket detail screen. One word. Shown when the rocket is out of service. -->
+    <string name="rockets_status_inactive">Inactive</string>
+    <!-- Small badge on a rocket list card. One word. Shown when the rocket can fly again. -->
+    <string name="rockets_list_item_reusable">Reusable</string>
+
+    <!-- Card heading on the rocket detail screen, above the basic facts. One line, bold. -->
+    <string name="rockets_detail_info_title">Rocket Information</string>
+    <!-- Card heading on the rocket detail screen, above the rocket description text. One line, bold. -->
+    <string name="rockets_detail_description_title">Description</string>
+    <!-- Card heading on the rocket detail screen, above size and thrust rows. One line, bold. -->
+    <string name="rockets_detail_performance_title">Performance</string>
+    <!-- Card heading on the rocket detail screen, above the orbit payload rows. One line, bold. -->
+    <string name="rockets_detail_capacity_title">Payload Capacity</string>
+    <!-- Card heading on the rocket detail screen, above the launch count rows. One line, bold. -->
+    <string name="rockets_detail_launch_stats_title">Launch Statistics</string>
+    <!-- Card heading on the rocket detail screen, above the landing count rows. One line, bold. -->
+    <string name="rockets_detail_landing_stats_title">Landing Statistics</string>
+    <!-- Row label format on the rocket detail screen. %1$s is the row label, such as Length. Keep the colon style of the language. -->
+    <string name="rockets_detail_label_format">%1$s:</string>
+    <!-- Row label, left column. The rocket full name is the value. -->
+    <string name="rockets_detail_label_full_name">Full Name</string>
+    <!-- Row label, left column. The rocket variant is the value. -->
+    <string name="rockets_detail_label_variant">Variant</string>
+    <!-- Row label, left column. The maker of the rocket is the value. -->
+    <string name="rockets_detail_label_manufacturer">Manufacturer</string>
+    <!-- Row label, left column. The date of the first flight is the value. -->
+    <string name="rockets_detail_label_maiden_flight">Maiden Flight</string>
+    <!-- Row label, left column. The value is Active or Inactive. -->
+    <string name="rockets_detail_label_status">Status</string>
+    <!-- Row label, left column. The value is Yes or No. -->
+    <string name="rockets_detail_label_reusable">Reusable</string>
+    <!-- Row label, left column. The value is a number of stages or a range such as 1-2. -->
+    <string name="rockets_detail_label_stages">Stages</string>
+    <!-- Row value. Answer to a yes or no question such as Reusable. One word. -->
+    <string name="rockets_detail_value_yes">Yes</string>
+    <!-- Row value. Answer to a yes or no question such as Reusable. One word. -->
+    <string name="rockets_detail_value_no">No</string>
+    <!-- Row value, range of stages. %1$d is the fewest stages, %2$d the most stages. Example: 1-2. -->
+    <string name="rockets_detail_stages_range">%1$d-%2$d</string>
+    <!-- Row label, left column. The rocket length is the value. -->
+    <string name="rockets_detail_label_length">Length</string>
+    <!-- Row label, left column. The rocket diameter is the value. -->
+    <string name="rockets_detail_label_diameter">Diameter</string>
+    <!-- Row label, left column. The mass at launch is the value. -->
+    <string name="rockets_detail_label_launch_mass">Launch Mass</string>
+    <!-- Row label, left column. The thrust at liftoff is the value. -->
+    <string name="rockets_detail_label_liftoff_thrust">Liftoff Thrust</string>
+    <!-- Row label, left column. The cost of one launch is the value. -->
+    <string name="rockets_detail_label_launch_cost">Launch Cost</string>
+    <!-- Row value, length in meters. %1$s is a formatted number such as 70.0. -->
+    <string name="rockets_detail_value_meters">%1$s m</string>
+    <!-- Row value, mass in kilograms. %1$s is a formatted number such as 549054. -->
+    <string name="rockets_detail_value_kilograms">%1$s kg</string>
+    <!-- Row value, thrust in kilonewtons. %1$s is a formatted number such as 7607. -->
+    <string name="rockets_detail_value_kilonewtons">%1$s kN</string>
+    <!-- Row value, cost in millions of US dollars. %1$s is a formatted number such as 67. Keep the dollar sign and the M. -->
+    <string name="rockets_detail_value_cost_millions">$%1$sM</string>
+    <!-- Row label, left column. Payload to low Earth orbit. Orbit code, keep short. -->
+    <string name="rockets_detail_label_leo">LEO</string>
+    <!-- Row label, left column. Payload to geostationary transfer orbit. Orbit code, keep short. -->
+    <string name="rockets_detail_label_gto">GTO</string>
+    <!-- Row label, left column. Payload to geostationary orbit. Orbit code, keep short. -->
+    <string name="rockets_detail_label_geo">GEO</string>
+    <!-- Row label, left column. Payload to sun-synchronous orbit. Orbit code, keep short. -->
+    <string name="rockets_detail_label_sso">SSO</string>
+    <!-- Row label, left column. The number of launches is the value. -->
+    <string name="rockets_detail_label_total_launches">Total Launches</string>
+    <!-- Row label, left column, on the launch and the landing cards. The count of successes is the value. -->
+    <string name="rockets_detail_label_successful">Successful</string>
+    <!-- Row label, left column, on the launch and the landing cards. The count of failures is the value. -->
+    <string name="rockets_detail_label_failed">Failed</string>
+    <!-- Row label, left column. The count of launches not flown yet is the value. -->
+    <string name="rockets_detail_label_pending">Pending</string>
+    <!-- Row label, left column, on the launch and the landing cards. The count of successes in a row is the value. -->
+    <string name="rockets_detail_label_consecutive_successes">Consecutive Successes</string>
+    <!-- Row label, left column. The count of landing attempts is the value. -->
+    <string name="rockets_detail_label_attempted">Attempted</string>
+
+    <!-- Title of the rocket filter sheet. One line, large heading. Ampersand is written as an entity. -->
+    <string name="rockets_filter_title">Filter &amp; Sort</string>
+    <!-- Text button in the filter sheet header. Clears every filter. One line, max 14 chars. -->
+    <string name="rockets_filter_clear_all">Clear All</string>
+    <!-- Card heading in the filter sheet, above the search field. One line. -->
+    <string name="rockets_filter_search_title">Search</string>
+    <!-- Floating label of the search field in the filter sheet. One line. -->
+    <string name="rockets_filter_search_label">Rocket Name</string>
+    <!-- Placeholder of the search field in the filter sheet. Example rocket names. One line. -->
+    <string name="rockets_filter_search_placeholder">e.g., Falcon, Atlas, Starship</string>
+    <!-- Button under the search field. Empties the search text. One line, max 14 chars. -->
+    <string name="rockets_filter_search_clear">Clear</string>
+    <!-- Button under the search field. Runs the search. One line, max 14 chars. -->
+    <string name="rockets_filter_search_apply">Apply</string>
+    <!-- Card heading in the filter sheet, above the sort order menu. One line. -->
+    <string name="rockets_filter_sort_title">Sort By</string>
+    <!-- Card heading in the filter sheet, above the status and program filters. One line. -->
+    <string name="rockets_filter_section_title">Filters</string>
+    <!-- Label above the active status segmented buttons. One line. -->
+    <string name="rockets_filter_active_title">Active Status</string>
+    <!-- Segmented button. No filter on this setting. One word, max 12 chars. -->
+    <string name="rockets_filter_option_all">All</string>
+    <!-- Segmented button. Shows rockets in service only. Max 12 chars. -->
+    <string name="rockets_filter_active_only">Active Only</string>
+    <!-- Segmented button. Shows rockets out of service only. One word, max 12 chars. -->
+    <string name="rockets_filter_retired">Retired</string>
+    <!-- Label above the reusable segmented buttons. One line. -->
+    <string name="rockets_filter_reusable_title">Reusability</string>
+    <!-- Segmented button. Shows rockets that can fly again only. One word, max 12 chars. -->
+    <string name="rockets_filter_reusable">Reusable</string>
+    <!-- Segmented button. Shows rockets that fly once only. One word, max 12 chars. -->
+    <string name="rockets_filter_expendable">Expendable</string>
+    <!-- Heading above the program filter field. One line. -->
+    <string name="rockets_filter_programs_title">Programs</string>
+    <!-- Heading above the rocket family filter field. One line. -->
+    <string name="rockets_filter_families_title">Families</string>
+    <!-- Small text in the filter sheet while the program and family lists load. One line. -->
+    <string name="rockets_filter_loading">Loading filter options...</string>
+    <!-- Small text in the filter sheet when the program and family lists are empty. One line. -->
+    <string name="rockets_filter_none_loaded">No filter options loaded</string>
+    <!-- Text button under the empty-options message. Loads the lists again. One line. -->
+    <string name="rockets_filter_reload">Reload Options</string>
+    <!-- Text button at the end of the filter section. Loads the lists again. One line. -->
+    <string name="rockets_filter_refresh">Refresh Filter Options</string>
+    <!-- Button at the bottom of the filter sheet. Closes the sheet. One word. -->
+    <string name="rockets_filter_close">Close</string>
+    <!-- Content description of the close icon on a selected filter chip. Read by screen readers. -->
+    <string name="rockets_filter_remove_description">Remove filter</string>
+    <!-- Content description of the check icon on a selected filter option. Read by screen readers. -->
+    <string name="rockets_filter_selected_description">Selected</string>
+    <!-- Disabled menu item when the filter search matches no option. One line. -->
+    <string name="rockets_filter_no_results">No results found</string>
+    <!-- Placeholder of a filter field when nothing is selected. One line. -->
+    <string name="rockets_filter_select_placeholder">Select options...</string>
+    <!-- Placeholder of a filter field when options are selected. %1$d is the number of selected options. One line. -->
+    <string name="rockets_filter_selected_count">%1$d selected</string>
+    <!-- Content description of the dropdown arrow when the menu is open. Read by screen readers. -->
+    <string name="rockets_filter_collapse_description">Collapse</string>
+    <!-- Content description of the dropdown arrow when the menu is closed. Read by screen readers. -->
+    <string name="rockets_filter_expand_description">Expand</string>
+</resources>

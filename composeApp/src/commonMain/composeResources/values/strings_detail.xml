@@ -1,0 +1,346 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- Content description of the info icon on the Website button. Read by screen readers. -->
+    <string name="launch_detail_info_description">Information</string>
+    <!-- Button label, one word. Opens the website of an agency, rocket or location. -->
+    <string name="launch_detail_link_website">Website</string>
+    <!-- Content description of the Wikipedia icon on the Wikipedia button. Read by screen readers. -->
+    <string name="launch_detail_link_wikipedia_description">Wikipedia</string>
+    <!-- Button label, one word. Opens the Wikipedia page of an agency, rocket or location. -->
+    <string name="launch_detail_link_wikipedia">Wikipedia</string>
+    <!-- Statistic label under a percentage. Two short lines; the line break is part of the text. -->
+    <string name="launch_detail_stat_success_rate">Success\nRate</string>
+    <!-- Statistic label under a launch count. Two short lines; the line break is part of the text. -->
+    <string name="launch_detail_stat_total_launches">Total\nLaunches</string>
+    <!-- Statistic label under a launch count. Two short lines; the line break is part of the text. -->
+    <string name="launch_detail_stat_successful_launches">Successful\nLaunches</string>
+    <!-- Statistic label under a launch count. Two short lines; the line break is part of the text. -->
+    <string name="launch_detail_stat_failed_launches">Failed\nLaunches</string>
+    <!-- Content description of the agency logo image. Read by screen readers. -->
+    <string name="launch_detail_agency_logo_description">Agency logo</string>
+    <!-- Content description of the placeholder agency icon, shown when the logo is missing. Read by screen readers. -->
+    <string name="launch_detail_agency_icon_description">Agency</string>
+    <!-- Label of an info tile on the agency card. One word; the value is the agency type, such as Government. -->
+    <string name="launch_detail_agency_tile_type">Type</string>
+    <!-- Label of an info tile on the agency card. One word; the value is a year. -->
+    <string name="launch_detail_agency_tile_founded">Founded</string>
+    <!-- Label of an info tile on the agency card, max 14 chars. The value is a person's name. -->
+    <string name="launch_detail_agency_tile_administrator">Administrator</string>
+    <!-- Label of an info tile on the agency card. One word; the value is a country code. -->
+    <string name="launch_detail_agency_tile_country">Country</string>
+    <!-- Heading above the agency description on the agency card. One line. -->
+    <string name="launch_detail_agency_about_heading">About</string>
+    <!-- Heading above the list of alternate videos for a launch. One line. -->
+    <string name="launch_detail_videos_more_heading">More Videos</string>
+    <!-- Content description of the play button on a video row. Read by screen readers. -->
+    <string name="launch_detail_videos_open_description">Open video in app</string>
+    <!-- Badge on a video thumbnail while the stream is live. One word, max 6 chars. -->
+    <string name="launch_detail_videos_live_badge">LIVE</string>
+    <!-- Value shown when a time or result is not known yet. Max 4 chars. -->
+    <string name="launch_detail_value_tbd">TBD</string>
+    <!-- Value shown when a name or place is missing. One word. -->
+    <string name="launch_detail_value_unknown">Unknown</string>
+    <!-- Label of an info tile with the launch weather probability. One word. -->
+    <string name="launch_detail_tile_weather">Weather</string>
+    <!-- Label of an info tile with the landing result. One word. -->
+    <string name="launch_detail_landing_tile_result">Result</string>
+    <!-- Content description of the info button on the launch time. Opens the precision dialog. Read by screen readers. -->
+    <string name="launch_detail_precision_info_description">Launch time precision info</string>
+    <!-- Label of an info tile with the mission name. One word. -->
+    <string name="launch_detail_tile_mission">Mission</string>
+    <!-- Label of an info tile with the launch pad location. Two words. -->
+    <string name="launch_detail_tile_launch_site">Launch Site</string>
+    <!-- Landing summary in an info tile. %1$d is the number of successful landings, %2$d the number of attempts. One line. -->
+    <string name="launch_detail_landing_success_count">%1$d/%2$d Success</string>
+    <!-- Landing summary in an info tile when one landing is attempted. One word. -->
+    <string name="launch_detail_landing_attempt_single">Attempt</string>
+    <!-- Landing summary in an info tile. %1$d is the number of landing attempts. One line. -->
+    <plurals name="launch_detail_landing_attempts_count">
+        <item quantity="one">%1$d Attempt</item>
+        <item quantity="other">%1$d Attempts</item>
+    </plurals>
+    <!-- Label of an info tile with the landing summary. One word. -->
+    <string name="launch_detail_tile_landing">Landing</string>
+    <!-- Label above one launch country. One word. -->
+    <string name="launch_detail_country_single">Country</string>
+    <!-- Label above several launch countries. One word. -->
+    <string name="launch_detail_country_multiple">Countries</string>
+    <!-- Heading of the crew card on a launch. One line. -->
+    <string name="launch_detail_crew_heading">Crew Information</string>
+    <!-- Sub-heading above the crew that launches. One line. -->
+    <string name="launch_detail_crew_launch">Launch Crew</string>
+    <!-- Sub-heading above the crew that stays on the spacecraft. One line. -->
+    <string name="launch_detail_crew_onboard">Onboard Crew</string>
+    <!-- Sub-heading above the crew that lands. One line. -->
+    <string name="launch_detail_crew_landing">Landing Crew</string>
+    <!-- Name shown when an astronaut has no name. Two words. -->
+    <string name="launch_detail_crew_unknown_astronaut">Unknown Astronaut</string>
+    <!-- Role shown when a crew member has no role. Two words. -->
+    <string name="launch_detail_crew_unknown_role">Crew Member</string>
+    <!-- Content description of the Flight Club logo. Read by screen readers. -->
+    <string name="launch_detail_flightclub_logo_description">Flight Club</string>
+    <!-- Button text on the Flight Club card. Opens the Flight Club website. One or two lines. -->
+    <string name="launch_detail_flightclub_button">View Telemetry on Flight Club</string>
+    <!-- Content description of the external link icon on the Flight Club card. Read by screen readers. -->
+    <string name="launch_detail_flightclub_link_description">Open external link</string>
+    <!-- Text button under a long description. Collapses the text. Two words. -->
+    <string name="launch_detail_read_less">Read less</string>
+    <!-- Text button under a long description. Expands the text. Two words. -->
+    <string name="launch_detail_read_more">Read more</string>
+    <!-- Heading of a rocket stage card. %1$d is the stage number, starting at 1. One line. -->
+    <string name="launch_detail_landing_stage_number">Stage #%1$d</string>
+    <!-- Tag on a rocket stage card. %1$s is the flight number of the booster. One line. -->
+    <string name="launch_detail_landing_flight_number">Flight #%1$s</string>
+    <!-- Label of an info row with the date of the previous flight of the booster. Two words. -->
+    <string name="launch_detail_landing_previous_flight">Previous Flight</string>
+    <!-- Label of an info row with the booster turnaround time. One word. -->
+    <string name="launch_detail_landing_turnaround">Turnaround</string>
+    <!-- Label of an info tile with the rocket stage type. Two words. -->
+    <string name="launch_detail_landing_tile_stage_type">Stage Type</string>
+    <!-- Label of an info tile with the landing type. Two words. -->
+    <string name="launch_detail_landing_tile_landing_type">Landing Type</string>
+    <!-- Label of an info tile that says if a landing was attempted. One word. -->
+    <string name="launch_detail_landing_tile_attempt">Attempt</string>
+    <!-- Answer value in an info tile. One word. -->
+    <string name="launch_detail_value_yes">Yes</string>
+    <!-- Answer value in an info tile. One word. -->
+    <string name="launch_detail_value_no">No</string>
+    <!-- Value of the landing result tile. One word. -->
+    <string name="launch_detail_landing_result_success">Success</string>
+    <!-- Value of the landing result tile. One word. -->
+    <string name="launch_detail_landing_result_failure">Failure</string>
+    <!-- Heading of the landing details block on a rocket stage card. Two words. -->
+    <string name="launch_detail_landing_details_heading">Landing Details</string>
+    <!-- Label of an info row with the landing location. One word. -->
+    <string name="launch_detail_landing_location">Location</string>
+    <!-- Label of an info row with the downrange landing distance. One word. -->
+    <string name="launch_detail_landing_downrange">Downrange</string>
+    <!-- Landing distance in kilometres. %1$s is a number, or the text for a missing value. -->
+    <string name="launch_detail_landing_downrange_value">%1$s km</string>
+    <!-- Value shown when a number is not available. Max 4 chars. -->
+    <string name="launch_detail_value_na">N/A</string>
+    <!-- Text button under a long description. Collapses the text. Two words. -->
+    <string name="launch_detail_show_less_lower">Show less</string>
+    <!-- Text button under a long description. Expands the text. Two words. -->
+    <string name="launch_detail_show_more_lower">Show more</string>
+    <!-- Content description of the location photo. Read by screen readers. -->
+    <string name="launch_detail_location_image_description">Location Image</string>
+    <!-- Content description of the location map image. Read by screen readers. -->
+    <string name="launch_detail_location_map_description">Location Map</string>
+    <!-- Content description of the country flag image. Read by screen readers. -->
+    <string name="launch_detail_location_flag_description">Flag</string>
+    <!-- Content description of the launch pad photo. Read by screen readers. -->
+    <string name="launch_detail_pad_image_description">Pad Image</string>
+    <!-- Content description of the launch pad map image. Read by screen readers. -->
+    <string name="launch_detail_pad_map_description">Pad Map</string>
+    <!-- Line of small text on the pad card. %1$s is the latitude, %2$s the longitude, both decimal numbers. -->
+    <string name="launch_detail_pad_coordinates">Coordinates: %1$s, %2$s</string>
+    <!-- Content description of the map icon on the Open Map button. Read by screen readers. -->
+    <string name="launch_detail_pad_map_icon_description">Map</string>
+    <!-- Button label. Opens the pad location in a map app. Two words. -->
+    <string name="launch_detail_pad_open_map">Open Map</string>
+    <!-- Label under the number of launches from a pad. One word. -->
+    <string name="launch_detail_pad_stat_launches">Launches</string>
+    <!-- Label under the number of orbital launch attempts from a pad. Two words. -->
+    <string name="launch_detail_pad_stat_orbital_attempts">Orbital Attempts</string>
+    <!-- Line of small text on the pad card. %1$s is a duration such as 3 days. -->
+    <string name="launch_detail_pad_fastest_turnaround">Fastest Turnaround: %1$s</string>
+    <!-- Text button under the list of launch updates. %1$d is the number of hidden updates. One line. -->
+    <string name="launch_detail_updates_show_more">Show More (%1$d more)</string>
+    <!-- Text button under a list. Collapses the list. Two words. -->
+    <string name="launch_detail_show_less">Show Less</string>
+    <!-- Content description of the rocket image. Read by screen readers. -->
+    <string name="launch_detail_vehicle_image_description">Rocket image</string>
+    <!-- Name shown when a rocket has no name. Two words. -->
+    <string name="launch_detail_vehicle_unknown_name">Unknown Rocket</string>
+    <!-- Chip on the rocket card. One word. -->
+    <string name="launch_detail_vehicle_status_active">Active</string>
+    <!-- Chip on the rocket card. One word. -->
+    <string name="launch_detail_vehicle_status_inactive">Inactive</string>
+    <!-- Chip on the rocket card. One word. -->
+    <string name="launch_detail_vehicle_status_reusable">Reusable</string>
+    <!-- Chip on the rocket card. One word. -->
+    <string name="launch_detail_vehicle_status_expendable">Expendable</string>
+    <!-- Label of an info tile with the rocket manufacturer. One word. -->
+    <string name="launch_detail_vehicle_tile_manufacturer">Manufacturer</string>
+    <!-- Label of an info tile with the rocket variant. One word. -->
+    <string name="launch_detail_vehicle_tile_variant">Variant</string>
+    <!-- Label of an info tile with another name of the rocket. One word. -->
+    <string name="launch_detail_vehicle_tile_alias">Alias</string>
+    <!-- Label of an info tile with the rocket family. One word. -->
+    <string name="launch_detail_vehicle_tile_family">Family</string>
+    <!-- Label of an info tile with several rocket families. One word. -->
+    <string name="launch_detail_vehicle_tile_families">Families</string>
+    <!-- Label of an info tile with the number of rocket stages. One word. -->
+    <string name="launch_detail_vehicle_tile_stages">Stages</string>
+    <!-- Label of an info tile with the date of the first flight of the rocket. Two words. -->
+    <string name="launch_detail_vehicle_tile_maiden_flight">Maiden Flight</string>
+    <!-- Label of an info tile with the shortest time between two flights. Two words. -->
+    <string name="launch_detail_vehicle_tile_fastest_turnaround">Fastest Turnaround</string>
+    <!-- Heading of the expandable list of rocket specifications. One line. -->
+    <string name="launch_detail_vehicle_specifications_heading">Specifications</string>
+    <!-- Content description of the arrow icon of an open section. Read by screen readers. -->
+    <string name="launch_detail_vehicle_collapse_description">Collapse</string>
+    <!-- Content description of the arrow icon of a closed section. Read by screen readers. -->
+    <string name="launch_detail_vehicle_expand_description">Expand</string>
+    <!-- Label of a rocket specification. One word. -->
+    <string name="launch_detail_vehicle_spec_length">Length</string>
+    <!-- Label of a rocket specification. One word. -->
+    <string name="launch_detail_vehicle_spec_diameter">Diameter</string>
+    <!-- Label of a rocket specification, the mass at lift-off. Two words. -->
+    <string name="launch_detail_vehicle_spec_launch_mass">Launch Mass</string>
+    <!-- Label of a rocket specification, the price of one launch. Two words. -->
+    <string name="launch_detail_vehicle_spec_launch_cost">Launch Cost</string>
+    <!-- Label of a rocket specification: payload to low Earth orbit. Abbreviation, max 4 chars. -->
+    <string name="launch_detail_vehicle_spec_leo">LEO</string>
+    <!-- Label of a rocket specification: payload to geostationary transfer orbit. Abbreviation, max 4 chars. -->
+    <string name="launch_detail_vehicle_spec_gto">GTO</string>
+    <!-- Label of a rocket specification: payload to geostationary orbit. Abbreviation, max 4 chars. -->
+    <string name="launch_detail_vehicle_spec_geo">GEO</string>
+    <!-- Label of a rocket specification: payload to sun-synchronous orbit. Abbreviation, max 4 chars. -->
+    <string name="launch_detail_vehicle_spec_sso">SSO</string>
+    <!-- Label of a rocket specification. One word. -->
+    <string name="launch_detail_vehicle_spec_thrust">Thrust</string>
+    <!-- Value of the thrust specification, followed by a second value. %1$s is a number. -->
+    <string name="launch_detail_vehicle_spec_thrust_value">%1$s to</string>
+    <!-- Label of a rocket specification, the highest point of the orbit. One word. -->
+    <string name="launch_detail_vehicle_spec_apogee">Apogee</string>
+    <!-- Heading above the launch statistics of a rocket. One line. -->
+    <string name="launch_detail_vehicle_statistics_heading">Launch Vehicle Statistics</string>
+    <!-- Statistic label under a launch count. Two short lines; the line break is part of the text. -->
+    <string name="launch_detail_stat_pending_launches">Pending\nLaunches</string>
+    <!-- Statistic label under a count of successes in a row. Two short lines; the line break is part of the text. -->
+    <string name="launch_detail_stat_consecutive_success">Consecutive\nSuccess</string>
+    <!-- Heading above the landing statistics of a rocket. One line. -->
+    <string name="launch_detail_vehicle_landing_statistics_heading">Landing Statistics</string>
+    <!-- Statistic label under a landing count. Two short lines; the line break is part of the text. -->
+    <string name="launch_detail_stat_attempted_landings">Attempted\nLandings</string>
+    <!-- Statistic label under a landing count. Two short lines; the line break is part of the text. -->
+    <string name="launch_detail_stat_successful_landings">Successful\nLandings</string>
+    <!-- Statistic label under a landing count. Two short lines; the line break is part of the text. -->
+    <string name="launch_detail_stat_failed_landings">Failed\nLandings</string>
+    <!-- Content description of the mission patch image. Read by screen readers. -->
+    <string name="launch_detail_mission_patch_description">Mission Patch</string>
+    <!-- Content description of the placeholder icon shown when the mission patch fails to load. Read by screen readers. -->
+    <string name="launch_detail_mission_icon_description">Mission</string>
+    <!-- Name shown when a mission has no name. Two words. -->
+    <string name="launch_detail_mission_unknown_name">Unknown Mission</string>
+    <!-- Button that closes the launch time precision dialog. One word, max 6 chars. -->
+    <string name="launch_detail_precision_ok">OK</string>
+    <!-- Title of the dialog that explains how exact the launch time is. One line. -->
+    <string name="launch_detail_precision_title">Launch Time Precision</string>
+    <!-- Body of the dialog that explains how exact the launch time is. Several lines. NET means No Earlier Than. -->
+    <string name="launch_detail_precision_body">The launch NET (No Earlier Than) value is supplied by the provider and precision may vary. NET can represent a fully scheduled time, an approximate window, only a year, only a month, etc. Some launches only have rough or placeholder NET values until closer to launch.</string>
+    <!-- Label under a launch count in the Quick Facts grid. Two short lines; the line break is part of the text. -->
+    <string name="launch_detail_facts_launch_all_time">Launch\nAll Time</string>
+    <!-- Label under a launch count in the Quick Facts grid. Two short lines; the line break is part of the text. -->
+    <string name="launch_detail_facts_location_all_time">Location\nAll Time</string>
+    <!-- Label under a launch count in the Quick Facts grid. %1$s is a year such as 2026. Two short lines; the line break is part of the text. -->
+    <string name="launch_detail_facts_total_year">Total\n%1$s</string>
+    <!-- Heading above the grid of launch count cards. One line. -->
+    <string name="launch_detail_quick_facts_heading">Quick Facts</string>
+    <!-- Text button under the list of related events. %1$d is the number of hidden events. One line. -->
+    <string name="launch_detail_events_load_more">Load More (%1$d more)</string>
+    <!-- Content description of the image of a related event. Read by screen readers. -->
+    <string name="launch_detail_event_image_description">Event Image</string>
+    <!-- Content description of the placeholder icon of a related event. Read by screen readers. -->
+    <string name="launch_detail_event_icon_description">Event Icon</string>
+    <!-- Message under a spinner while related events load. One line. -->
+    <string name="launch_detail_events_loading">Loading related events...</string>
+    <!-- Message when a launch has no related events. One line. -->
+    <string name="launch_detail_events_empty">No related events available</string>
+    <!-- Text button under the list of related news. %1$d is the number of hidden articles. One line. -->
+    <string name="launch_detail_news_load_more">Load More (%1$d more)</string>
+    <!-- Content description of the image of a news article. Read by screen readers. -->
+    <string name="launch_detail_news_image_description">Article Image</string>
+    <!-- Content description of the placeholder icon of a news article. Read by screen readers. -->
+    <string name="launch_detail_news_icon_description">Article Icon</string>
+    <!-- Message under a spinner while related news load. One line. -->
+    <string name="launch_detail_news_loading">Loading related news...</string>
+    <!-- Message when a launch has no related news. One line. -->
+    <string name="launch_detail_news_empty">No related news available</string>
+    <!-- Content description of the placeholder icon shown when the spacecraft image fails to load. Read by screen readers. -->
+    <string name="launch_detail_spacecraft_image_failed_description">Spacecraft image failed to load</string>
+    <!-- Chip on the spacecraft card. S/N means serial number. %1$s is the serial number. -->
+    <string name="launch_detail_spacecraft_serial">S/N: %1$s</string>
+    <!-- Chip on the spacecraft card when the craft is in orbit. Two words. -->
+    <string name="launch_detail_spacecraft_in_space">In Space</string>
+    <!-- Label of an info tile with the flight destination. One word. -->
+    <string name="launch_detail_spacecraft_tile_destination">Destination</string>
+    <!-- Label of an info tile with the number of flights of a spacecraft. Two words. -->
+    <string name="launch_detail_spacecraft_tile_total_flights">Total Flights</string>
+    <!-- Label of an info tile with the number of finished missions of a spacecraft. Two words. -->
+    <string name="launch_detail_spacecraft_tile_completed_missions">Completed Missions</string>
+    <!-- Label of an info tile with the end time of a mission. Two words. -->
+    <string name="launch_detail_spacecraft_tile_mission_end">Mission End</string>
+    <!-- Label of an info tile with the length of a mission. Two words. -->
+    <string name="launch_detail_spacecraft_tile_mission_duration">Mission Duration</string>
+    <!-- Label of an info tile with the total time a spacecraft spent in space. Three words. -->
+    <string name="launch_detail_spacecraft_tile_time_in_space">Time in Space</string>
+    <!-- Label of an info tile with the total time a spacecraft spent docked. Two words. -->
+    <string name="launch_detail_spacecraft_tile_time_docked">Time Docked</string>
+    <!-- Label of an info tile with the time between two flights of a spacecraft. Two words. -->
+    <string name="launch_detail_spacecraft_tile_turnaround_time">Turnaround Time</string>
+    <!-- Label of an info tile with the place where a spacecraft lands. Two words. -->
+    <string name="launch_detail_spacecraft_tile_landing_location">Landing Location</string>
+    <!-- Heading above the list of docking events. %1$d is the number of events. One line. -->
+    <string name="launch_detail_spacecraft_docking_events">Docking Events (%1$d)</string>
+    <!-- Small label above the docking date. One word. -->
+    <string name="launch_detail_spacecraft_docked">Docked</string>
+    <!-- Small label above the departure date. One word. -->
+    <string name="launch_detail_spacecraft_departed">Departed</string>
+    <!-- Title of a timeline entry that has no type. One word. -->
+    <string name="launch_detail_timeline_event_fallback">Event</string>
+    <!-- Heading of the Overview section on the launch detail screen. One line. -->
+    <string name="launch_detail_section_overview">Overview</string>
+    <!-- Heading of the Timeline section on the launch detail screen. One line. -->
+    <string name="launch_detail_section_timeline">Timeline</string>
+    <!-- Heading of the Updates section on the launch detail screen. One line. -->
+    <string name="launch_detail_section_updates">Updates</string>
+    <!-- Heading of the Related Events section on the launch detail screen. One line. -->
+    <string name="launch_detail_section_related_events">Related Events</string>
+    <!-- Heading of the Related News section on the launch detail screen. One line. -->
+    <string name="launch_detail_section_related_news">Related News</string>
+    <!-- Heading of the Mission Details section on the launch detail screen. One line. -->
+    <string name="launch_detail_section_mission_details">Mission Details</string>
+    <!-- Heading of the Launch Location section on the launch detail screen. One line. -->
+    <string name="launch_detail_section_launch_location">Launch Location</string>
+    <!-- Heading of the Spacecraft Details section on the launch detail screen. One line. -->
+    <string name="launch_detail_section_spacecraft_details">Spacecraft Details</string>
+    <!-- Heading of the Launch Service Provider section on the launch detail screen. One line. -->
+    <string name="launch_detail_section_launch_service_provider">Launch Service Provider</string>
+    <!-- Heading of the Launch Service Provider Statistics section on the launch detail screen. One line. -->
+    <string name="launch_detail_section_launch_service_provider_statistics">Launch Service Provider Statistics</string>
+    <!-- Heading of the Launch Vehicle Details section on the launch detail screen. One line. -->
+    <string name="launch_detail_section_launch_vehicle_details">Launch Vehicle Details</string>
+    <!-- Heading of the Landing Details section on the launch detail screen. One line. -->
+    <string name="launch_detail_section_landing_details">Landing Details</string>
+    <!-- Heading above the video player before the launch. Two words. -->
+    <string name="launch_detail_watch_live">Watch Live</string>
+    <!-- Heading above the video player after the launch. Two words. -->
+    <string name="launch_detail_watch_replay">Watch Replay</string>
+    <!-- Heading above the video player when the launch time is unknown. Two words. -->
+    <string name="launch_detail_watch_launch">Watch Launch</string>
+    <!-- Name of a launch in a video title when the mission has no name. Two words. -->
+    <string name="launch_detail_launch_fallback_name">Space Launch</string>
+    <!-- Message on the Rocket tab when a launch has no rocket or spacecraft data. One or two lines. -->
+    <string name="launch_detail_rocket_tab_empty">No rocket or spacecraft details available for this launch.</string>
+    <!-- Heading on the launch detail error card, above the error message. One or two lines. -->
+    <string name="launch_detail_error_title">Oops! Something went wrong</string>
+    <!-- Button on the launch detail error card. Loads the launch again. Two words. -->
+    <string name="launch_detail_error_try_again">Try Again</string>
+    <!-- Title of the system share sheet when a launch is shared. One line. -->
+    <string name="launch_detail_share_title">Space Launch Information</string>
+    <!-- Content description of the share button in the top bar. Read by screen readers. -->
+    <string name="launch_detail_share_description">Share</string>
+    <!-- Content description of the button that opens the video in full screen. Read by screen readers. -->
+    <string name="launch_detail_fullscreen_description">Open fullscreen</string>
+    <!-- Tab title on the phone launch detail screen. One word, max 10 chars. -->
+    <string name="launch_detail_tab_overview">Overview</string>
+    <!-- Tab title on the phone launch detail screen. One word, max 10 chars. -->
+    <string name="launch_detail_tab_mission">Mission</string>
+    <!-- Tab title on the phone launch detail screen. One word, max 10 chars. -->
+    <string name="launch_detail_tab_agency">Agency</string>
+    <!-- Tab title on the phone launch detail screen. One word, max 10 chars. -->
+    <string name="launch_detail_tab_rocket">Rocket</string>
+</resources>

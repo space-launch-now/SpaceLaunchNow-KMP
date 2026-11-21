@@ -56,6 +56,12 @@ import me.calebjones.spacelaunchnow.util.logging.recentNseBreadcrumbs
 import me.calebjones.spacelaunchnow.util.logging.shareCopiesToClipboard
 import me.calebjones.spacelaunchnow.util.sharePlainText
 import org.koin.compose.koinInject
+import org.jetbrains.compose.resources.stringResource
+import spacelaunchnow_kmp.composeapp.generated.resources.Res
+import spacelaunchnow_kmp.composeapp.generated.resources.common_back
+import spacelaunchnow_kmp.composeapp.generated.resources.settings_diagnostics_reset_button
+import spacelaunchnow_kmp.composeapp.generated.resources.settings_diagnostics_reset_hint
+import spacelaunchnow_kmp.composeapp.generated.resources.settings_diagnostics_title
 
 /**
  * Ground-truth diagnostics: live filter state, NSE App Group state (iOS),
@@ -92,10 +98,10 @@ fun DiagnosticsScreen(
     Scaffold(
         topBar = {
             TopAppBar(
-                title = { Text("Diagnostics") },
+                title = { Text(stringResource(Res.string.settings_diagnostics_title)) },
                 navigationIcon = {
                     IconButton(onClick = onNavigateBack) {
-                        Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "Back")
+                        Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = stringResource(Res.string.common_back))
                     }
                 }
             )
@@ -163,6 +169,7 @@ fun DiagnosticsScreen(
                         )
                         (mismatchedRows ?: emptyList()).forEach { row ->
                             Text(
+                                // i18n-ignore: developer diagnostic data line, not translated
                                 "${row.topic} desired=${row.desired} confirmed=${row.confirmed} attempts=${row.attempts} lastAttempt=${row.last_attempt ?: "-"} error=${row.last_error ?: "-"}",
                                 style = MaterialTheme.typography.bodySmall,
                                 fontFamily = FontFamily.Monospace
@@ -183,6 +190,7 @@ fun DiagnosticsScreen(
                     DiagnosticsCard("Recent NSE delivery decisions") {
                         breadcrumbs.reversed().forEach { crumb ->
                             Text(
+                                // i18n-ignore: developer diagnostic data line, not translated
                                 "${crumb.timestampEpochSeconds} ${crumb.type} → ${crumb.decision} (${crumb.reason})",
                                 style = MaterialTheme.typography.bodySmall,
                                 fontFamily = FontFamily.Monospace,
@@ -245,12 +253,12 @@ fun DiagnosticsScreen(
                             subsRefresh++
                         }
                     }
-                ) { Text("Reset push subscriptions (resubscribe from scratch)") }
+                ) { Text(stringResource(Res.string.settings_diagnostics_reset_button)) }
                 Text(
                     // "Resubscribe from scratch", NOT "fix all subscriptions": it
                     // repairs only what the ledger knows about, and nothing on the
                     // FCM side can repair what it doesn't.
-                    "Unsubscribes every push topic this install has a record of, then resubscribes from your settings. Notifications may pause briefly while it runs.",
+                    stringResource(Res.string.settings_diagnostics_reset_hint),
                     style = MaterialTheme.typography.bodySmall,
                     color = MaterialTheme.colorScheme.onSurfaceVariant
                 )

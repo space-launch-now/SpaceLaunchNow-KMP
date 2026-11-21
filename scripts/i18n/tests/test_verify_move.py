@@ -18,6 +18,10 @@ STRINGS_XML = """<?xml version="1.0" encoding="utf-8"?>
 """
 
 
+def failures_of(diff, strings, other):
+    return verify_move.verify(diff, strings, other)[0]
+
+
 def diff_of(removed, added, path="composeApp/src/commonMain/kotlin/A.kt"):
     return (f"diff --git a/{path} b/{path}\n--- a/{path}\n+++ b/{path}\n@@ -1,1 +1,1 @@\n"
             + "".join(f"-{r}\n" for r in removed) + "".join(f"+{a}\n" for a in added))
@@ -36,7 +40,7 @@ class VerifyMoveTest(unittest.TestCase):
         cls.tmp.cleanup()
 
     def run_diff(self, removed, added):
-        return verify_move.verify(diff_of(removed, added), self.strings, self.other)
+        return failures_of(diff_of(removed, added), self.strings, self.other)
 
     def test_equal_text_passes(self):
         self.assertEqual([], self.run_diff(['Text("About")'], ["Text(stringResource(Res.string.about_title))"]))
@@ -77,7 +81,7 @@ class VerifyMoveTest(unittest.TestCase):
 
     def test_non_kotlin_file_is_ignored(self):
         diff = diff_of(['<x>"Hi"</x>'], ["Res.string.nope"], path="other/file.xml")
-        self.assertEqual([], verify_move.verify(diff, self.strings, self.other))
+        self.assertEqual([], failures_of(diff, self.strings, self.other))
 
     def test_touches_strings(self):
         self.assertTrue(verify_move.touches_strings(diff_of(["a"], ["b"], path="x/values/strings.xml")))
@@ -100,15 +104,15 @@ class VerifyMoveTest(unittest.TestCase):
         self.assertEqual([], self.run_diff(removed, added))
 
     def test_hoisted_literal_in_another_hunk_matches(self):
-        self.assertEqual([], verify_move.verify(self.hoisted_diff("About"), self.strings, self.other))
+        self.assertEqual([], failures_of(self.hoisted_diff("About"), self.strings, self.other))
 
     def test_hoisted_literal_with_wrong_text_fails(self):
-        self.assertEqual(1, len(verify_move.verify(self.hoisted_diff("About us"), self.strings, self.other)))
+        self.assertEqual(1, len(failures_of(self.hoisted_diff("About us"), self.strings, self.other)))
 
     def test_removed_literal_in_another_file_does_not_match(self):
         diff = (diff_of(['Text("About")'], ["Text(1)"], path="composeApp/src/commonMain/kotlin/B.kt")
                 + diff_of([], ["Text(stringResource(Res.string.about_title))"]))
-        self.assertEqual(1, len(verify_move.verify(diff, self.strings, self.other)))
+        self.assertEqual(1, len(failures_of(diff, self.strings, self.other)))
 
     def test_default_strings_reads_every_strings_file(self):
         root = Path(self.tmp.name) / "repo"
@@ -131,6 +135,38 @@ class VerifyMoveTest(unittest.TestCase):
         return (f"diff --git a/{path} b/{path}\n--- a/{path}\n+++ b/{path}\n"
                 "@@ -5,0 +6 @@\n+val d = stringResource(Res.string.about_title)\n"
                 f'@@ -40 +41 @@\n-Text("{removed_text}")\n+Text(d)\n')
+
+    def test_key_in_a_new_file_counts_as_new_text(self):
+        path = "composeApp/src/commonMain/kotlin/New.kt"
+        diff = (f"diff --git a/{path} b/{path}\nnew file mode 100644\n--- /dev/null\n+++ b/{path}\n"
+                "@@ -0,0 +1 @@\n+val t = getString(Res.string.about_title)\n")
+        failures, new_text = verify_move.verify(diff, self.strings, self.other)
+        self.assertEqual([], failures)
+        self.assertEqual([f"{path}: about_title"], new_text)
+
+    def test_key_in_an_existing_file_is_not_new_text(self):
+        failures, new_text = verify_move.verify(
+            diff_of([], ["Text(stringResource(Res.string.about_title))"]), self.strings, self.other)
+        self.assertEqual(1, len(failures))
+        self.assertEqual([], new_text)
+
+    def test_literal_in_braces_inside_a_template_matches(self):
+        removed = ['Text("${name.ifBlank { "About" }}")']
+        self.assertEqual([], self.run_diff(removed, ["Text(stringResource(Res.string.about_title))"]))
+
+    def test_braces_inside_a_template_become_one_placeholder(self):
+        removed = ['Text("Version: ${name.ifBlank { "?" }} ($build)")']
+        added = ["Text(stringResource(Res.string.version, name, build))"]
+        self.assertEqual([], self.run_diff(removed, added))
+
+    def test_literal_nested_in_template_expression_matches(self):
+        removed = ['Text("${a ?: "About"} km")']
+        self.assertEqual([], self.run_diff(removed, ["Text(stringResource(Res.string.about_title))"]))
+
+    def test_template_expression_across_lines_matches(self):
+        added = ["stringResource(Res.string.version, f, g)"]
+        self.assertEqual(1, len(self.run_diff(['"Version: ${', "    f", '}"'], added)))  # needs 2 placeholders
+        self.assertEqual([], self.run_diff(['"Version: ${', "    f", '} (${g})"'], added))
 
     def test_main_exit_codes(self):
         base = Path(self.tmp.name)

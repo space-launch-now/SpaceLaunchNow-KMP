@@ -18,6 +18,14 @@ import me.calebjones.spacelaunchnow.domain.model.CrewMemberSummary
 import me.calebjones.spacelaunchnow.ui.astronaut.components.AstronautProfileCard
 import me.calebjones.spacelaunchnow.ui.theme.SpaceLaunchNowPreviewTheme
 import org.jetbrains.compose.ui.tooling.preview.Preview
+import org.jetbrains.compose.resources.stringResource
+import spacelaunchnow_kmp.composeapp.generated.resources.Res
+import spacelaunchnow_kmp.composeapp.generated.resources.launch_detail_crew_heading
+import spacelaunchnow_kmp.composeapp.generated.resources.launch_detail_crew_landing
+import spacelaunchnow_kmp.composeapp.generated.resources.launch_detail_crew_launch
+import spacelaunchnow_kmp.composeapp.generated.resources.launch_detail_crew_onboard
+import spacelaunchnow_kmp.composeapp.generated.resources.launch_detail_crew_unknown_astronaut
+import spacelaunchnow_kmp.composeapp.generated.resources.launch_detail_crew_unknown_role
 
 /**
  * Displays crew information for a launch, organized by crew role (launch, onboard, landing).
@@ -44,7 +52,7 @@ fun CrewInformationCard(
         verticalArrangement = Arrangement.spacedBy(12.dp)
     ) {
         Text(
-            text = "Crew Information",
+            text = stringResource(Res.string.launch_detail_crew_heading),
             style = MaterialTheme.typography.titleLarge,
             fontWeight = FontWeight.Bold,
             color = MaterialTheme.colorScheme.onSurfaceVariant
@@ -69,7 +77,7 @@ fun CrewInformationCard(
 
                     if (launchCrew.isNotEmpty()) {
                         CrewSectionWithLabel(
-                            label = "Launch Crew",
+                            label = stringResource(Res.string.launch_detail_crew_launch),
                             crew = launchCrew,
                             onAstronautClick = onAstronautClick
                         )
@@ -79,7 +87,7 @@ fun CrewInformationCard(
                     if (onboardCrew.isNotEmpty()) {
                         if (needsDivider) HorizontalDivider(modifier = Modifier.padding(vertical = 4.dp))
                         CrewSectionWithLabel(
-                            label = "Onboard Crew",
+                            label = stringResource(Res.string.launch_detail_crew_onboard),
                             crew = onboardCrew,
                             onAstronautClick = onAstronautClick
                         )
@@ -89,7 +97,7 @@ fun CrewInformationCard(
                     if (landingCrew.isNotEmpty()) {
                         if (needsDivider) HorizontalDivider(modifier = Modifier.padding(vertical = 4.dp))
                         CrewSectionWithLabel(
-                            label = "Landing Crew",
+                            label = stringResource(Res.string.launch_detail_crew_landing),
                             crew = landingCrew,
                             onAstronautClick = onAstronautClick
                         )
@@ -100,7 +108,7 @@ fun CrewInformationCard(
                 if (crewsAreIdentical && onboardCrew.isNotEmpty()) {
                     HorizontalDivider(modifier = Modifier.padding(vertical = 4.dp))
                     CrewSectionWithLabel(
-                        label = "Onboard Crew",
+                        label = stringResource(Res.string.launch_detail_crew_onboard),
                         crew = onboardCrew,
                         onAstronautClick = onAstronautClick
                     )
@@ -133,8 +141,8 @@ private fun CrewSection(
     Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
         crew.forEach { member ->
             AstronautProfileCard(
-                astronautName = member.astronautName ?: "Unknown Astronaut",
-                role = member.role ?: "Crew Member",
+                astronautName = member.astronautName ?: stringResource(Res.string.launch_detail_crew_unknown_astronaut),
+                role = member.role ?: stringResource(Res.string.launch_detail_crew_unknown_role),
                 profileImageUrl = member.imageUrl,
                 agencyImageUrl = null,
                 onClick = { onAstronautClick?.invoke(member.astronautId) }

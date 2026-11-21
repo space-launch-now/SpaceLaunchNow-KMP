@@ -42,6 +42,19 @@ import me.calebjones.spacelaunchnow.ui.compose.LaunchWindowIndicator
 import me.calebjones.spacelaunchnow.util.DateTimeUtil
 import me.calebjones.spacelaunchnow.util.resolve
 import me.calebjones.spacelaunchnow.util.DateTimeUtil.formatLaunchTime
+import org.jetbrains.compose.resources.stringResource
+import org.jetbrains.compose.resources.pluralStringResource
+import spacelaunchnow_kmp.composeapp.generated.resources.Res
+import spacelaunchnow_kmp.composeapp.generated.resources.launch_detail_landing_attempt_single
+import spacelaunchnow_kmp.composeapp.generated.resources.launch_detail_landing_success_count
+import spacelaunchnow_kmp.composeapp.generated.resources.launch_detail_precision_info_description
+import spacelaunchnow_kmp.composeapp.generated.resources.launch_detail_tile_landing
+import spacelaunchnow_kmp.composeapp.generated.resources.launch_detail_tile_launch_site
+import spacelaunchnow_kmp.composeapp.generated.resources.launch_detail_tile_mission
+import spacelaunchnow_kmp.composeapp.generated.resources.launch_detail_tile_weather
+import spacelaunchnow_kmp.composeapp.generated.resources.launch_detail_value_tbd
+import spacelaunchnow_kmp.composeapp.generated.resources.launch_detail_value_unknown
+import spacelaunchnow_kmp.composeapp.generated.resources.launch_detail_landing_attempts_count
 
 /**
  * A combined overview card that displays key launch information.
@@ -139,7 +152,7 @@ fun CombinedLaunchOverviewCard(launch: Launch) {
                                         }
                                         Text(
                                             text = launch.net?.let { formatLaunchTime(it, useUtc) }
-                                                ?: "TBD",
+                                                ?: stringResource(Res.string.launch_detail_value_tbd),
                                             style = MaterialTheme.typography.headlineLarge,
                                             fontWeight = FontWeight.Bold,
                                             maxLines = 1,
@@ -150,7 +163,7 @@ fun CombinedLaunchOverviewCard(launch: Launch) {
                                             if (prob > 0) {
                                                 InfoTile(
                                                     icon = Icons.Filled.WbCloudy,
-                                                    label = "Weather",
+                                                    label = stringResource(Res.string.launch_detail_tile_weather),
                                                     value = "$prob%",
                                                     modifier = Modifier.weight(1f)
                                                 )
@@ -188,7 +201,7 @@ fun CombinedLaunchOverviewCard(launch: Launch) {
                                 ) {
                                     Icon(
                                         imageVector = Icons.Filled.Info,
-                                        contentDescription = "Launch time precision info",
+                                        contentDescription = stringResource(Res.string.launch_detail_precision_info_description),
                                         tint = MaterialTheme.colorScheme.onSurfaceVariant,
                                         modifier = Modifier.size(18.dp)
                                     )
@@ -201,13 +214,13 @@ fun CombinedLaunchOverviewCard(launch: Launch) {
                 // Metrics grid below
                 val tiles = buildList {
                     launch.mission?.name?.takeIf { it.isNotBlank() }
-                        ?.let { add(Triple(Icons.Filled.Category, "Mission", it)) }
+                        ?.let { add(Triple(Icons.Filled.Category, stringResource(Res.string.launch_detail_tile_mission), it)) }
                     launch.pad?.let { pad ->
-                        val site = pad.location?.name ?: pad.name ?: "Unknown"
+                        val site = pad.location?.name ?: pad.name ?: stringResource(Res.string.launch_detail_value_unknown)
                         add(
                             Triple(
                                 Icons.Filled.LocationOn,
-                                "Launch Site",
+                                stringResource(Res.string.launch_detail_tile_launch_site),
                                 site
                             )
                         )
@@ -223,11 +236,11 @@ fun CombinedLaunchOverviewCard(launch: Launch) {
 
                         val landingText = buildString {
                             if (successfulLandings > 0) {
-                                append("$successfulLandings/$totalAttempts Success")
+                                append(stringResource(Res.string.launch_detail_landing_success_count, successfulLandings, totalAttempts))
                             } else if (totalAttempts == 1) {
-                                append("Attempt")
+                                append(stringResource(Res.string.launch_detail_landing_attempt_single))
                             } else {
-                                append("$totalAttempts Attempt${if (totalAttempts != 1) "s" else ""}")
+                                append(pluralStringResource(Res.plurals.launch_detail_landing_attempts_count, totalAttempts, totalAttempts))
                             }
                             for (stage in landingsWithAttempt) {
                                 stage.landingAttempt?.location?.let { location ->
@@ -239,7 +252,7 @@ fun CombinedLaunchOverviewCard(launch: Launch) {
                         add(
                             Triple(
                                 Icons.Filled.FlightLand,
-                                "Landing",
+                                stringResource(Res.string.launch_detail_tile_landing),
                                 landingText
                             )
                         )
@@ -249,7 +262,7 @@ fun CombinedLaunchOverviewCard(launch: Launch) {
                         add(
                             Triple(
                                 Icons.Filled.WbCloudy,
-                                "Weather",
+                                stringResource(Res.string.launch_detail_tile_weather),
                                 "$prob%"
                             )
                         )

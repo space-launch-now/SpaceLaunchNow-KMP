@@ -83,6 +83,39 @@ import me.calebjones.spacelaunchnow.ui.viewmodel.SubscriptionViewModel
 import org.jetbrains.compose.ui.tooling.preview.Preview
 import org.koin.compose.koinInject
 import org.koin.compose.viewmodel.koinViewModel
+import org.jetbrains.compose.resources.stringResource
+import spacelaunchnow_kmp.composeapp.generated.resources.Res
+import spacelaunchnow_kmp.composeapp.generated.resources.onboarding_feature_alerts
+import spacelaunchnow_kmp.composeapp.generated.resources.onboarding_feature_countdown
+import spacelaunchnow_kmp.composeapp.generated.resources.onboarding_feature_map
+import spacelaunchnow_kmp.composeapp.generated.resources.onboarding_feature_timeline
+import spacelaunchnow_kmp.composeapp.generated.resources.onboarding_feature_trajectory
+import spacelaunchnow_kmp.composeapp.generated.resources.onboarding_paywall_billing_unavailable
+import spacelaunchnow_kmp.composeapp.generated.resources.onboarding_paywall_continue_app
+import spacelaunchnow_kmp.composeapp.generated.resources.onboarding_paywall_continue_free
+import spacelaunchnow_kmp.composeapp.generated.resources.onboarding_paywall_cta_default
+import spacelaunchnow_kmp.composeapp.generated.resources.onboarding_paywall_cta_trial
+import spacelaunchnow_kmp.composeapp.generated.resources.onboarding_paywall_disclosure
+import spacelaunchnow_kmp.composeapp.generated.resources.onboarding_paywall_features_heading
+import spacelaunchnow_kmp.composeapp.generated.resources.onboarding_paywall_features_more
+import spacelaunchnow_kmp.composeapp.generated.resources.onboarding_paywall_launch_placeholder
+import spacelaunchnow_kmp.composeapp.generated.resources.onboarding_paywall_monthly
+import spacelaunchnow_kmp.composeapp.generated.resources.onboarding_paywall_monthly_per_month
+import spacelaunchnow_kmp.composeapp.generated.resources.onboarding_paywall_next_launch_image
+import spacelaunchnow_kmp.composeapp.generated.resources.onboarding_paywall_perk_adfree_subtitle
+import spacelaunchnow_kmp.composeapp.generated.resources.onboarding_paywall_perk_adfree_title
+import spacelaunchnow_kmp.composeapp.generated.resources.onboarding_paywall_perk_calendar_subtitle
+import spacelaunchnow_kmp.composeapp.generated.resources.onboarding_paywall_perk_calendar_title
+import spacelaunchnow_kmp.composeapp.generated.resources.onboarding_paywall_perk_themes_subtitle
+import spacelaunchnow_kmp.composeapp.generated.resources.onboarding_paywall_perk_themes_title
+import spacelaunchnow_kmp.composeapp.generated.resources.onboarding_paywall_perk_widgets_subtitle_android
+import spacelaunchnow_kmp.composeapp.generated.resources.onboarding_paywall_perk_widgets_subtitle_ios
+import spacelaunchnow_kmp.composeapp.generated.resources.onboarding_paywall_perk_widgets_title
+import spacelaunchnow_kmp.composeapp.generated.resources.onboarding_paywall_save_badge
+import spacelaunchnow_kmp.composeapp.generated.resources.onboarding_paywall_subtitle_subscribed
+import spacelaunchnow_kmp.composeapp.generated.resources.onboarding_paywall_subtitle_trial
+import spacelaunchnow_kmp.composeapp.generated.resources.onboarding_paywall_title_subscribed
+import spacelaunchnow_kmp.composeapp.generated.resources.onboarding_paywall_title_trial
 
 // ---------------------------------------------------------------------------
 // Space theme colours
@@ -230,7 +263,7 @@ fun OnboardingContent(
             Spacer(modifier = Modifier.height(20.dp))
 
             Text(
-                text = if (isSubscribed) "Welcome Back!" else "Try Premium Free",
+                text = if (isSubscribed) stringResource(Res.string.onboarding_paywall_title_subscribed) else stringResource(Res.string.onboarding_paywall_title_trial),
                 style = MaterialTheme.typography.headlineMedium,
                 fontWeight = FontWeight.Bold,
                 color = Color.White,
@@ -241,9 +274,9 @@ fun OnboardingContent(
 
             Text(
                 text = if (isSubscribed) {
-                    "You're a Premium member. Thanks for supporting!"
+                    stringResource(Res.string.onboarding_paywall_subtitle_subscribed)
                 } else {
-                    "Get the most out of Space Launch Now with a free trial... cancel anytime."
+                    stringResource(Res.string.onboarding_paywall_subtitle_trial)
                 },
                 style = MaterialTheme.typography.bodyMedium,
                 color = Color.White.copy(alpha = 0.7f),
@@ -266,7 +299,7 @@ fun OnboardingContent(
             ) {
                 Column(modifier = Modifier.padding(16.dp)) {
                     Text(
-                        text = "PREMIUM FEATURES INCLUDE",
+                        text = stringResource(Res.string.onboarding_paywall_features_heading),
                         style = MaterialTheme.typography.labelSmall,
                         color = Color.White.copy(alpha = 0.45f),
                         fontWeight = FontWeight.SemiBold,
@@ -278,33 +311,33 @@ fun OnboardingContent(
 
                     OnboardingPerkCard(
                         icon = Icons.Default.Block,
-                        title = "Ad-Free Experience",
-                        subtitle = "Browse launches and news without interruptions."
+                        title = stringResource(Res.string.onboarding_paywall_perk_adfree_title),
+                        subtitle = stringResource(Res.string.onboarding_paywall_perk_adfree_subtitle)
                     )
                     Spacer(modifier = Modifier.height(10.dp))
                     OnboardingPerkCard(
                         icon = Icons.Default.Widgets,
-                        title = "Premium Widgets",
+                        title = stringResource(Res.string.onboarding_paywall_perk_widgets_title),
                         subtitle = if (getPlatform().type.isIOS)
-                            "Lock Screen & Home Screen widgets to track launches at a glance."
+                            stringResource(Res.string.onboarding_paywall_perk_widgets_subtitle_ios)
                         else
-                            "Premium customizable home screen widgets for upcoming launches."
+                            stringResource(Res.string.onboarding_paywall_perk_widgets_subtitle_android)
                     )
                     Spacer(modifier = Modifier.height(10.dp))
                     OnboardingPerkCard(
                         icon = Icons.Default.FormatPaint,
-                        title = "Themes Customization",
-                        subtitle = "Personalize your app with exclusive themes."
+                        title = stringResource(Res.string.onboarding_paywall_perk_themes_title),
+                        subtitle = stringResource(Res.string.onboarding_paywall_perk_themes_subtitle)
                     )
                     Spacer(modifier = Modifier.height(10.dp))
                     OnboardingPerkCard(
                         icon = Icons.Default.CalendarMonth,
-                        title = "Calendar Sync",
-                        subtitle = "Add launches directly to your calendar so you never miss one."
+                        title = stringResource(Res.string.onboarding_paywall_perk_calendar_title),
+                        subtitle = stringResource(Res.string.onboarding_paywall_perk_calendar_subtitle)
                     )
                     Spacer(modifier = Modifier.height(10.dp))
                     Text(
-                        text = "AND MUCH MORE!",
+                        text = stringResource(Res.string.onboarding_paywall_features_more),
                         style = MaterialTheme.typography.labelSmall,
                         color = Color.White.copy(alpha = 0.45f),
                         fontWeight = FontWeight.SemiBold,
@@ -323,9 +356,9 @@ fun OnboardingContent(
                 if (annualProduct != null) {
                     val trialLabel = annualProduct.freeTrialPeriodDisplay
                     val ctaLabel =
-                        if (trialLabel != null) "Start Your $trialLabel Free Trial" else "Start Free Trial"
+                        if (trialLabel != null) stringResource(Res.string.onboarding_paywall_cta_trial, trialLabel) else stringResource(Res.string.onboarding_paywall_cta_default)
                     val disclosureText =
-                        "Then ${annualProduct.formattedPrice}/year. Cancel anytime."
+                        stringResource(Res.string.onboarding_paywall_disclosure, annualProduct.formattedPrice)
 
                     Box(contentAlignment = Alignment.TopEnd) {
                         Button(
@@ -374,7 +407,7 @@ fun OnboardingContent(
                                     .padding(horizontal = 8.dp, vertical = 3.dp)
                             ) {
                                 Text(
-                                    text = "Save $savingsPercent",
+                                    text = stringResource(Res.string.onboarding_paywall_save_badge, savingsPercent),
                                     style = MaterialTheme.typography.labelSmall,
                                     fontWeight = FontWeight.Bold,
                                     color = MaterialTheme.colorScheme.onTertiary,
@@ -404,8 +437,8 @@ fun OnboardingContent(
                         ) {
                             Text(
                                 text = buildString {
-                                    append("Or go Monthly")
-                                    if (perMonth != null) append(" · $perMonth/mo")
+                                    append(stringResource(Res.string.onboarding_paywall_monthly))
+                                    if (perMonth != null) append(stringResource(Res.string.onboarding_paywall_monthly_per_month, perMonth))
                                 },
                                 style = MaterialTheme.typography.labelMedium
                             )
@@ -434,14 +467,14 @@ fun OnboardingContent(
                         )
                     ) {
                         Text(
-                            text = "Continue for free",
+                            text = stringResource(Res.string.onboarding_paywall_continue_free),
                             style = MaterialTheme.typography.labelMedium
                         )
                     }
 
                 } else if (billingUnavailable) {
                     Text(
-                        text = "Purchases not available on this device.",
+                        text = stringResource(Res.string.onboarding_paywall_billing_unavailable),
                         style = MaterialTheme.typography.labelSmall,
                         color = Color.White.copy(alpha = 0.45f),
                         textAlign = TextAlign.Center
@@ -459,7 +492,7 @@ fun OnboardingContent(
                         )
                     ) {
                         Text(
-                            text = "Continue for free",
+                            text = stringResource(Res.string.onboarding_paywall_continue_free),
                             style = MaterialTheme.typography.labelMedium,
                             fontWeight = FontWeight.SemiBold
                         )
@@ -482,7 +515,7 @@ fun OnboardingContent(
                     shape = RoundedCornerShape(14.dp)
                 ) {
                     Text(
-                        text = "Continue to App",
+                        text = stringResource(Res.string.onboarding_paywall_continue_app),
                         style = MaterialTheme.typography.titleSmall,
                         fontWeight = FontWeight.Bold
                     )
@@ -710,7 +743,7 @@ internal fun OnboardingNextLaunchCard(launch: Launch) {
             if (imageUrl != null) {
                 SubcomposeAsyncImage(
                     model = imageUrl,
-                    contentDescription = "Next launch image",
+                    contentDescription = stringResource(Res.string.onboarding_paywall_next_launch_image),
                     modifier = Modifier.fillMaxSize(),
                     contentScale = ContentScale.Crop,
                     loading = {
@@ -744,7 +777,7 @@ internal fun OnboardingNextLaunchCard(launch: Launch) {
                         ) {
                             Icon(
                                 imageVector = CustomIcons.RocketLaunch,
-                                contentDescription = "Launch placeholder",
+                                contentDescription = stringResource(Res.string.onboarding_paywall_launch_placeholder),
                                 modifier = Modifier.size(72.dp),
                                 tint = MaterialTheme.colorScheme.primary.copy(alpha = 0.6f)
                             )
@@ -767,7 +800,7 @@ internal fun OnboardingNextLaunchCard(launch: Launch) {
                 ) {
                     Icon(
                         imageVector = CustomIcons.RocketLaunch,
-                        contentDescription = "Launch placeholder",
+                        contentDescription = stringResource(Res.string.onboarding_paywall_launch_placeholder),
                         modifier = Modifier.size(72.dp),
                         tint = MaterialTheme.colorScheme.primary.copy(alpha = 0.6f)
                     )
@@ -788,11 +821,11 @@ internal fun OnboardingNextLaunchCard(launch: Launch) {
 @Composable
 internal fun OnboardingTrackingFeatureRow() {
     val features = listOf(
-        Pair(Icons.Default.Timer, "Countdown"),
-        Pair(Icons.Default.Map, "Map View"),
-        Pair(Icons.Default.TravelExplore, "Trajectory"),
-        Pair(Icons.Default.Timeline, "Timeline"),
-        Pair(Icons.Default.Notifications, "Alerts"),
+        Pair(Icons.Default.Timer, stringResource(Res.string.onboarding_feature_countdown)),
+        Pair(Icons.Default.Map, stringResource(Res.string.onboarding_feature_map)),
+        Pair(Icons.Default.TravelExplore, stringResource(Res.string.onboarding_feature_trajectory)),
+        Pair(Icons.Default.Timeline, stringResource(Res.string.onboarding_feature_timeline)),
+        Pair(Icons.Default.Notifications, stringResource(Res.string.onboarding_feature_alerts)),
     )
     Row(
         modifier = Modifier.fillMaxWidth(),
@@ -835,7 +868,9 @@ internal fun OnboardingTrackingFeatureRow() {
 private val previewAnnualProduct = ProductInfo(
     productId = "sln_premium",
     basePlanId = "annual",
+    // i18n-ignore: preview-only sample data
     title = "Space Launch Now Premium",
+    // i18n-ignore: preview-only sample data
     description = "Annual subscription",
     formattedPrice = "$9.99",
     priceAmountMicros = 9_990_000L,
@@ -849,7 +884,9 @@ private val previewAnnualProduct = ProductInfo(
 private val previewMonthlyProduct = ProductInfo(
     productId = "sln_premium",
     basePlanId = "monthly",
+    // i18n-ignore: preview-only sample data
     title = "Space Launch Now Premium",
+    // i18n-ignore: preview-only sample data
     description = "Monthly subscription",
     formattedPrice = "$1.49",
     priceAmountMicros = 1_490_000L,
@@ -940,6 +977,7 @@ private fun OnboardingErrorPreview() {
         OnboardingContent(
             annualProduct = previewAnnualProduct,
             savingsPercent = "38%",
+            // i18n-ignore: preview-only sample data
             errorMessage = "Purchase failed. Please try again."
         )
     }

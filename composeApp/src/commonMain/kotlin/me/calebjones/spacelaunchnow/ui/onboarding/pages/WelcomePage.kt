@@ -37,6 +37,13 @@ import me.calebjones.spacelaunchnow.ui.onboarding.OnboardingNextLaunchCard
 import me.calebjones.spacelaunchnow.ui.onboarding.OnboardingTrackingFeatureRow
 import me.calebjones.spacelaunchnow.ui.theme.SpaceLaunchNowPreviewTheme
 import org.jetbrains.compose.ui.tooling.preview.Preview
+import org.jetbrains.compose.resources.stringResource
+import spacelaunchnow_kmp.composeapp.generated.resources.Res
+import spacelaunchnow_kmp.composeapp.generated.resources.onboarding_welcome_app_name
+import spacelaunchnow_kmp.composeapp.generated.resources.onboarding_welcome_explore
+import spacelaunchnow_kmp.composeapp.generated.resources.onboarding_welcome_greeting
+import spacelaunchnow_kmp.composeapp.generated.resources.onboarding_welcome_next_launch
+import spacelaunchnow_kmp.composeapp.generated.resources.onboarding_welcome_tagline
 
 private val spaceGradient = Brush.verticalGradient(
     colors = listOf(Color(0xFF0A0E2A), Color(0xFF1A1040), Color(0xFF2A1060))
@@ -149,7 +156,7 @@ private fun WelcomeCardContent(modifier: Modifier = Modifier) {
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
                 Text(
-                    text = "Welcome to",
+                    text = stringResource(Res.string.onboarding_welcome_greeting),
                     style = MaterialTheme.typography.titleMedium,
                     color = MaterialTheme.colorScheme.onPrimary.copy(alpha = 0.7f),
                     textAlign = TextAlign.Center
@@ -158,7 +165,7 @@ private fun WelcomeCardContent(modifier: Modifier = Modifier) {
                 Spacer(modifier = Modifier.height(4.dp))
 
                 Text(
-                    text = "Space Launch Now",
+                    text = stringResource(Res.string.onboarding_welcome_app_name),
                     style = MaterialTheme.typography.headlineLarge,
                     fontWeight = FontWeight.Bold,
                     color = MaterialTheme.colorScheme.onPrimary,
@@ -168,7 +175,7 @@ private fun WelcomeCardContent(modifier: Modifier = Modifier) {
                 Spacer(modifier = Modifier.height(16.dp))
 
                 Text(
-                    text = "Your guide to every rocket launch,\nright from your pocket.",
+                    text = stringResource(Res.string.onboarding_welcome_tagline),
                     style = MaterialTheme.typography.bodyMedium,
                     color = MaterialTheme.colorScheme.onPrimary.copy(alpha = 0.6f),
                     textAlign = TextAlign.Center
@@ -195,7 +202,7 @@ private fun NextLaunchContent(
     ) {
         Column(modifier = Modifier.padding(12.dp)) {
             Text(
-                text = "NEXT UPCOMING LAUNCH",
+                text = stringResource(Res.string.onboarding_welcome_next_launch),
                 style = MaterialTheme.typography.labelSmall,
                 color = Color.White.copy(alpha = 0.5f),
                 fontWeight = FontWeight.SemiBold,
@@ -219,7 +226,7 @@ private fun NextLaunchContent(
                     color = Color.White.copy(alpha = 0.15f)
                 )
                 Text(
-                    text = "  Explore the App  ",
+                    text = stringResource(Res.string.onboarding_welcome_explore),
                     style = MaterialTheme.typography.labelSmall,
                     color = Color.White.copy(alpha = 0.4f),
                     fontWeight = FontWeight.SemiBold

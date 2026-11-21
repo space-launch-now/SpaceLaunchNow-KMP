@@ -45,6 +45,25 @@ import kotlinx.coroutines.launch
 import me.calebjones.spacelaunchnow.data.model.PremiumFeature
 import me.calebjones.spacelaunchnow.data.repository.SubscriptionRepository
 import org.koin.compose.koinInject
+import org.jetbrains.compose.resources.stringResource
+import spacelaunchnow_kmp.composeapp.generated.resources.Res
+import spacelaunchnow_kmp.composeapp.generated.resources.premium_badge_label
+import spacelaunchnow_kmp.composeapp.generated.resources.premium_feature_description_ad_free
+import spacelaunchnow_kmp.composeapp.generated.resources.premium_feature_description_advanced_widgets
+import spacelaunchnow_kmp.composeapp.generated.resources.premium_feature_description_cal_sync
+import spacelaunchnow_kmp.composeapp.generated.resources.premium_feature_description_custom_themes
+import spacelaunchnow_kmp.composeapp.generated.resources.premium_feature_description_notification_customization
+import spacelaunchnow_kmp.composeapp.generated.resources.premium_feature_description_wear_os
+import spacelaunchnow_kmp.composeapp.generated.resources.premium_feature_description_widgets_customization
+import spacelaunchnow_kmp.composeapp.generated.resources.premium_feature_title_ad_free
+import spacelaunchnow_kmp.composeapp.generated.resources.premium_feature_title_advanced_widgets
+import spacelaunchnow_kmp.composeapp.generated.resources.premium_feature_title_cal_sync
+import spacelaunchnow_kmp.composeapp.generated.resources.premium_feature_title_custom_themes
+import spacelaunchnow_kmp.composeapp.generated.resources.premium_feature_title_notification_customization
+import spacelaunchnow_kmp.composeapp.generated.resources.premium_feature_title_wear_os
+import spacelaunchnow_kmp.composeapp.generated.resources.premium_feature_title_widgets_customization
+import spacelaunchnow_kmp.composeapp.generated.resources.premium_gate_title
+import spacelaunchnow_kmp.composeapp.generated.resources.premium_gate_upgrade_button
 
 /**
  * Wrapper composable that gates content behind a premium feature
@@ -168,7 +187,7 @@ private fun DefaultPaywallCard(
             )
 
             Text(
-                text = "Premium Feature",
+                text = stringResource(Res.string.premium_gate_title),
                 style = MaterialTheme.typography.headlineSmall,
                 fontWeight = FontWeight.Bold
             )
@@ -185,7 +204,7 @@ private fun DefaultPaywallCard(
             ) {
                 Icon(Icons.Default.Star, contentDescription = null)
                 Spacer(Modifier.width(8.dp))
-                Text("Upgrade to Premium")
+                Text(stringResource(Res.string.premium_gate_upgrade_button))
             }
         }
     }
@@ -250,7 +269,7 @@ fun PremiumPromptCard(
                 .padding(horizontal = 16.dp)
                 .padding(bottom = 16.dp)
         ) {
-            Text("Upgrade to Premium")
+            Text(stringResource(Res.string.premium_gate_upgrade_button))
         }
     }
 }
@@ -264,7 +283,7 @@ fun PremiumPromptCard(
  *     feature = PremiumFeature.ADVANCED_FILTERS,
  *     onClick = { showAdvancedFilters() }
  * ) {
- *     Text("Advanced Filters")
+ *     Text(advancedFiltersLabel)
  * }
  * ```
  */
@@ -320,7 +339,7 @@ fun PremiumFeatureButton(
         if (!hasFeature) {
             Icon(
                 Icons.Default.Lock,
-                contentDescription = "Premium",
+                contentDescription = stringResource(Res.string.premium_badge_label),
                 modifier = Modifier.size(20.dp)
             )
             Spacer(Modifier.width(4.dp))
@@ -354,7 +373,7 @@ fun PremiumBadge(
                 tint = MaterialTheme.colorScheme.onPrimaryContainer
             )
             Text(
-                text = "Premium",
+                text = stringResource(Res.string.premium_badge_label),
                 style = MaterialTheme.typography.labelSmall,
                 fontWeight = FontWeight.Bold,
                 color = MaterialTheme.colorScheme.onPrimaryContainer,
@@ -414,27 +433,29 @@ fun rememberHasFeature(feature: PremiumFeature): State<Boolean> {
 }
 
 // Extension: Get user-friendly description for features
+@Composable
 fun PremiumFeature.getDescription(): String {
     return when (this) {
-        PremiumFeature.AD_FREE -> "Enjoy an ad-free experience throughout the app"
-        PremiumFeature.CUSTOM_THEMES -> "Personalize your app with custom color themes"
-        PremiumFeature.ADVANCED_WIDGETS -> "Access the launch list widget"
-        PremiumFeature.WIDGETS_CUSTOMIZATION -> "Customize your widgets look and feel"
-        PremiumFeature.CAL_SYNC -> "Access to Calendar Sync Link for syncing launches and events"
-        PremiumFeature.NOTIFICATION_CUSTOMIZATION -> "Customize your notification preferences"
-        PremiumFeature.WEAR_OS -> "Access Space Launch Now on your Wear OS watch"
+        PremiumFeature.AD_FREE -> stringResource(Res.string.premium_feature_description_ad_free)
+        PremiumFeature.CUSTOM_THEMES -> stringResource(Res.string.premium_feature_description_custom_themes)
+        PremiumFeature.ADVANCED_WIDGETS -> stringResource(Res.string.premium_feature_description_advanced_widgets)
+        PremiumFeature.WIDGETS_CUSTOMIZATION -> stringResource(Res.string.premium_feature_description_widgets_customization)
+        PremiumFeature.CAL_SYNC -> stringResource(Res.string.premium_feature_description_cal_sync)
+        PremiumFeature.NOTIFICATION_CUSTOMIZATION -> stringResource(Res.string.premium_feature_description_notification_customization)
+        PremiumFeature.WEAR_OS -> stringResource(Res.string.premium_feature_description_wear_os)
     }
 }
 
 // Extension: Get user-friendly description for features
+@Composable
 fun PremiumFeature.getTitle(): String {
     return when (this) {
-        PremiumFeature.AD_FREE -> "Ad-Free Experience"
-        PremiumFeature.CUSTOM_THEMES -> "Custom Themes"
-        PremiumFeature.ADVANCED_WIDGETS -> "Advanced Widget"
-        PremiumFeature.WIDGETS_CUSTOMIZATION -> "Widget Customization"
-        PremiumFeature.CAL_SYNC -> "Calendar Sync"
-        PremiumFeature.NOTIFICATION_CUSTOMIZATION -> "Notification Customization"
-        PremiumFeature.WEAR_OS -> "Wear OS"
+        PremiumFeature.AD_FREE -> stringResource(Res.string.premium_feature_title_ad_free)
+        PremiumFeature.CUSTOM_THEMES -> stringResource(Res.string.premium_feature_title_custom_themes)
+        PremiumFeature.ADVANCED_WIDGETS -> stringResource(Res.string.premium_feature_title_advanced_widgets)
+        PremiumFeature.WIDGETS_CUSTOMIZATION -> stringResource(Res.string.premium_feature_title_widgets_customization)
+        PremiumFeature.CAL_SYNC -> stringResource(Res.string.premium_feature_title_cal_sync)
+        PremiumFeature.NOTIFICATION_CUSTOMIZATION -> stringResource(Res.string.premium_feature_title_notification_customization)
+        PremiumFeature.WEAR_OS -> stringResource(Res.string.premium_feature_title_wear_os)
     }
 }

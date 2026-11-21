@@ -31,6 +31,13 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import me.calebjones.spacelaunchnow.ui.theme.SpaceLaunchNowPreviewTheme
 import org.jetbrains.compose.ui.tooling.preview.Preview
+import org.jetbrains.compose.resources.stringResource
+import spacelaunchnow_kmp.composeapp.generated.resources.Res
+import spacelaunchnow_kmp.composeapp.generated.resources.onboarding_widget_go
+import spacelaunchnow_kmp.composeapp.generated.resources.onboarding_widget_go_for_launch_badge
+import spacelaunchnow_kmp.composeapp.generated.resources.onboarding_widget_next_launch
+import spacelaunchnow_kmp.composeapp.generated.resources.onboarding_widget_status_go
+import spacelaunchnow_kmp.composeapp.generated.resources.onboarding_widget_upcoming_launches
 
 private val WidgetDark = Color(0xFF1C1C1E)
 private val WidgetSurface = Color(0xFF2C2C2E)
@@ -93,6 +100,7 @@ fun LockScreenWidgetMockup(modifier: Modifier = Modifier) {
     ) {
         Column(verticalArrangement = Arrangement.spacedBy(4.dp)) {
             Text(
+                // i18n-ignore: widget mockup sample data
                 text = "Falcon 9 Block 5",
                 style = MaterialTheme.typography.bodySmall,
                 color = WidgetTextPrimary,
@@ -111,6 +119,7 @@ fun LockScreenWidgetMockup(modifier: Modifier = Modifier) {
                     tint = WidgetAccent
                 )
                 Text(
+                    // i18n-ignore: widget mockup sample data
                     text = "2d 5hr",
                     style = MaterialTheme.typography.labelSmall,
                     color = WidgetAccent,
@@ -118,6 +127,7 @@ fun LockScreenWidgetMockup(modifier: Modifier = Modifier) {
                 )
             }
             Text(
+                // i18n-ignore: widget mockup sample data
                 text = "SpaceX",
                 style = MaterialTheme.typography.labelSmall,
                 color = WidgetTextSecondary
@@ -155,7 +165,7 @@ fun HomeScreenWidgetSmallMockup(modifier: Modifier = Modifier) {
                     tint = WidgetAccent
                 )
                 Text(
-                    text = "Go",
+                    text = stringResource(Res.string.onboarding_widget_go),
                     style = MaterialTheme.typography.labelSmall,
                     color = WidgetAccent,
                     fontWeight = FontWeight.Medium
@@ -164,6 +174,7 @@ fun HomeScreenWidgetSmallMockup(modifier: Modifier = Modifier) {
 
             // Launch name
             Text(
+                // i18n-ignore: widget mockup sample data
                 text = "Starlink Group 12-5",
                 style = MaterialTheme.typography.bodySmall,
                 color = WidgetTextPrimary,
@@ -174,6 +185,7 @@ fun HomeScreenWidgetSmallMockup(modifier: Modifier = Modifier) {
 
             // Countdown
             Text(
+                // i18n-ignore: widget mockup sample data
                 text = "2d 5hr",
                 style = MaterialTheme.typography.titleMedium,
                 color = WidgetTextPrimary,
@@ -202,7 +214,7 @@ fun HomeScreenWidgetMediumMockup(modifier: Modifier = Modifier) {
         Column(modifier = Modifier.fillMaxWidth()) {
             // Header
             Text(
-                text = "NEXT LAUNCH",
+                text = stringResource(Res.string.onboarding_widget_next_launch),
                 style = MaterialTheme.typography.labelSmall,
                 color = WidgetTextSecondary,
                 fontWeight = FontWeight.SemiBold,
@@ -239,6 +251,7 @@ fun HomeScreenWidgetMediumMockup(modifier: Modifier = Modifier) {
                 ) {
                     // Launch name
                     Text(
+                        // i18n-ignore: widget mockup sample data
                         text = "SLS Block 1 | Artemis II",
                         style = MaterialTheme.typography.bodySmall,
                         color = WidgetTextPrimary,
@@ -255,7 +268,7 @@ fun HomeScreenWidgetMediumMockup(modifier: Modifier = Modifier) {
                             .padding(horizontal = 6.dp, vertical = 2.dp)
                     ) {
                         Text(
-                            text = "GO FOR LAUNCH",
+                            text = stringResource(Res.string.onboarding_widget_go_for_launch_badge),
                             style = MaterialTheme.typography.labelSmall,
                             color = Color.White,
                             fontWeight = FontWeight.Bold,
@@ -265,6 +278,7 @@ fun HomeScreenWidgetMediumMockup(modifier: Modifier = Modifier) {
 
                     // Countdown
                     Text(
+                        // i18n-ignore: widget mockup sample data
                         text = "1 hr, 34 min",
                         style = MaterialTheme.typography.bodyMedium,
                         color = WidgetAccent,
@@ -283,6 +297,7 @@ fun HomeScreenWidgetMediumMockup(modifier: Modifier = Modifier) {
                             tint = WidgetTextSecondary
                         )
                         Text(
+                            // i18n-ignore: widget mockup sample data
                             text = "NASA \u00B7 Kennedy Space Ce\u2026",
                             style = MaterialTheme.typography.labelSmall,
                             color = WidgetTextSecondary,
@@ -319,7 +334,7 @@ fun AndroidLaunchListWidgetMockup(modifier: Modifier = Modifier) {
     ) {
         // Header
         Text(
-            text = "Upcoming Launches",
+            text = stringResource(Res.string.onboarding_widget_upcoming_launches),
             style = MaterialTheme.typography.bodyMedium,
             color = widgetGreen,
             fontWeight = FontWeight.Bold
@@ -333,7 +348,7 @@ fun AndroidLaunchListWidgetMockup(modifier: Modifier = Modifier) {
             agency = "National Aeronautics and Space Administration",
             location = "Kennedy Space Center, FL, USA",
             countdown = "1h 24m",
-            status = "Go for Launch",
+            status = stringResource(Res.string.onboarding_widget_status_go),
             accentColor = widgetGreen
         )
         AndroidWidgetLaunchItem(
@@ -341,7 +356,7 @@ fun AndroidLaunchListWidgetMockup(modifier: Modifier = Modifier) {
             agency = "SpaceX",
             location = "Cape Canaveral SFS, FL, USA",
             countdown = "14h 52m",
-            status = "Go for Launch",
+            status = stringResource(Res.string.onboarding_widget_status_go),
             accentColor = widgetGreen
         )
         AndroidWidgetLaunchItem(
@@ -349,7 +364,7 @@ fun AndroidLaunchListWidgetMockup(modifier: Modifier = Modifier) {
             agency = "SpaceX",
             location = "Vandenberg SFB, CA, USA",
             countdown = "1d 2h",
-            status = "Go for Launch",
+            status = stringResource(Res.string.onboarding_widget_status_go),
             accentColor = widgetGreen
         )
         AndroidWidgetLaunchItem(
@@ -357,7 +372,7 @@ fun AndroidLaunchListWidgetMockup(modifier: Modifier = Modifier) {
             agency = "Space Pioneer",
             location = "Jiuquan Satellite Launch Center, People's Republic of China",
             countdown = "1d 7h",
-            status = "Go for Launch",
+            status = stringResource(Res.string.onboarding_widget_status_go),
             accentColor = widgetGreen
         )
     }

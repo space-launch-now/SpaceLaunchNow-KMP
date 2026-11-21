@@ -39,6 +39,12 @@ import com.valentinilk.shimmer.shimmer
 import me.calebjones.spacelaunchnow.ui.theme.SpaceLaunchNowPreviewTheme
 import me.calebjones.spacelaunchnow.ui.theme.SpaceLaunchNowTheme
 import org.jetbrains.compose.ui.tooling.preview.Preview
+import org.jetbrains.compose.resources.stringResource
+import spacelaunchnow_kmp.composeapp.generated.resources.Res
+import spacelaunchnow_kmp.composeapp.generated.resources.astronaut_profile_agency_logo_description
+import spacelaunchnow_kmp.composeapp.generated.resources.astronaut_profile_click_label
+import spacelaunchnow_kmp.composeapp.generated.resources.astronaut_profile_description
+import spacelaunchnow_kmp.composeapp.generated.resources.astronaut_profile_photo_description
 
 /**
  * A compact horizontal card displaying astronaut profile information.
@@ -67,17 +73,19 @@ fun AstronautProfileCard(
     onClick: () -> Unit,
     modifier: Modifier = Modifier
 ) {
+    val clickLabel = stringResource(Res.string.astronaut_profile_click_label, astronautName)
+    val cardDescription = stringResource(Res.string.astronaut_profile_description, astronautName, role)
     Card(
         modifier = modifier
             .fillMaxWidth()
             .height(64.dp)
             .clickable(
                 onClick = onClick,
-                onClickLabel = "View $astronautName's profile"
+                onClickLabel = clickLabel
             )
             .semantics {
                 this.role = Role.Button
-                contentDescription = "$astronautName, $role. Tap to view profile"
+                contentDescription = cardDescription
             },
         shape = RoundedCornerShape(12.dp),
         colors = CardDefaults.cardColors(
@@ -102,7 +110,7 @@ fun AstronautProfileCard(
                 if (profileImageUrl != null) {
                     SubcomposeAsyncImage(
                         model = profileImageUrl,
-                        contentDescription = "$astronautName's profile photo",
+                        contentDescription = stringResource(Res.string.astronaut_profile_photo_description, astronautName),
                         modifier = Modifier
                             .fillMaxSize()
                             .clip(CircleShape),
@@ -180,7 +188,7 @@ fun AstronautProfileCard(
                 ) {
                     SubcomposeAsyncImage(
                         model = agencyImageUrl,
-                        contentDescription = "Agency logo",
+                        contentDescription = stringResource(Res.string.astronaut_profile_agency_logo_description),
                         modifier = Modifier
                             .fillMaxSize()
                             .padding(4.dp),

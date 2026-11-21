@@ -46,6 +46,8 @@ import org.jetbrains.compose.resources.painterResource
 import org.jetbrains.compose.ui.tooling.preview.Preview
 import spacelaunchnow_kmp.composeapp.generated.resources.Res
 import spacelaunchnow_kmp.composeapp.generated.resources.launcher
+import spacelaunchnow_kmp.composeapp.generated.resources.app_layout_scaffold_logo_description
+import org.jetbrains.compose.resources.stringResource
 
 /**
  * Unified adaptive app scaffold that uses NavigationSuiteScaffold to automatically
@@ -126,7 +128,7 @@ fun AdaptiveAppScaffold(
                                             ) {
                                                 Image(
                                                     painter = painterResource(Res.drawable.launcher),
-                                                    contentDescription = "Space Launch Now",
+                                                    contentDescription = stringResource(Res.string.app_layout_scaffold_logo_description),
                                                     contentScale = ContentScale.Fit,
                                                     modifier = Modifier
                                                         .size(48.dp)
@@ -138,7 +140,7 @@ fun AdaptiveAppScaffold(
                                             WideNavigationRailItem(
                                                 selected = currentBaseRoute == tab.route::class.qualifiedName,
                                                 onClick = {
-                                                    onTabSelected?.invoke(tab.label)
+                                                    onTabSelected?.invoke(tab.analyticsName)
                                                     navController.navigate(tab.route) {
                                                         launchSingleTop = true
                                                         restoreState = true
@@ -147,10 +149,10 @@ fun AdaptiveAppScaffold(
                                                 icon = {
                                                     Icon(
                                                         tab.icon,
-                                                        contentDescription = tab.contentDescription
+                                                        contentDescription = stringResource(tab.contentDescription)
                                                     )
                                                 },
-                                                label = { Text(tab.label) },
+                                                label = { Text(stringResource(tab.label)) },
                                                 railExpanded = railState.targetValue == WideNavigationRailValue.Expanded
                                             )
                                         }
@@ -208,13 +210,13 @@ fun AdaptiveAppScaffold(
                                     icon = {
                                         Icon(
                                             tab.icon,
-                                            contentDescription = tab.contentDescription
+                                            contentDescription = stringResource(tab.contentDescription)
                                         )
                                     },
-                                    label = { Text(tab.label) },
+                                    label = { Text(stringResource(tab.label)) },
                                     selected = currentRoute == tab.route::class.qualifiedName,
                                     onClick = {
-                                        onTabSelected?.invoke(tab.label)
+                                        onTabSelected?.invoke(tab.analyticsName)
                                         navController.navigate(tab.route) {
                                             launchSingleTop = true
                                             restoreState = true
@@ -236,7 +238,7 @@ private fun AdaptiveAppScaffoldPreview() {
     SpaceLaunchNowPreviewTheme {
         val navController = rememberNavController()
         AdaptiveAppScaffold(navController = navController) {
-            Text("Preview content")
+            Text("Preview content") // i18n-ignore: preview sample data
         }
     }
 }
@@ -247,7 +249,7 @@ private fun AdaptiveAppScaffoldDarkPreview() {
     SpaceLaunchNowPreviewTheme(isDark = true) {
         val navController = rememberNavController()
         AdaptiveAppScaffold(navController = navController) {
-            Text("Preview content (dark)")
+            Text("Preview content (dark)") // i18n-ignore: preview sample data
         }
     }
 }

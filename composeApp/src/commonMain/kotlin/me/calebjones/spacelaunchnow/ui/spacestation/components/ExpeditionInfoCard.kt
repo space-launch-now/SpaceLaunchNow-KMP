@@ -35,6 +35,16 @@ import me.calebjones.spacelaunchnow.domain.model.CrewMember
 import me.calebjones.spacelaunchnow.domain.model.ExpeditionDetailItem
 import me.calebjones.spacelaunchnow.domain.model.ExpeditionMiniItem
 import me.calebjones.spacelaunchnow.util.DateTimeUtil
+import spacelaunchnow_kmp.composeapp.generated.resources.Res
+import org.jetbrains.compose.resources.stringResource
+import spacelaunchnow_kmp.composeapp.generated.resources.station_crew_member_unknown
+import spacelaunchnow_kmp.composeapp.generated.resources.station_expedition_crew_placeholder_description
+import spacelaunchnow_kmp.composeapp.generated.resources.station_expedition_crew_title
+import spacelaunchnow_kmp.composeapp.generated.resources.station_expedition_end
+import spacelaunchnow_kmp.composeapp.generated.resources.station_expedition_icon_description
+import spacelaunchnow_kmp.composeapp.generated.resources.station_expedition_ongoing
+import spacelaunchnow_kmp.composeapp.generated.resources.station_expedition_patch_description
+import spacelaunchnow_kmp.composeapp.generated.resources.station_expedition_start
 
 /**
  * Card displaying detailed expedition information with crew
@@ -59,7 +69,7 @@ fun ExpeditionInfoCard(
                 ) {
                     SubcomposeAsyncImage(
                         model = patchUrl,
-                        contentDescription = "Mission Patch",
+                        contentDescription = stringResource(Res.string.station_expedition_patch_description),
                         modifier = Modifier
                             .size(200.dp)
                             .clip(CircleShape),
@@ -88,7 +98,7 @@ fun ExpeditionInfoCard(
                             ) {
                                 Icon(
                                     imageVector = FontAwesomeIcons.Solid.UserAstronaut,
-                                    contentDescription = "Expedition Icon",
+                                    contentDescription = stringResource(Res.string.station_expedition_icon_description),
                                     modifier = Modifier.size(48.dp),
                                     tint = MaterialTheme.colorScheme.onSurfaceVariant
                                 )
@@ -111,7 +121,7 @@ fun ExpeditionInfoCard(
             Row(modifier = Modifier.fillMaxWidth()) {
                 Column(modifier = Modifier.weight(1f)) {
                     Text(
-                        text = "Start",
+                        text = stringResource(Res.string.station_expedition_start),
                         style = MaterialTheme.typography.labelSmall,
                         color = MaterialTheme.colorScheme.onSurfaceVariant
                     )
@@ -127,13 +137,13 @@ fun ExpeditionInfoCard(
 
                 Column(modifier = Modifier.weight(1f)) {
                     Text(
-                        text = "End",
+                        text = stringResource(Res.string.station_expedition_end),
                         style = MaterialTheme.typography.labelSmall,
                         color = MaterialTheme.colorScheme.onSurfaceVariant
                     )
                     Text(
                         text = expedition.end?.let { DateTimeUtil.formatLaunchDate(it) }
-                            ?: "Ongoing",
+                            ?: stringResource(Res.string.station_expedition_ongoing),
                         style = MaterialTheme.typography.bodyMedium
                     )
                 }
@@ -147,7 +157,7 @@ fun ExpeditionInfoCard(
                 Spacer(modifier = Modifier.height(16.dp))
 
                 Text(
-                    text = "Crew (${crew.size})",
+                    text = stringResource(Res.string.station_expedition_crew_title, crew.size),
                     style = MaterialTheme.typography.titleSmall,
                     modifier = Modifier.padding(bottom = 12.dp)
                 )
@@ -190,7 +200,7 @@ fun ExpeditionInfoCard(
             Row(modifier = Modifier.fillMaxWidth()) {
                 Column(modifier = Modifier.weight(1f)) {
                     Text(
-                        text = "Start",
+                        text = stringResource(Res.string.station_expedition_start),
                         style = MaterialTheme.typography.labelSmall,
                         color = MaterialTheme.colorScheme.onSurfaceVariant
                     )
@@ -206,13 +216,13 @@ fun ExpeditionInfoCard(
 
                 Column(modifier = Modifier.weight(1f)) {
                     Text(
-                        text = "End",
+                        text = stringResource(Res.string.station_expedition_end),
                         style = MaterialTheme.typography.labelSmall,
                         color = MaterialTheme.colorScheme.onSurfaceVariant
                     )
                     Text(
                         text = expeditionMini.end?.let { DateTimeUtil.formatLaunchDate(it) }
-                            ?: "Ongoing",
+                            ?: stringResource(Res.string.station_expedition_ongoing),
                         style = MaterialTheme.typography.bodyMedium
                     )
                 }
@@ -267,7 +277,7 @@ private fun CrewMemberRow(
                 ) {
                     Icon(
                         imageVector = FontAwesomeIcons.Solid.UserAstronaut,
-                        contentDescription = "Crew placeholder",
+                        contentDescription = stringResource(Res.string.station_expedition_crew_placeholder_description),
                         modifier = Modifier.size(96.dp),
                         tint = MaterialTheme.colorScheme.primary.copy(alpha = 0.6f)
                     )
@@ -280,7 +290,7 @@ private fun CrewMemberRow(
         // Name, role, and agency
         Column(modifier = Modifier.weight(1f)) {
             Text(
-                text = astronaut.name ?: "Unknown",
+                text = astronaut.name ?: stringResource(Res.string.station_crew_member_unknown),
                 style = MaterialTheme.typography.bodyMedium,
                 maxLines = 1,
                 overflow = TextOverflow.Ellipsis

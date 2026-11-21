@@ -26,11 +26,14 @@ def default_strings():
     return sorted(VALUES_DIR.glob("strings*.xml"))
 
 KEY_RE = re.compile(r"\bRes\.string\.([A-Za-z0-9_]+)")
-# A string literal; `${...}` may hold quotes (`${a ?: ""}`) and stays inside the literal.
-LITERAL_RE = re.compile(r'(?<!")"((?:[^"\\\n$]|\\.|\$\{[^{}\n]*\}|\$)*)"(?!")')
+# `${...}` in a template: may hold quotes, run over several lines and hold one level of
+# braces (`${name.ifBlank { "Unknown" }}`).
+TEMPLATE_EXPR = r"\$\{(?:[^{}]|\{[^{}]*\})*\}"
+# A string literal; a `${...}` expression stays inside the literal.
+LITERAL_RE = re.compile(r'(?<!")"((?:[^"\\\n$]|\\.|' + TEMPLATE_EXPR + r'|\$)*)"(?!")')
 # Two literals joined by `+` (same line or across lines) form one literal.
 CONCAT_RE = re.compile(r'"\s*\+\s*"')
-KT_VAR_RE = re.compile(r"\$(?:\{([^{}]*)\}|([A-Za-z_][A-Za-z0-9_]*))")
+KT_VAR_RE = re.compile(r"\$(?:\{((?:[^{}]|\{[^{}]*\})*)\}|([A-Za-z_][A-Za-z0-9_]*))")
 PRINTF_PATTERN = r"%(?:(\d+)\$)?[-#+ 0,(]*\d*(?:\.\d+)?([a-zA-Z%])"  # shared with pseudo_locale
 PRINTF_RE = re.compile(PRINTF_PATTERN)
 SIMPLE_ESCAPES = {"n": "\n", "t": "\t", "b": "\b", "r": "\r"}
@@ -126,7 +129,13 @@ def parse_hunks(diff: str):
 def removed_literals(removed):
     """Normalized Kotlin literals in removed lines; `"a" +` newline `"b"` counts as one."""
     text = CONCAT_RE.sub("", "\n".join(removed))
-    return [normalize_literal(m.group(1)) for m in LITERAL_RE.finditer(text)]
+    out = []
+    for m in LITERAL_RE.finditer(text):
+        out.append(normalize_literal(m.group(1)))
+        # A literal inside `${...}` (`${a ?: "N/A"}`) can move to its own resource.
+        for expr in KT_VAR_RE.finditer(m.group(1)):
+            out += [normalize_literal(n.group(1)) for n in LITERAL_RE.finditer(expr.group(1) or "")]
+    return out
 
 
 def check_hunk(pool, added, strings, other):
@@ -148,19 +157,31 @@ def check_hunk(pool, added, strings, other):
     return problems
 
 
+def new_files(diff: str):
+    """Paths of files the diff creates (`--- /dev/null`)."""
+    return set(re.findall(r"^--- /dev/null\n\+\+\+ b/(\S+)", diff, re.M))
+
+
 def verify(diff: str, strings, other):
-    """Match added keys to removed literals per file, so a literal hoisted into a
-    `val` in another hunk of the same file still counts."""
+    """Return (failures, new_text). Keys added in a file that is new in the diff go to
+    `new_text`: no text was removed from such a file, so there is nothing to compare. They
+    count as new text, not as a move, and do not fail. Elsewhere, match added keys to
+    removed literals per file, so a literal hoisted into a `val` in another hunk of the
+    same file still counts."""
+    created = new_files(diff)
     by_file = {}
     for path, removed, added in parse_hunks(diff):
         if (path or "").endswith(".kt"):
             by_file.setdefault(path, []).append((removed, added))
-    failures = []
+    failures, new_text = [], []
     for path, hunks in by_file.items():
+        if path in created:
+            new_text += [f"{path}: {k}" for _, added in hunks for line in added for k in KEY_RE.findall(line)]
+            continue
         pool = removed_literals([line for removed, _ in hunks for line in removed])
         for _, added in hunks:
             failures += [f"{path}: {p}" for p in check_hunk(pool, added, strings, other)]
-    return failures
+    return failures, new_text
 
 
 def git_diff(base: str) -> str:
@@ -190,9 +211,11 @@ def main(argv=None) -> int:
         return 0
 
     strings, other = load_strings(args.strings or default_strings())
-    failures = verify(diff, strings, other)
+    failures, new_text = verify(diff, strings, other)
     for f in failures:
         print(f"FAIL {f}")
+    if new_text:
+        print(f"verify_move: {len(new_text)} key(s) in files new in the diff count as new text, not moves")
     print(f"verify_move: {'FAIL' if failures else 'ok'} ({len(failures)} problem(s))")
     return 1 if failures else 0
 

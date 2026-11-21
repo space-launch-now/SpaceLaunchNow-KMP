@@ -53,6 +53,12 @@ import me.calebjones.spacelaunchnow.domain.model.VideoLink
 import me.calebjones.spacelaunchnow.util.VideoUtil
 import me.calebjones.spacelaunchnow.util.logging.SpaceLogger
 import kotlin.time.Clock.System
+import spacelaunchnow_kmp.composeapp.generated.resources.Res
+import spacelaunchnow_kmp.composeapp.generated.resources.app_video_fullscreen_external_description
+import spacelaunchnow_kmp.composeapp.generated.resources.app_video_fullscreen_position
+import spacelaunchnow_kmp.composeapp.generated.resources.common_back
+import spacelaunchnow_kmp.composeapp.generated.resources.common_live
+import org.jetbrains.compose.resources.stringResource
 
 private val log by lazy { SpaceLogger.getLogger("FullscreenVideoScreen") }
 
@@ -145,7 +151,7 @@ fun FullscreenVideoScreen(
                     ) {
                         Icon(
                             imageVector = Icons.Default.ArrowBack,
-                            contentDescription = "Back",
+                            contentDescription = stringResource(Res.string.common_back),
                             tint = Color.White,
                             modifier = Modifier.size(24.dp)
                         )
@@ -189,7 +195,7 @@ fun FullscreenVideoScreen(
                                 shape = RoundedCornerShape(4.dp)
                             ) {
                                 Text(
-                                    text = "LIVE",
+                                    text = stringResource(Res.string.common_live),
                                     modifier = Modifier.padding(horizontal = 6.dp, vertical = 2.dp),
                                     style = MaterialTheme.typography.labelSmall,
                                     color = Color.White,
@@ -211,7 +217,7 @@ fun FullscreenVideoScreen(
                         ) {
                             Icon(
                                 imageVector = Icons.Default.OpenInNew,
-                                contentDescription = "Open in external app",
+                                contentDescription = stringResource(Res.string.app_video_fullscreen_external_description),
                                 tint = Color.White,
                                 modifier = Modifier.size(20.dp)
                             )
@@ -278,7 +284,7 @@ private fun VideoSelectionControls(
     ) {
         // Current video info
         Text(
-            text = "Video ${selectedIndex + 1} of ${videos.size}",
+            text = stringResource(Res.string.app_video_fullscreen_position, selectedIndex + 1, videos.size),
             style = MaterialTheme.typography.labelMedium,
             color = Color.White.copy(alpha = 0.7f)
         )
@@ -335,7 +341,7 @@ private fun VideoSelectionButton(
 
             if (video.live == true) {
                 Text(
-                    text = "LIVE",
+                    text = stringResource(Res.string.common_live),
                     style = MaterialTheme.typography.labelSmall,
                     color = Color.Red,
                     fontWeight = FontWeight.Bold
@@ -447,7 +453,7 @@ fun FullscreenVideoScreen(
                     ) {
                         Icon(
                             imageVector = Icons.Default.ArrowBack,
-                            contentDescription = "Back",
+                            contentDescription = stringResource(Res.string.common_back),
                             tint = Color.White,
                             modifier = Modifier.size(24.dp)
                         )
@@ -480,7 +486,7 @@ fun FullscreenVideoScreen(
                     ) {
                         Icon(
                             imageVector = Icons.Default.OpenInNew,
-                            contentDescription = "Open in external app",
+                            contentDescription = stringResource(Res.string.app_video_fullscreen_external_description),
                             tint = Color.White,
                             modifier = Modifier.size(20.dp)
                         )

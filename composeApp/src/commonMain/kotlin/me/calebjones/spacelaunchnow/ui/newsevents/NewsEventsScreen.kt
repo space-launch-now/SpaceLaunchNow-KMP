@@ -62,6 +62,18 @@ import me.calebjones.spacelaunchnow.ui.viewmodel.NewsEventsUiState
 import me.calebjones.spacelaunchnow.ui.viewmodel.NewsEventsViewModel
 import org.jetbrains.compose.ui.tooling.preview.Preview
 import org.koin.compose.viewmodel.koinViewModel
+import spacelaunchnow_kmp.composeapp.generated.resources.Res
+import spacelaunchnow_kmp.composeapp.generated.resources.app_newsevents_empty_events
+import spacelaunchnow_kmp.composeapp.generated.resources.app_newsevents_empty_events_search
+import spacelaunchnow_kmp.composeapp.generated.resources.app_newsevents_empty_news
+import spacelaunchnow_kmp.composeapp.generated.resources.app_newsevents_empty_news_search
+import spacelaunchnow_kmp.composeapp.generated.resources.app_newsevents_error_title
+import spacelaunchnow_kmp.composeapp.generated.resources.app_newsevents_filter_description
+import spacelaunchnow_kmp.composeapp.generated.resources.app_newsevents_search_placeholder_events
+import spacelaunchnow_kmp.composeapp.generated.resources.app_newsevents_search_placeholder_news
+import spacelaunchnow_kmp.composeapp.generated.resources.app_newsevents_title
+import spacelaunchnow_kmp.composeapp.generated.resources.common_retry
+import org.jetbrains.compose.resources.stringResource
 
 /**
  * Main screen for browsing news articles and space events.
@@ -254,7 +266,7 @@ private fun NewsEventsContent(
                 horizontalArrangement = Arrangement.SpaceBetween
             ) {
                 Text(
-                    text = "News & Events",
+                    text = stringResource(Res.string.app_newsevents_title),
                     style = MaterialTheme.typography.headlineMedium,
                     fontWeight = FontWeight.Bold,
                     modifier = Modifier.weight(1f)
@@ -262,14 +274,14 @@ private fun NewsEventsContent(
                 BadgedBox(
                     badge = {
                         if (uiState.activeFilterCount > 0) {
-                            Badge { Text("${uiState.activeFilterCount}") }
+                            Badge { Text(uiState.activeFilterCount.toString()) }
                         }
                     }
                 ) {
                     IconButton(onClick = { showFilterSheet = true }) {
                         Icon(
                             imageVector = Icons.Default.FilterList,
-                            contentDescription = "Filter"
+                            contentDescription = stringResource(Res.string.app_newsevents_filter_description)
                         )
                     }
                 }
@@ -280,9 +292,9 @@ private fun NewsEventsContent(
                 query = uiState.searchQuery,
                 onQueryChange = onSearchQueryChange,
                 placeholder = if (uiState.selectedTab == NewsEventsTab.NEWS)
-                    "Search news articles..."
+                    stringResource(Res.string.app_newsevents_search_placeholder_news)
                 else
-                    "Search events...",
+                    stringResource(Res.string.app_newsevents_search_placeholder_events),
                 modifier = Modifier.padding(horizontal = 16.dp, vertical = 4.dp)
             )
 
@@ -404,9 +416,9 @@ private fun NewsTabContent(
             item {
                 EmptyState(
                     message = if (searchQuery.isNotBlank())
-                        "No articles found for \"$searchQuery\""
+                        stringResource(Res.string.app_newsevents_empty_news_search, searchQuery)
                     else
-                        "No news articles found"
+                        stringResource(Res.string.app_newsevents_empty_news)
                 )
             }
         }
@@ -477,9 +489,9 @@ private fun EventsTabContent(
             item {
                 EmptyState(
                     message = if (searchQuery.isNotBlank())
-                        "No events found for \"$searchQuery\""
+                        stringResource(Res.string.app_newsevents_empty_events_search, searchQuery)
                     else
-                        "No events found"
+                        stringResource(Res.string.app_newsevents_empty_events)
                 )
             }
         }
@@ -512,7 +524,7 @@ private fun ErrorState(
         verticalArrangement = Arrangement.spacedBy(8.dp)
     ) {
         Text(
-            text = "Error loading content",
+            text = stringResource(Res.string.app_newsevents_error_title),
             style = MaterialTheme.typography.titleMedium,
             textAlign = TextAlign.Center
         )
@@ -524,7 +536,7 @@ private fun ErrorState(
         )
         if (onRetry != null) {
             TextButton(onClick = onRetry) {
-                Text("Retry")
+                Text(stringResource(Res.string.common_retry))
             }
         }
     }
@@ -555,7 +567,7 @@ private fun NewsEventsScreenPreview() {
     SpaceLaunchNowPreviewTheme {
         Surface {
             Text(
-                text = "News & Events Screen Preview",
+                text = "News & Events Screen Preview", // i18n-ignore: preview sample data
                 modifier = Modifier.padding(16.dp)
             )
         }
@@ -568,7 +580,7 @@ private fun NewsEventsScreenDarkPreview() {
     SpaceLaunchNowPreviewTheme(isDark = true) {
         Surface {
             Text(
-                text = "News & Events Screen Preview (Dark)",
+                text = "News & Events Screen Preview (Dark)", // i18n-ignore: preview sample data
                 modifier = Modifier.padding(16.dp)
             )
         }

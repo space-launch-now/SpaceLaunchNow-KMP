@@ -26,6 +26,12 @@ import me.calebjones.spacelaunchnow.domain.model.Spacecraft
 import me.calebjones.spacelaunchnow.ui.compose.StarshipVehiclesShimmer
 import me.calebjones.spacelaunchnow.ui.layout.rememberAdaptiveLayoutState
 import me.calebjones.spacelaunchnow.ui.viewmodel.ViewState
+import spacelaunchnow_kmp.composeapp.generated.resources.Res
+import org.jetbrains.compose.resources.stringResource
+import spacelaunchnow_kmp.composeapp.generated.resources.starship_vehicles_boosters_empty
+import spacelaunchnow_kmp.composeapp.generated.resources.starship_vehicles_boosters_error
+import spacelaunchnow_kmp.composeapp.generated.resources.starship_vehicles_spacecraft_empty
+import spacelaunchnow_kmp.composeapp.generated.resources.starship_vehicles_spacecraft_error
 
 /**
  * Grid displaying spacecraft (Starship ships) with pagination
@@ -107,13 +113,13 @@ internal fun SpacecraftGrid(
 
             spacecraftState.hasErrorWithNoData -> {
                 VehicleErrorState(
-                    message = "Failed to load spacecraft",
+                    message = stringResource(Res.string.starship_vehicles_spacecraft_error),
                     error = spacecraftState.error
                 )
             }
 
             else -> {
-                VehicleEmptyState(message = "No Starship spacecraft available")
+                VehicleEmptyState(message = stringResource(Res.string.starship_vehicles_spacecraft_empty))
             }
         }
     }
@@ -199,13 +205,13 @@ internal fun LaunchersGrid(
 
             launchersState.hasErrorWithNoData -> {
                 VehicleErrorState(
-                    message = "Failed to load boosters",
+                    message = stringResource(Res.string.starship_vehicles_boosters_error),
                     error = launchersState.error
                 )
             }
 
             else -> {
-                VehicleEmptyState(message = "No Super Heavy boosters available")
+                VehicleEmptyState(message = stringResource(Res.string.starship_vehicles_boosters_empty))
             }
         }
     }

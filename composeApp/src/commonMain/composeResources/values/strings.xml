@@ -8,6 +8,10 @@
     <string name="common_loading">Loading...</string>
     <!-- Button, one line, max 14 chars. Tries a failed load again. -->
     <string name="common_retry">Retry</string>
+    <!-- Shared word. Red badge on live video, one word, max 8 chars. -->
+    <string name="common_live">LIVE</string>
+    <!-- Shared word. Fallback label when a name is missing, for example a country or event type. One word. -->
+    <string name="common_unknown">Unknown</string>
     <!-- Heading on the rocket detail error screen, above the error message. One or two lines. -->
     <string name="rocket_detail_error_title">Error loading rocket details</string>
     <!-- Screen title in the top bar. One line, large heading. -->

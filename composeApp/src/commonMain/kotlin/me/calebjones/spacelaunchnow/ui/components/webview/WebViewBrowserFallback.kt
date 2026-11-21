@@ -17,6 +17,10 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import me.calebjones.spacelaunchnow.util.ExternalLinkHandler
+import spacelaunchnow_kmp.composeapp.generated.resources.Res
+import spacelaunchnow_kmp.composeapp.generated.resources.app_components_web_fallback_button
+import spacelaunchnow_kmp.composeapp.generated.resources.app_components_web_fallback_opening
+import org.jetbrains.compose.resources.stringResource
 
 /**
  * Shared fallback used by the iOS and Desktop [WebView] actuals, which have no in-app browser.
@@ -45,7 +49,7 @@ fun WebViewBrowserFallback(
         verticalArrangement = Arrangement.Center,
     ) {
         Text(
-            text = "Opening article in your browser…",
+            text = stringResource(Res.string.app_components_web_fallback_opening),
             style = MaterialTheme.typography.bodyLarge,
             textAlign = TextAlign.Center,
         )
@@ -58,7 +62,7 @@ fun WebViewBrowserFallback(
                 contentDescription = null,
             )
             Text(
-                text = "Open in browser",
+                text = stringResource(Res.string.app_components_web_fallback_button),
                 modifier = Modifier.padding(start = 8.dp),
             )
         }
