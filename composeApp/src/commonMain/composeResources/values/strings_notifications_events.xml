@@ -1,0 +1,247 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- Section heading in the event detail card, above the event description text. One line, bold. -->
+    <string name="event_detail_description">Description</string>
+    <!-- Section heading in the event detail card, above the list of date, location, duration rows. One line, bold. -->
+    <string name="event_detail_event_details">Event Details</string>
+    <!-- Row label in the event details list. Value (an event date and time) shows beside it. One word. -->
+    <string name="event_detail_label_date">Date</string>
+    <!-- Row label in the event details list. Value (a place name) shows beside it. One word. -->
+    <string name="event_detail_label_location">Location</string>
+    <!-- Row label in the event details list. Value (a length of time) shows beside it. One word. -->
+    <string name="event_detail_label_duration">Duration</string>
+    <!-- Row label in the event details list. Value is the live state, for example Live Now. One word. -->
+    <string name="event_detail_label_status">Status</string>
+    <!-- Row value in the event details list when the event webcast is live. The red circle is an emoji; keep it. Short. -->
+    <string name="event_detail_status_live_now">Live Now 🔴</string>
+    <!-- Row label in the event details list. Value is the date and time of the last data update. Short. -->
+    <string name="event_detail_label_last_updated">Last Updated</string>
+    <!-- Card heading above the list of link buttons for the event. One line, bold. -->
+    <string name="event_detail_links">Links</string>
+    <!-- Button text for an event link that has no title. One word. -->
+    <string name="event_detail_link_fallback">Info</string>
+    <!-- Card heading above the list of agencies, used when the event has exactly one agency. One line, bold. -->
+    <string name="event_detail_agency">Agency</string>
+    <!-- Card heading above the list of agencies, used when the event has two or more agencies. One line, bold. -->
+    <string name="event_detail_agencies">Agencies</string>
+    <!-- Card heading above the list of astronauts at the event. One line, bold. -->
+    <string name="event_detail_astronauts">Astronauts</string>
+    <!-- Card heading above the list of space stations at the event. One line, bold. -->
+    <string name="event_detail_space_stations">Space Stations</string>
+    <!-- Card heading above the list of space station expeditions at the event. One line, bold. -->
+    <string name="event_detail_expeditions">Expeditions</string>
+    <!-- Row title for an expedition that has no name. One word. -->
+    <string name="event_detail_expedition_fallback">Expedition</string>
+    <!-- Card heading above the list of launches linked to the event. One line, bold. -->
+    <string name="event_detail_related_launches">Related Launches</string>
+    <!-- Content description of the placeholder icon shown when a program image fails to load. Read by screen readers. One word. -->
+    <string name="event_detail_mission_description">Mission</string>
+    <!-- Card heading above the list of news updates for the event. One line, bold. -->
+    <string name="event_detail_updates">Updates</string>
+    <!-- Heading on the event detail error card, above the error message. One or two lines. -->
+    <string name="event_detail_error_title">Oops! Something went wrong</string>
+    <!-- Button on the event detail error card. Loads the event again. One line, max 14 chars. -->
+    <string name="event_detail_try_again">Try Again</string>
+    <!-- Line under the updates list when more than 10 updates exist. %1$d is the number of updates not shown. Keep the leading plus sign. -->
+    <string name="event_detail_updates_more">+ %1$d more updates</string>
+    <!-- Hint in the empty detail pane of the two-pane Schedule screen on tablets. Tells the user to pick a launch from the list. One or two lines. -->
+    <string name="schedule_select_launch_prompt">Select a launch to view details</string>
+    <!-- Content description of the X button in the search field. Closes the search field. Read by screen readers. -->
+    <string name="schedule_close_search">Close search</string>
+    <!-- Placeholder text inside the empty launch search field. One line. -->
+    <string name="schedule_search_placeholder">Search launches</string>
+    <!-- Screen title at the top of the Schedule screen. One line, large heading. -->
+    <string name="schedule_title">Launch Schedule</string>
+    <!-- Content description of the filter icon button in the top bar. Opens the filter sheet. Read by screen readers. -->
+    <string name="schedule_filter_button_description">Filter</string>
+    <!-- Content description of the search icon button in the top bar. Opens the search field. Read by screen readers. -->
+    <string name="schedule_search_button_description">Search</string>
+    <!-- Tab label. Shows launches that have not happened yet. One word, max 14 chars. -->
+    <string name="schedule_tab_upcoming">Upcoming</string>
+    <!-- Tab label. Shows launches that already happened. One word, max 14 chars. -->
+    <string name="schedule_tab_previous">Previous</string>
+    <!-- Heading on the launch list error block, above the error message. One line. -->
+    <string name="schedule_error_loading">Error loading launches</string>
+    <!-- Message in the launch list when no launch matches the filters or search. One line. -->
+    <string name="schedule_empty">No launches found</string>
+    <!-- Title of the filter sheet. One line, large heading. -->
+    <string name="schedule_filter_sheet_title">Filter Launches</string>
+    <!-- Content description of the close icon button on the filter sheet. Read by screen readers. -->
+    <string name="schedule_filter_close">Close</string>
+    <!-- Button on the filter sheet and the reload dialog. Dismisses without changes. One word, max 14 chars. -->
+    <string name="schedule_filter_cancel">Cancel</string>
+    <!-- Button on the filter sheet when no filter is selected. Applies the filters. One word, max 14 chars. -->
+    <string name="schedule_filter_apply">Apply</string>
+    <!-- Title of the confirm dialog opened by the reload button on the filter sheet. A question. One line. -->
+    <string name="schedule_filter_reload_title">Reload Filter Options?</string>
+    <!-- Body of the reload confirm dialog. Several lines. -->
+    <string name="schedule_filter_reload_message">This will re-download all filter options from the server. This may take a few moments and will refresh the list of agencies, programs, rockets, locations, and statuses.</string>
+    <!-- Confirm button of the reload dialog. One word, max 14 chars. -->
+    <string name="schedule_filter_reload_confirm">Reload</string>
+    <!-- Button at the bottom of the filter sheet. Opens the reload confirm dialog. One line. -->
+    <string name="schedule_filter_reload_button">Reload Filter Options</string>
+    <!-- Small button on the filter sheet next to the active filter count. Removes every selected filter. Max 14 chars. -->
+    <string name="schedule_filter_clear_all">Clear All</string>
+    <!-- Info note at the top of the filter sheet, shown next to an info icon. Two or three lines. Home page and Schedule are screen names. -->
+    <string name="schedule_filter_scope_note">These filters only affect the Schedule screen. They won\'t change what appears on the Home page or in notifications.</string>
+    <!-- Banner text on the filter sheet. Starts with a construction emoji; keep it. One line. -->
+    <string name="schedule_filter_work_in_progress">🚧 Work In Progress</string>
+    <!-- Section heading on the filter sheet, above the crewed-only switch. One line. -->
+    <string name="schedule_filter_launch_type_heading">Launch Type Filters</string>
+    <!-- Label of a switch on the filter sheet. When on, only crewed launches show. One line. -->
+    <string name="schedule_filter_crewed_only">Crewed Launches Only</string>
+    <!-- Filter section heading on the filter sheet. Space agencies and launch providers. One line. -->
+    <string name="schedule_filter_agencies">Agencies</string>
+    <!-- Filter section heading on the filter sheet. Space programs. One line. -->
+    <string name="schedule_filter_programs">Programs</string>
+    <!-- Filter section heading on the filter sheet. Rocket types. One line. -->
+    <string name="schedule_filter_rockets">Rockets</string>
+    <!-- Warning under the Rockets filter when more than one rocket is selected. API is a technical term. One or two lines. -->
+    <string name="schedule_filter_rocket_limit_note">Note: API supports only 1 rocket filter. Only the first selection will be applied.</string>
+    <!-- Filter section heading on the filter sheet. Launch sites. One line. -->
+    <string name="schedule_filter_locations">Locations</string>
+    <!-- Filter section heading on the filter sheet. Launch statuses such as Go or Hold. One line. -->
+    <string name="schedule_filter_statuses">Statuses</string>
+    <!-- Filter section heading on the filter sheet. Target orbits. One line. -->
+    <string name="schedule_filter_orbits">Orbits</string>
+    <!-- Filter section heading on the filter sheet. Types of mission such as Communications. One line. -->
+    <string name="schedule_filter_mission_types">Mission Types</string>
+    <!-- Filter section heading on the filter sheet. Rocket families such as Falcon. One line. -->
+    <string name="schedule_filter_launcher_families">Launcher Families</string>
+    <!-- Content description of the small X icon on a selected filter chip. Removes that filter. Read by screen readers. -->
+    <string name="schedule_filter_remove">Remove filter</string>
+    <!-- Placeholder in a filter dropdown field when nothing is selected. One line. Keep the three dots. -->
+    <string name="schedule_filter_select_options">Select options...</string>
+    <!-- Content description of the dropdown arrow when the list is open. Read by screen readers. -->
+    <string name="schedule_filter_collapse">Collapse</string>
+    <!-- Content description of the dropdown arrow when the list is closed. Read by screen readers. -->
+    <string name="schedule_filter_expand">Expand</string>
+    <!-- Disabled item in a filter dropdown when the typed search matches nothing. One line. -->
+    <string name="schedule_filter_no_results">No results found</string>
+    <!-- Content description of the check mark beside a selected filter option. Read by screen readers. -->
+    <string name="schedule_filter_selected_description">Selected</string>
+    <!-- Launch name in a list card when the launch has no name. Short. -->
+    <string name="schedule_launch_unknown_name">Unknown Launch</string>
+    <!-- Launch site in a list card when the launch has no location. Short. -->
+    <string name="schedule_launch_unknown_location">Unknown Location</string>
+    <!-- Content description of the rocket icon shown when a launch image is missing. Read by screen readers. -->
+    <string name="schedule_launch_image_placeholder">placeholder</string>
+    <!-- Button on the filter sheet when filters are selected. %1$d is the number of selected filters. One line. -->
+    <string name="schedule_filter_apply_filters">Apply %1$d Filters</string>
+    <!-- Button on the filter side sheet when filters are selected. %1$d is the number of selected filters, shown in brackets. Max 14 chars. -->
+    <string name="schedule_filter_apply_count">Apply (%1$d)</string>
+    <!-- Line at the top of the filter sheet. %1$d is the number of selected filters. (s) marks an optional plural. -->
+    <string name="schedule_filter_active_count">%1$d active filter(s)</string>
+    <!-- Placeholder in a filter dropdown field when options are chosen. %1$d is the number of chosen options. One line. -->
+    <string name="schedule_filter_selected_count">%1$d selected</string>
+    <!-- Screen title in the top bar of the notification settings screen. One line. -->
+    <string name="notification_settings_title">Notification Filters</string>
+    <!-- Heading of the warning card shown when the system notification permission is off. One line. -->
+    <string name="notification_settings_disabled_title">Notifications Disabled</string>
+    <!-- Text in the warning card shown when the system notification permission is off. One or two lines. -->
+    <string name="notification_settings_disabled_message">Enable notifications to receive launch alerts.</string>
+    <!-- Button in the warning card. Asks the system for the notification permission. One word, max 14 chars. -->
+    <string name="notification_settings_enable_button">Enable</string>
+    <!-- Button in the warning card. Opens the system settings screen for the app. Max 14 chars. -->
+    <string name="notification_settings_open_settings_button">Open Settings</string>
+    <!-- Intro sentence under the top bar of the notification settings screen. Two lines. -->
+    <string name="notification_settings_intro">Configure your notification preferences to stay updated with your favorite launches!</string>
+    <!-- Title of a switch. When on, the user gets a notification for every launch. One line. -->
+    <string name="notification_settings_follow_all_title">Follow All Launches</string>
+    <!-- Description under the Follow All Launches switch. One or two lines. -->
+    <string name="notification_settings_follow_all_description">Get notified for every launch across all agencies and locations</string>
+    <!-- Note shown when Follow All Launches is on. Tells the user the agency and location choices below are ignored. Two lines. -->
+    <string name="notification_settings_follow_all_override_note">You\'re following all launches! Individual selections below are overridden.</string>
+    <!-- Section heading above the strict matching switch. One line. -->
+    <string name="notification_settings_matching_title">Notification Matching</string>
+    <!-- Description under the Notification Matching heading. One or two lines. -->
+    <string name="notification_settings_matching_description">Control how your selected agencies and locations work together</string>
+    <!-- Title of a switch. When on, a launch must match both an agency and a location. One line. -->
+    <string name="notification_settings_strict_matching_title">Strict Matching</string>
+    <!-- Note under the Strict Matching switch when Follow All Launches is on. One or two lines. -->
+    <string name="notification_settings_matching_not_applicable">Not applicable when following all launches</string>
+    <!-- Explains the strict matching mode. STRICT, BOTH and AND are in capitals for emphasis; keep the emphasis. Two lines. -->
+    <string name="notification_settings_strict_summary">STRICT: Show launches that match BOTH agency AND location</string>
+    <!-- Example for strict matching. SpaceX and Kennedy Space Center are proper names. KSC is the short form of Kennedy Space Center. ONLY is in capitals for emphasis. Two or three lines. -->
+    <string name="notification_settings_strict_example">Example: If you select SpaceX + Kennedy Space Center, you\'ll ONLY get SpaceX launches from KSC.</string>
+    <!-- Three bullet lines under the strict matching example. Each line starts with a bullet, a check or cross emoji. Keep the emoji and the line breaks. KSC is the short form of Kennedy Space Center. -->
+    <string name="notification_settings_strict_bullets">• ✅ SpaceX from KSC\n• ❌ SpaceX from other locations\n• ❌ Other agencies from KSC</string>
+    <!-- Explains the flexible matching mode. FLEXIBLE, ANY and OR are in capitals for emphasis; keep the emphasis. Two lines. -->
+    <string name="notification_settings_flexible_summary">FLEXIBLE: Show launches that match ANY agency OR location</string>
+    <!-- Example for flexible matching. SpaceX and Kennedy Space Center are proper names. KSC is the short form of Kennedy Space Center. ALL and AND are in capitals for emphasis. Two or three lines. -->
+    <string name="notification_settings_flexible_example">Example: If you select SpaceX + Kennedy Space Center, you\'ll get ALL SpaceX launches AND all KSC launches.</string>
+    <!-- Three bullet lines under the flexible matching example. Each line starts with a bullet and a check emoji. Keep the emoji and the line breaks. KSC is the short form of Kennedy Space Center. -->
+    <string name="notification_settings_flexible_bullets">• ✅ SpaceX from anywhere\n• ✅ Any agency from KSC\n• ✅ Much more notifications</string>
+    <!-- Section heading above the list of agency checkboxes. One line. -->
+    <string name="notification_settings_providers_title">Launch Service Providers</string>
+    <!-- Description under the Launch Service Providers heading. One line. -->
+    <string name="notification_settings_providers_description">Select which launch providers to follow</string>
+    <!-- Title of a switch. When on, Starlink launches send no notification. Starlink is a product name. One line. -->
+    <string name="notification_settings_mute_starlink_title">Mute Starlink launches</string>
+    <!-- Description under the Mute Starlink launches switch. Starlink is a product name. One or two lines. -->
+    <string name="notification_settings_mute_starlink_description">You\'ll still be notified if a Starlink launch fails.</string>
+    <!-- Section heading above the list of location checkboxes. One line. -->
+    <string name="notification_settings_locations_title">Launch Locations</string>
+    <!-- Description under the Launch Locations heading. One line. -->
+    <string name="notification_settings_locations_description">Select which locations to follow</string>
+    <!-- Title of the premium upsell card. One or two lines. -->
+    <string name="notification_settings_premium_title">Unlock Notification Customization</string>
+    <!-- Body of the premium upsell card. Premium is the name of the paid plan. Two lines. -->
+    <string name="notification_settings_premium_description">Upgrade to Premium to customize your notification preferences.</string>
+    <!-- Section heading above the list of topic switches. One line. -->
+    <string name="notification_settings_topics_title">Notification Topics</string>
+    <!-- Sub-heading above the event, news and announcement switches. One line. -->
+    <string name="notification_settings_general_title">General Notifications</string>
+    <!-- Title of a switch for space event notifications. One line. -->
+    <string name="notification_settings_event_title">Event Notifications</string>
+    <!-- Description under the Event Notifications switch. One or two lines. -->
+    <string name="notification_settings_event_description">Space events like spacewalks and dockings</string>
+    <!-- Title of a switch for featured news notifications. One line. -->
+    <string name="notification_settings_news_title">Featured News</string>
+    <!-- Description under the Featured News switch. One line. -->
+    <string name="notification_settings_news_description">Curated space news articles</string>
+    <!-- Title of a switch for app announcement notifications. One line. -->
+    <string name="notification_settings_announcements_title">Announcements</string>
+    <!-- Description under the Announcements switch. Space Launch Now is the app name; do not translate. One or two lines. -->
+    <string name="notification_settings_announcements_description">Announcements and special messages from Space Launch Now</string>
+    <!-- Sub-heading above the timed countdown switches. One line. -->
+    <string name="notification_settings_countdown_title">Countdown Notifications</string>
+    <!-- Description under the Countdown Notifications sub-heading. One or two lines. -->
+    <string name="notification_settings_countdown_description">Get notified at specific times before launch</string>
+    <!-- Title of a switch for notifications sent when the launch time changes. NET means No Earlier Than. One line. -->
+    <string name="notification_settings_net_change_title">Net Timestamp Changes</string>
+    <!-- Description under the Net Timestamp Changes switch. One line. -->
+    <string name="notification_settings_net_change_description">When launch times are updated</string>
+    <!-- Title of a switch for a notification sent 24 hours before launch. One line. -->
+    <string name="notification_settings_notice_24h_title">24 Hour Notice</string>
+    <!-- Description under the 24 Hour Notice switch. One line. -->
+    <string name="notification_settings_notice_24h_description">24 hours before launch</string>
+    <!-- Title of a switch for a notification sent 1 hour before launch. One line. -->
+    <string name="notification_settings_notice_1h_title">1 Hour Notice</string>
+    <!-- Description under the 1 Hour Notice switch. One line. -->
+    <string name="notification_settings_notice_1h_description">1 hour before launch</string>
+    <!-- Title of a switch for a notification sent 10 minutes before launch. One line. -->
+    <string name="notification_settings_notice_10m_title">10 Minutes Notice</string>
+    <!-- Description under the 10 Minutes Notice switch. One line. -->
+    <string name="notification_settings_notice_10m_description">10 minutes before launch</string>
+    <!-- Title of a switch for a notification sent 1 minute before launch. One line. -->
+    <string name="notification_settings_notice_1m_title">1 Minute Notice</string>
+    <!-- Description under the 1 Minute Notice switch. Light, friendly tone. One line. -->
+    <string name="notification_settings_notice_1m_description">1 minute before launch - for the most dedicated!</string>
+    <!-- Sub-heading above the launch status switches. One line. -->
+    <string name="notification_settings_status_title">Status Notifications</string>
+    <!-- Description under the Status Notifications sub-heading. One or two lines. -->
+    <string name="notification_settings_status_description">Stay updated on launch progress and outcomes</string>
+    <!-- Title of a switch. When on, only launches that have a live video stream send notifications. One line. -->
+    <string name="notification_settings_webcast_title">Webcast Only Launches</string>
+    <!-- Description under the Webcast Only Launches switch. One line. -->
+    <string name="notification_settings_webcast_description">Launches that have live video streams</string>
+    <!-- Title of a switch for notifications sent while a rocket is flying. One line. -->
+    <string name="notification_settings_in_flight_title">In-Flight Updates</string>
+    <!-- Description under the In-Flight Updates switch. One line. -->
+    <string name="notification_settings_in_flight_description">Real-time updates during launch</string>
+    <!-- Title of a switch for notifications sent when a mission succeeds. One line. -->
+    <string name="notification_settings_mission_success_title">Mission Success</string>
+    <!-- Description under the Mission Success switch. Light, friendly tone. One line. -->
+    <string name="notification_settings_mission_success_description">Celebrate successful launches!</string>
+</resources>
