@@ -343,24 +343,6 @@ composeApp/src/commonMain/kotlin/me/calebjones/spacelaunchnow/ui/detail/compose/
 composeApp/src/commonMain/kotlin/me/calebjones/spacelaunchnow/ui/detail/compose/tabs/RocketTabContent.kt	Launch Vehicle Details
 composeApp/src/commonMain/kotlin/me/calebjones/spacelaunchnow/ui/detail/compose/tabs/RocketTabContent.kt	No rocket or spacecraft details available for this launch.
 composeApp/src/commonMain/kotlin/me/calebjones/spacelaunchnow/ui/detail/compose/tabs/RocketTabContent.kt	Spacecraft Details
-composeApp/src/commonMain/kotlin/me/calebjones/spacelaunchnow/ui/event/EventDetailView.kt	+ ${updates.size - 10} more updates
-composeApp/src/commonMain/kotlin/me/calebjones/spacelaunchnow/ui/event/EventDetailView.kt	Astronauts
-composeApp/src/commonMain/kotlin/me/calebjones/spacelaunchnow/ui/event/EventDetailView.kt	Back
-composeApp/src/commonMain/kotlin/me/calebjones/spacelaunchnow/ui/event/EventDetailView.kt	Date
-composeApp/src/commonMain/kotlin/me/calebjones/spacelaunchnow/ui/event/EventDetailView.kt	Description
-composeApp/src/commonMain/kotlin/me/calebjones/spacelaunchnow/ui/event/EventDetailView.kt	Duration
-composeApp/src/commonMain/kotlin/me/calebjones/spacelaunchnow/ui/event/EventDetailView.kt	Event Details
-composeApp/src/commonMain/kotlin/me/calebjones/spacelaunchnow/ui/event/EventDetailView.kt	Expeditions
-composeApp/src/commonMain/kotlin/me/calebjones/spacelaunchnow/ui/event/EventDetailView.kt	Last Updated
-composeApp/src/commonMain/kotlin/me/calebjones/spacelaunchnow/ui/event/EventDetailView.kt	Links
-composeApp/src/commonMain/kotlin/me/calebjones/spacelaunchnow/ui/event/EventDetailView.kt	Location
-composeApp/src/commonMain/kotlin/me/calebjones/spacelaunchnow/ui/event/EventDetailView.kt	Mission
-composeApp/src/commonMain/kotlin/me/calebjones/spacelaunchnow/ui/event/EventDetailView.kt	Oops! Something went wrong
-composeApp/src/commonMain/kotlin/me/calebjones/spacelaunchnow/ui/event/EventDetailView.kt	Related Launches
-composeApp/src/commonMain/kotlin/me/calebjones/spacelaunchnow/ui/event/EventDetailView.kt	Space Stations
-composeApp/src/commonMain/kotlin/me/calebjones/spacelaunchnow/ui/event/EventDetailView.kt	Status
-composeApp/src/commonMain/kotlin/me/calebjones/spacelaunchnow/ui/event/EventDetailView.kt	Try Again
-composeApp/src/commonMain/kotlin/me/calebjones/spacelaunchnow/ui/event/EventDetailView.kt	Updates
 composeApp/src/commonMain/kotlin/me/calebjones/spacelaunchnow/ui/explore/ExploreScreen.kt	Explore
 composeApp/src/commonMain/kotlin/me/calebjones/spacelaunchnow/ui/explore/ExploreSections.kt	Agencies
 composeApp/src/commonMain/kotlin/me/calebjones/spacelaunchnow/ui/explore/ExploreSections.kt	Astronauts
@@ -704,48 +686,6 @@ composeApp/src/commonMain/kotlin/me/calebjones/spacelaunchnow/ui/rockets/compose
 composeApp/src/commonMain/kotlin/me/calebjones/spacelaunchnow/ui/rockets/compose/RocketListItem.kt	${rocket.name} image
 composeApp/src/commonMain/kotlin/me/calebjones/spacelaunchnow/ui/rockets/compose/RocketListItem.kt	Active
 composeApp/src/commonMain/kotlin/me/calebjones/spacelaunchnow/ui/rockets/compose/RocketListItem.kt	Reusable
-composeApp/src/commonMain/kotlin/me/calebjones/spacelaunchnow/ui/schedule/ScheduleFilterBottomSheet.kt	Close
-composeApp/src/commonMain/kotlin/me/calebjones/spacelaunchnow/ui/schedule/ScheduleFilterBottomSheet.kt	Filter Launches
-composeApp/src/commonMain/kotlin/me/calebjones/spacelaunchnow/ui/schedule/ScheduleFilterContent.kt	${filterState.activeFilterCount()} active filter(s)
-composeApp/src/commonMain/kotlin/me/calebjones/spacelaunchnow/ui/schedule/ScheduleFilterContent.kt	Agencies
-composeApp/src/commonMain/kotlin/me/calebjones/spacelaunchnow/ui/schedule/ScheduleFilterContent.kt	Cancel
-composeApp/src/commonMain/kotlin/me/calebjones/spacelaunchnow/ui/schedule/ScheduleFilterContent.kt	Clear All
-composeApp/src/commonMain/kotlin/me/calebjones/spacelaunchnow/ui/schedule/ScheduleFilterContent.kt	Crewed Launches Only
-composeApp/src/commonMain/kotlin/me/calebjones/spacelaunchnow/ui/schedule/ScheduleFilterContent.kt	Launch Type Filters
-composeApp/src/commonMain/kotlin/me/calebjones/spacelaunchnow/ui/schedule/ScheduleFilterContent.kt	Launcher Families
-composeApp/src/commonMain/kotlin/me/calebjones/spacelaunchnow/ui/schedule/ScheduleFilterContent.kt	Locations
-composeApp/src/commonMain/kotlin/me/calebjones/spacelaunchnow/ui/schedule/ScheduleFilterContent.kt	Mission Types
-composeApp/src/commonMain/kotlin/me/calebjones/spacelaunchnow/ui/schedule/ScheduleFilterContent.kt	No results found
-composeApp/src/commonMain/kotlin/me/calebjones/spacelaunchnow/ui/schedule/ScheduleFilterContent.kt	Orbits
-composeApp/src/commonMain/kotlin/me/calebjones/spacelaunchnow/ui/schedule/ScheduleFilterContent.kt	Programs
-composeApp/src/commonMain/kotlin/me/calebjones/spacelaunchnow/ui/schedule/ScheduleFilterContent.kt	Reload
-composeApp/src/commonMain/kotlin/me/calebjones/spacelaunchnow/ui/schedule/ScheduleFilterContent.kt	Reload Filter Options
-composeApp/src/commonMain/kotlin/me/calebjones/spacelaunchnow/ui/schedule/ScheduleFilterContent.kt	Reload Filter Options?
-composeApp/src/commonMain/kotlin/me/calebjones/spacelaunchnow/ui/schedule/ScheduleFilterContent.kt	Remove filter
-composeApp/src/commonMain/kotlin/me/calebjones/spacelaunchnow/ui/schedule/ScheduleFilterContent.kt	Rockets
-composeApp/src/commonMain/kotlin/me/calebjones/spacelaunchnow/ui/schedule/ScheduleFilterContent.kt	Selected
-composeApp/src/commonMain/kotlin/me/calebjones/spacelaunchnow/ui/schedule/ScheduleFilterContent.kt	Statuses
-composeApp/src/commonMain/kotlin/me/calebjones/spacelaunchnow/ui/schedule/ScheduleFilterContent.kt	These filters only affect the Schedule screen. They won't change what appears on the Home page or in notifications.
-composeApp/src/commonMain/kotlin/me/calebjones/spacelaunchnow/ui/schedule/ScheduleFilterContent.kt	This will re-download all filter options from the server. This may take a few moments and will refresh the list of agencies, programs, rockets, locations, and statuses.
-composeApp/src/commonMain/kotlin/me/calebjones/spacelaunchnow/ui/schedule/ScheduleFilterContent.kt	🚧 Work In Progress
-composeApp/src/commonMain/kotlin/me/calebjones/spacelaunchnow/ui/schedule/ScheduleFilterSideSheet.kt	Cancel
-composeApp/src/commonMain/kotlin/me/calebjones/spacelaunchnow/ui/schedule/ScheduleFilterSideSheet.kt	Close
-composeApp/src/commonMain/kotlin/me/calebjones/spacelaunchnow/ui/schedule/ScheduleFilterSideSheet.kt	Filter Launches
-composeApp/src/commonMain/kotlin/me/calebjones/spacelaunchnow/ui/schedule/ScheduleScreen.kt	${uiState.filterState.activeFilterCount()}
-composeApp/src/commonMain/kotlin/me/calebjones/spacelaunchnow/ui/schedule/ScheduleScreen.kt	Close search
-composeApp/src/commonMain/kotlin/me/calebjones/spacelaunchnow/ui/schedule/ScheduleScreen.kt	Error loading launches
-composeApp/src/commonMain/kotlin/me/calebjones/spacelaunchnow/ui/schedule/ScheduleScreen.kt	Filter
-composeApp/src/commonMain/kotlin/me/calebjones/spacelaunchnow/ui/schedule/ScheduleScreen.kt	Filter
-composeApp/src/commonMain/kotlin/me/calebjones/spacelaunchnow/ui/schedule/ScheduleScreen.kt	Launch Schedule
-composeApp/src/commonMain/kotlin/me/calebjones/spacelaunchnow/ui/schedule/ScheduleScreen.kt	No launches found
-composeApp/src/commonMain/kotlin/me/calebjones/spacelaunchnow/ui/schedule/ScheduleScreen.kt	Previous
-composeApp/src/commonMain/kotlin/me/calebjones/spacelaunchnow/ui/schedule/ScheduleScreen.kt	Previous
-composeApp/src/commonMain/kotlin/me/calebjones/spacelaunchnow/ui/schedule/ScheduleScreen.kt	Retry
-composeApp/src/commonMain/kotlin/me/calebjones/spacelaunchnow/ui/schedule/ScheduleScreen.kt	Search
-composeApp/src/commonMain/kotlin/me/calebjones/spacelaunchnow/ui/schedule/ScheduleScreen.kt	Search launches
-composeApp/src/commonMain/kotlin/me/calebjones/spacelaunchnow/ui/schedule/ScheduleScreen.kt	Select a launch to view details
-composeApp/src/commonMain/kotlin/me/calebjones/spacelaunchnow/ui/schedule/ScheduleScreen.kt	Upcoming
-composeApp/src/commonMain/kotlin/me/calebjones/spacelaunchnow/ui/schedule/ScheduleScreen.kt	Upcoming
 composeApp/src/commonMain/kotlin/me/calebjones/spacelaunchnow/ui/settings/CalendarSyncScreen.kt	Back
 composeApp/src/commonMain/kotlin/me/calebjones/spacelaunchnow/ui/settings/CalendarSyncScreen.kt	Calendar Feed URLs
 composeApp/src/commonMain/kotlin/me/calebjones/spacelaunchnow/ui/settings/CalendarSyncScreen.kt	Calendar Sync
@@ -777,60 +717,6 @@ composeApp/src/commonMain/kotlin/me/calebjones/spacelaunchnow/ui/settings/Diagno
 composeApp/src/commonMain/kotlin/me/calebjones/spacelaunchnow/ui/settings/LoggingSettingsSection.kt	Diagnostic Logging
 composeApp/src/commonMain/kotlin/me/calebjones/spacelaunchnow/ui/settings/LoggingSettingsSection.kt	Help us debug issues by sharing diagnostic logs. Standard sends warnings 
 composeApp/src/commonMain/kotlin/me/calebjones/spacelaunchnow/ui/settings/LoggingSettingsSection.kt	Open Diagnostics
-composeApp/src/commonMain/kotlin/me/calebjones/spacelaunchnow/ui/settings/NotificationSettingsScreen.kt	1 Hour Notice
-composeApp/src/commonMain/kotlin/me/calebjones/spacelaunchnow/ui/settings/NotificationSettingsScreen.kt	1 Minute Notice
-composeApp/src/commonMain/kotlin/me/calebjones/spacelaunchnow/ui/settings/NotificationSettingsScreen.kt	1 hour before launch
-composeApp/src/commonMain/kotlin/me/calebjones/spacelaunchnow/ui/settings/NotificationSettingsScreen.kt	1 minute before launch - for the most dedicated!
-composeApp/src/commonMain/kotlin/me/calebjones/spacelaunchnow/ui/settings/NotificationSettingsScreen.kt	10 Minutes Notice
-composeApp/src/commonMain/kotlin/me/calebjones/spacelaunchnow/ui/settings/NotificationSettingsScreen.kt	10 minutes before launch
-composeApp/src/commonMain/kotlin/me/calebjones/spacelaunchnow/ui/settings/NotificationSettingsScreen.kt	24 Hour Notice
-composeApp/src/commonMain/kotlin/me/calebjones/spacelaunchnow/ui/settings/NotificationSettingsScreen.kt	24 hours before launch
-composeApp/src/commonMain/kotlin/me/calebjones/spacelaunchnow/ui/settings/NotificationSettingsScreen.kt	Announcements
-composeApp/src/commonMain/kotlin/me/calebjones/spacelaunchnow/ui/settings/NotificationSettingsScreen.kt	Announcements and special messages from Space Launch Now
-composeApp/src/commonMain/kotlin/me/calebjones/spacelaunchnow/ui/settings/NotificationSettingsScreen.kt	Back
-composeApp/src/commonMain/kotlin/me/calebjones/spacelaunchnow/ui/settings/NotificationSettingsScreen.kt	Celebrate successful launches!
-composeApp/src/commonMain/kotlin/me/calebjones/spacelaunchnow/ui/settings/NotificationSettingsScreen.kt	Configure your notification preferences to stay updated with your favorite launches!
-composeApp/src/commonMain/kotlin/me/calebjones/spacelaunchnow/ui/settings/NotificationSettingsScreen.kt	Control how your selected agencies and locations work together
-composeApp/src/commonMain/kotlin/me/calebjones/spacelaunchnow/ui/settings/NotificationSettingsScreen.kt	Countdown Notifications
-composeApp/src/commonMain/kotlin/me/calebjones/spacelaunchnow/ui/settings/NotificationSettingsScreen.kt	Curated space news articles
-composeApp/src/commonMain/kotlin/me/calebjones/spacelaunchnow/ui/settings/NotificationSettingsScreen.kt	Enable notifications to receive launch alerts.
-composeApp/src/commonMain/kotlin/me/calebjones/spacelaunchnow/ui/settings/NotificationSettingsScreen.kt	Event Notifications
-composeApp/src/commonMain/kotlin/me/calebjones/spacelaunchnow/ui/settings/NotificationSettingsScreen.kt	Example: If you select SpaceX + Kennedy Space Center, you'll ONLY get SpaceX launches from KSC.
-composeApp/src/commonMain/kotlin/me/calebjones/spacelaunchnow/ui/settings/NotificationSettingsScreen.kt	Example: If you select SpaceX + Kennedy Space Center, you'll get ALL SpaceX launches AND all KSC launches.
-composeApp/src/commonMain/kotlin/me/calebjones/spacelaunchnow/ui/settings/NotificationSettingsScreen.kt	FLEXIBLE: Show launches that match ANY agency OR location
-composeApp/src/commonMain/kotlin/me/calebjones/spacelaunchnow/ui/settings/NotificationSettingsScreen.kt	Featured News
-composeApp/src/commonMain/kotlin/me/calebjones/spacelaunchnow/ui/settings/NotificationSettingsScreen.kt	Follow All Launches
-composeApp/src/commonMain/kotlin/me/calebjones/spacelaunchnow/ui/settings/NotificationSettingsScreen.kt	General Notifications
-composeApp/src/commonMain/kotlin/me/calebjones/spacelaunchnow/ui/settings/NotificationSettingsScreen.kt	Get notified at specific times before launch
-composeApp/src/commonMain/kotlin/me/calebjones/spacelaunchnow/ui/settings/NotificationSettingsScreen.kt	Get notified for every launch across all agencies and locations
-composeApp/src/commonMain/kotlin/me/calebjones/spacelaunchnow/ui/settings/NotificationSettingsScreen.kt	In-Flight Updates
-composeApp/src/commonMain/kotlin/me/calebjones/spacelaunchnow/ui/settings/NotificationSettingsScreen.kt	Launch Locations
-composeApp/src/commonMain/kotlin/me/calebjones/spacelaunchnow/ui/settings/NotificationSettingsScreen.kt	Launch Service Providers
-composeApp/src/commonMain/kotlin/me/calebjones/spacelaunchnow/ui/settings/NotificationSettingsScreen.kt	Launches that have live video streams
-composeApp/src/commonMain/kotlin/me/calebjones/spacelaunchnow/ui/settings/NotificationSettingsScreen.kt	Mission Success
-composeApp/src/commonMain/kotlin/me/calebjones/spacelaunchnow/ui/settings/NotificationSettingsScreen.kt	Mute Starlink launches
-composeApp/src/commonMain/kotlin/me/calebjones/spacelaunchnow/ui/settings/NotificationSettingsScreen.kt	Net Timestamp Changes
-composeApp/src/commonMain/kotlin/me/calebjones/spacelaunchnow/ui/settings/NotificationSettingsScreen.kt	Not applicable when following all launches
-composeApp/src/commonMain/kotlin/me/calebjones/spacelaunchnow/ui/settings/NotificationSettingsScreen.kt	Notification Filters
-composeApp/src/commonMain/kotlin/me/calebjones/spacelaunchnow/ui/settings/NotificationSettingsScreen.kt	Notification Matching
-composeApp/src/commonMain/kotlin/me/calebjones/spacelaunchnow/ui/settings/NotificationSettingsScreen.kt	Notification Topics
-composeApp/src/commonMain/kotlin/me/calebjones/spacelaunchnow/ui/settings/NotificationSettingsScreen.kt	Notifications Disabled
-composeApp/src/commonMain/kotlin/me/calebjones/spacelaunchnow/ui/settings/NotificationSettingsScreen.kt	Real-time updates during launch
-composeApp/src/commonMain/kotlin/me/calebjones/spacelaunchnow/ui/settings/NotificationSettingsScreen.kt	STRICT: Show launches that match BOTH agency AND location
-composeApp/src/commonMain/kotlin/me/calebjones/spacelaunchnow/ui/settings/NotificationSettingsScreen.kt	Select which launch providers to follow
-composeApp/src/commonMain/kotlin/me/calebjones/spacelaunchnow/ui/settings/NotificationSettingsScreen.kt	Select which locations to follow
-composeApp/src/commonMain/kotlin/me/calebjones/spacelaunchnow/ui/settings/NotificationSettingsScreen.kt	Space events like spacewalks and dockings
-composeApp/src/commonMain/kotlin/me/calebjones/spacelaunchnow/ui/settings/NotificationSettingsScreen.kt	Status Notifications
-composeApp/src/commonMain/kotlin/me/calebjones/spacelaunchnow/ui/settings/NotificationSettingsScreen.kt	Stay updated on launch progress and outcomes
-composeApp/src/commonMain/kotlin/me/calebjones/spacelaunchnow/ui/settings/NotificationSettingsScreen.kt	Strict Matching
-composeApp/src/commonMain/kotlin/me/calebjones/spacelaunchnow/ui/settings/NotificationSettingsScreen.kt	Unlock Notification Customization
-composeApp/src/commonMain/kotlin/me/calebjones/spacelaunchnow/ui/settings/NotificationSettingsScreen.kt	Upgrade to Premium to customize your notification preferences.
-composeApp/src/commonMain/kotlin/me/calebjones/spacelaunchnow/ui/settings/NotificationSettingsScreen.kt	Webcast Only Launches
-composeApp/src/commonMain/kotlin/me/calebjones/spacelaunchnow/ui/settings/NotificationSettingsScreen.kt	When launch times are updated
-composeApp/src/commonMain/kotlin/me/calebjones/spacelaunchnow/ui/settings/NotificationSettingsScreen.kt	You'll still be notified if a Starlink launch fails.
-composeApp/src/commonMain/kotlin/me/calebjones/spacelaunchnow/ui/settings/NotificationSettingsScreen.kt	You're following all launches! Individual selections below are overridden.
-composeApp/src/commonMain/kotlin/me/calebjones/spacelaunchnow/ui/settings/NotificationSettingsScreen.kt	• ✅ SpaceX from KSC\n• ❌ SpaceX from other locations\n• ❌ Other agencies from KSC
-composeApp/src/commonMain/kotlin/me/calebjones/spacelaunchnow/ui/settings/NotificationSettingsScreen.kt	• ✅ SpaceX from anywhere\n• ✅ Any agency from KSC\n• ✅ Much more notifications
 composeApp/src/commonMain/kotlin/me/calebjones/spacelaunchnow/ui/settings/SettingsScreen.kt	API URL switching, topic testing, and developer options
 composeApp/src/commonMain/kotlin/me/calebjones/spacelaunchnow/ui/settings/SettingsScreen.kt	About Details
 composeApp/src/commonMain/kotlin/me/calebjones/spacelaunchnow/ui/settings/SettingsScreen.kt	Ad privacy settings

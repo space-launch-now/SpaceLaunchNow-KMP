@@ -44,6 +44,35 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import me.calebjones.spacelaunchnow.data.model.FilterOption
+import org.jetbrains.compose.resources.stringResource
+import spacelaunchnow_kmp.composeapp.generated.resources.Res
+import spacelaunchnow_kmp.composeapp.generated.resources.schedule_filter_active_count
+import spacelaunchnow_kmp.composeapp.generated.resources.schedule_filter_agencies
+import spacelaunchnow_kmp.composeapp.generated.resources.schedule_filter_cancel
+import spacelaunchnow_kmp.composeapp.generated.resources.schedule_filter_clear_all
+import spacelaunchnow_kmp.composeapp.generated.resources.schedule_filter_collapse
+import spacelaunchnow_kmp.composeapp.generated.resources.schedule_filter_crewed_only
+import spacelaunchnow_kmp.composeapp.generated.resources.schedule_filter_expand
+import spacelaunchnow_kmp.composeapp.generated.resources.schedule_filter_launch_type_heading
+import spacelaunchnow_kmp.composeapp.generated.resources.schedule_filter_launcher_families
+import spacelaunchnow_kmp.composeapp.generated.resources.schedule_filter_locations
+import spacelaunchnow_kmp.composeapp.generated.resources.schedule_filter_mission_types
+import spacelaunchnow_kmp.composeapp.generated.resources.schedule_filter_no_results
+import spacelaunchnow_kmp.composeapp.generated.resources.schedule_filter_orbits
+import spacelaunchnow_kmp.composeapp.generated.resources.schedule_filter_programs
+import spacelaunchnow_kmp.composeapp.generated.resources.schedule_filter_reload_button
+import spacelaunchnow_kmp.composeapp.generated.resources.schedule_filter_reload_confirm
+import spacelaunchnow_kmp.composeapp.generated.resources.schedule_filter_reload_message
+import spacelaunchnow_kmp.composeapp.generated.resources.schedule_filter_reload_title
+import spacelaunchnow_kmp.composeapp.generated.resources.schedule_filter_remove
+import spacelaunchnow_kmp.composeapp.generated.resources.schedule_filter_rocket_limit_note
+import spacelaunchnow_kmp.composeapp.generated.resources.schedule_filter_rockets
+import spacelaunchnow_kmp.composeapp.generated.resources.schedule_filter_scope_note
+import spacelaunchnow_kmp.composeapp.generated.resources.schedule_filter_select_options
+import spacelaunchnow_kmp.composeapp.generated.resources.schedule_filter_selected_count
+import spacelaunchnow_kmp.composeapp.generated.resources.schedule_filter_selected_description
+import spacelaunchnow_kmp.composeapp.generated.resources.schedule_filter_statuses
+import spacelaunchnow_kmp.composeapp.generated.resources.schedule_filter_work_in_progress
 
 /**
  * Filter content composable - displays filter options with selectable chips
@@ -79,9 +108,9 @@ fun ScheduleFilterContent(
     if (showReloadConfirmDialog) {
         AdCoveringAlertDialog(
             onDismissRequest = { showReloadConfirmDialog = false },
-            title = { Text("Reload Filter Options?") },
+            title = { Text(stringResource(Res.string.schedule_filter_reload_title)) },
             text = {
-                Text("This will re-download all filter options from the server. This may take a few moments and will refresh the list of agencies, programs, rockets, locations, and statuses.")
+                Text(stringResource(Res.string.schedule_filter_reload_message))
             },
             confirmButton = {
                 TextButton(
@@ -90,12 +119,12 @@ fun ScheduleFilterContent(
                         onReloadOptions?.invoke()
                     }
                 ) {
-                    Text("Reload")
+                    Text(stringResource(Res.string.schedule_filter_reload_confirm))
                 }
             },
             dismissButton = {
                 TextButton(onClick = { showReloadConfirmDialog = false }) {
-                    Text("Cancel")
+                    Text(stringResource(Res.string.schedule_filter_cancel))
                 }
             }
         )
@@ -131,7 +160,7 @@ fun ScheduleFilterContent(
                             verticalAlignment = Alignment.CenterVertically
                         ) {
                             Text(
-                                text = "${filterState.activeFilterCount()} active filter(s)",
+                                text = stringResource(Res.string.schedule_filter_active_count, filterState.activeFilterCount()),
                                 style = MaterialTheme.typography.titleSmall,
                             )
                             OutlinedButton(
@@ -148,7 +177,7 @@ fun ScheduleFilterContent(
                                 }
                             ) {
                                 Text(
-                                    text = "Clear All",
+                                    text = stringResource(Res.string.schedule_filter_clear_all),
                                     style = MaterialTheme.typography.labelSmall,
                                 )
                             }
@@ -181,7 +210,7 @@ fun ScheduleFilterContent(
                                 style = MaterialTheme.typography.titleMedium
                             )
                             Text(
-                                text = "These filters only affect the Schedule screen. They won't change what appears on the Home page or in notifications.",
+                                text = stringResource(Res.string.schedule_filter_scope_note),
                                 style = MaterialTheme.typography.bodySmall
                             )
                         }
@@ -202,7 +231,7 @@ fun ScheduleFilterContent(
                             verticalAlignment = Alignment.CenterVertically
                         ) {
                             Text(
-                                text = "🚧 Work In Progress",
+                                text = stringResource(Res.string.schedule_filter_work_in_progress),
                                 style = MaterialTheme.typography.labelLarge,
                                 fontWeight = FontWeight.Bold
                             )
@@ -218,14 +247,14 @@ fun ScheduleFilterContent(
                     verticalArrangement = Arrangement.spacedBy(8.dp)
                 ) {
                     Text(
-                        text = "Launch Type Filters",
+                        text = stringResource(Res.string.schedule_filter_launch_type_heading),
                         style = MaterialTheme.typography.titleMedium,
                         fontWeight = FontWeight.Bold
                     )
 
                     // Is Crewed toggle
                     BooleanFilterRow(
-                        label = "Crewed Launches Only",
+                        label = stringResource(Res.string.schedule_filter_crewed_only),
                         value = filterState.isCrewed,
                         onValueChange = { newValue ->
                             filterState = filterState.copy(isCrewed = newValue)
@@ -238,7 +267,7 @@ fun ScheduleFilterContent(
             if (agencies.isNotEmpty()) {
                 item {
                     FilterSection(
-                        title = "Agencies",
+                        title = stringResource(Res.string.schedule_filter_agencies),
                         options = agencies,
                         selectedIds = filterState.selectedAgencyIds.toList(),
                         onSelectionChange = { newSelection ->
@@ -252,7 +281,7 @@ fun ScheduleFilterContent(
             if (programs.isNotEmpty()) {
                 item {
                     FilterSection(
-                        title = "Programs",
+                        title = stringResource(Res.string.schedule_filter_programs),
                         options = programs,
                         selectedIds = filterState.selectedProgramIds.toList(),
                         onSelectionChange = { newSelection ->
@@ -267,14 +296,14 @@ fun ScheduleFilterContent(
             if (rockets.isNotEmpty()) {
                 item {
                     FilterSection(
-                        title = "Rockets",
+                        title = stringResource(Res.string.schedule_filter_rockets),
                         options = rockets,
                         selectedIds = filterState.selectedRocketIds.toList(),
                         onSelectionChange = { newSelection ->
                             filterState = filterState.copy(selectedRocketIds = newSelection.toSet())
                         },
                         note = if (filterState.selectedRocketIds.size > 1)
-                            "Note: API supports only 1 rocket filter. Only the first selection will be applied."
+                            stringResource(Res.string.schedule_filter_rocket_limit_note)
                         else null
                     )
                 }
@@ -284,7 +313,7 @@ fun ScheduleFilterContent(
             if (locations.isNotEmpty()) {
                 item {
                     FilterSection(
-                        title = "Locations",
+                        title = stringResource(Res.string.schedule_filter_locations),
                         options = locations,
                         selectedIds = filterState.selectedLocationIds.toList(),
                         onSelectionChange = { newSelection ->
@@ -299,7 +328,7 @@ fun ScheduleFilterContent(
             if (statuses.isNotEmpty()) {
                 item {
                     FilterSection(
-                        title = "Statuses",
+                        title = stringResource(Res.string.schedule_filter_statuses),
                         options = statuses,
                         selectedIds = filterState.selectedStatusIds.toList(),
                         onSelectionChange = { newSelection ->
@@ -314,7 +343,7 @@ fun ScheduleFilterContent(
             if (orbits.isNotEmpty()) {
                 item {
                     FilterSection(
-                        title = "Orbits",
+                        title = stringResource(Res.string.schedule_filter_orbits),
                         options = orbits,
                         selectedIds = filterState.selectedOrbitIds.toList(),
                         onSelectionChange = { newSelection ->
@@ -329,7 +358,7 @@ fun ScheduleFilterContent(
             if (missionTypes.isNotEmpty()) {
                 item {
                     FilterSection(
-                        title = "Mission Types",
+                        title = stringResource(Res.string.schedule_filter_mission_types),
                         options = missionTypes,
                         selectedIds = filterState.selectedMissionTypeIds.toList(),
                         onSelectionChange = { newSelection ->
@@ -344,7 +373,7 @@ fun ScheduleFilterContent(
             if (launcherConfigFamilies.isNotEmpty()) {
                 item {
                     FilterSection(
-                        title = "Launcher Families",
+                        title = stringResource(Res.string.schedule_filter_launcher_families),
                         options = launcherConfigFamilies,
                         selectedIds = filterState.selectedLauncherConfigFamilyIds.toList(),
                         onSelectionChange = { newSelection ->
@@ -362,7 +391,7 @@ fun ScheduleFilterContent(
                         onClick = { showReloadConfirmDialog = true },
                         modifier = Modifier.fillMaxWidth()
                     ) {
-                        Text("Reload Filter Options")
+                        Text(stringResource(Res.string.schedule_filter_reload_button))
                     }
                 }
             }
@@ -443,7 +472,7 @@ private fun FilterSection(
                         trailingIcon = {
                             Icon(
                                 imageVector = Icons.Default.Close,
-                                contentDescription = "Remove filter",
+                                contentDescription = stringResource(Res.string.schedule_filter_remove),
                                 modifier = Modifier.size(16.dp)
                             )
                         }
@@ -462,14 +491,14 @@ private fun FilterSection(
                 modifier = Modifier.fillMaxWidth(),
                 placeholder = {
                     Text(
-                        if (selectedIds.isEmpty()) "Select options..."
-                        else "${selectedIds.size} selected"
+                        if (selectedIds.isEmpty()) stringResource(Res.string.schedule_filter_select_options)
+                        else stringResource(Res.string.schedule_filter_selected_count, selectedIds.size)
                     )
                 },
                 trailingIcon = {
                     Icon(
                         imageVector = Icons.Default.ArrowDropDown,
-                        contentDescription = if (expanded) "Collapse" else "Expand",
+                        contentDescription = if (expanded) stringResource(Res.string.schedule_filter_collapse) else stringResource(Res.string.schedule_filter_expand),
                         modifier = Modifier.clickable { expanded = !expanded }
                     )
                 },
@@ -489,7 +518,7 @@ private fun FilterSection(
             ) {
                 if (filteredOptions.isEmpty()) {
                     DropdownMenuItem(
-                        text = { Text("No results found") },
+                        text = { Text(stringResource(Res.string.schedule_filter_no_results)) },
                         onClick = { },
                         enabled = false
                     )
@@ -510,7 +539,7 @@ private fun FilterSection(
                                     if (isSelected) {
                                         Icon(
                                             imageVector = Icons.Default.Check,
-                                            contentDescription = "Selected",
+                                            contentDescription = stringResource(Res.string.schedule_filter_selected_description),
                                             tint = MaterialTheme.colorScheme.primary
                                         )
                                     }
