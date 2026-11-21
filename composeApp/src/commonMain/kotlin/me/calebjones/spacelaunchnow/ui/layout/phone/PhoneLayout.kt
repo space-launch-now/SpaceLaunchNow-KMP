@@ -123,7 +123,8 @@ fun PhoneLayout(
                     currentRoute?.contains("Astronauts") != true &&
                     currentRoute?.contains("FullscreenVideo") != true &&
                     currentRoute?.contains("NotificationSettings") != true &&
-                    currentRoute?.contains("DebugSettings") != true
+                    currentRoute?.contains("DebugSettings") != true &&
+                    currentRoute?.contains("SupportUs") != true
         }
     }
 

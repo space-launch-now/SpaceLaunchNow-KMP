@@ -1,5 +1,6 @@
 package me.calebjones.spacelaunchnow.ui.onboarding
 
+import me.calebjones.spacelaunchnow.analytics.events.PaywallSource
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -107,13 +108,14 @@ fun OnboardingPaywallScreen(
     val nextLaunch by nextUpViewModel.nextLaunch.collectAsState()
     val availableProducts by viewModel.availableProducts.collectAsState()
     val shownAt = remember { TimeSource.Monotonic.markNow() }
+    val source = PaywallSource.ONBOARDING.value
 
     LaunchedEffect(Unit) {
         nextUpViewModel.fetchNextLaunch()
-        viewModel.trackPaywallViewed("onboarding")
+        viewModel.trackPaywallViewed(source)
         DatadogLogger.info(
             "onboarding_paywall_shown",
-            mapOf("source" to "onboarding", "screen" to "OnboardingScreen")
+            mapOf("source" to source, "screen" to "OnboardingScreen")
         )
     }
 
@@ -158,13 +160,13 @@ fun OnboardingPaywallScreen(
         nextLaunch = nextLaunch,
         isSubscribed = subscriptionState.isSubscribed,
         onSubscribe = { type, product ->
-            viewModel.trackTierSelected(type, product.productId, source = "onboarding")
-            viewModel.purchaseProduct(product, source = "onboarding")
+            viewModel.trackTierSelected(type, product.productId, source = source)
+            viewModel.purchaseProduct(product, source = source)
         },
-        onRestorePurchases = { viewModel.restorePurchases(source = "onboarding") },
+        onRestorePurchases = { viewModel.restorePurchases(source = source) },
         onDismiss = {
             if (!subscriptionState.isSubscribed) {
-                viewModel.trackPaywallDismissed("onboarding", shownAt.elapsedNow().inWholeSeconds)
+                viewModel.trackPaywallDismissed(source, shownAt.elapsedNow().inWholeSeconds)
             }
             coroutineScope.launch {
                 appPreferences.setOnboardingCompleted(true)

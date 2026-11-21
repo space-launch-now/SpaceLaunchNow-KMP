@@ -162,7 +162,9 @@ fun LaunchDetailScreen(
                     onVideoSelected = viewModel::selectVideo,
                     onNavigateToSettings = {
                         navController?.navigate(
-                            me.calebjones.spacelaunchnow.navigation.SupportUs
+                            me.calebjones.spacelaunchnow.navigation.SupportUs(
+                                me.calebjones.spacelaunchnow.analytics.events.PaywallSource.LAUNCH_DETAIL_REMOVE_ADS.value
+                            )
                         )
                     },
                     onEventClick = { eventId ->

@@ -1,5 +1,6 @@
 package me.calebjones.spacelaunchnow.ui.home.components
 
+import me.calebjones.spacelaunchnow.analytics.events.PaywallSource
 import androidx.compose.animation.core.FastOutSlowInEasing
 import androidx.compose.animation.core.RepeatMode
 import androidx.compose.animation.core.animateFloat
@@ -49,7 +50,7 @@ fun HomeTopBar(navController: NavController) {
         },
         actions = {
             if (!isPremium) {
-                SupportUsButton(onClick = { navController.navigate(SupportUs) })
+                SupportUsButton(onClick = { navController.navigate(SupportUs(PaywallSource.HOME_HEART.value)) })
             }
             IconButton(
                 onClick = {

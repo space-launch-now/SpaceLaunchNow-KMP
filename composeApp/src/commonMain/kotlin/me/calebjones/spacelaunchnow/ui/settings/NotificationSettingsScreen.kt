@@ -1,5 +1,6 @@
 package me.calebjones.spacelaunchnow.ui.settings
 
+import me.calebjones.spacelaunchnow.analytics.events.PaywallSource
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -558,7 +559,7 @@ fun NotificationSettingsScreen(
                         description = "Upgrade to Premium to customize your notification preferences.",
                         icon = Icons.Default.Notifications,
                         onUpgradeClick = {
-                            navController.navigate(SupportUs)
+                            navController.navigate(SupportUs(PaywallSource.NOTIFICATION_SETTINGS.value))
                         }
                     )
                 }

@@ -1,5 +1,6 @@
 package me.calebjones.spacelaunchnow.ui.settings
 
+import me.calebjones.spacelaunchnow.analytics.events.PaywallSource
 import me.calebjones.spacelaunchnow.ui.ads.AdCoveringAlertDialog
 import me.calebjones.spacelaunchnow.ui.ads.AdCoveringExposedDropdownMenu
 import androidx.compose.foundation.clickable
@@ -296,7 +297,7 @@ fun SettingsScreen(
                         SettingsNavigationRow(
                             title = "Go Premium \u2728",
                             subtitle = "Ad-free, widgets, themes & more",
-                            onClick = { navController.navigate(me.calebjones.spacelaunchnow.navigation.SupportUs) },
+                            onClick = { navController.navigate(me.calebjones.spacelaunchnow.navigation.SupportUs(PaywallSource.SETTINGS_ROW.value)) },
                             icon = Icons.Filled.Star
                         )
                     }
