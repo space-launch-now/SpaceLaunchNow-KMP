@@ -40,6 +40,7 @@ import androidx.navigation.compose.rememberNavController
 import coil3.compose.SubcomposeAsyncImage
 import com.valentinilk.shimmer.shimmer
 import me.calebjones.spacelaunchnow.LocalUseUtc
+import me.calebjones.spacelaunchnow.domain.mapper.launchStatusLabel
 import me.calebjones.spacelaunchnow.domain.model.Launch
 import me.calebjones.spacelaunchnow.domain.model.NetPrecision
 import me.calebjones.spacelaunchnow.navigation.LaunchDetail
@@ -257,7 +258,7 @@ fun FeaturedLaunchRowCard(
                             contentColor = Color.White
                         ) {
                             Text(
-                                text = status.name.uppercase(),
+                                text = launchStatusLabel(status).uppercase(),
                                 modifier = Modifier.padding(horizontal = 6.dp, vertical = 2.dp),
                                 style = MaterialTheme.typography.labelSmall.copy(
                                     fontWeight = FontWeight.Medium,

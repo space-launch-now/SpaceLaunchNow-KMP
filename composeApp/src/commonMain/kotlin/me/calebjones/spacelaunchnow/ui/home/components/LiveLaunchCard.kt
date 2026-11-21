@@ -39,6 +39,7 @@ import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import coil3.compose.SubcomposeAsyncImage
 import com.valentinilk.shimmer.shimmer
+import me.calebjones.spacelaunchnow.domain.mapper.launchStatusLabel
 import me.calebjones.spacelaunchnow.domain.model.Launch
 import me.calebjones.spacelaunchnow.navigation.LaunchDetail
 import me.calebjones.spacelaunchnow.ui.compose.LiveIndicator
@@ -79,7 +80,7 @@ fun LiveLaunchCard(
     val title by remember(launch) {
         mutableStateOf(LaunchFormatUtil.formatLaunchTitle(launch))
     }
-    val statusText = launch.status?.name ?: "In Flight"
+    val statusText = launch.status?.let { launchStatusLabel(it) } ?: "In Flight"
     val statusColor = getLaunchStatusColor(launch.status?.id)
     val cardDescription = stringResource(Res.string.home_live_launch_description, title, statusText)
     val isWebcastLive = launch.webcastLive
@@ -272,7 +273,7 @@ private fun LiveLaunchCardPreviewContent(
     val title by remember(launch) {
         mutableStateOf(LaunchFormatUtil.formatLaunchTitle(launch))
     }
-    val statusText = launch.status?.name ?: "In Flight"
+    val statusText = launch.status?.let { launchStatusLabel(it) } ?: "In Flight"
     val statusColor = getLaunchStatusColor(launch.status?.id)
     val cardDescription = stringResource(Res.string.home_live_launch_description, title, statusText)
 

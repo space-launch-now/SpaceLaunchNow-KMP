@@ -48,6 +48,7 @@ import coil3.compose.AsyncImage
 import coil3.compose.SubcomposeAsyncImage
 import com.valentinilk.shimmer.shimmer
 import me.calebjones.spacelaunchnow.LocalUseUtc
+import me.calebjones.spacelaunchnow.domain.mapper.launchStatusLabel
 import me.calebjones.spacelaunchnow.domain.model.AstronautSummary
 import me.calebjones.spacelaunchnow.domain.model.Event
 import me.calebjones.spacelaunchnow.domain.model.ExpeditionSummary
@@ -563,7 +564,7 @@ private fun RelatedLaunchesCard(
             launches.forEach { l ->
                 RowWithImage(
                     title = l.name,
-                    subtitle = l.status?.name ?: "",
+                    subtitle = l.status?.let { launchStatusLabel(it) } ?: "",
                     imageUrl = l.imageUrl,
                     fallbackText = l.name.firstOrNull()?.uppercase() ?: "",
                     onClick = { onLaunchClick?.invoke(l.id) }

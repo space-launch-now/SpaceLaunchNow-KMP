@@ -38,6 +38,8 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import coil3.compose.SubcomposeAsyncImage
 import com.valentinilk.shimmer.shimmer
+import me.calebjones.spacelaunchnow.domain.mapper.missionTypeLabel
+import me.calebjones.spacelaunchnow.domain.mapper.orbitLabel
 import me.calebjones.spacelaunchnow.domain.model.Mission
 import me.calebjones.spacelaunchnow.ui.components.InfoChip
 import org.jetbrains.compose.resources.stringResource
@@ -124,10 +126,10 @@ fun MissionDetailsCard(mission: Mission, missionPatchUrl: String?) {
                 // Tag chips row for type and orbit
                 LazyRow(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
                     mission.type?.takeIf { it.isNotBlank() }?.let { type ->
-                        item { InfoChip(icon = Icons.Filled.Category, text = type) }
+                        item { InfoChip(icon = Icons.Filled.Category, text = missionTypeLabel(type)) }
                     }
-                    mission.orbit?.name?.takeIf { it.isNotBlank() }?.let { orbitName ->
-                        item { InfoChip(icon = Icons.Filled.Public, text = orbitName) }
+                    mission.orbit?.takeIf { it.name.isNotBlank() }?.let { orbit ->
+                        item { InfoChip(icon = Icons.Filled.Public, text = orbitLabel(orbit)) }
                     }
                 }
 

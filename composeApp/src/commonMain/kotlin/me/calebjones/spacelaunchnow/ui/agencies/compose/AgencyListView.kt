@@ -46,6 +46,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import coil3.compose.AsyncImage
+import me.calebjones.spacelaunchnow.domain.mapper.countryLabel
 import me.calebjones.spacelaunchnow.domain.model.Agency
 import me.calebjones.spacelaunchnow.domain.model.Country
 import org.jetbrains.compose.ui.tooling.preview.Preview
@@ -229,7 +230,7 @@ fun AgencyListItem(
                                 onClick = { },
                                 label = {
                                     Text(
-                                        text = country.name ?: stringResource(Res.string.agency_list_country_unknown),
+                                        text = countryLabel(country) ?: stringResource(Res.string.agency_list_country_unknown),
                                         style = MaterialTheme.typography.labelSmall
                                     )
                                 }
