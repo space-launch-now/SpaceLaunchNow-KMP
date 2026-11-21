@@ -14,7 +14,6 @@ import org.jetbrains.compose.ui.tooling.preview.Preview
 import kotlinx.coroutines.launch
 import me.calebjones.spacelaunchnow.ui.components.PlatformBackHandler
 import me.calebjones.spacelaunchnow.ui.theme.SpaceLaunchNowPreviewTheme
-import spacelaunchnow_kmp.composeapp.generated.resources.Res
 
 /**
  * Generic wrapper for list-detail two-pane layouts on tablets/desktop.

@@ -68,7 +68,6 @@ import me.calebjones.spacelaunchnow.ui.subscription.SupportUsScreen
 import me.calebjones.spacelaunchnow.ui.theme.SpaceLaunchNowTheme
 import me.calebjones.spacelaunchnow.ui.video.FullscreenVideoScreen
 import me.calebjones.spacelaunchnow.ui.viewmodel.ThemeOption
-import spacelaunchnow_kmp.composeapp.generated.resources.Res
 
 @Deprecated(
     message = "Use AdaptiveAppScaffold which automatically selects NavigationBar/Rail/Drawer", // i18n-ignore: @Deprecated message, read by developers only

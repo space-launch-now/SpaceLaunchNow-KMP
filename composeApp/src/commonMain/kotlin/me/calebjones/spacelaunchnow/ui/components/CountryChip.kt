@@ -21,7 +21,6 @@ import spacelaunchnow_kmp.composeapp.generated.resources.Res
 import spacelaunchnow_kmp.composeapp.generated.resources.app_components_country_chip_flag_description
 import spacelaunchnow_kmp.composeapp.generated.resources.common_unknown
 import org.jetbrains.compose.resources.stringResource
-import spacelaunchnow_kmp.composeapp.generated.resources.common_unknown
 
 /**
  * Country chip with flag image
