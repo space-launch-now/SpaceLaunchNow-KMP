@@ -10,8 +10,6 @@
     <string name="station_exit_fullscreen_description">Exit Fullscreen</string>
     <!-- Station map marker, Android only. Title of the marker that shows where the station is. Keep short. -->
     <string name="station_map_marker_title">ISS</string>
-    <!-- Station map marker, Android only. Second line under the marker title. %1$s is the latitude and %2$s the longitude, both as numbers with 4 decimals. -->
-    <string name="station_map_marker_snippet">Lat: %1$s°, Lon: %2$s°</string>
 
     <!-- Station position card. Heading of the card, one line. -->
     <string name="station_position_title">Current Position</string>
