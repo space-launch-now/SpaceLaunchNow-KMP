@@ -27,13 +27,14 @@ import me.calebjones.spacelaunchnow.getPlatform
 import org.jetbrains.compose.resources.stringResource
 import spacelaunchnow_kmp.composeapp.generated.resources.Res
 import spacelaunchnow_kmp.composeapp.generated.resources.fine_print_auto_renew_notice
-import spacelaunchnow_kmp.composeapp.generated.resources.fine_print_billing_note_android
-import spacelaunchnow_kmp.composeapp.generated.resources.fine_print_billing_note_ios
-import spacelaunchnow_kmp.composeapp.generated.resources.fine_print_billing_note_other
+import spacelaunchnow_kmp.composeapp.generated.resources.fine_print_billing_note
 import spacelaunchnow_kmp.composeapp.generated.resources.fine_print_manage_app_store
 import spacelaunchnow_kmp.composeapp.generated.resources.fine_print_manage_generic
 import spacelaunchnow_kmp.composeapp.generated.resources.fine_print_manage_google_play
 import spacelaunchnow_kmp.composeapp.generated.resources.fine_print_secure_billing_title
+import spacelaunchnow_kmp.composeapp.generated.resources.fine_print_store_app_store
+import spacelaunchnow_kmp.composeapp.generated.resources.fine_print_store_google_play
+import spacelaunchnow_kmp.composeapp.generated.resources.fine_print_store_other
 import spacelaunchnow_kmp.composeapp.generated.resources.fine_print_trial_disclosure
 
 /**
@@ -86,11 +87,14 @@ fun FinePrint(
 
         Text(
             text = stringResource(
-                when (platformType) {
-                    PlatformType.ANDROID -> Res.string.fine_print_billing_note_android
-                    PlatformType.IOS -> Res.string.fine_print_billing_note_ios
-                    else -> Res.string.fine_print_billing_note_other
-                }
+                Res.string.fine_print_billing_note,
+                stringResource(
+                    when (platformType) {
+                        PlatformType.ANDROID -> Res.string.fine_print_store_google_play
+                        PlatformType.IOS -> Res.string.fine_print_store_app_store
+                        else -> Res.string.fine_print_store_other
+                    }
+                )
             ),
             style = MaterialTheme.typography.bodySmall,
             textAlign = TextAlign.Center,

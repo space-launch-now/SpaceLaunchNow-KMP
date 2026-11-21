@@ -197,12 +197,14 @@
     <string name="support_us_legacy_banner_prompt">Choose a plan below to continue supporting development!</string>
     <!-- Heading of the fine print on subscription screens. One line. -->
     <string name="fine_print_secure_billing_title">Secure Billing</string>
-    <!-- Billing note on Android. Google Play is the store name. -->
-    <string name="fine_print_billing_note_android">Purchases are processed securely through Google Play.</string>
-    <!-- Billing note on iOS. The App Store is the store name. -->
-    <string name="fine_print_billing_note_ios">Purchases are processed securely through the App Store.</string>
-    <!-- Billing note on other platforms, such as desktop. -->
-    <string name="fine_print_billing_note_other">Purchases are processed securely through your platform's store.</string>
+    <!-- Billing note. %1$s is the store name: the next three strings. -->
+    <string name="fine_print_billing_note">Purchases are processed securely through %1$s.</string>
+    <!-- Store name on Android, used in the billing note. -->
+    <string name="fine_print_store_google_play">Google Play</string>
+    <!-- Store name on iOS, used in the billing note. Reads after "through". -->
+    <string name="fine_print_store_app_store">the App Store</string>
+    <!-- Store name on other platforms, such as desktop, used in the billing note. -->
+    <string name="fine_print_store_other">your platform's store</string>
     <!-- Free trial disclosure required by store policy. %1$s is the price after the trial, such as $9.99/year. %2$s is the trial length, such as 3-day. -->
     <string name="fine_print_trial_disclosure">Free trial will automatically convert to a paid subscription at %1$s unless canceled before the trial ends. You won't be charged if you cancel during the %2$s trial period.</string>
     <!-- Auto-renew notice under the plans. Three sentences. -->
