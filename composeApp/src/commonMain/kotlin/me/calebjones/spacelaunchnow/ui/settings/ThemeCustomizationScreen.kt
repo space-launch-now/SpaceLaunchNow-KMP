@@ -152,7 +152,6 @@ import spacelaunchnow_kmp.composeapp.generated.resources.settings_theme_widget_r
 import spacelaunchnow_kmp.composeapp.generated.resources.settings_theme_widget_subtitle
 import spacelaunchnow_kmp.composeapp.generated.resources.settings_theme_widget_transparency_hint
 import spacelaunchnow_kmp.composeapp.generated.resources.settings_theme_widget_transparency_title
-import spacelaunchnow_kmp.composeapp.generated.resources.*
 
 /**
  * Platform-specific widget update composable.

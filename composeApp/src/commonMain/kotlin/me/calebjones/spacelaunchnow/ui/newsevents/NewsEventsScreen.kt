@@ -74,7 +74,6 @@ import spacelaunchnow_kmp.composeapp.generated.resources.app_newsevents_search_p
 import spacelaunchnow_kmp.composeapp.generated.resources.app_newsevents_title
 import spacelaunchnow_kmp.composeapp.generated.resources.common_retry
 import org.jetbrains.compose.resources.stringResource
-import spacelaunchnow_kmp.composeapp.generated.resources.*
 
 /**
  * Main screen for browsing news articles and space events.

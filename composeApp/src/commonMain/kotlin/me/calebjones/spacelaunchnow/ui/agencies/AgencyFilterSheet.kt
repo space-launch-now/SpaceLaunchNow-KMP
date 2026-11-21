@@ -59,7 +59,6 @@ import spacelaunchnow_kmp.composeapp.generated.resources.agency_filter_search_ti
 import spacelaunchnow_kmp.composeapp.generated.resources.agency_filter_selected_description
 import spacelaunchnow_kmp.composeapp.generated.resources.agency_filter_sort_title
 import spacelaunchnow_kmp.composeapp.generated.resources.agency_filter_title
-import spacelaunchnow_kmp.composeapp.generated.resources.*
 
 /**
  * Filter and sort bottom sheet content for agency list.

@@ -147,7 +147,6 @@ import spacelaunchnow_kmp.composeapp.generated.resources.settings_main_wear_earl
 import spacelaunchnow_kmp.composeapp.generated.resources.settings_main_wear_early_release_body
 import spacelaunchnow_kmp.composeapp.generated.resources.settings_theme_tab_label
 import spacelaunchnow_kmp.composeapp.generated.resources.settings_theme_title
-import spacelaunchnow_kmp.composeapp.generated.resources.*
 
 @OptIn(ExperimentalMaterial3Api::class, androidx.compose.material3.ExperimentalMaterial3ExpressiveApi::class)
 @Composable

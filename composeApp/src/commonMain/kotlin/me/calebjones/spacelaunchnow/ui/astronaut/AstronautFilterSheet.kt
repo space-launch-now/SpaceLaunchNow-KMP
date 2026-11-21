@@ -79,7 +79,6 @@ import spacelaunchnow_kmp.composeapp.generated.resources.astronaut_filter_title
 import spacelaunchnow_kmp.composeapp.generated.resources.astronaut_filter_type_human
 import spacelaunchnow_kmp.composeapp.generated.resources.astronaut_filter_type_non_human
 import spacelaunchnow_kmp.composeapp.generated.resources.astronaut_filter_type_title
-import spacelaunchnow_kmp.composeapp.generated.resources.*
 
 /**
  * Filter and sort bottom sheet content for astronaut list.
