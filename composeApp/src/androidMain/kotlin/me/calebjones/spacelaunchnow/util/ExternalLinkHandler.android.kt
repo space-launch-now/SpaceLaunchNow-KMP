@@ -3,7 +3,7 @@ package me.calebjones.spacelaunchnow.util
 import android.content.Context
 import android.content.Intent
 import android.net.Uri
-import me.calebjones.spacelaunchnow.R
+import me.calebjones.spacelaunchnow.shared.R
 
 /**
  * Android implementation for opening external links.

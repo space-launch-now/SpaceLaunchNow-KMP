@@ -36,6 +36,12 @@ class CheckHardcodedTextTest(unittest.TestCase):
         self.assertEqual(code, 1)
         self.assertIn('Home.kt:1: "Next Launch"', out)
 
+    def test_new_literal_in_android_app_fails(self):
+        self.write("androidApp/src/main/kotlin/ui/Home.kt", 'fun A() { Text("Next Launch") }\n')
+        code, out = self.run_check()
+        self.assertEqual(code, 1)
+        self.assertIn('androidApp/src/main/kotlin/ui/Home.kt:1: "Next Launch"', out)
+
     def test_baseline_literal_passes_at_any_line(self):
         self.write(SCREEN, 'fun A() { Text("Next Launch") }\n')
         self.run_check("--update")

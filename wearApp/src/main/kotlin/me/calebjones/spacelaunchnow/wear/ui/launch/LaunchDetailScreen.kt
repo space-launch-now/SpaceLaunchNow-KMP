@@ -30,6 +30,7 @@ import androidx.compose.ui.graphics.TransformOrigin
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.layout.Layout
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.Constraints
@@ -86,7 +87,7 @@ private fun LaunchDetailContent(
         scrollState = columnState,
         edgeButton = {
             EdgeButton(onClick = onOpenOnPhone) {
-                Text("Open on Phone")
+                Text(stringResource(R.string.open_on_phone))
             }
         },
     ) { contentPadding ->
@@ -329,11 +330,11 @@ private fun CountdownSegments(net: Instant) {
             verticalAlignment = Alignment.CenterVertically,
             horizontalArrangement = Arrangement.Center,
         ) {
-            CountdownSegment(segments.days, "DAYS")
+            CountdownSegment(segments.days, stringResource(R.string.wear_countdown_label_days))
             CountdownColon()
-            CountdownSegment(segments.hours, "HOURS")
+            CountdownSegment(segments.hours, stringResource(R.string.wear_countdown_label_hours))
             CountdownColon()
-            CountdownSegment(segments.minutes, "MIN")
+            CountdownSegment(segments.minutes, stringResource(R.string.wear_countdown_label_minutes))
         }
     }
 }

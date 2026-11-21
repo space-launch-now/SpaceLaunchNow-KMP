@@ -90,13 +90,13 @@ jobs:
         env:
           FIREBASE_GOOGLE_SERVICES_JSON: ${{ secrets.FIREBASE_GOOGLE_SERVICES_JSON }}
         run: |
-          echo "$FIREBASE_GOOGLE_SERVICES_JSON" | base64 -d > composeApp/google-services.json
+          echo "$FIREBASE_GOOGLE_SERVICES_JSON" | base64 -d > androidApp/google-services.json
 
       - name: Grant execute permission for gradlew
         run: chmod +x gradlew
 
       - name: Check code formatting & Run tests
-        run: ./gradlew :composeApp:lint test --parallel --continue
+        run: ./gradlew :androidApp:lint test --parallel --continue
         continue-on-error: true
 
       - name: Generate test report
@@ -109,14 +109,14 @@ jobs:
           fail-on-error: false
 
       - name: Build Debug APK (parallel)
-        run: ./gradlew :composeApp:assembleDebug :wearApp:assembleDebug --parallel --build-cache
+        run: ./gradlew :androidApp:assembleDebug :wearApp:assembleDebug --parallel --build-cache
 
       - name: Upload Debug APK
         uses: actions/upload-artifact@v6
         with:
           name: debug-apk
           path: |
-            composeApp/build/outputs/apk/debug/*.apk
+            androidApp/build/outputs/apk/debug/*.apk
             wearApp/build/outputs/apk/debug/*.apk
           retention-days: 7
 

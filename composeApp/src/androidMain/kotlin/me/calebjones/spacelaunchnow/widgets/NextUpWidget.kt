@@ -46,8 +46,8 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import kotlin.time.Clock
 import kotlin.time.Instant
-import me.calebjones.spacelaunchnow.MainActivity
-import me.calebjones.spacelaunchnow.R
+import me.calebjones.spacelaunchnow.platform.mainActivityIntent
+import me.calebjones.spacelaunchnow.shared.R
 import me.calebjones.spacelaunchnow.domain.model.Launch
 import me.calebjones.spacelaunchnow.ui.theme.getWidgetAppearanceBlocking
 import me.calebjones.spacelaunchnow.util.logging.logger
@@ -125,7 +125,7 @@ fun NextUpWidgetContent(
             .cornerRadius(cornerRadius.dp)
             .clickable(
                 actionStartActivity(
-                    Intent(context, MainActivity::class.java).apply {
+                    mainActivityIntent(context).apply {
                         launch?.id?.let { launchId ->
                             putExtra("launch_id", launchId)
                         }

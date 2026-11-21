@@ -20,7 +20,7 @@ severity trains people to ignore you.
 
 These are gitignored and must never be committed. Check every diff:
 
-`.env` · `keystore.properties` · `*.keystore` / `*.jks` · `composeApp/google-services.json`
+`.env` · `keystore.properties` · `*.keystore` / `*.jks` · `androidApp/google-services.json`
 · `iosApp/iosApp/GoogleService-Info.plist` · `iosApp/iosApp/Secrets.plist`
 
 ```bash

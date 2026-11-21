@@ -14,9 +14,10 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.guava.await
 import kotlinx.coroutines.isActive
 import kotlinx.coroutines.launch
+import me.calebjones.spacelaunchnow.wear.R
 import me.calebjones.spacelaunchnow.wear.data.WatchLaunchRepository
 import me.calebjones.spacelaunchnow.wear.data.model.CachedLaunch
-import kotlin.time.Clock
+import me.calebjones.spacelaunchnow.wear.util.formatWearCountdown
 import kotlin.time.Duration.Companion.seconds
 
 data class LaunchDetailUiState(
@@ -52,7 +53,7 @@ class LaunchDetailViewModel(
             } else {
                 _uiState.value = _uiState.value.copy(
                     isLoading = false,
-                    error = "Launch not found",
+                    error = context.getString(R.string.wear_launch_not_found),
                 )
             }
         }
@@ -101,20 +102,6 @@ class LaunchDetailViewModel(
         }
     }
 
-    private fun formatCountdown(launch: CachedLaunch): String {
-        val now = Clock.System.now()
-        val duration = launch.net - now
-        if (duration.isNegative()) return "Launched"
-
-        val totalMinutes = duration.inWholeMinutes
-        val hours = totalMinutes / 60
-        val minutes = totalMinutes % 60
-
-        return when {
-            hours >= 24 -> "T-${hours / 24}d ${hours % 24}h"
-            hours > 0 -> "T-${hours}h ${minutes}m"
-            minutes > 0 -> "T-${minutes}m"
-            else -> "T-0"
-        }
-    }
+    private fun formatCountdown(launch: CachedLaunch): String =
+        formatWearCountdown(context.resources, launch.net)
 }

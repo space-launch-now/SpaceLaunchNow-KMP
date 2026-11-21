@@ -18,10 +18,18 @@ import sys
 import xml.etree.ElementTree as ET
 from pathlib import Path
 
-DEFAULT_STRINGS = [Path("composeApp/src/commonMain/composeResources/values/strings.xml")]
+VALUES_DIR = Path("composeApp/src/commonMain/composeResources/values")
+
+
+def default_strings():
+    """Every English strings*.xml (strings.xml, strings_time.xml, ...) in the values folder."""
+    return sorted(VALUES_DIR.glob("strings*.xml"))
 
 KEY_RE = re.compile(r"\bRes\.string\.([A-Za-z0-9_]+)")
-LITERAL_RE = re.compile(r'(?<!")"((?:[^"\\\n]|\\.)*)"(?!")')
+# A string literal; `${...}` may hold quotes (`${a ?: ""}`) and stays inside the literal.
+LITERAL_RE = re.compile(r'(?<!")"((?:[^"\\\n$]|\\.|\$\{[^{}\n]*\}|\$)*)"(?!")')
+# Two literals joined by `+` (same line or across lines) form one literal.
+CONCAT_RE = re.compile(r'"\s*\+\s*"')
 KT_VAR_RE = re.compile(r"\$(?:\{([^{}]*)\}|([A-Za-z_][A-Za-z0-9_]*))")
 PRINTF_PATTERN = r"%(?:(\d+)\$)?[-#+ 0,(]*\d*(?:\.\d+)?([a-zA-Z%])"  # shared with pseudo_locale
 PRINTF_RE = re.compile(PRINTF_PATTERN)
@@ -115,9 +123,14 @@ def parse_hunks(diff: str):
         yield path, removed, added
 
 
-def check_hunk(removed, added, strings, other):
-    """Return a list of problem strings for one hunk."""
-    pool = [normalize_literal(m.group(1)) for line in removed for m in LITERAL_RE.finditer(line)]
+def removed_literals(removed):
+    """Normalized Kotlin literals in removed lines; `"a" +` newline `"b"` counts as one."""
+    text = CONCAT_RE.sub("", "\n".join(removed))
+    return [normalize_literal(m.group(1)) for m in LITERAL_RE.finditer(text)]
+
+
+def check_hunk(pool, added, strings, other):
+    """Return a list of problem strings for one hunk; `pool` (the file's removed literals) is consumed."""
     problems = []
     for line in added:
         for key in KEY_RE.findall(line):
@@ -136,11 +149,17 @@ def check_hunk(removed, added, strings, other):
 
 
 def verify(diff: str, strings, other):
-    failures = []
+    """Match added keys to removed literals per file, so a literal hoisted into a
+    `val` in another hunk of the same file still counts."""
+    by_file = {}
     for path, removed, added in parse_hunks(diff):
-        if not (path or "").endswith(".kt"):
-            continue
-        failures += [f"{path}: {p}" for p in check_hunk(removed, added, strings, other)]
+        if (path or "").endswith(".kt"):
+            by_file.setdefault(path, []).append((removed, added))
+    failures = []
+    for path, hunks in by_file.items():
+        pool = removed_literals([line for removed, _ in hunks for line in removed])
+        for _, added in hunks:
+            failures += [f"{path}: {p}" for p in check_hunk(pool, added, strings, other)]
     return failures
 
 
@@ -170,7 +189,7 @@ def main(argv=None) -> int:
         print("verify_move: no strings*.xml in the diff, skipped")
         return 0
 
-    strings, other = load_strings(args.strings or DEFAULT_STRINGS)
+    strings, other = load_strings(args.strings or default_strings())
     failures = verify(diff, strings, other)
     for f in failures:
         print(f"FAIL {f}")

@@ -169,7 +169,7 @@ DATADOG_ENVIRONMENT=production          # Environment tag
 
 Linux/Mac:
 ```bash
-base64 -i composeApp/google-services.json | tr -d '\n'
+base64 -i androidApp/google-services.json | tr -d '\n'
 ```
 
 Windows PowerShell:
