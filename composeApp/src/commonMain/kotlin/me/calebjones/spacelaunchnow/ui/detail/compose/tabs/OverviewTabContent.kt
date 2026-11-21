@@ -25,6 +25,12 @@ import me.calebjones.spacelaunchnow.ui.detail.compose.components.RelatedNewsCard
 import me.calebjones.spacelaunchnow.ui.detail.compose.components.TimelineCard
 import me.calebjones.spacelaunchnow.ui.state.VideoPlayerState
 import org.koin.compose.koinInject
+import org.jetbrains.compose.resources.stringResource
+import spacelaunchnow_kmp.composeapp.generated.resources.Res
+import spacelaunchnow_kmp.composeapp.generated.resources.launch_detail_section_related_events
+import spacelaunchnow_kmp.composeapp.generated.resources.launch_detail_section_related_news
+import spacelaunchnow_kmp.composeapp.generated.resources.launch_detail_section_timeline
+import spacelaunchnow_kmp.composeapp.generated.resources.launch_detail_section_updates
 
 /**
  * Overview tab content for launch detail view.
@@ -68,7 +74,7 @@ fun OverviewTabContent(
         // Timeline Card
         if (launch.timeline.isNotEmpty()) {
             Text(
-                text = "Timeline",
+                text = stringResource(Res.string.launch_detail_section_timeline),
                 style = MaterialTheme.typography.titleLarge,
                 fontWeight = FontWeight.Bold
             )
@@ -97,7 +103,7 @@ fun OverviewTabContent(
         // Launch Updates Section
         if (launch.updates.isNotEmpty()) {
             Text(
-                text = "Updates",
+                text = stringResource(Res.string.launch_detail_section_updates),
                 style = MaterialTheme.typography.titleLarge,
                 fontWeight = FontWeight.Bold
             )
@@ -109,7 +115,7 @@ fun OverviewTabContent(
         // Related Events Section
         if (relatedEvents.isNotEmpty() || isEventsLoading || eventsError != null) {
             Text(
-                text = "Related Events",
+                text = stringResource(Res.string.launch_detail_section_related_events),
                 style = MaterialTheme.typography.titleLarge,
                 fontWeight = FontWeight.Bold
             )
@@ -126,7 +132,7 @@ fun OverviewTabContent(
         // Related News Section
         if (relatedNews.isNotEmpty() || isNewsLoading || newsError != null) {
             Text(
-                text = "Related News",
+                text = stringResource(Res.string.launch_detail_section_related_news),
                 style = MaterialTheme.typography.titleLarge,
                 fontWeight = FontWeight.Bold
             )

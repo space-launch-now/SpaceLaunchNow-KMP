@@ -15,31 +15,36 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import me.calebjones.spacelaunchnow.domain.model.NetPrecision
+import org.jetbrains.compose.resources.stringResource
+import spacelaunchnow_kmp.composeapp.generated.resources.Res
+import spacelaunchnow_kmp.composeapp.generated.resources.launch_detail_precision_body
+import spacelaunchnow_kmp.composeapp.generated.resources.launch_detail_precision_ok
+import spacelaunchnow_kmp.composeapp.generated.resources.launch_detail_precision_title
+import spacelaunchnow_kmp.composeapp.generated.resources.launch_detail_value_unknown
 
 @Composable
 fun PrecisionInfoDialog(
     netPrecision: NetPrecision?,
     onDismiss: () -> Unit
 ) {
-    val ui = remember(netPrecision) { mapNetPrecisionUi(netPrecision) }
+    val ui = mapNetPrecisionUi(netPrecision)
     AdCoveringAlertDialog(
         onDismissRequest = onDismiss,
         confirmButton = {
-            TextButton(onClick = onDismiss) { Text("OK") }
+            TextButton(onClick = onDismiss) { Text(stringResource(Res.string.launch_detail_precision_ok)) }
         },
         title = {
             Row(
                 verticalAlignment = Alignment.CenterVertically,
                 horizontalArrangement = Arrangement.spacedBy(8.dp)
             ) {
-                Text(text = "Launch Time Precision", style = MaterialTheme.typography.titleLarge)
+                Text(text = stringResource(Res.string.launch_detail_precision_title), style = MaterialTheme.typography.titleLarge)
             }
         },
         text = {
@@ -71,7 +76,7 @@ fun PrecisionInfoDialog(
                 }
                 Spacer(Modifier.height(12.dp))
                 Text(
-                    text = "The launch NET (No Earlier Than) value is supplied by the provider and precision may vary. NET can represent a fully scheduled time, an approximate window, only a year, only a month, etc. Some launches only have rough or placeholder NET values until closer to launch.",
+                    text = stringResource(Res.string.launch_detail_precision_body),
                     style = MaterialTheme.typography.bodySmall,
                     color = MaterialTheme.colorScheme.onSurfaceVariant
                 )
@@ -86,11 +91,12 @@ private data class PrecisionUi(
     val secondary: String?
 )
 
+@Composable
 private fun mapNetPrecisionUi(netPrecision: NetPrecision?): PrecisionUi {
     // Defaults
     val defaultPrimary = netPrecision?.name?.takeIf { it.isNotBlank() }
         ?: netPrecision?.abbrev?.takeIf { it.isNotBlank() }
-        ?: "Unknown"
+        ?: stringResource(Res.string.launch_detail_value_unknown)
     val fallbackSecondary = netPrecision?.description?.takeIf { it.isNotBlank() }
 
     // Choose icon and concise secondary by id when available
