@@ -513,7 +513,11 @@ fun NotificationSettingsScreen(
                                 }
                                 Switch(
                                     checked = uiState.notificationSettings.muteStarlink,
-                                    onCheckedChange = { viewModel.toggleMuteStarlink() },
+                                    onCheckedChange = if (uiState.hasNotificationCustomization) {
+                                        { viewModel.toggleMuteStarlink() }
+                                    } else {
+                                        null // locked: the row handles the tap
+                                    },
                                     enabled = uiState.hasNotificationCustomization
                                 )
                             }
