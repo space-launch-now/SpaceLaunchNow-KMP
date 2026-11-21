@@ -50,6 +50,18 @@ import me.calebjones.spacelaunchnow.ui.rockets.compose.RocketListItem
 import me.calebjones.spacelaunchnow.ui.viewmodel.RocketSortOrder
 import me.calebjones.spacelaunchnow.ui.viewmodel.RocketViewModel
 import org.koin.compose.viewmodel.koinViewModel
+import org.jetbrains.compose.resources.stringResource
+import spacelaunchnow_kmp.composeapp.generated.resources.Res
+import spacelaunchnow_kmp.composeapp.generated.resources.common_back
+import spacelaunchnow_kmp.composeapp.generated.resources.common_retry
+import spacelaunchnow_kmp.composeapp.generated.resources.rockets_list_empty_message
+import spacelaunchnow_kmp.composeapp.generated.resources.rockets_list_empty_title
+import spacelaunchnow_kmp.composeapp.generated.resources.rockets_list_error_title
+import spacelaunchnow_kmp.composeapp.generated.resources.rockets_list_error_unknown
+import spacelaunchnow_kmp.composeapp.generated.resources.rockets_list_filter_description
+import spacelaunchnow_kmp.composeapp.generated.resources.rockets_list_loading
+import spacelaunchnow_kmp.composeapp.generated.resources.rockets_list_title
+import spacelaunchnow_kmp.composeapp.generated.resources.rockets_list_title_filtered
 
 /**
  * Main screen for browsing rockets.
@@ -118,9 +130,9 @@ fun RocketListScreen(
                     val hasFilters = activeFilterCount > 0
                     Text(
                         text = if (uiState.totalCount > 0 && hasFilters) {
-                            "Rockets (${uiState.totalCount})"
+                            stringResource(Res.string.rockets_list_title_filtered, uiState.totalCount)
                         } else {
-                            "Rockets"
+                            stringResource(Res.string.rockets_list_title)
                         }
                     )
                 },
@@ -128,7 +140,7 @@ fun RocketListScreen(
                     IconButton(onClick = onNavigateBack) {
                         Icon(
                             imageVector = Icons.AutoMirrored.Outlined.ArrowBack,
-                            contentDescription = "Back"
+                            contentDescription = stringResource(Res.string.common_back)
                         )
                     }
                 },
@@ -146,7 +158,7 @@ fun RocketListScreen(
                         ) {
                             Icon(
                                 imageVector = Icons.Default.FilterList,
-                                contentDescription = "Filter rockets"
+                                contentDescription = stringResource(Res.string.rockets_list_filter_description)
                             )
                         }
                     }
@@ -167,7 +179,7 @@ fun RocketListScreen(
                 // Error state
                 uiState.error != null && uiState.rockets.isEmpty() -> {
                     ErrorContent(
-                        errorMessage = uiState.error ?: "Unknown error",
+                        errorMessage = uiState.error ?: stringResource(Res.string.rockets_list_error_unknown),
                         onRetry = { viewModel.refresh() }
                     )
                 }
@@ -282,7 +294,7 @@ private fun LoadingContent() {
         ) {
             LoadingIndicator()
             Text(
-                text = "Loading rockets...",
+                text = stringResource(Res.string.rockets_list_loading),
                 style = MaterialTheme.typography.bodyLarge,
                 color = MaterialTheme.colorScheme.onSurfaceVariant
             )
@@ -311,7 +323,7 @@ private fun ErrorContent(
                 tint = MaterialTheme.colorScheme.error
             )
             Text(
-                text = "Failed to load rockets",
+                text = stringResource(Res.string.rockets_list_error_title),
                 style = MaterialTheme.typography.titleMedium,
                 fontWeight = FontWeight.Bold,
                 textAlign = TextAlign.Center
@@ -323,7 +335,7 @@ private fun ErrorContent(
                 textAlign = TextAlign.Center
             )
             Button(onClick = onRetry) {
-                Text("Retry")
+                Text(stringResource(Res.string.common_retry))
             }
         }
     }
@@ -347,13 +359,13 @@ private fun EmptyContent() {
                 tint = MaterialTheme.colorScheme.onSurfaceVariant
             )
             Text(
-                text = "No rockets found",
+                text = stringResource(Res.string.rockets_list_empty_title),
                 style = MaterialTheme.typography.titleMedium,
                 fontWeight = FontWeight.Bold,
                 textAlign = TextAlign.Center
             )
             Text(
-                text = "Try adjusting your filters",
+                text = stringResource(Res.string.rockets_list_empty_message),
                 style = MaterialTheme.typography.bodyMedium,
                 color = MaterialTheme.colorScheme.onSurfaceVariant,
                 textAlign = TextAlign.Center

@@ -30,6 +30,11 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import coil3.compose.AsyncImage
 import me.calebjones.spacelaunchnow.domain.model.VehicleConfig
+import org.jetbrains.compose.resources.stringResource
+import spacelaunchnow_kmp.composeapp.generated.resources.Res
+import spacelaunchnow_kmp.composeapp.generated.resources.rockets_list_item_image_description
+import spacelaunchnow_kmp.composeapp.generated.resources.rockets_list_item_reusable
+import spacelaunchnow_kmp.composeapp.generated.resources.rockets_status_active
 
 /**
  * Individual rocket list item card.
@@ -61,7 +66,7 @@ fun RocketListItem(
                 rocket.imageUrl?.let { imageUrl ->
                     AsyncImage(
                         model = imageUrl,
-                        contentDescription = "${rocket.name} image",
+                        contentDescription = stringResource(Res.string.rockets_list_item_image_description, rocket.name),
                         modifier = Modifier.fillMaxSize(),
                         contentScale = ContentScale.Crop
                     )
@@ -104,7 +109,7 @@ fun RocketListItem(
                 ) {
                     if (rocket.active == true) {
                         Text(
-                            text = "Active",
+                            text = stringResource(Res.string.rockets_status_active),
                             style = MaterialTheme.typography.bodySmall,
                             color = MaterialTheme.colorScheme.tertiary
                         )
@@ -112,7 +117,7 @@ fun RocketListItem(
 
                     if (rocket.reusable == true) {
                         Text(
-                            text = "Reusable",
+                            text = stringResource(Res.string.rockets_list_item_reusable),
                             style = MaterialTheme.typography.bodySmall,
                             color = MaterialTheme.colorScheme.secondary
                         )
