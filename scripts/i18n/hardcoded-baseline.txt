@@ -746,7 +746,6 @@ composeApp/src/commonMain/kotlin/me/calebjones/spacelaunchnow/ui/schedule/Schedu
 composeApp/src/commonMain/kotlin/me/calebjones/spacelaunchnow/ui/schedule/ScheduleScreen.kt	Select a launch to view details
 composeApp/src/commonMain/kotlin/me/calebjones/spacelaunchnow/ui/schedule/ScheduleScreen.kt	Upcoming
 composeApp/src/commonMain/kotlin/me/calebjones/spacelaunchnow/ui/schedule/ScheduleScreen.kt	Upcoming
-composeApp/src/commonMain/kotlin/me/calebjones/spacelaunchnow/ui/settings/LoggingSettingsSection.kt	Help us debug issues by sharing diagnostic logs. Standard sends warnings 
 composeApp/src/commonMain/kotlin/me/calebjones/spacelaunchnow/ui/settings/NotificationSettingsScreen.kt	1 Hour Notice
 composeApp/src/commonMain/kotlin/me/calebjones/spacelaunchnow/ui/settings/NotificationSettingsScreen.kt	1 Minute Notice
 composeApp/src/commonMain/kotlin/me/calebjones/spacelaunchnow/ui/settings/NotificationSettingsScreen.kt	1 hour before launch
