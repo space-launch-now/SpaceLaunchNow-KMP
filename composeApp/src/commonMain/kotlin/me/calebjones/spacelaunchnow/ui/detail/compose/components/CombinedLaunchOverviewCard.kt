@@ -129,7 +129,7 @@ fun CombinedLaunchOverviewCard(launch: Launch) {
                                         launch.net?.let { net ->
                                             // Just the date part, without the time: "Today at"
                                             Text(
-                                                text = DateTimeUtil.relativeLaunchDateLead(net, useUtc).resolve(),
+                                                text = DateTimeUtil.relativeLaunchDateLead(net, useUtc).resolve().trim(),
                                                 style = MaterialTheme.typography.headlineMedium,
                                                 color = MaterialTheme.colorScheme.onSurfaceVariant,
                                                 maxLines = 2,

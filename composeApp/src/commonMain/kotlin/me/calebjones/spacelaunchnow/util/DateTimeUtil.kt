@@ -102,31 +102,17 @@ object DateTimeUtil {
 
     /**
      * The date part of [relativeLaunchDateTime], without the clock time: "Today at", "Monday at".
-     * A launch more than a week away gives its formatted date and time without the last word,
-     * the same cut the launch detail card always made.
+     * It reuses the same strings with an empty time, so the caller trims the resolved text.
+     * A launch more than a week away gives its formatted date and time without the last word.
      *
      * Read the result with [resolve] in a composable or [load] in a coroutine.
      */
-    fun relativeLaunchDateLead(instant: Instant, useUtc: Boolean = false): LocalizedText {
-        return try {
-            val timeZone = if (useUtc) TimeZone.UTC else TimeZone.currentSystemDefault()
-            val localDateTime = instant.toLocalDateTime(timeZone)
-            val now = System.now().toLocalDateTime(timeZone)
-
-            when (localDateTime.date.toEpochDays() - now.date.toEpochDays()) {
-                0L -> LocalizedText.Str(Res.string.time_today_at_lead)
-                1L -> LocalizedText.Str(Res.string.time_tomorrow_at_lead)
-                (-1L) -> LocalizedText.Str(Res.string.time_yesterday_at_lead)
-                in 2..6 -> LocalizedText.Str(
-                    Res.string.time_weekday_at_lead,
-                    listOf(LocalizedText.Str(weekdayName(localDateTime.dayOfWeek)))
-                )
-                else -> LocalizedText.Plain(formatLaunchDateTime(instant, useUtc).substringBeforeLast(" "))
-            }
-        } catch (e: Exception) {
-            LocalizedText.Plain(instant.toString().substringBeforeLast(" "))
+    fun relativeLaunchDateLead(instant: Instant, useUtc: Boolean = false): LocalizedText =
+        when (val full = relativeLaunchDateTime(instant, useUtc)) {
+            is LocalizedText.Str -> full.copy(args = full.args.dropLast(1) + "")
+            is LocalizedText.Plain -> LocalizedText.Plain(full.value.substringBeforeLast(" "))
+            is LocalizedText.Joined -> full
         }
-    }
 
     private fun weekdayName(day: DayOfWeek): StringResource = when (day) {
         DayOfWeek.MONDAY -> Res.string.time_weekday_monday
