@@ -27,6 +27,12 @@ import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import me.calebjones.spacelaunchnow.navigation.NotificationSettings
 import org.jetbrains.compose.ui.tooling.preview.Preview
+import spacelaunchnow_kmp.composeapp.generated.resources.Res
+import spacelaunchnow_kmp.composeapp.generated.resources.app_compose_empty_state_action
+import spacelaunchnow_kmp.composeapp.generated.resources.app_compose_empty_state_action_icon_description
+import spacelaunchnow_kmp.composeapp.generated.resources.app_compose_empty_state_message
+import spacelaunchnow_kmp.composeapp.generated.resources.app_compose_empty_state_title
+import org.jetbrains.compose.resources.stringResource
 
 /**
  * A reusable component that displays an empty state card when no data matches the user's filters.
@@ -43,9 +49,9 @@ import org.jetbrains.compose.ui.tooling.preview.Preview
 fun EmptyStateCard(
     navController: NavController? = null,
     icon: ImageVector = Icons.Default.FilterAlt,
-    title: String = "No Launches Match Your Filters",
-    message: String = "Try adjusting your agency or location filters to see more launches",
-    actionButtonText: String = "Adjust Filters",
+    title: String = stringResource(Res.string.app_compose_empty_state_title),
+    message: String = stringResource(Res.string.app_compose_empty_state_message),
+    actionButtonText: String = stringResource(Res.string.app_compose_empty_state_action),
     onActionClick: (() -> Unit)? = null,
     modifier: Modifier = Modifier
 ) {
@@ -106,7 +112,7 @@ fun EmptyStateCard(
                 ) {
                     Icon(
                         imageVector = Icons.Default.Settings,
-                        contentDescription = "Settings"
+                        contentDescription = stringResource(Res.string.app_compose_empty_state_action_icon_description)
                     )
                     Spacer(modifier = Modifier.width(8.dp))
                     Text(actionButtonText)

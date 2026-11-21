@@ -22,28 +22,28 @@ object PreviewData {
         id = 1,
         name = "Go for Launch",
         abbrev = "Go",
-        description = "Launch is proceeding as scheduled"
+        description = "Launch is proceeding as scheduled" // i18n-ignore: preview sample data
     )
 
     val domainStatusTBD = LaunchStatus(
         id = 2,
         name = "To Be Determined",
         abbrev = "TBD",
-        description = "Launch date to be determined"
+        description = "Launch date to be determined" // i18n-ignore: preview sample data
     )
 
     val domainStatusSuccess = LaunchStatus(
         id = 3,
         name = "Launch Successful",
         abbrev = "Success",
-        description = "Launch was successful"
+        description = "Launch was successful" // i18n-ignore: preview sample data
     )
 
     val domainStatusInFlight = LaunchStatus(
         id = 6,
         name = "In Flight",
         abbrev = "InFlight",
-        description = "Vehicle is currently in flight"
+        description = "Vehicle is currently in flight" // i18n-ignore: preview sample data
     )
 
     val domainProviderSpaceX = Provider(
@@ -71,7 +71,7 @@ object PreviewData {
     val domainMissionStarlink = Mission(
         id = 1,
         name = "Starlink Group 6-34",
-        description = "Deployment of Starlink satellites",
+        description = "Deployment of Starlink satellites", // i18n-ignore: preview sample data
         type = "Communications",
         orbit = null,
         imageUrl = null
@@ -80,7 +80,7 @@ object PreviewData {
     val domainMissionGOESU = Mission(
         id = 2,
         name = "GOES-U",
-        description = "Geostationary weather satellite",
+        description = "Geostationary weather satellite", // i18n-ignore: preview sample data
         type = "Earth Science",
         orbit = null,
         imageUrl = null
@@ -89,7 +89,7 @@ object PreviewData {
     val domainMissionCrew = Mission(
         id = 3,
         name = "Crew-8",
-        description = "SpaceX Crew Dragon mission to ISS",
+        description = "SpaceX Crew Dragon mission to ISS", // i18n-ignore: preview sample data
         type = "Human Exploration",
         orbit = null,
         imageUrl = null

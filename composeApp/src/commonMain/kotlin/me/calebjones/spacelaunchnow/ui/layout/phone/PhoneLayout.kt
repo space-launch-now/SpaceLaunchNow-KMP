@@ -70,7 +70,7 @@ import me.calebjones.spacelaunchnow.ui.video.FullscreenVideoScreen
 import me.calebjones.spacelaunchnow.ui.viewmodel.ThemeOption
 
 @Deprecated(
-    message = "Use AdaptiveAppScaffold which automatically selects NavigationBar/Rail/Drawer",
+    message = "Use AdaptiveAppScaffold which automatically selects NavigationBar/Rail/Drawer", // i18n-ignore: @Deprecated message, read by developers only
     replaceWith = ReplaceWith(
         "AdaptiveAppScaffold(navController, themeOption, content)",
         "me.calebjones.spacelaunchnow.ui.layout.AdaptiveAppScaffold"

@@ -152,38 +152,9 @@ composeApp/src/commonMain/kotlin/me/calebjones/spacelaunchnow/ui/astronaut/compo
 composeApp/src/commonMain/kotlin/me/calebjones/spacelaunchnow/ui/astronaut/components/AstronautStatsCard.kt	Overview
 composeApp/src/commonMain/kotlin/me/calebjones/spacelaunchnow/ui/astronaut/components/AstronautStatsCard.kt	Status
 composeApp/src/commonMain/kotlin/me/calebjones/spacelaunchnow/ui/astronaut/components/AstronautStatsCard.kt	Time in Space
-composeApp/src/commonMain/kotlin/me/calebjones/spacelaunchnow/ui/components/AppIconBox.kt	Space Launch Now
-composeApp/src/commonMain/kotlin/me/calebjones/spacelaunchnow/ui/components/AppRatingDialog.kt	Ask me later
-composeApp/src/commonMain/kotlin/me/calebjones/spacelaunchnow/ui/components/AppRatingDialog.kt	Enjoying Space Launch Now?
-composeApp/src/commonMain/kotlin/me/calebjones/spacelaunchnow/ui/components/AppRatingDialog.kt	GitHub Issue
-composeApp/src/commonMain/kotlin/me/calebjones/spacelaunchnow/ui/components/AppRatingDialog.kt	I'd Love Your Feedback
-composeApp/src/commonMain/kotlin/me/calebjones/spacelaunchnow/ui/components/AppRatingDialog.kt	I'd love to hear your feedback! Are you enjoying using the app?
-composeApp/src/commonMain/kotlin/me/calebjones/spacelaunchnow/ui/components/AppRatingDialog.kt	Join Discord Community
-composeApp/src/commonMain/kotlin/me/calebjones/spacelaunchnow/ui/components/AppRatingDialog.kt	Maybe Later
-composeApp/src/commonMain/kotlin/me/calebjones/spacelaunchnow/ui/components/AppRatingDialog.kt	Not really
-composeApp/src/commonMain/kotlin/me/calebjones/spacelaunchnow/ui/components/AppRatingDialog.kt	Send Email
-composeApp/src/commonMain/kotlin/me/calebjones/spacelaunchnow/ui/components/AppRatingDialog.kt	Yes, I love it!
-composeApp/src/commonMain/kotlin/me/calebjones/spacelaunchnow/ui/components/AppRatingDialog.kt	Your feedback helps me improve! How would you like to share your thoughts?
-composeApp/src/commonMain/kotlin/me/calebjones/spacelaunchnow/ui/components/CountryChip.kt	Flag of ${country.name}
-composeApp/src/commonMain/kotlin/me/calebjones/spacelaunchnow/ui/components/FilterChip.kt	Active Only
-composeApp/src/commonMain/kotlin/me/calebjones/spacelaunchnow/ui/components/FilterChip.kt	Remove $label filter
-composeApp/src/commonMain/kotlin/me/calebjones/spacelaunchnow/ui/components/FilterChip.kt	SpaceX
 composeApp/src/commonMain/kotlin/me/calebjones/spacelaunchnow/ui/components/FinePrint.kt	Any purchase unlocks all premium features. 
 composeApp/src/commonMain/kotlin/me/calebjones/spacelaunchnow/ui/components/FinePrint.kt	Free trial will automatically convert to a paid subscription 
 composeApp/src/commonMain/kotlin/me/calebjones/spacelaunchnow/ui/components/FinePrint.kt	Secure Billing
-composeApp/src/commonMain/kotlin/me/calebjones/spacelaunchnow/ui/components/OfflineBanner.kt	Cached
-composeApp/src/commonMain/kotlin/me/calebjones/spacelaunchnow/ui/components/OfflineBanner.kt	Offline - Showing cached data
-composeApp/src/commonMain/kotlin/me/calebjones/spacelaunchnow/ui/components/OfflineBanner.kt	Retry
-composeApp/src/commonMain/kotlin/me/calebjones/spacelaunchnow/ui/components/SearchBar.kt	Clear search
-composeApp/src/commonMain/kotlin/me/calebjones/spacelaunchnow/ui/components/SearchBar.kt	Search icon
-composeApp/src/commonMain/kotlin/me/calebjones/spacelaunchnow/ui/components/SearchBar.kt	Search rockets
-composeApp/src/commonMain/kotlin/me/calebjones/spacelaunchnow/ui/components/SearchBar.kt	Search rockets
-composeApp/src/commonMain/kotlin/me/calebjones/spacelaunchnow/ui/components/SortMenu.kt	Sort
-composeApp/src/commonMain/kotlin/me/calebjones/spacelaunchnow/ui/components/SortMenu.kt	Sort by
-composeApp/src/commonMain/kotlin/me/calebjones/spacelaunchnow/ui/components/webview/WebViewBrowserFallback.kt	Open in browser
-composeApp/src/commonMain/kotlin/me/calebjones/spacelaunchnow/ui/components/webview/WebViewBrowserFallback.kt	Opening article in your browser…
-composeApp/src/commonMain/kotlin/me/calebjones/spacelaunchnow/ui/compose/AgencyLogoBadge.kt	Agency logo
-composeApp/src/commonMain/kotlin/me/calebjones/spacelaunchnow/ui/compose/BottomNavigationBar.kt	Navigation is now handled by NavigationSuiteScaffold inside AdaptiveAppScaffold
 composeApp/src/commonMain/kotlin/me/calebjones/spacelaunchnow/ui/compose/CountdownWidget.kt	Description
 composeApp/src/commonMain/kotlin/me/calebjones/spacelaunchnow/ui/compose/CountdownWidget.kt	Launch Status
 composeApp/src/commonMain/kotlin/me/calebjones/spacelaunchnow/ui/compose/CountdownWidget.kt	NET Feb 15, 2026
@@ -191,32 +162,6 @@ composeApp/src/commonMain/kotlin/me/calebjones/spacelaunchnow/ui/compose/Countdo
 composeApp/src/commonMain/kotlin/me/calebjones/spacelaunchnow/ui/compose/CountdownWidget.kt	Status information
 composeApp/src/commonMain/kotlin/me/calebjones/spacelaunchnow/ui/compose/CountdownWidget.kt	The launch is a go!
 composeApp/src/commonMain/kotlin/me/calebjones/spacelaunchnow/ui/compose/CountdownWidget.kt	fallback
-composeApp/src/commonMain/kotlin/me/calebjones/spacelaunchnow/ui/compose/EmptyStateCard.kt	Settings
-composeApp/src/commonMain/kotlin/me/calebjones/spacelaunchnow/ui/compose/HeroDetailScaffold.kt	Back
-composeApp/src/commonMain/kotlin/me/calebjones/spacelaunchnow/ui/compose/HeroDetailScaffold.kt	Image placeholder
-composeApp/src/commonMain/kotlin/me/calebjones/spacelaunchnow/ui/compose/LaunchCardHeader.kt	Agency Logo
-composeApp/src/commonMain/kotlin/me/calebjones/spacelaunchnow/ui/compose/LaunchCardHeader.kt	Agency placeholder
-composeApp/src/commonMain/kotlin/me/calebjones/spacelaunchnow/ui/compose/LaunchCardHeader.kt	Launch Location
-composeApp/src/commonMain/kotlin/me/calebjones/spacelaunchnow/ui/compose/LaunchWindowIndicator.kt	Duration
-composeApp/src/commonMain/kotlin/me/calebjones/spacelaunchnow/ui/compose/LaunchWindowIndicator.kt	Launch Window
-composeApp/src/commonMain/kotlin/me/calebjones/spacelaunchnow/ui/compose/ListDetailWrapper.kt	Detail Pane — $item
-composeApp/src/commonMain/kotlin/me/calebjones/spacelaunchnow/ui/compose/ListDetailWrapper.kt	Detail Pane — $item
-composeApp/src/commonMain/kotlin/me/calebjones/spacelaunchnow/ui/compose/ListDetailWrapper.kt	List Pane — tap an item
-composeApp/src/commonMain/kotlin/me/calebjones/spacelaunchnow/ui/compose/ListDetailWrapper.kt	List Pane — tap an item
-composeApp/src/commonMain/kotlin/me/calebjones/spacelaunchnow/ui/compose/ListDetailWrapper.kt	Select an item to see details
-composeApp/src/commonMain/kotlin/me/calebjones/spacelaunchnow/ui/compose/ListDetailWrapper.kt	Select an item to see details
-composeApp/src/commonMain/kotlin/me/calebjones/spacelaunchnow/ui/compose/LiveIndicator.kt	LIVE
-composeApp/src/commonMain/kotlin/me/calebjones/spacelaunchnow/ui/compose/LiveIndicator.kt	Live broadcast indicator
-composeApp/src/commonMain/kotlin/me/calebjones/spacelaunchnow/ui/compose/SharedDetailScaffold.kt	Back
-composeApp/src/commonMain/kotlin/me/calebjones/spacelaunchnow/ui/compose/SharedDetailScaffold.kt	Image placeholder
-composeApp/src/commonMain/kotlin/me/calebjones/spacelaunchnow/ui/compose/VideoPlayer.kt	Enter fullscreen
-composeApp/src/commonMain/kotlin/me/calebjones/spacelaunchnow/ui/compose/VideoPlayer.kt	Error
-composeApp/src/commonMain/kotlin/me/calebjones/spacelaunchnow/ui/compose/VideoPlayer.kt	LIVE
-composeApp/src/commonMain/kotlin/me/calebjones/spacelaunchnow/ui/compose/VideoPlayer.kt	LIVE
-composeApp/src/commonMain/kotlin/me/calebjones/spacelaunchnow/ui/compose/VideoPlayer.kt	Open in App
-composeApp/src/commonMain/kotlin/me/calebjones/spacelaunchnow/ui/compose/VideoPlayer.kt	Play video
-composeApp/src/commonMain/kotlin/me/calebjones/spacelaunchnow/ui/compose/VideoPlayer.kt	Retry
-composeApp/src/commonMain/kotlin/me/calebjones/spacelaunchnow/ui/compose/VideoPlayer.kt	Video thumbnail
 composeApp/src/commonMain/kotlin/me/calebjones/spacelaunchnow/ui/detail/LaunchDetailScreen.kt	Open fullscreen
 composeApp/src/commonMain/kotlin/me/calebjones/spacelaunchnow/ui/detail/compose/LaunchDetailStateViews.kt	Back
 composeApp/src/commonMain/kotlin/me/calebjones/spacelaunchnow/ui/detail/compose/LaunchDetailStateViews.kt	Error
@@ -361,37 +306,6 @@ composeApp/src/commonMain/kotlin/me/calebjones/spacelaunchnow/ui/event/EventDeta
 composeApp/src/commonMain/kotlin/me/calebjones/spacelaunchnow/ui/event/EventDetailView.kt	Status
 composeApp/src/commonMain/kotlin/me/calebjones/spacelaunchnow/ui/event/EventDetailView.kt	Try Again
 composeApp/src/commonMain/kotlin/me/calebjones/spacelaunchnow/ui/event/EventDetailView.kt	Updates
-composeApp/src/commonMain/kotlin/me/calebjones/spacelaunchnow/ui/explore/ExploreScreen.kt	Explore
-composeApp/src/commonMain/kotlin/me/calebjones/spacelaunchnow/ui/explore/ExploreSections.kt	Agencies
-composeApp/src/commonMain/kotlin/me/calebjones/spacelaunchnow/ui/explore/ExploreSections.kt	Astronauts
-composeApp/src/commonMain/kotlin/me/calebjones/spacelaunchnow/ui/explore/ExploreSections.kt	Browse astronaut profiles
-composeApp/src/commonMain/kotlin/me/calebjones/spacelaunchnow/ui/explore/ExploreSections.kt	ISS Tracking
-composeApp/src/commonMain/kotlin/me/calebjones/spacelaunchnow/ui/explore/ExploreSections.kt	Launcher configurations
-composeApp/src/commonMain/kotlin/me/calebjones/spacelaunchnow/ui/explore/ExploreSections.kt	Live tracking and crew info
-composeApp/src/commonMain/kotlin/me/calebjones/spacelaunchnow/ui/explore/ExploreSections.kt	Navigate to Agencies list to explore space organizations
-composeApp/src/commonMain/kotlin/me/calebjones/spacelaunchnow/ui/explore/ExploreSections.kt	Navigate to Astronauts list to view career stats and missions
-composeApp/src/commonMain/kotlin/me/calebjones/spacelaunchnow/ui/explore/ExploreSections.kt	Navigate to ISS Tracking with live position and crew information
-composeApp/src/commonMain/kotlin/me/calebjones/spacelaunchnow/ui/explore/ExploreSections.kt	Navigate to News and Events to browse articles and upcoming space events
-composeApp/src/commonMain/kotlin/me/calebjones/spacelaunchnow/ui/explore/ExploreSections.kt	Navigate to Rockets list to explore launch vehicles
-composeApp/src/commonMain/kotlin/me/calebjones/spacelaunchnow/ui/explore/ExploreSections.kt	Navigate to Starship dashboard for updates and launches
-composeApp/src/commonMain/kotlin/me/calebjones/spacelaunchnow/ui/explore/ExploreSections.kt	News & Events
-composeApp/src/commonMain/kotlin/me/calebjones/spacelaunchnow/ui/explore/ExploreSections.kt	Rockets
-composeApp/src/commonMain/kotlin/me/calebjones/spacelaunchnow/ui/explore/ExploreSections.kt	Space agencies and missions
-composeApp/src/commonMain/kotlin/me/calebjones/spacelaunchnow/ui/explore/ExploreSections.kt	Space news and upcoming events
-composeApp/src/commonMain/kotlin/me/calebjones/spacelaunchnow/ui/explore/ExploreSections.kt	SpaceX Starship development
-composeApp/src/commonMain/kotlin/me/calebjones/spacelaunchnow/ui/explore/ExploreSections.kt	Starship
-composeApp/src/commonMain/kotlin/me/calebjones/spacelaunchnow/ui/explore/components/ExploreCard.kt	Browse launcher configurations and technical specifications
-composeApp/src/commonMain/kotlin/me/calebjones/spacelaunchnow/ui/explore/components/ExploreCard.kt	Browse launcher configurations and technical specifications
-composeApp/src/commonMain/kotlin/me/calebjones/spacelaunchnow/ui/explore/components/ExploreCard.kt	Browse launcher configurations and technical specifications
-composeApp/src/commonMain/kotlin/me/calebjones/spacelaunchnow/ui/explore/components/ExploreCard.kt	Browse launcher configurations and technical specifications
-composeApp/src/commonMain/kotlin/me/calebjones/spacelaunchnow/ui/explore/components/ExploreCard.kt	Navigate to Rockets
-composeApp/src/commonMain/kotlin/me/calebjones/spacelaunchnow/ui/explore/components/ExploreCard.kt	Navigate to Rockets
-composeApp/src/commonMain/kotlin/me/calebjones/spacelaunchnow/ui/explore/components/ExploreCard.kt	Navigate to Rockets
-composeApp/src/commonMain/kotlin/me/calebjones/spacelaunchnow/ui/explore/components/ExploreCard.kt	Navigate to Rockets
-composeApp/src/commonMain/kotlin/me/calebjones/spacelaunchnow/ui/explore/components/ExploreCard.kt	Rockets
-composeApp/src/commonMain/kotlin/me/calebjones/spacelaunchnow/ui/explore/components/ExploreCard.kt	Rockets
-composeApp/src/commonMain/kotlin/me/calebjones/spacelaunchnow/ui/explore/components/ExploreCard.kt	Rockets
-composeApp/src/commonMain/kotlin/me/calebjones/spacelaunchnow/ui/explore/components/ExploreCard.kt	Rockets
 composeApp/src/commonMain/kotlin/me/calebjones/spacelaunchnow/ui/home/components/ArticlesView.kt	Article Icon
 composeApp/src/commonMain/kotlin/me/calebjones/spacelaunchnow/ui/home/components/ArticlesView.kt	Article Image
 composeApp/src/commonMain/kotlin/me/calebjones/spacelaunchnow/ui/home/components/ArticlesView.kt	Failed to load articles
@@ -478,47 +392,6 @@ composeApp/src/commonMain/kotlin/me/calebjones/spacelaunchnow/ui/home/components
 composeApp/src/commonMain/kotlin/me/calebjones/spacelaunchnow/ui/home/components/ThisDayInHistorySection.kt	Failed to load history launches
 composeApp/src/commonMain/kotlin/me/calebjones/spacelaunchnow/ui/home/components/ThisDayInHistorySection.kt	No launches on this day
 composeApp/src/commonMain/kotlin/me/calebjones/spacelaunchnow/ui/home/components/ThisDayInHistorySection.kt	Showing cached data
-composeApp/src/commonMain/kotlin/me/calebjones/spacelaunchnow/ui/layout/AdaptiveAppScaffold.kt	Preview content
-composeApp/src/commonMain/kotlin/me/calebjones/spacelaunchnow/ui/layout/AdaptiveAppScaffold.kt	Preview content (dark)
-composeApp/src/commonMain/kotlin/me/calebjones/spacelaunchnow/ui/layout/AdaptiveAppScaffold.kt	Space Launch Now
-composeApp/src/commonMain/kotlin/me/calebjones/spacelaunchnow/ui/layout/NavigationRouteConfig.kt	Explore
-composeApp/src/commonMain/kotlin/me/calebjones/spacelaunchnow/ui/layout/NavigationRouteConfig.kt	Explore tab
-composeApp/src/commonMain/kotlin/me/calebjones/spacelaunchnow/ui/layout/NavigationRouteConfig.kt	Home
-composeApp/src/commonMain/kotlin/me/calebjones/spacelaunchnow/ui/layout/NavigationRouteConfig.kt	Home tab
-composeApp/src/commonMain/kotlin/me/calebjones/spacelaunchnow/ui/layout/NavigationRouteConfig.kt	News
-composeApp/src/commonMain/kotlin/me/calebjones/spacelaunchnow/ui/layout/NavigationRouteConfig.kt	News and Events tab
-composeApp/src/commonMain/kotlin/me/calebjones/spacelaunchnow/ui/layout/NavigationRouteConfig.kt	Schedule
-composeApp/src/commonMain/kotlin/me/calebjones/spacelaunchnow/ui/layout/NavigationRouteConfig.kt	Schedule tab
-composeApp/src/commonMain/kotlin/me/calebjones/spacelaunchnow/ui/layout/NavigationRouteConfig.kt	Settings
-composeApp/src/commonMain/kotlin/me/calebjones/spacelaunchnow/ui/layout/NavigationRouteConfig.kt	Settings tab
-composeApp/src/commonMain/kotlin/me/calebjones/spacelaunchnow/ui/layout/desktop/TabletDesktopLayout.kt	App Icon
-composeApp/src/commonMain/kotlin/me/calebjones/spacelaunchnow/ui/layout/desktop/TabletDesktopLayout.kt	Use AdaptiveAppScaffold which automatically selects NavigationBar/Rail/Drawer
-composeApp/src/commonMain/kotlin/me/calebjones/spacelaunchnow/ui/layout/phone/PhoneLayout.kt	Use AdaptiveAppScaffold which automatically selects NavigationBar/Rail/Drawer
-composeApp/src/commonMain/kotlin/me/calebjones/spacelaunchnow/ui/newsevents/NewsDetailScreen.kt	Back
-composeApp/src/commonMain/kotlin/me/calebjones/spacelaunchnow/ui/newsevents/NewsDetailScreen.kt	Open in browser
-composeApp/src/commonMain/kotlin/me/calebjones/spacelaunchnow/ui/newsevents/NewsDetailScreen.kt	Starship completes integrated flight test
-composeApp/src/commonMain/kotlin/me/calebjones/spacelaunchnow/ui/newsevents/NewsDetailScreen.kt	Starship completes integrated flight test
-composeApp/src/commonMain/kotlin/me/calebjones/spacelaunchnow/ui/newsevents/NewsEventsFilterBottomSheet.kt	Clear All Filters
-composeApp/src/commonMain/kotlin/me/calebjones/spacelaunchnow/ui/newsevents/NewsEventsFilterBottomSheet.kt	Close
-composeApp/src/commonMain/kotlin/me/calebjones/spacelaunchnow/ui/newsevents/NewsEventsFilterBottomSheet.kt	Loading event types...
-composeApp/src/commonMain/kotlin/me/calebjones/spacelaunchnow/ui/newsevents/NewsEventsFilterBottomSheet.kt	Remove filter
-composeApp/src/commonMain/kotlin/me/calebjones/spacelaunchnow/ui/newsevents/NewsEventsFilterBottomSheet.kt	Remove filter
-composeApp/src/commonMain/kotlin/me/calebjones/spacelaunchnow/ui/newsevents/NewsEventsFilterBottomSheet.kt	Select event types
-composeApp/src/commonMain/kotlin/me/calebjones/spacelaunchnow/ui/newsevents/NewsEventsFilterBottomSheet.kt	Select sources
-composeApp/src/commonMain/kotlin/me/calebjones/spacelaunchnow/ui/newsevents/NewsEventsScreen.kt	${uiState.activeFilterCount}
-composeApp/src/commonMain/kotlin/me/calebjones/spacelaunchnow/ui/newsevents/NewsEventsScreen.kt	Error loading content
-composeApp/src/commonMain/kotlin/me/calebjones/spacelaunchnow/ui/newsevents/NewsEventsScreen.kt	Filter
-composeApp/src/commonMain/kotlin/me/calebjones/spacelaunchnow/ui/newsevents/NewsEventsScreen.kt	News & Events
-composeApp/src/commonMain/kotlin/me/calebjones/spacelaunchnow/ui/newsevents/NewsEventsScreen.kt	News & Events Screen Preview
-composeApp/src/commonMain/kotlin/me/calebjones/spacelaunchnow/ui/newsevents/NewsEventsScreen.kt	News & Events Screen Preview (Dark)
-composeApp/src/commonMain/kotlin/me/calebjones/spacelaunchnow/ui/newsevents/NewsEventsScreen.kt	Retry
-composeApp/src/commonMain/kotlin/me/calebjones/spacelaunchnow/ui/newsevents/components/EventListItem.kt	Astronauts will perform a scheduled spacewalk to replace a faulty antenna on the International Space Station.
-composeApp/src/commonMain/kotlin/me/calebjones/spacelaunchnow/ui/newsevents/components/EventListItem.kt	Event image for ${event.name}
-composeApp/src/commonMain/kotlin/me/calebjones/spacelaunchnow/ui/newsevents/components/EventListItem.kt	Event: ${event.name}, Type: ${event.type.name}
-composeApp/src/commonMain/kotlin/me/calebjones/spacelaunchnow/ui/newsevents/components/NewsListItem.kt	Article image for ${article.title}
-composeApp/src/commonMain/kotlin/me/calebjones/spacelaunchnow/ui/newsevents/components/NewsListItem.kt	News article: ${article.title} from ${article.newsSite}
-composeApp/src/commonMain/kotlin/me/calebjones/spacelaunchnow/ui/newsevents/components/NewsListItem.kt	SpaceX Successfully Launches Starship on 5th Integrated Flight Test
-composeApp/src/commonMain/kotlin/me/calebjones/spacelaunchnow/ui/newsevents/components/NewsListItem.kt	SpaceX has successfully completed its fifth integrated flight test of the Starship launch system, achieving several key milestones including a soft ocean splashdown.
 composeApp/src/commonMain/kotlin/me/calebjones/spacelaunchnow/ui/onboarding/DeviceFrame.kt	Android Frame
 composeApp/src/commonMain/kotlin/me/calebjones/spacelaunchnow/ui/onboarding/DeviceFrame.kt	Android Frame
 composeApp/src/commonMain/kotlin/me/calebjones/spacelaunchnow/ui/onboarding/DeviceFrame.kt	iPhone Frame
@@ -604,34 +477,6 @@ composeApp/src/commonMain/kotlin/me/calebjones/spacelaunchnow/ui/onboarding/page
 composeApp/src/commonMain/kotlin/me/calebjones/spacelaunchnow/ui/onboarding/pages/WidgetShowcaseContent.kt	Upcoming Launches
 composeApp/src/commonMain/kotlin/me/calebjones/spacelaunchnow/ui/onboarding/pages/WidgetsPage.kt	Widgets at a Glance
 composeApp/src/commonMain/kotlin/me/calebjones/spacelaunchnow/ui/preload/PreloadScreen.kt	Loading launch data
-composeApp/src/commonMain/kotlin/me/calebjones/spacelaunchnow/ui/preview/PreviewData.kt	Deployment of Starlink satellites
-composeApp/src/commonMain/kotlin/me/calebjones/spacelaunchnow/ui/preview/PreviewData.kt	Geostationary weather satellite
-composeApp/src/commonMain/kotlin/me/calebjones/spacelaunchnow/ui/preview/PreviewData.kt	Launch date to be determined
-composeApp/src/commonMain/kotlin/me/calebjones/spacelaunchnow/ui/preview/PreviewData.kt	Launch is proceeding as scheduled
-composeApp/src/commonMain/kotlin/me/calebjones/spacelaunchnow/ui/preview/PreviewData.kt	Launch was successful
-composeApp/src/commonMain/kotlin/me/calebjones/spacelaunchnow/ui/preview/PreviewData.kt	SpaceX Crew Dragon mission to ISS
-composeApp/src/commonMain/kotlin/me/calebjones/spacelaunchnow/ui/preview/PreviewData.kt	Vehicle is currently in flight
-composeApp/src/commonMain/kotlin/me/calebjones/spacelaunchnow/ui/roadmap/RoadmapScreen.kt	Back
-composeApp/src/commonMain/kotlin/me/calebjones/spacelaunchnow/ui/roadmap/RoadmapScreen.kt	Last updated: $updated
-composeApp/src/commonMain/kotlin/me/calebjones/spacelaunchnow/ui/roadmap/RoadmapScreen.kt	Loading roadmap...
-composeApp/src/commonMain/kotlin/me/calebjones/spacelaunchnow/ui/roadmap/RoadmapScreen.kt	Oops!
-composeApp/src/commonMain/kotlin/me/calebjones/spacelaunchnow/ui/roadmap/RoadmapScreen.kt	Retry
-composeApp/src/commonMain/kotlin/me/calebjones/spacelaunchnow/ui/roadmap/RoadmapScreen.kt	Roadmap
-composeApp/src/commonMain/kotlin/me/calebjones/spacelaunchnow/ui/roadmap/RoadmapViewModel.kt	Additional Widgets
-composeApp/src/commonMain/kotlin/me/calebjones/spacelaunchnow/ui/roadmap/RoadmapViewModel.kt	Astronauts Profiles
-composeApp/src/commonMain/kotlin/me/calebjones/spacelaunchnow/ui/roadmap/RoadmapViewModel.kt	Customizable schedule page with advanced sorting options
-composeApp/src/commonMain/kotlin/me/calebjones/spacelaunchnow/ui/roadmap/RoadmapViewModel.kt	Detailed pages for launch vehicles with specifications and images
-composeApp/src/commonMain/kotlin/me/calebjones/spacelaunchnow/ui/roadmap/RoadmapViewModel.kt	Initial iOS Launch
-composeApp/src/commonMain/kotlin/me/calebjones/spacelaunchnow/ui/roadmap/RoadmapViewModel.kt	Launch Vehicles Page
-composeApp/src/commonMain/kotlin/me/calebjones/spacelaunchnow/ui/roadmap/RoadmapViewModel.kt	MVP release of the all new Space Launch Now app for iOS devices
-composeApp/src/commonMain/kotlin/me/calebjones/spacelaunchnow/ui/roadmap/RoadmapViewModel.kt	More home screen widgets with customizable themes
-composeApp/src/commonMain/kotlin/me/calebjones/spacelaunchnow/ui/roadmap/RoadmapViewModel.kt	New pages with additional content
-composeApp/src/commonMain/kotlin/me/calebjones/spacelaunchnow/ui/roadmap/RoadmapViewModel.kt	Notification Filter Issues
-composeApp/src/commonMain/kotlin/me/calebjones/spacelaunchnow/ui/roadmap/RoadmapViewModel.kt	Profiles for astronauts with mission history and biographies
-composeApp/src/commonMain/kotlin/me/calebjones/spacelaunchnow/ui/roadmap/RoadmapViewModel.kt	Schedule page Sorting
-composeApp/src/commonMain/kotlin/me/calebjones/spacelaunchnow/ui/roadmap/RoadmapViewModel.kt	Starship | Rockets | Agencies | ISS Tracking
-composeApp/src/commonMain/kotlin/me/calebjones/spacelaunchnow/ui/roadmap/RoadmapViewModel.kt	This roadmap represents planned features and is subject to change based on user feedback and priorities.
-composeApp/src/commonMain/kotlin/me/calebjones/spacelaunchnow/ui/roadmap/RoadmapViewModel.kt	Users receiving notifications for locations they did not select
 composeApp/src/commonMain/kotlin/me/calebjones/spacelaunchnow/ui/rockets/RocketListScreen.kt	Back
 composeApp/src/commonMain/kotlin/me/calebjones/spacelaunchnow/ui/rockets/RocketListScreen.kt	Failed to load rockets
 composeApp/src/commonMain/kotlin/me/calebjones/spacelaunchnow/ui/rockets/RocketListScreen.kt	Filter rockets
@@ -1074,13 +919,6 @@ composeApp/src/commonMain/kotlin/me/calebjones/spacelaunchnow/ui/subscription/Te
 composeApp/src/commonMain/kotlin/me/calebjones/spacelaunchnow/ui/subscription/TemporaryPremiumCard.kt	Loading ad…
 composeApp/src/commonMain/kotlin/me/calebjones/spacelaunchnow/ui/subscription/TemporaryPremiumCard.kt	Time remaining: ${formatTimeRemaining(earliestExpiration?.timeRemaining)}
 composeApp/src/commonMain/kotlin/me/calebjones/spacelaunchnow/ui/subscription/TemporaryPremiumCard.kt	Watch Ad for 24h Premium Access
-composeApp/src/commonMain/kotlin/me/calebjones/spacelaunchnow/ui/video/FullscreenVideoScreen.kt	Back
-composeApp/src/commonMain/kotlin/me/calebjones/spacelaunchnow/ui/video/FullscreenVideoScreen.kt	Back
-composeApp/src/commonMain/kotlin/me/calebjones/spacelaunchnow/ui/video/FullscreenVideoScreen.kt	LIVE
-composeApp/src/commonMain/kotlin/me/calebjones/spacelaunchnow/ui/video/FullscreenVideoScreen.kt	LIVE
-composeApp/src/commonMain/kotlin/me/calebjones/spacelaunchnow/ui/video/FullscreenVideoScreen.kt	Open in external app
-composeApp/src/commonMain/kotlin/me/calebjones/spacelaunchnow/ui/video/FullscreenVideoScreen.kt	Open in external app
-composeApp/src/commonMain/kotlin/me/calebjones/spacelaunchnow/ui/video/FullscreenVideoScreen.kt	Video ${selectedIndex + 1} of ${videos.size}
 composeApp/src/commonMain/kotlin/me/calebjones/spacelaunchnow/ui/viewmodel/SpaceStationViewModel.kt	Live HD views of Earth from the International Space Station
 composeApp/src/commonMain/kotlin/me/calebjones/spacelaunchnow/util/logging/PushDiagnostics.kt	Push registration summary
 composeApp/src/desktopMain/kotlin/me/calebjones/spacelaunchnow/Main.kt	Space Launch Now

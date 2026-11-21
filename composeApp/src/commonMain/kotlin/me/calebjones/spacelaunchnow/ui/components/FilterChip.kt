@@ -16,6 +16,9 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import org.jetbrains.compose.ui.tooling.preview.Preview
+import spacelaunchnow_kmp.composeapp.generated.resources.Res
+import spacelaunchnow_kmp.composeapp.generated.resources.app_components_filter_chip_remove_description
+import org.jetbrains.compose.resources.stringResource
 
 /**
  * Filter chip component displaying active filter with optional remove action.
@@ -42,7 +45,7 @@ fun FilterChip(
             {
                 Icon(
                     imageVector = Icons.Default.Close,
-                    contentDescription = "Remove $label filter",
+                    contentDescription = stringResource(Res.string.app_components_filter_chip_remove_description, label),
                     modifier = Modifier.size(18.dp)
                 )
             }
@@ -62,7 +65,7 @@ private fun FilterChipPreview() {
     MaterialTheme {
         Surface {
             FilterChip(
-                label = "SpaceX",
+                label = "SpaceX", // i18n-ignore: preview sample data
                 onRemove = {}
             )
         }
@@ -75,7 +78,7 @@ private fun FilterChipWithoutRemovePreview() {
     MaterialTheme {
         Surface {
             FilterChip(
-                label = "Active Only"
+                label = "Active Only" // i18n-ignore: preview sample data
             )
         }
     }
