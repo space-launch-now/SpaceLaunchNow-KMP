@@ -10,6 +10,19 @@ import androidx.compose.ui.unit.dp
 import compose.icons.FontAwesomeIcons
 import compose.icons.fontawesomeicons.Brands
 import compose.icons.fontawesomeicons.brands.Discord
+import spacelaunchnow_kmp.composeapp.generated.resources.Res
+import spacelaunchnow_kmp.composeapp.generated.resources.app_components_feedback_button_discord
+import spacelaunchnow_kmp.composeapp.generated.resources.app_components_feedback_button_email
+import spacelaunchnow_kmp.composeapp.generated.resources.app_components_feedback_button_github
+import spacelaunchnow_kmp.composeapp.generated.resources.app_components_feedback_button_later
+import spacelaunchnow_kmp.composeapp.generated.resources.app_components_feedback_message
+import spacelaunchnow_kmp.composeapp.generated.resources.app_components_feedback_title
+import spacelaunchnow_kmp.composeapp.generated.resources.app_components_rating_button_later
+import spacelaunchnow_kmp.composeapp.generated.resources.app_components_rating_button_no
+import spacelaunchnow_kmp.composeapp.generated.resources.app_components_rating_button_yes
+import spacelaunchnow_kmp.composeapp.generated.resources.app_components_rating_message
+import spacelaunchnow_kmp.composeapp.generated.resources.app_components_rating_title
+import org.jetbrains.compose.resources.stringResource
 
 /**
  * Dialog that asks if user is enjoying the app before showing native review.
@@ -34,13 +47,13 @@ fun AppRatingDialog(
         textContentColor = MaterialTheme.colorScheme.onSurfaceVariant,
         title = {
             Text(
-                text = "Enjoying Space Launch Now?",
+                text = stringResource(Res.string.app_components_rating_title),
                 style = MaterialTheme.typography.headlineSmall
             )
         },
         text = {
             Text(
-                text = "I'd love to hear your feedback! Are you enjoying using the app?",
+                text = stringResource(Res.string.app_components_rating_message),
                 style = MaterialTheme.typography.bodyMedium
             )
         },
@@ -54,7 +67,7 @@ fun AppRatingDialog(
                     onClick = onNoNotEnjoying,
                     modifier = Modifier.weight(1f)
                 ) {
-                    Text("Not really")
+                    Text(stringResource(Res.string.app_components_rating_button_no))
                 }
                 
                 // "Yes, I love it!" - Filled button for primary positive action
@@ -62,7 +75,7 @@ fun AppRatingDialog(
                     onClick = onYesEnjoyingApp,
                     modifier = Modifier.weight(1f)
                 ) {
-                    Text("Yes, I love it!")
+                    Text(stringResource(Res.string.app_components_rating_button_yes))
                 }
             }
         },
@@ -72,7 +85,7 @@ fun AppRatingDialog(
                 onClick = onNotNow,
                 modifier = Modifier.fillMaxWidth()
             ) {
-                Text("Ask me later")
+                Text(stringResource(Res.string.app_components_rating_button_later))
             }
         }
     )
@@ -96,14 +109,14 @@ fun FeedbackDialog(
         textContentColor = MaterialTheme.colorScheme.onSurfaceVariant,
         title = {
             Text(
-                text = "I'd Love Your Feedback",
+                text = stringResource(Res.string.app_components_feedback_title),
                 style = MaterialTheme.typography.headlineSmall
             )
         },
         text = {
             Column {
                 Text(
-                    text = "Your feedback helps me improve! How would you like to share your thoughts?",
+                    text = stringResource(Res.string.app_components_feedback_message),
                     style = MaterialTheme.typography.bodyMedium
                 )
                 
@@ -119,7 +132,7 @@ fun FeedbackDialog(
                         onClick = onOpenGitHub,
                         modifier = Modifier.weight(1f)
                     ) {
-                        Text("GitHub Issue")
+                        Text(stringResource(Res.string.app_components_feedback_button_github))
                     }
                     
                     // "Send Email" - Filled button for primary action
@@ -127,7 +140,7 @@ fun FeedbackDialog(
                         onClick = onSendEmail,
                         modifier = Modifier.weight(1f)
                     ) {
-                        Text("Send Email")
+                        Text(stringResource(Res.string.app_components_feedback_button_email))
                     }
                 }
                 
@@ -144,7 +157,7 @@ fun FeedbackDialog(
                         modifier = Modifier.size(18.dp)
                     )
                     Spacer(Modifier.width(8.dp))
-                    Text("Join Discord Community")
+                    Text(stringResource(Res.string.app_components_feedback_button_discord))
                 }
                 
                 Spacer(Modifier.height(8.dp))
@@ -154,7 +167,7 @@ fun FeedbackDialog(
                     onClick = onDismiss,
                     modifier = Modifier.fillMaxWidth()
                 ) {
-                    Text("Maybe Later")
+                    Text(stringResource(Res.string.app_components_feedback_button_later))
                 }
             }
         },

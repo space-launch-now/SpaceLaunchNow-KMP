@@ -73,6 +73,64 @@ import me.calebjones.spacelaunchnow.ui.subscription.PremiumPromptCard
 import me.calebjones.spacelaunchnow.ui.viewmodel.SettingsViewModel
 import org.koin.compose.koinInject
 import org.koin.compose.viewmodel.koinViewModel
+import org.jetbrains.compose.resources.stringResource
+import spacelaunchnow_kmp.composeapp.generated.resources.Res
+import spacelaunchnow_kmp.composeapp.generated.resources.common_back
+import spacelaunchnow_kmp.composeapp.generated.resources.notification_settings_announcements_description
+import spacelaunchnow_kmp.composeapp.generated.resources.notification_settings_announcements_title
+import spacelaunchnow_kmp.composeapp.generated.resources.notification_settings_countdown_description
+import spacelaunchnow_kmp.composeapp.generated.resources.notification_settings_countdown_title
+import spacelaunchnow_kmp.composeapp.generated.resources.notification_settings_disabled_message
+import spacelaunchnow_kmp.composeapp.generated.resources.notification_settings_disabled_title
+import spacelaunchnow_kmp.composeapp.generated.resources.notification_settings_enable_button
+import spacelaunchnow_kmp.composeapp.generated.resources.notification_settings_event_description
+import spacelaunchnow_kmp.composeapp.generated.resources.notification_settings_event_title
+import spacelaunchnow_kmp.composeapp.generated.resources.notification_settings_flexible_bullets
+import spacelaunchnow_kmp.composeapp.generated.resources.notification_settings_flexible_example
+import spacelaunchnow_kmp.composeapp.generated.resources.notification_settings_flexible_summary
+import spacelaunchnow_kmp.composeapp.generated.resources.notification_settings_follow_all_description
+import spacelaunchnow_kmp.composeapp.generated.resources.notification_settings_follow_all_override_note
+import spacelaunchnow_kmp.composeapp.generated.resources.notification_settings_follow_all_title
+import spacelaunchnow_kmp.composeapp.generated.resources.notification_settings_general_title
+import spacelaunchnow_kmp.composeapp.generated.resources.notification_settings_in_flight_description
+import spacelaunchnow_kmp.composeapp.generated.resources.notification_settings_in_flight_title
+import spacelaunchnow_kmp.composeapp.generated.resources.notification_settings_intro
+import spacelaunchnow_kmp.composeapp.generated.resources.notification_settings_locations_description
+import spacelaunchnow_kmp.composeapp.generated.resources.notification_settings_locations_title
+import spacelaunchnow_kmp.composeapp.generated.resources.notification_settings_matching_description
+import spacelaunchnow_kmp.composeapp.generated.resources.notification_settings_matching_not_applicable
+import spacelaunchnow_kmp.composeapp.generated.resources.notification_settings_matching_title
+import spacelaunchnow_kmp.composeapp.generated.resources.notification_settings_mission_success_description
+import spacelaunchnow_kmp.composeapp.generated.resources.notification_settings_mission_success_title
+import spacelaunchnow_kmp.composeapp.generated.resources.notification_settings_mute_starlink_description
+import spacelaunchnow_kmp.composeapp.generated.resources.notification_settings_mute_starlink_title
+import spacelaunchnow_kmp.composeapp.generated.resources.notification_settings_net_change_description
+import spacelaunchnow_kmp.composeapp.generated.resources.notification_settings_net_change_title
+import spacelaunchnow_kmp.composeapp.generated.resources.notification_settings_news_description
+import spacelaunchnow_kmp.composeapp.generated.resources.notification_settings_news_title
+import spacelaunchnow_kmp.composeapp.generated.resources.notification_settings_notice_10m_description
+import spacelaunchnow_kmp.composeapp.generated.resources.notification_settings_notice_10m_title
+import spacelaunchnow_kmp.composeapp.generated.resources.notification_settings_notice_1h_description
+import spacelaunchnow_kmp.composeapp.generated.resources.notification_settings_notice_1h_title
+import spacelaunchnow_kmp.composeapp.generated.resources.notification_settings_notice_1m_description
+import spacelaunchnow_kmp.composeapp.generated.resources.notification_settings_notice_1m_title
+import spacelaunchnow_kmp.composeapp.generated.resources.notification_settings_notice_24h_description
+import spacelaunchnow_kmp.composeapp.generated.resources.notification_settings_notice_24h_title
+import spacelaunchnow_kmp.composeapp.generated.resources.notification_settings_open_settings_button
+import spacelaunchnow_kmp.composeapp.generated.resources.notification_settings_premium_description
+import spacelaunchnow_kmp.composeapp.generated.resources.notification_settings_premium_title
+import spacelaunchnow_kmp.composeapp.generated.resources.notification_settings_providers_description
+import spacelaunchnow_kmp.composeapp.generated.resources.notification_settings_providers_title
+import spacelaunchnow_kmp.composeapp.generated.resources.notification_settings_status_description
+import spacelaunchnow_kmp.composeapp.generated.resources.notification_settings_status_title
+import spacelaunchnow_kmp.composeapp.generated.resources.notification_settings_strict_bullets
+import spacelaunchnow_kmp.composeapp.generated.resources.notification_settings_strict_example
+import spacelaunchnow_kmp.composeapp.generated.resources.notification_settings_strict_matching_title
+import spacelaunchnow_kmp.composeapp.generated.resources.notification_settings_strict_summary
+import spacelaunchnow_kmp.composeapp.generated.resources.notification_settings_title
+import spacelaunchnow_kmp.composeapp.generated.resources.notification_settings_topics_title
+import spacelaunchnow_kmp.composeapp.generated.resources.notification_settings_webcast_description
+import spacelaunchnow_kmp.composeapp.generated.resources.notification_settings_webcast_title
 
 @OptIn(ExperimentalMaterial3Api::class, ExperimentalMaterial3ExpressiveApi::class)
 @Composable
@@ -141,7 +199,7 @@ fun NotificationSettingsScreen(
             TopAppBar(
                 title = {
                     Text(
-                        text = "Notification Filters",
+                        text = stringResource(Res.string.notification_settings_title),
                         style = MaterialTheme.typography.headlineMedium,
                         fontWeight = FontWeight.Bold,
                         fontSize = 24.sp,
@@ -149,7 +207,7 @@ fun NotificationSettingsScreen(
                 },
                 navigationIcon = {
                     IconButton(onClick = onNavigateBack) {
-                        Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "Back")
+                        Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = stringResource(Res.string.common_back))
                     }
                 }
             )
@@ -188,13 +246,13 @@ fun NotificationSettingsScreen(
                             Spacer(modifier = Modifier.width(12.dp))
                             Column(modifier = Modifier.weight(1f)) {
                                 Text(
-                                    text = "Notifications Disabled",
+                                    text = stringResource(Res.string.notification_settings_disabled_title),
                                     style = MaterialTheme.typography.titleSmall,
                                     fontWeight = FontWeight.Bold,
                                     color = MaterialTheme.colorScheme.onErrorContainer
                                 )
                                 Text(
-                                    text = "Enable notifications to receive launch alerts.",
+                                    text = stringResource(Res.string.notification_settings_disabled_message),
                                     style = MaterialTheme.typography.bodySmall,
                                     color = MaterialTheme.colorScheme.onErrorContainer
                                 )
@@ -219,9 +277,9 @@ fun NotificationSettingsScreen(
                             ) {
                                 Text(
                                     if (permissionRemedy == NotificationPermissionRemedy.REQUEST_PERMISSION) {
-                                        "Enable"
+                                        stringResource(Res.string.notification_settings_enable_button)
                                     } else {
-                                        "Open Settings"
+                                        stringResource(Res.string.notification_settings_open_settings_button)
                                     }
                                 )
                             }
@@ -232,7 +290,7 @@ fun NotificationSettingsScreen(
 
             item {
                 Text(
-                    text = "Configure your notification preferences to stay updated with your favorite launches!",
+                    text = stringResource(Res.string.notification_settings_intro),
                     style = MaterialTheme.typography.titleMedium,
                     color = MaterialTheme.colorScheme.onSurfaceVariant,
                     modifier = Modifier.padding(bottom = 8.dp)
@@ -260,13 +318,13 @@ fun NotificationSettingsScreen(
                         ) {
                             Column(modifier = Modifier.weight(1f)) {
                                 Text(
-                                    text = "Follow All Launches",
+                                    text = stringResource(Res.string.notification_settings_follow_all_title),
                                     style = MaterialTheme.typography.titleMedium,
                                     fontWeight = FontWeight.SemiBold,
                                     color = MaterialTheme.colorScheme.onPrimaryContainer
                                 )
                                 Text(
-                                    text = "Get notified for every launch across all agencies and locations",
+                                    text = stringResource(Res.string.notification_settings_follow_all_description),
                                     style = MaterialTheme.typography.labelMedium,
                                     color = MaterialTheme.colorScheme.onPrimaryContainer
                                 )
@@ -279,7 +337,7 @@ fun NotificationSettingsScreen(
 
                         if (uiState.notificationSettings.followAllLaunches) {
                             Text(
-                                text = "You're following all launches! Individual selections below are overridden.",
+                                text = stringResource(Res.string.notification_settings_follow_all_override_note),
                                 style = MaterialTheme.typography.bodySmall,
                                 color = MaterialTheme.colorScheme.onPrimaryContainer
                             )
@@ -304,7 +362,7 @@ fun NotificationSettingsScreen(
                         modifier = Modifier.padding(16.dp)
                     ) {
                         Text(
-                            text = "Notification Matching",
+                            text = stringResource(Res.string.notification_settings_matching_title),
                             style = MaterialTheme.typography.titleMedium,
                             fontWeight = FontWeight.Bold,
                             color = MaterialTheme.colorScheme.primary
@@ -313,7 +371,7 @@ fun NotificationSettingsScreen(
                         Spacer(modifier = Modifier.height(8.dp))
 
                         Text(
-                            text = "Control how your selected agencies and locations work together",
+                            text = stringResource(Res.string.notification_settings_matching_description),
                             style = MaterialTheme.typography.bodyMedium,
                             color = MaterialTheme.colorScheme.onSurfaceVariant
                         )
@@ -337,7 +395,7 @@ fun NotificationSettingsScreen(
                                 modifier = Modifier.weight(1f)
                             ) {
                                 Text(
-                                    text = "Strict Matching",
+                                    text = stringResource(Res.string.notification_settings_strict_matching_title),
                                     style = MaterialTheme.typography.bodyLarge,
                                     fontWeight = FontWeight.Medium,
                                     color = if (uiState.notificationSettings.followAllLaunches) {
@@ -351,7 +409,7 @@ fun NotificationSettingsScreen(
 
                                 if (uiState.notificationSettings.followAllLaunches) {
                                     Text(
-                                        text = "Not applicable when following all launches",
+                                        text = stringResource(Res.string.notification_settings_matching_not_applicable),
                                         style = MaterialTheme.typography.bodySmall,
                                         color = MaterialTheme.colorScheme.onSurfaceVariant.copy(
                                             alpha = 0.6f
@@ -362,7 +420,7 @@ fun NotificationSettingsScreen(
                                     if (uiState.notificationSettings.useStrictMatching) {
                                         Column {
                                             Text(
-                                                text = "STRICT: Show launches that match BOTH agency AND location",
+                                                text = stringResource(Res.string.notification_settings_strict_summary),
                                                 style = MaterialTheme.typography.bodySmall,
                                                 fontWeight = FontWeight.Medium,
                                                 color = MaterialTheme.colorScheme.primary
@@ -371,13 +429,13 @@ fun NotificationSettingsScreen(
                                             Spacer(modifier = Modifier.height(8.dp))
 
                                             Text(
-                                                text = "Example: If you select SpaceX + Kennedy Space Center, you'll ONLY get SpaceX launches from KSC.",
+                                                text = stringResource(Res.string.notification_settings_strict_example),
                                                 style = MaterialTheme.typography.bodySmall,
                                                 color = MaterialTheme.colorScheme.onSurfaceVariant
                                             )
 
                                             Text(
-                                                text = "• ✅ SpaceX from KSC\n• ❌ SpaceX from other locations\n• ❌ Other agencies from KSC",
+                                                text = stringResource(Res.string.notification_settings_strict_bullets),
                                                 style = MaterialTheme.typography.bodySmall,
                                                 color = MaterialTheme.colorScheme.onSurfaceVariant
                                             )
@@ -385,7 +443,7 @@ fun NotificationSettingsScreen(
                                     } else {
                                         Column {
                                             Text(
-                                                text = "FLEXIBLE: Show launches that match ANY agency OR location",
+                                                text = stringResource(Res.string.notification_settings_flexible_summary),
                                                 style = MaterialTheme.typography.bodySmall,
                                                 fontWeight = FontWeight.Medium,
                                                 color = MaterialTheme.colorScheme.secondary
@@ -394,13 +452,13 @@ fun NotificationSettingsScreen(
                                             Spacer(modifier = Modifier.height(8.dp))
 
                                             Text(
-                                                text = "Example: If you select SpaceX + Kennedy Space Center, you'll get ALL SpaceX launches AND all KSC launches.",
+                                                text = stringResource(Res.string.notification_settings_flexible_example),
                                                 style = MaterialTheme.typography.bodySmall,
                                                 color = MaterialTheme.colorScheme.onSurfaceVariant
                                             )
 
                                             Text(
-                                                text = "• ✅ SpaceX from anywhere\n• ✅ Any agency from KSC\n• ✅ Much more notifications",
+                                                text = stringResource(Res.string.notification_settings_flexible_bullets),
                                                 style = MaterialTheme.typography.bodySmall,
                                                 color = MaterialTheme.colorScheme.onSurfaceVariant
                                             )
@@ -426,13 +484,13 @@ fun NotificationSettingsScreen(
             item {
                 Column {
                     Text(
-                        text = "Launch Service Providers",
+                        text = stringResource(Res.string.notification_settings_providers_title),
                         style = MaterialTheme.typography.titleLarge,
                         color = MaterialTheme.colorScheme.primary,
                         fontWeight = FontWeight.Bold
                     )
                     Text(
-                        text = "Select which launch providers to follow",
+                        text = stringResource(Res.string.notification_settings_providers_description),
                         style = MaterialTheme.typography.labelMedium,
                         color = MaterialTheme.colorScheme.onSurface
                     )
@@ -497,7 +555,7 @@ fun NotificationSettingsScreen(
                                 Column(modifier = Modifier.weight(1f)) {
                                     Row(verticalAlignment = Alignment.CenterVertically) {
                                         Text(
-                                            text = "Mute Starlink launches",
+                                            text = stringResource(Res.string.notification_settings_mute_starlink_title),
                                             style = MaterialTheme.typography.titleMedium
                                         )
                                         Spacer(Modifier.width(4.dp))
@@ -506,7 +564,7 @@ fun NotificationSettingsScreen(
                                         }
                                     }
                                     Text(
-                                        text = "You'll still be notified if a Starlink launch fails.",
+                                        text = stringResource(Res.string.notification_settings_mute_starlink_description),
                                         style = MaterialTheme.typography.labelMedium,
                                         color = MaterialTheme.colorScheme.onSurfaceVariant
                                     )
@@ -530,13 +588,13 @@ fun NotificationSettingsScreen(
             item {
                 Column {
                     Text(
-                        text = "Launch Locations",
+                        text = stringResource(Res.string.notification_settings_locations_title),
                         style = MaterialTheme.typography.titleLarge,
                         color = MaterialTheme.colorScheme.primary,
                         fontWeight = FontWeight.Bold
                     )
                     Text(
-                        text = "Select which locations to follow",
+                        text = stringResource(Res.string.notification_settings_locations_description),
                         style = MaterialTheme.typography.labelMedium,
                         color = MaterialTheme.colorScheme.onSurface
                     )
@@ -582,8 +640,8 @@ fun NotificationSettingsScreen(
                 if (!uiState.hasNotificationCustomization) {
                     PremiumPromptCard(
                         modifier = Modifier.fillMaxWidth(),
-                        title = "Unlock Notification Customization",
-                        description = "Upgrade to Premium to customize your notification preferences.",
+                        title = stringResource(Res.string.notification_settings_premium_title),
+                        description = stringResource(Res.string.notification_settings_premium_description),
                         icon = Icons.Default.Notifications,
                         onUpgradeClick = {
                             navController.navigate(SupportUs(PaywallSource.NOTIFICATION_SETTINGS.value))
@@ -595,7 +653,7 @@ fun NotificationSettingsScreen(
             // Notification Topics Card
             item {
                 Text(
-                    text = "Notification Topics",
+                    text = stringResource(Res.string.notification_settings_topics_title),
                     style = MaterialTheme.typography.titleLarge,
                     color = MaterialTheme.colorScheme.primary,
                     fontWeight = FontWeight.Bold
@@ -612,28 +670,28 @@ fun NotificationSettingsScreen(
                         verticalArrangement = Arrangement.spacedBy(8.dp)
                     ) {
                         Text(
-                            text = "General Notifications",
+                            text = stringResource(Res.string.notification_settings_general_title),
                             style = MaterialTheme.typography.titleMedium,
                             fontWeight = FontWeight.SemiBold
                         )
 
                         NotificationTopicToggle(
-                            title = "Event Notifications",
-                            description = "Space events like spacewalks and dockings",
+                            title = stringResource(Res.string.notification_settings_event_title),
+                            description = stringResource(Res.string.notification_settings_event_description),
                             checked = uiState.notificationSettings.isTopicEnabled(NotificationTopic.EVENTS),
                             onCheckedChange = viewModel::updateEventNotifications
                         )
 
                         NotificationTopicToggle(
-                            title = "Featured News",
-                            description = "Curated space news articles",
+                            title = stringResource(Res.string.notification_settings_news_title),
+                            description = stringResource(Res.string.notification_settings_news_description),
                             checked = uiState.notificationSettings.isTopicEnabled(NotificationTopic.FEATURED_NEWS),
                             onCheckedChange = viewModel::updateFeaturedNews
                         )
 
                         NotificationTopicToggle(
-                            title = "Announcements",
-                            description = "Announcements and special messages from Space Launch Now",
+                            title = stringResource(Res.string.notification_settings_announcements_title),
+                            description = stringResource(Res.string.notification_settings_announcements_description),
                             checked = uiState.notificationSettings.isTopicEnabled(NotificationTopic.ANNOUNCEMENTS),
                             onCheckedChange = viewModel::updateAnnouncements
                         )
@@ -656,7 +714,7 @@ fun NotificationSettingsScreen(
                                 verticalAlignment = Alignment.CenterVertically
                             ) {
                                 Text(
-                                    text = "Countdown Notifications",
+                                    text = stringResource(Res.string.notification_settings_countdown_title),
                                     style = MaterialTheme.typography.titleMedium,
                                     fontWeight = FontWeight.SemiBold
                                 )
@@ -667,15 +725,15 @@ fun NotificationSettingsScreen(
                                 }
                             }
                             Text(
-                                text = "Get notified at specific times before launch",
+                                text = stringResource(Res.string.notification_settings_countdown_description),
                                 style = MaterialTheme.typography.bodySmall,
                                 color = MaterialTheme.colorScheme.onSurfaceVariant
                             )
                         }
 
                         NotificationTopicToggle(
-                            title = "Net Timestamp Changes",
-                            description = "When launch times are updated",
+                            title = stringResource(Res.string.notification_settings_net_change_title),
+                            description = stringResource(Res.string.notification_settings_net_change_description),
                             checked = uiState.notificationSettings.isTopicEnabled(NotificationTopic.NETSTAMP_CHANGED),
                             onCheckedChange = viewModel::updateNetstampChanged,
                             enabled = uiState.hasNotificationCustomization,
@@ -683,15 +741,15 @@ fun NotificationSettingsScreen(
                         )
 
                         NotificationTopicToggle(
-                            title = "24 Hour Notice",
-                            description = "24 hours before launch",
+                            title = stringResource(Res.string.notification_settings_notice_24h_title),
+                            description = stringResource(Res.string.notification_settings_notice_24h_description),
                             checked = uiState.notificationSettings.isTopicEnabled(NotificationTopic.TWENTY_FOUR_HOUR),
                             onCheckedChange = viewModel::updateTwentyFourHour
                         )
 
                         NotificationTopicToggle(
-                            title = "1 Hour Notice",
-                            description = "1 hour before launch",
+                            title = stringResource(Res.string.notification_settings_notice_1h_title),
+                            description = stringResource(Res.string.notification_settings_notice_1h_description),
                             checked = uiState.notificationSettings.isTopicEnabled(NotificationTopic.ONE_HOUR),
                             onCheckedChange = viewModel::updateOneHour,
                             enabled = uiState.hasNotificationCustomization,
@@ -699,15 +757,15 @@ fun NotificationSettingsScreen(
                         )
 
                         NotificationTopicToggle(
-                            title = "10 Minutes Notice",
-                            description = "10 minutes before launch",
+                            title = stringResource(Res.string.notification_settings_notice_10m_title),
+                            description = stringResource(Res.string.notification_settings_notice_10m_description),
                             checked = uiState.notificationSettings.isTopicEnabled(NotificationTopic.TEN_MINUTES),
                             onCheckedChange = viewModel::updateTenMinutes
                         )
 
                         NotificationTopicToggle(
-                            title = "1 Minute Notice",
-                            description = "1 minute before launch - for the most dedicated!",
+                            title = stringResource(Res.string.notification_settings_notice_1m_title),
+                            description = stringResource(Res.string.notification_settings_notice_1m_description),
                             checked = uiState.notificationSettings.isTopicEnabled(NotificationTopic.ONE_MINUTE),
                             onCheckedChange = viewModel::updateOneMinute,
                             enabled = uiState.hasNotificationCustomization,
@@ -732,7 +790,7 @@ fun NotificationSettingsScreen(
                                 verticalAlignment = Alignment.CenterVertically
                             ) {
                                 Text(
-                                    text = "Status Notifications",
+                                    text = stringResource(Res.string.notification_settings_status_title),
                                     style = MaterialTheme.typography.titleMedium,
                                     fontWeight = FontWeight.SemiBold
                                 )
@@ -743,15 +801,15 @@ fun NotificationSettingsScreen(
                                 }
                             }
                             Text(
-                                text = "Stay updated on launch progress and outcomes",
+                                text = stringResource(Res.string.notification_settings_status_description),
                                 style = MaterialTheme.typography.bodySmall,
                                 color = MaterialTheme.colorScheme.onSurfaceVariant
                             )
                         }
 
                         NotificationTopicToggle(
-                            title = "Webcast Only Launches",
-                            description = "Launches that have live video streams",
+                            title = stringResource(Res.string.notification_settings_webcast_title),
+                            description = stringResource(Res.string.notification_settings_webcast_description),
                             checked = uiState.notificationSettings.isTopicEnabled(NotificationTopic.WEBCAST_ONLY),
                             onCheckedChange = viewModel::updateWebcastOnly,
                             enabled = uiState.hasNotificationCustomization,
@@ -759,8 +817,8 @@ fun NotificationSettingsScreen(
                         )
 
                         NotificationTopicToggle(
-                            title = "In-Flight Updates",
-                            description = "Real-time updates during launch",
+                            title = stringResource(Res.string.notification_settings_in_flight_title),
+                            description = stringResource(Res.string.notification_settings_in_flight_description),
                             checked = uiState.notificationSettings.isTopicEnabled(NotificationTopic.IN_FLIGHT),
                             onCheckedChange = viewModel::updateInFlight,
                             enabled = uiState.hasNotificationCustomization,
@@ -768,8 +826,8 @@ fun NotificationSettingsScreen(
                         )
 
                         NotificationTopicToggle(
-                            title = "Mission Success",
-                            description = "Celebrate successful launches!",
+                            title = stringResource(Res.string.notification_settings_mission_success_title),
+                            description = stringResource(Res.string.notification_settings_mission_success_description),
                             checked = uiState.notificationSettings.isTopicEnabled(NotificationTopic.SUCCESS),
                             onCheckedChange = viewModel::updateSuccess
                         )

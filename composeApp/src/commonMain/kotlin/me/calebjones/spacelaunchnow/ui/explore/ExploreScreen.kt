@@ -23,6 +23,9 @@ import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import me.calebjones.spacelaunchnow.ui.explore.components.ExploreCard
 import me.calebjones.spacelaunchnow.ui.layout.rememberAdaptiveLayoutState
+import spacelaunchnow_kmp.composeapp.generated.resources.Res
+import spacelaunchnow_kmp.composeapp.generated.resources.app_explore_title
+import org.jetbrains.compose.resources.stringResource
 
 /**
  * Explore screen displaying a grid of discovery sections.
@@ -55,7 +58,7 @@ fun ExploreScreen(
                 windowInsets = WindowInsets(0, 0, 0, 0),
                 title = {
                     Text(
-                        text = "Explore",
+                        text = stringResource(Res.string.app_explore_title),
                         style = MaterialTheme.typography.headlineMedium,
                         fontWeight = FontWeight.Bold,
                     )

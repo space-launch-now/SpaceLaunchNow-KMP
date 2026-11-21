@@ -32,6 +32,11 @@ import me.calebjones.spacelaunchnow.ui.theme.SpaceLaunchNowPreviewTheme
 import me.calebjones.spacelaunchnow.ui.viewmodel.HistoryViewModel.HistoryData
 import me.calebjones.spacelaunchnow.ui.viewmodel.ViewState
 import org.jetbrains.compose.ui.tooling.preview.Preview
+import org.jetbrains.compose.resources.stringResource
+import spacelaunchnow_kmp.composeapp.generated.resources.Res
+import spacelaunchnow_kmp.composeapp.generated.resources.home_cached_data_notice
+import spacelaunchnow_kmp.composeapp.generated.resources.home_history_empty
+import spacelaunchnow_kmp.composeapp.generated.resources.home_history_error
 
 // Layout constants
 private val CARD_HEIGHT = 200.dp
@@ -71,7 +76,7 @@ fun ThisDayInHistorySection(
                                     .padding(bottom = 4.dp)
                             ) {
                                 Text(
-                                    text = "Showing cached data",
+                                    text = stringResource(Res.string.home_cached_data_notice),
                                     style = MaterialTheme.typography.bodySmall,
                                     color = MaterialTheme.colorScheme.onErrorContainer,
                                     modifier = Modifier.padding(8.dp)
@@ -99,7 +104,7 @@ fun ThisDayInHistorySection(
                                 verticalArrangement = Arrangement.spacedBy(8.dp)
                             ) {
                                 Text(
-                                    text = "Failed to load history launches",
+                                    text = stringResource(Res.string.home_history_error),
                                     fontWeight = FontWeight.Medium,
                                     color = MaterialTheme.colorScheme.onErrorContainer
                                 )
@@ -137,7 +142,7 @@ fun ThisDayInHistorySection(
                             contentAlignment = Alignment.Center
                         ) {
                             Text(
-                                text = "No launches on this day",
+                                text = stringResource(Res.string.home_history_empty),
                                 style = MaterialTheme.typography.bodyMedium,
                                 color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.6f)
                             )

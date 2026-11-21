@@ -27,6 +27,10 @@ import coil3.compose.SubcomposeAsyncImage
 import me.calebjones.spacelaunchnow.domain.model.AstronautListItem
 import me.calebjones.spacelaunchnow.ui.theme.SpaceLaunchNowPreviewTheme
 import org.jetbrains.compose.ui.tooling.preview.Preview
+import spacelaunchnow_kmp.composeapp.generated.resources.Res
+import org.jetbrains.compose.resources.stringResource
+import spacelaunchnow_kmp.composeapp.generated.resources.station_crew_member_unknown
+import spacelaunchnow_kmp.composeapp.generated.resources.station_crew_title
 
 /**
  * Card displaying current crew members aboard the space station
@@ -42,7 +46,7 @@ fun CrewCard(
     ) {
         Column(modifier = Modifier.padding(16.dp)) {
             Text(
-                text = "Current Crew (${crew.size})",
+                text = stringResource(Res.string.station_crew_title, crew.size),
                 style = MaterialTheme.typography.titleMedium,
                 modifier = Modifier.padding(bottom = 12.dp)
             )
@@ -97,7 +101,7 @@ private fun CrewMemberItem(astronaut: AstronautListItem) {
 
         Column(modifier = Modifier.padding(start = 12.dp)) {
             Text(
-                text = astronaut.name ?: "Unknown",
+                text = astronaut.name ?: stringResource(Res.string.station_crew_member_unknown),
                 style = MaterialTheme.typography.bodyLarge
             )
         }

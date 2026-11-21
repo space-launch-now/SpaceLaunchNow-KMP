@@ -13,56 +13,75 @@ import me.calebjones.spacelaunchnow.navigation.NewsEvents
 import me.calebjones.spacelaunchnow.navigation.Rockets
 import me.calebjones.spacelaunchnow.navigation.SpaceStationDetail
 import me.calebjones.spacelaunchnow.navigation.Starship
+import spacelaunchnow_kmp.composeapp.generated.resources.Res
+import spacelaunchnow_kmp.composeapp.generated.resources.app_explore_card_agencies_content_description
+import spacelaunchnow_kmp.composeapp.generated.resources.app_explore_card_agencies_description
+import spacelaunchnow_kmp.composeapp.generated.resources.app_explore_card_agencies_title
+import spacelaunchnow_kmp.composeapp.generated.resources.app_explore_card_astronauts_content_description
+import spacelaunchnow_kmp.composeapp.generated.resources.app_explore_card_astronauts_description
+import spacelaunchnow_kmp.composeapp.generated.resources.app_explore_card_astronauts_title
+import spacelaunchnow_kmp.composeapp.generated.resources.app_explore_card_iss_content_description
+import spacelaunchnow_kmp.composeapp.generated.resources.app_explore_card_iss_description
+import spacelaunchnow_kmp.composeapp.generated.resources.app_explore_card_iss_title
+import spacelaunchnow_kmp.composeapp.generated.resources.app_explore_card_news_events_content_description
+import spacelaunchnow_kmp.composeapp.generated.resources.app_explore_card_news_events_description
+import spacelaunchnow_kmp.composeapp.generated.resources.app_explore_card_news_events_title
+import spacelaunchnow_kmp.composeapp.generated.resources.app_explore_card_rockets_content_description
+import spacelaunchnow_kmp.composeapp.generated.resources.app_explore_card_rockets_description
+import spacelaunchnow_kmp.composeapp.generated.resources.app_explore_card_rockets_title
+import spacelaunchnow_kmp.composeapp.generated.resources.app_explore_card_starship_content_description
+import spacelaunchnow_kmp.composeapp.generated.resources.app_explore_card_starship_description
+import spacelaunchnow_kmp.composeapp.generated.resources.app_explore_card_starship_title
 
 object ExploreSections {
     val sections = listOf(
         ExploreSection(
             id = "iss_tracking",
-            title = "ISS Tracking",
-            description = "Live tracking and crew info",
+            title = Res.string.app_explore_card_iss_title,
+            description = Res.string.app_explore_card_iss_description,
             icon = Icons.Filled.Satellite,
             route = SpaceStationDetail(4), // ISS has ID 4
-            contentDescription = "Navigate to ISS Tracking with live position and crew information"
+            contentDescription = Res.string.app_explore_card_iss_content_description
         ),
         ExploreSection(
             id = "agencies",
-            title = "Agencies",
-            description = "Space agencies and missions",
+            title = Res.string.app_explore_card_agencies_title,
+            description = Res.string.app_explore_card_agencies_description,
             icon = Icons.Filled.Business,
             route = Agencies,
-            contentDescription = "Navigate to Agencies list to explore space organizations"
+            contentDescription = Res.string.app_explore_card_agencies_content_description
         ),
         ExploreSection(
             id = "astronauts",
-            title = "Astronauts",
-            description = "Browse astronaut profiles",
+            title = Res.string.app_explore_card_astronauts_title,
+            description = Res.string.app_explore_card_astronauts_description,
             icon = Icons.Filled.Person,
             route = Astronauts,
-            contentDescription = "Navigate to Astronauts list to view career stats and missions"
+            contentDescription = Res.string.app_explore_card_astronauts_content_description
         ),
         ExploreSection(
             id = "rockets",
-            title = "Rockets",
-            description = "Launcher configurations",
+            title = Res.string.app_explore_card_rockets_title,
+            description = Res.string.app_explore_card_rockets_description,
             icon = Icons.Filled.Rocket,
             route = Rockets,
-            contentDescription = "Navigate to Rockets list to explore launch vehicles"
+            contentDescription = Res.string.app_explore_card_rockets_content_description
         ),
         ExploreSection(
             id = "starship",
-            title = "Starship",
-            description = "SpaceX Starship development",
+            title = Res.string.app_explore_card_starship_title,
+            description = Res.string.app_explore_card_starship_description,
             icon = Icons.Filled.RocketLaunch,
             route = Starship,
-            contentDescription = "Navigate to Starship dashboard for updates and launches"
+            contentDescription = Res.string.app_explore_card_starship_content_description
         ),
         ExploreSection(
             id = "news_events",
-            title = "News & Events",
-            description = "Space news and upcoming events",
+            title = Res.string.app_explore_card_news_events_title,
+            description = Res.string.app_explore_card_news_events_description,
             icon = Icons.Filled.Newspaper,
             route = NewsEvents(),
-            contentDescription = "Navigate to News and Events to browse articles and upcoming space events"
+            contentDescription = Res.string.app_explore_card_news_events_content_description
         )
     )
 }

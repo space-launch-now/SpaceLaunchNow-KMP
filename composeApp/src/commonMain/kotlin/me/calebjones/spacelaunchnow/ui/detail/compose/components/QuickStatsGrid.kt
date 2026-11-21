@@ -21,6 +21,12 @@ import kotlinx.datetime.TimeZone
 import kotlinx.datetime.toLocalDateTime
 import me.calebjones.spacelaunchnow.domain.model.Launch
 import me.calebjones.spacelaunchnow.ui.components.StatCard
+import org.jetbrains.compose.resources.stringResource
+import spacelaunchnow_kmp.composeapp.generated.resources.Res
+import spacelaunchnow_kmp.composeapp.generated.resources.launch_detail_facts_launch_all_time
+import spacelaunchnow_kmp.composeapp.generated.resources.launch_detail_facts_location_all_time
+import spacelaunchnow_kmp.composeapp.generated.resources.launch_detail_facts_total_year
+import spacelaunchnow_kmp.composeapp.generated.resources.launch_detail_quick_facts_heading
 
 @Composable
 fun QuickStatsGrid(launch: Launch) {
@@ -31,13 +37,13 @@ fun QuickStatsGrid(launch: Launch) {
 
     val facts = buildList {
         launch.launchAttemptCounts?.orbital?.let { count ->
-            add(Fact(Icons.Filled.Public, "#${count}", "Launch\nAll Time"))
+            add(Fact(Icons.Filled.Public, "#${count}", stringResource(Res.string.launch_detail_facts_launch_all_time)))
         }
         launch.launchAttemptCounts?.pad?.let { count ->
-            add(Fact(Icons.Filled.Place, "#${count}", "Location\nAll Time"))
+            add(Fact(Icons.Filled.Place, "#${count}", stringResource(Res.string.launch_detail_facts_location_all_time)))
         }
         launch.launchAttemptCounts?.orbitalYear?.let { count ->
-            add(Fact(Icons.Filled.CalendarToday, "#${count}", "Total\n$currentYear"))
+            add(Fact(Icons.Filled.CalendarToday, "#${count}", stringResource(Res.string.launch_detail_facts_total_year, currentYear.toString())))
         }
         launch.launchAttemptCounts?.agencyYear?.let { count ->
             add(
@@ -57,7 +63,7 @@ fun QuickStatsGrid(launch: Launch) {
         verticalArrangement = Arrangement.spacedBy(16.dp)
     ) {
         Text(
-            text = "Quick Facts",
+            text = stringResource(Res.string.launch_detail_quick_facts_heading),
             style = MaterialTheme.typography.titleLarge,
             fontWeight = FontWeight.Bold
         )

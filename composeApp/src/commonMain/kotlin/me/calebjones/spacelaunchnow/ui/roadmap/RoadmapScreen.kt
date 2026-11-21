@@ -46,9 +46,18 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import me.calebjones.spacelaunchnow.data.model.RoadmapData
 import me.calebjones.spacelaunchnow.data.model.RoadmapItem
 import me.calebjones.spacelaunchnow.data.model.RoadmapStatus
 import org.koin.compose.viewmodel.koinViewModel
+import spacelaunchnow_kmp.composeapp.generated.resources.Res
+import spacelaunchnow_kmp.composeapp.generated.resources.app_roadmap_error_title
+import spacelaunchnow_kmp.composeapp.generated.resources.app_roadmap_last_updated
+import spacelaunchnow_kmp.composeapp.generated.resources.app_roadmap_loading
+import spacelaunchnow_kmp.composeapp.generated.resources.app_roadmap_title
+import spacelaunchnow_kmp.composeapp.generated.resources.common_back
+import spacelaunchnow_kmp.composeapp.generated.resources.common_retry
+import org.jetbrains.compose.resources.stringResource
 
 /**
  * Roadmap screen showing planned features and development timeline
@@ -66,13 +75,15 @@ fun RoadmapScreen(
     viewModel: RoadmapViewModel = koinViewModel()
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
+    // Fallback items are resolved here because their text comes from string resources.
+    val roadmapData = uiState.placeholderData?.toRoadmapData() ?: uiState.roadmapData
 
     Scaffold(
         topBar = {
             CenterAlignedTopAppBar(
                 title = {
                     Text(
-                        text = "Roadmap",
+                        text = stringResource(Res.string.app_roadmap_title),
                         style = MaterialTheme.typography.headlineMedium,
                         fontWeight = FontWeight.Bold,
                         fontSize = 36.sp
@@ -82,7 +93,7 @@ fun RoadmapScreen(
                     IconButton(onClick = onNavigateBack) {
                         Icon(
                             Icons.AutoMirrored.Filled.ArrowBack,
-                            contentDescription = "Back"
+                            contentDescription = stringResource(Res.string.common_back)
                         )
                     }
                 }
@@ -104,9 +115,9 @@ fun RoadmapScreen(
                         onRetry = { viewModel.refresh() }
                     )
                 }
-                uiState.roadmapData != null -> {
+                roadmapData != null -> {
                     RoadmapContent(
-                        roadmapData = uiState.roadmapData!!
+                        roadmapData = roadmapData
                     )
                 }
             }
@@ -127,7 +138,7 @@ private fun LoadingState() {
         ) {
             LoadingIndicator()
             Text(
-                text = "Loading roadmap...",
+                text = stringResource(Res.string.app_roadmap_loading),
                 style = MaterialTheme.typography.bodyMedium,
                 color = MaterialTheme.colorScheme.onSurfaceVariant
             )
@@ -150,7 +161,7 @@ private fun ErrorState(
             modifier = Modifier.padding(32.dp)
         ) {
             Text(
-                text = "Oops!",
+                text = stringResource(Res.string.app_roadmap_error_title),
                 style = MaterialTheme.typography.headlineSmall,
                 fontWeight = FontWeight.Bold
             )
@@ -160,7 +171,7 @@ private fun ErrorState(
                 color = MaterialTheme.colorScheme.error
             )
             androidx.compose.material3.Button(onClick = onRetry) {
-                Text("Retry")
+                Text(stringResource(Res.string.common_retry))
             }
         }
     }
@@ -199,7 +210,7 @@ private fun RoadmapContent(
             
             roadmapData.lastUpdated?.let { updated ->
                 Text(
-                    text = "Last updated: $updated",
+                    text = stringResource(Res.string.app_roadmap_last_updated, updated),
                     style = MaterialTheme.typography.bodySmall,
                     color = MaterialTheme.colorScheme.onSurfaceVariant,
                     modifier = Modifier.padding(bottom = 16.dp)
@@ -366,3 +377,20 @@ private fun getStatusIcon(status: RoadmapStatus) = when (status) {
     RoadmapStatus.PLANNED -> Icons.Filled.Schedule
     RoadmapStatus.BACKLOG -> Icons.Filled.ThumbUp
 }
+
+@Composable
+private fun PlaceholderRoadmapData.toRoadmapData(): RoadmapData = RoadmapData(
+    items = items.map { item ->
+        RoadmapItem(
+            id = item.id,
+            title = stringResource(item.title),
+            description = stringResource(item.description),
+            status = item.status,
+            quarter = stringResource(item.quarter),
+            category = item.category,
+            priority = item.priority
+        )
+    },
+    lastUpdated = stringResource(lastUpdated),
+    message = stringResource(message)
+)

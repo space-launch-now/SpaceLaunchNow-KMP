@@ -40,6 +40,23 @@ import me.calebjones.spacelaunchnow.domain.model.Location
 import me.calebjones.spacelaunchnow.domain.model.Pad
 import me.calebjones.spacelaunchnow.ui.components.StatCard
 import me.calebjones.spacelaunchnow.util.parseIsoDurationToHumanReadable
+import org.jetbrains.compose.resources.stringResource
+import spacelaunchnow_kmp.composeapp.generated.resources.Res
+import spacelaunchnow_kmp.composeapp.generated.resources.launch_detail_info_description
+import spacelaunchnow_kmp.composeapp.generated.resources.launch_detail_link_website
+import spacelaunchnow_kmp.composeapp.generated.resources.launch_detail_link_wikipedia
+import spacelaunchnow_kmp.composeapp.generated.resources.launch_detail_link_wikipedia_description
+import spacelaunchnow_kmp.composeapp.generated.resources.launch_detail_location_flag_description
+import spacelaunchnow_kmp.composeapp.generated.resources.launch_detail_location_image_description
+import spacelaunchnow_kmp.composeapp.generated.resources.launch_detail_location_map_description
+import spacelaunchnow_kmp.composeapp.generated.resources.launch_detail_pad_coordinates
+import spacelaunchnow_kmp.composeapp.generated.resources.launch_detail_pad_fastest_turnaround
+import spacelaunchnow_kmp.composeapp.generated.resources.launch_detail_pad_image_description
+import spacelaunchnow_kmp.composeapp.generated.resources.launch_detail_pad_map_description
+import spacelaunchnow_kmp.composeapp.generated.resources.launch_detail_pad_map_icon_description
+import spacelaunchnow_kmp.composeapp.generated.resources.launch_detail_pad_open_map
+import spacelaunchnow_kmp.composeapp.generated.resources.launch_detail_pad_stat_launches
+import spacelaunchnow_kmp.composeapp.generated.resources.launch_detail_pad_stat_orbital_attempts
 
 @Composable
 fun LaunchLocationCard(
@@ -69,7 +86,7 @@ fun LaunchLocationCard(
                     ) {
                         AsyncImage(
                             model = mapUrl,
-                            contentDescription = "Location Image",
+                            contentDescription = stringResource(Res.string.launch_detail_location_image_description),
                             modifier = Modifier
                                 .fillMaxWidth()
                                 .clip(RoundedCornerShape(8.dp)),
@@ -83,7 +100,7 @@ fun LaunchLocationCard(
                     ) {
                         AsyncImage(
                             model = mapUrl,
-                            contentDescription = "Location Map",
+                            contentDescription = stringResource(Res.string.launch_detail_location_map_description),
                             modifier = Modifier
                                 .fillMaxWidth()
                                 .clip(RoundedCornerShape(8.dp)),
@@ -103,7 +120,7 @@ fun LaunchLocationCard(
                     Row(verticalAlignment = Alignment.CenterVertically) {
                         AsyncImage(
                             model = "https://flagcdn.com/w40/${alpha2.lowercase()}.png",
-                            contentDescription = "Flag",
+                            contentDescription = stringResource(Res.string.launch_detail_location_flag_description),
                             modifier = Modifier.width(24.dp).height(16.dp)
                                 .clip(RoundedCornerShape(2.dp)),
                             contentScale = ContentScale.Crop
@@ -182,7 +199,7 @@ fun LaunchLocationCard(
                             ) {
                                 AsyncImage(
                                     model = mapUrl,
-                                    contentDescription = "Pad Image",
+                                    contentDescription = stringResource(Res.string.launch_detail_pad_image_description),
                                     modifier = Modifier
                                         .fillMaxWidth()
                                         .clip(RoundedCornerShape(8.dp)),
@@ -196,7 +213,7 @@ fun LaunchLocationCard(
                             ) {
                                 AsyncImage(
                                     model = mapUrl,
-                                    contentDescription = "Pad Map",
+                                    contentDescription = stringResource(Res.string.launch_detail_pad_map_description),
                                     modifier = Modifier
                                         .fillMaxWidth()
                                         .clip(RoundedCornerShape(8.dp)),
@@ -224,16 +241,12 @@ fun LaunchLocationCard(
                                 it.longitude?.let { lon ->
                                     val latStr = ((lat * 100).toInt() / 100.0).toString()
                                     val lonStr = ((lon * 100).toInt() / 100.0).toString()
-                                    "Coordinates: $latStr, $lonStr"
+                                    stringResource(Res.string.launch_detail_pad_coordinates, latStr, lonStr)
                                 }
                             },
                             it.fastestTurnaround?.takeIf { f -> f.isNotBlank() }
                                 ?.let { f ->
-                                    "Fastest Turnaround: ${
-                                        parseIsoDurationToHumanReadable(
-                                            f
-                                        )
-                                    }"
+                                    stringResource(Res.string.launch_detail_pad_fastest_turnaround, parseIsoDurationToHumanReadable(f))
                                 }
                         )
 
@@ -257,11 +270,11 @@ fun LaunchLocationCard(
                                 ) {
                                     Icon(
                                         imageVector = FontAwesomeIcons.Solid.Map,
-                                        contentDescription = "Map",
+                                        contentDescription = stringResource(Res.string.launch_detail_pad_map_icon_description),
                                         modifier = Modifier.size(18.dp)
                                     )
                                     Spacer(modifier = Modifier.width(8.dp))
-                                    Text("Open Map", color = MaterialTheme.colorScheme.onTertiary)
+                                    Text(stringResource(Res.string.launch_detail_pad_open_map), color = MaterialTheme.colorScheme.onTertiary)
                                 }
                             }
                         }
@@ -274,11 +287,11 @@ fun LaunchLocationCard(
                                 ) {
                                     Icon(
                                         imageVector = FontAwesomeIcons.Solid.InfoCircle,
-                                        contentDescription = "Information",
+                                        contentDescription = stringResource(Res.string.launch_detail_info_description),
                                         modifier = Modifier.size(18.dp)
                                     )
                                     Spacer(modifier = Modifier.width(8.dp))
-                                    Text("Website")
+                                    Text(stringResource(Res.string.launch_detail_link_website))
                                 }
                             }
                             it.wikiUrl?.let { url ->
@@ -289,11 +302,11 @@ fun LaunchLocationCard(
                                 ) {
                                     Icon(
                                         imageVector = FontAwesomeIcons.Brands.WikipediaW,
-                                        contentDescription = "Wikipedia",
+                                        contentDescription = stringResource(Res.string.launch_detail_link_wikipedia_description),
                                         modifier = Modifier.size(18.dp)
                                     )
                                     Spacer(modifier = Modifier.width(8.dp))
-                                    Text("Wikipedia", color = MaterialTheme.colorScheme.onSecondary)
+                                    Text(stringResource(Res.string.launch_detail_link_wikipedia), color = MaterialTheme.colorScheme.onSecondary)
                                 }
                             }
                         }
@@ -316,7 +329,7 @@ fun PadQuickStatsRow(pad: Pad?) {
                 modifier = Modifier.weight(1f),
                 icon = Icons.Filled.Public,
                 value = pad.totalLaunchCount.toString(),
-                label = "Launches"
+                label = stringResource(Res.string.launch_detail_pad_stat_launches)
             )
         }
         if (pad.orbitalLaunchAttemptCount != null) {
@@ -324,7 +337,7 @@ fun PadQuickStatsRow(pad: Pad?) {
                 modifier = Modifier.weight(1f),
                 icon = Icons.Filled.TrendingUp,
                 value = pad.orbitalLaunchAttemptCount.toString(),
-                label = "Orbital Attempts"
+                label = stringResource(Res.string.launch_detail_pad_stat_orbital_attempts)
             )
         }
     }

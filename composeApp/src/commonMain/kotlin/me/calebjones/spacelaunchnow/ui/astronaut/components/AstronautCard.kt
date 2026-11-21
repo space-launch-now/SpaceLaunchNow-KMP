@@ -39,6 +39,11 @@ import me.calebjones.spacelaunchnow.ui.components.StatusChip
 import me.calebjones.spacelaunchnow.ui.theme.SpaceLaunchNowPreviewTheme
 import me.calebjones.spacelaunchnow.ui.theme.SpaceLaunchNowTheme
 import org.jetbrains.compose.ui.tooling.preview.Preview
+import org.jetbrains.compose.resources.stringResource
+import spacelaunchnow_kmp.composeapp.generated.resources.Res
+import spacelaunchnow_kmp.composeapp.generated.resources.astronaut_card_description
+import spacelaunchnow_kmp.composeapp.generated.resources.astronaut_unknown
+import spacelaunchnow_kmp.composeapp.generated.resources.astronaut_card_unknown_name
 
 /**
  * Card component displaying astronaut information in a list.
@@ -52,10 +57,14 @@ fun AstronautCard(
     onClick: () -> Unit,
     modifier: Modifier = Modifier
 ) {
-    val contentDesc = "Astronaut card for ${astronaut.name?.ifBlank { "Unknown" } ?: "Unknown"}. " +
-            "Status: ${astronaut.statusName ?: "Unknown"}. " +
-            "Agency: ${astronaut.agencyName ?: "Unknown"}. " +
-            "Tap to view details."
+    val unknown = stringResource(Res.string.astronaut_unknown)
+    val unknownName = stringResource(Res.string.astronaut_card_unknown_name)
+    val contentDesc = stringResource(
+        Res.string.astronaut_card_description,
+        astronaut.name?.ifBlank { unknown } ?: unknown,
+        astronaut.statusName ?: unknown,
+        astronaut.agencyName ?: unknown
+    )
     
     Card(
         modifier = modifier
@@ -121,7 +130,7 @@ fun AstronautCard(
             ) {
                 // Name
                 Text(
-                    text = astronaut.name?.ifBlank { "Unknown Astronaut" } ?: "Unknown Astronaut",
+                    text = astronaut.name?.ifBlank { unknownName } ?: unknownName,
                     style = MaterialTheme.typography.titleMedium,
                     fontWeight = FontWeight.SemiBold,
                     maxLines = 2,

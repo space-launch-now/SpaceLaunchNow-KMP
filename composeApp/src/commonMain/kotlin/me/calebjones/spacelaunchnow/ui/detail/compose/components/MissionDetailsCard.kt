@@ -38,8 +38,17 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import coil3.compose.SubcomposeAsyncImage
 import com.valentinilk.shimmer.shimmer
+import me.calebjones.spacelaunchnow.domain.mapper.missionTypeLabel
+import me.calebjones.spacelaunchnow.domain.mapper.orbitLabel
 import me.calebjones.spacelaunchnow.domain.model.Mission
 import me.calebjones.spacelaunchnow.ui.components.InfoChip
+import org.jetbrains.compose.resources.stringResource
+import spacelaunchnow_kmp.composeapp.generated.resources.Res
+import spacelaunchnow_kmp.composeapp.generated.resources.launch_detail_mission_icon_description
+import spacelaunchnow_kmp.composeapp.generated.resources.launch_detail_mission_patch_description
+import spacelaunchnow_kmp.composeapp.generated.resources.launch_detail_mission_unknown_name
+import spacelaunchnow_kmp.composeapp.generated.resources.launch_detail_read_less
+import spacelaunchnow_kmp.composeapp.generated.resources.launch_detail_read_more
 
 @Composable
 fun MissionDetailsCard(mission: Mission, missionPatchUrl: String?) {
@@ -65,7 +74,7 @@ fun MissionDetailsCard(mission: Mission, missionPatchUrl: String?) {
                     missionPatchUrl?.let { imageUrl ->
                         SubcomposeAsyncImage(
                             model = imageUrl,
-                            contentDescription = "Mission Patch",
+                            contentDescription = stringResource(Res.string.launch_detail_mission_patch_description),
                             modifier = Modifier
                                 .size(200.dp)
                                 .padding(8.dp)
@@ -96,7 +105,7 @@ fun MissionDetailsCard(mission: Mission, missionPatchUrl: String?) {
                                 ) {
                                     Icon(
                                         imageVector = Icons.Filled.Error,
-                                        contentDescription = "Mission",
+                                        contentDescription = stringResource(Res.string.launch_detail_mission_icon_description),
                                         tint = MaterialTheme.colorScheme.onSurfaceVariant,
                                         modifier = Modifier.size(32.dp)
                                     )
@@ -107,7 +116,7 @@ fun MissionDetailsCard(mission: Mission, missionPatchUrl: String?) {
                 }
             }
             Text(
-                text = mission.name ?: "Unknown Mission",
+                text = mission.name ?: stringResource(Res.string.launch_detail_mission_unknown_name),
                 style = MaterialTheme.typography.headlineMedium,
                 fontWeight = FontWeight.Medium,
                 color = MaterialTheme.colorScheme.onSurfaceVariant,
@@ -117,10 +126,10 @@ fun MissionDetailsCard(mission: Mission, missionPatchUrl: String?) {
                 // Tag chips row for type and orbit
                 LazyRow(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
                     mission.type?.takeIf { it.isNotBlank() }?.let { type ->
-                        item { InfoChip(icon = Icons.Filled.Category, text = type) }
+                        item { InfoChip(icon = Icons.Filled.Category, text = missionTypeLabel(type)) }
                     }
-                    mission.orbit?.name?.takeIf { it.isNotBlank() }?.let { orbitName ->
-                        item { InfoChip(icon = Icons.Filled.Public, text = orbitName) }
+                    mission.orbit?.takeIf { it.name.isNotBlank() }?.let { orbit ->
+                        item { InfoChip(icon = Icons.Filled.Public, text = orbitLabel(orbit)) }
                     }
                 }
 
@@ -142,7 +151,7 @@ fun MissionDetailsCard(mission: Mission, missionPatchUrl: String?) {
                         )
                         if (hasOverflow || expanded) {
                             TextButton(onClick = { expanded = !expanded }) {
-                                Text(if (expanded) "Read less" else "Read more")
+                                Text(if (expanded) stringResource(Res.string.launch_detail_read_less) else stringResource(Res.string.launch_detail_read_more))
                             }
                         }
                     }

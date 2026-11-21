@@ -41,6 +41,24 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import me.calebjones.spacelaunchnow.ui.viewmodel.AgencySortOrder
+import org.jetbrains.compose.resources.stringResource
+import spacelaunchnow_kmp.composeapp.generated.resources.Res
+import spacelaunchnow_kmp.composeapp.generated.resources.agency_filter_clear_all
+import spacelaunchnow_kmp.composeapp.generated.resources.agency_filter_done
+import spacelaunchnow_kmp.composeapp.generated.resources.agency_filter_featured_all
+import spacelaunchnow_kmp.composeapp.generated.resources.agency_filter_featured_none
+import spacelaunchnow_kmp.composeapp.generated.resources.agency_filter_featured_only
+import spacelaunchnow_kmp.composeapp.generated.resources.agency_filter_featured_title
+import spacelaunchnow_kmp.composeapp.generated.resources.agency_filter_filters_title
+import spacelaunchnow_kmp.composeapp.generated.resources.agency_filter_name_label
+import spacelaunchnow_kmp.composeapp.generated.resources.agency_filter_name_placeholder
+import spacelaunchnow_kmp.composeapp.generated.resources.agency_filter_order_label
+import spacelaunchnow_kmp.composeapp.generated.resources.agency_filter_search_apply
+import spacelaunchnow_kmp.composeapp.generated.resources.agency_filter_search_clear
+import spacelaunchnow_kmp.composeapp.generated.resources.agency_filter_search_title
+import spacelaunchnow_kmp.composeapp.generated.resources.agency_filter_selected_description
+import spacelaunchnow_kmp.composeapp.generated.resources.agency_filter_sort_title
+import spacelaunchnow_kmp.composeapp.generated.resources.agency_filter_title
 
 /**
  * Filter and sort bottom sheet content for agency list.
@@ -80,12 +98,12 @@ fun AgencyFilterSheet(
                 verticalAlignment = Alignment.CenterVertically
             ) {
                 Text(
-                    text = "Filter & Sort",
+                    text = stringResource(Res.string.agency_filter_title),
                     style = MaterialTheme.typography.titleLarge,
                     fontWeight = FontWeight.Bold
                 )
                 TextButton(onClick = onClearAll) {
-                    Text("Clear All")
+                    Text(stringResource(Res.string.agency_filter_clear_all))
                 }
             }
         }
@@ -100,7 +118,7 @@ fun AgencyFilterSheet(
             ) {
                 Column(modifier = Modifier.padding(16.dp)) {
                     Text(
-                        text = "Search",
+                        text = stringResource(Res.string.agency_filter_search_title),
                         style = MaterialTheme.typography.titleMedium,
                         fontWeight = FontWeight.SemiBold,
                         modifier = Modifier.padding(bottom = 8.dp)
@@ -108,8 +126,8 @@ fun AgencyFilterSheet(
                     OutlinedTextField(
                         value = localSearchQuery,
                         onValueChange = { localSearchQuery = it },
-                        label = { Text("Agency Name") },
-                        placeholder = { Text("e.g., NASA, SpaceX") },
+                        label = { Text(stringResource(Res.string.agency_filter_name_label)) },
+                        placeholder = { Text(stringResource(Res.string.agency_filter_name_placeholder)) },
                         modifier = Modifier.fillMaxWidth(),
                         singleLine = true,
                         shape = RoundedCornerShape(12.dp)
@@ -126,13 +144,13 @@ fun AgencyFilterSheet(
                             },
                             modifier = Modifier.weight(1f)
                         ) {
-                            Text("Clear")
+                            Text(stringResource(Res.string.agency_filter_search_clear))
                         }
                         Button(
                             onClick = { onSearchQueryChange(localSearchQuery) },
                             modifier = Modifier.weight(1f)
                         ) {
-                            Text("Apply")
+                            Text(stringResource(Res.string.agency_filter_search_apply))
                         }
                     }
                 }
@@ -149,7 +167,7 @@ fun AgencyFilterSheet(
             ) {
                 Column(modifier = Modifier.padding(16.dp)) {
                     Text(
-                        text = "Sort By",
+                        text = stringResource(Res.string.agency_filter_sort_title),
                         style = MaterialTheme.typography.titleMedium,
                         fontWeight = FontWeight.SemiBold,
                         modifier = Modifier.padding(bottom = 8.dp)
@@ -163,7 +181,7 @@ fun AgencyFilterSheet(
                             value = selectedSortOrder.displayName,
                             onValueChange = {},
                             readOnly = true,
-                            label = { Text("Order") },
+                            label = { Text(stringResource(Res.string.agency_filter_order_label)) },
                             trailingIcon = {
                                 ExposedDropdownMenuDefaults.TrailingIcon(expanded = sortExpanded)
                             },
@@ -190,7 +208,7 @@ fun AgencyFilterSheet(
                                             if (sortOrder == selectedSortOrder) {
                                                 Icon(
                                                     imageVector = Icons.Default.Check,
-                                                    contentDescription = "Selected",
+                                                    contentDescription = stringResource(Res.string.agency_filter_selected_description),
                                                     tint = MaterialTheme.colorScheme.primary
                                                 )
                                             }
@@ -221,7 +239,7 @@ fun AgencyFilterSheet(
                     verticalArrangement = Arrangement.spacedBy(12.dp)
                 ) {
                     Text(
-                        text = "Filters",
+                        text = stringResource(Res.string.agency_filter_filters_title),
                         style = MaterialTheme.typography.titleMedium,
                         fontWeight = FontWeight.SemiBold
                     )
@@ -229,7 +247,7 @@ fun AgencyFilterSheet(
                     // Featured Filter
                     Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
                         Text(
-                            text = "Featured Agencies",
+                            text = stringResource(Res.string.agency_filter_featured_title),
                             style = MaterialTheme.typography.bodyMedium,
                             fontWeight = FontWeight.Medium
                         )
@@ -238,19 +256,19 @@ fun AgencyFilterSheet(
                                 selected = featuredFilter == null,
                                 onClick = { onFeaturedChange(null) },
                                 shape = SegmentedButtonDefaults.itemShape(index = 0, count = 3),
-                                label = { Text("All") }
+                                label = { Text(stringResource(Res.string.agency_filter_featured_all)) }
                             )
                             SegmentedButton(
                                 selected = featuredFilter == true,
                                 onClick = { onFeaturedChange(true) },
                                 shape = SegmentedButtonDefaults.itemShape(index = 1, count = 3),
-                                label = { Text("Featured Only") }
+                                label = { Text(stringResource(Res.string.agency_filter_featured_only)) }
                             )
                             SegmentedButton(
                                 selected = featuredFilter == false,
                                 onClick = { onFeaturedChange(false) },
                                 shape = SegmentedButtonDefaults.itemShape(index = 2, count = 3),
-                                label = { Text("Non-Featured") }
+                                label = { Text(stringResource(Res.string.agency_filter_featured_none)) }
                             )
                         }
                     }
@@ -271,7 +289,7 @@ fun AgencyFilterSheet(
                         containerColor = MaterialTheme.colorScheme.primary
                     )
                 ) {
-                    Text("Done")
+                    Text(stringResource(Res.string.agency_filter_done))
                 }
             }
         }

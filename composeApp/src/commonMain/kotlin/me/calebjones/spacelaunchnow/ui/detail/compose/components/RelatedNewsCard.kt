@@ -45,6 +45,14 @@ import me.calebjones.spacelaunchnow.domain.mapper.toDomainSummary
 import me.calebjones.spacelaunchnow.domain.model.ArticleSummary
 import me.calebjones.spacelaunchnow.LocalUseUtc
 import me.calebjones.spacelaunchnow.util.DateTimeUtil
+import org.jetbrains.compose.resources.stringResource
+import spacelaunchnow_kmp.composeapp.generated.resources.Res
+import spacelaunchnow_kmp.composeapp.generated.resources.launch_detail_news_empty
+import spacelaunchnow_kmp.composeapp.generated.resources.launch_detail_news_icon_description
+import spacelaunchnow_kmp.composeapp.generated.resources.launch_detail_news_image_description
+import spacelaunchnow_kmp.composeapp.generated.resources.launch_detail_news_load_more
+import spacelaunchnow_kmp.composeapp.generated.resources.launch_detail_news_loading
+import spacelaunchnow_kmp.composeapp.generated.resources.launch_detail_show_less
 
 @Composable
 fun RelatedNewsCard(
@@ -81,7 +89,7 @@ fun RelatedNewsCard(
                             .padding(horizontal = 16.dp, vertical = 8.dp)
                     ) {
                         Text(
-                            text = "Load More (${articles.size - 5} more)",
+                            text = stringResource(Res.string.launch_detail_news_load_more, articles.size - 5),
                             style = MaterialTheme.typography.labelLarge
                         )
                     }
@@ -96,7 +104,7 @@ fun RelatedNewsCard(
                             .padding(horizontal = 16.dp, vertical = 8.dp)
                     ) {
                         Text(
-                            text = "Show Less",
+                            text = stringResource(Res.string.launch_detail_show_less),
                             style = MaterialTheme.typography.labelLarge
                         )
                     }
@@ -145,7 +153,7 @@ fun RelatedNewsItem(
             val image = article.imageUrl
             SubcomposeAsyncImage(
                 model = image,
-                contentDescription = "Article Image",
+                contentDescription = stringResource(Res.string.launch_detail_news_image_description),
                 modifier = Modifier
                     .size(96.dp)
                     .clip(shape = RoundedCornerShape(2.dp)),
@@ -173,7 +181,7 @@ fun RelatedNewsItem(
                     ) {
                         Icon(
                             imageVector = FontAwesomeIcons.Solid.Newspaper,
-                            contentDescription = "Article Icon",
+                            contentDescription = stringResource(Res.string.launch_detail_news_icon_description),
                             modifier = Modifier.size(48.dp),
                             tint = MaterialTheme.colorScheme.primary.copy(alpha = 0.6f)
                         )
@@ -244,7 +252,7 @@ fun RelatedNewsLoadingState() {
         )
         Spacer(modifier = Modifier.height(8.dp))
         Text(
-            text = "Loading related news...",
+            text = stringResource(Res.string.launch_detail_news_loading),
             style = MaterialTheme.typography.bodyMedium,
             color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.6f)
         )
@@ -269,7 +277,7 @@ fun RelatedNewsErrorState(error: String) {
             verticalArrangement = Arrangement.spacedBy(4.dp)
         ) {
             Text(
-                text = "No related news available",
+                text = stringResource(Res.string.launch_detail_news_empty),
                 style = MaterialTheme.typography.bodyMedium,
                 color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.7f)
             )

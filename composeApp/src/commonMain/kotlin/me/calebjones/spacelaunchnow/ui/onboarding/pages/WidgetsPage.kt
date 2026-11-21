@@ -11,6 +11,11 @@ import me.calebjones.spacelaunchnow.isIOS
 import me.calebjones.spacelaunchnow.ui.onboarding.OnboardingPage
 import me.calebjones.spacelaunchnow.ui.theme.SpaceLaunchNowPreviewTheme
 import org.jetbrains.compose.ui.tooling.preview.Preview
+import org.jetbrains.compose.resources.stringResource
+import spacelaunchnow_kmp.composeapp.generated.resources.Res
+import spacelaunchnow_kmp.composeapp.generated.resources.onboarding_widgets_subtitle_android
+import spacelaunchnow_kmp.composeapp.generated.resources.onboarding_widgets_subtitle_ios
+import spacelaunchnow_kmp.composeapp.generated.resources.onboarding_widgets_title
 
 /**
  * Onboarding page showcasing platform-specific home screen widgets.
@@ -20,11 +25,11 @@ import org.jetbrains.compose.ui.tooling.preview.Preview
 @Composable
 fun WidgetsPage(modifier: Modifier = Modifier, isIOS: Boolean = getPlatform().type == PlatformType.IOS) {
     OnboardingPage(
-        title = "Widgets at a Glance",
+        title = stringResource(Res.string.onboarding_widgets_title),
         subtitle = if (isIOS)
-            "Keep track of launches right from your Lock Screen and Home Screen."
+            stringResource(Res.string.onboarding_widgets_subtitle_ios)
         else
-            "Add a launch widget to your Home Screen.",
+            stringResource(Res.string.onboarding_widgets_subtitle_android),
         icon = Icons.Default.Widgets,
         modifier = modifier
     ) {

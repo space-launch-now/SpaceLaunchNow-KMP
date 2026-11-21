@@ -1,0 +1,176 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- Space station detail. Screen reader description of the back arrow on the error screen. -->
+    <string name="station_detail_navigate_back">Navigate back</string>
+    <!-- Space station detail. Heading on the error screen, above the error message. One or two lines. -->
+    <string name="station_detail_error_title">Failed to load station details</string>
+    <!-- Space station detail. Screen reader description of the button that opens the map full screen. -->
+    <string name="station_fullscreen_map_description">Fullscreen Map</string>
+    <!-- Space station detail. Screen reader description of the button that closes the full screen map. -->
+    <string name="station_exit_fullscreen_description">Exit Fullscreen</string>
+    <!-- Station map marker, Android only. Title of the marker that shows where the station is. Keep short. -->
+    <string name="station_map_marker_title">ISS</string>
+
+    <!-- Station position card. Heading of the card, one line. -->
+    <string name="station_position_title">Current Position</string>
+    <!-- Station position card. Screen reader description of the pin icon next to latitude and longitude. -->
+    <string name="station_position_location">Location</string>
+    <!-- Station position card. Small label above the latitude value. One word. -->
+    <string name="station_position_latitude">Latitude</string>
+    <!-- Station position card. Small label above the longitude value. One word. -->
+    <string name="station_position_longitude">Longitude</string>
+    <!-- Station position card. %1$s is a number with 4 decimals, such as 51.6400. Keep the degree sign. -->
+    <string name="station_position_degrees">%1$s°</string>
+    <!-- Station position card. Small label above the altitude value, and its icon description. One word. -->
+    <string name="station_position_altitude">Altitude</string>
+    <!-- Station position card. Altitude value. %1$s is a number, such as 408.3. Keep the unit short. -->
+    <string name="station_position_altitude_value">%1$s km</string>
+    <!-- Station position card. Small label above the speed value, and its icon description. One word. -->
+    <string name="station_position_velocity">Velocity</string>
+    <!-- Station position card. Speed value. %1$s is a number, such as 27580. Keep the unit short. -->
+    <string name="station_position_speed_value">%1$s km/h</string>
+    <!-- Station position card. Small label above the day or night state of the station. One word. -->
+    <string name="station_position_visibility">Visibility</string>
+    <!-- Station position card. Small label above the orbit name. One word. -->
+    <string name="station_position_orbit">Orbit</string>
+    <!-- Station position card. Text shown while the position loads. One line. -->
+    <string name="station_position_loading">Loading position...</string>
+
+    <!-- Station crew card. Heading. %1$d is the number of crew members. -->
+    <string name="station_crew_title">Current Crew (%1$d)</string>
+    <!-- Station crew lists. Shown in place of a crew member name that is missing. One word. -->
+    <string name="station_crew_member_unknown">Unknown</string>
+
+    <!-- Station docking card and station statistics. Heading of the docking card and label of the docked vehicles count. -->
+    <string name="station_docked_vehicles">Docked Vehicles</string>
+    <!-- Station docking card. Screen reader description of the vehicle icon. -->
+    <string name="station_docking_vehicle_description">Docked Vehicle</string>
+    <!-- Station docking card. Shown in place of a vehicle name that is missing. -->
+    <string name="station_docking_vehicle_unknown">Unknown Vehicle</string>
+    <!-- Station docking card. Small line under a vehicle. %1$s is a date such as Nov 3, 2026. -->
+    <string name="station_docking_since">Since %1$s</string>
+
+    <!-- Expedition card. Screen reader description of the mission patch image. -->
+    <string name="station_expedition_patch_description">Mission Patch</string>
+    <!-- Expedition card. Screen reader description of the expedition icon. -->
+    <string name="station_expedition_icon_description">Expedition Icon</string>
+    <!-- Expedition card. Small label above the start date. One word. -->
+    <string name="station_expedition_start">Start</string>
+    <!-- Expedition card. Small label above the end date. One word. -->
+    <string name="station_expedition_end">End</string>
+    <!-- Expedition card. Shown in place of the end date while the expedition runs. One word. -->
+    <string name="station_expedition_ongoing">Ongoing</string>
+    <!-- Expedition card. Heading of the crew list. %1$d is the number of crew members. -->
+    <string name="station_expedition_crew_title">Crew (%1$d)</string>
+    <!-- Expedition card. Screen reader description of the picture shown when a crew member has no photo. -->
+    <string name="station_expedition_crew_placeholder_description">Crew placeholder</string>
+
+    <!-- Station owners card. Heading of the card. -->
+    <string name="station_agencies_title">Operating Agencies</string>
+    <!-- Station owners card. Screen reader description of an agency logo. %1$s is the agency name. -->
+    <string name="station_agency_logo_description">%1$s logo</string>
+
+    <!-- Station news card. Heading of the card. -->
+    <string name="station_reports_title">News and Reports</string>
+    <!-- Station news card. Button that shows more articles. One line. %1$d is how many more articles it shows. -->
+    <string name="station_reports_load_more">Load More (%1$d more)</string>
+    <!-- Station news card. Button that shows fewer articles. One line. -->
+    <string name="station_reports_show_less">Show Less</string>
+
+    <!-- Station statistics card. Heading of the card. -->
+    <string name="station_specs_title">Station Statistics</string>
+    <!-- Station statistics card. Label above the number of people on board. -->
+    <string name="station_specs_crew">Onboard Crew</string>
+    <!-- Station statistics card. Label above the station height. One word. -->
+    <string name="station_specs_height">Height</string>
+    <!-- Station statistics card. Label above the station width. One word. -->
+    <string name="station_specs_width">Width</string>
+    <!-- Station statistics card. Label above the station mass. One word. -->
+    <string name="station_specs_mass">Mass</string>
+    <!-- Station statistics card. Label above the station volume. One word. -->
+    <string name="station_specs_volume">Volume</string>
+    <!-- Station statistics card. Label above the date the station was founded. One word. -->
+    <string name="station_specs_founded">Founded</string>
+    <!-- Station statistics card. Length in metres. %1$s is a number, such as 109.0. -->
+    <string name="station_specs_meters_value">%1$s m</string>
+    <!-- Station statistics card. Mass in kilograms. %1$s is a number with thousands separators. -->
+    <string name="station_specs_kilograms_value">%1$s kg</string>
+    <!-- Station statistics card. Volume in cubic metres. %1$s is a number. -->
+    <string name="station_specs_cubic_meters_value">%1$s m³</string>
+
+    <!-- Starship screen. Top bar title and name used when the program has no name. One line. -->
+    <string name="starship_title">Starship</string>
+    <!-- Starship screen. Tab label. One word. -->
+    <string name="starship_tab_overview">Overview</string>
+    <!-- Starship screen. Tab label. One word. -->
+    <string name="starship_tab_events">Events</string>
+    <!-- Starship screen. Tab label. One word. -->
+    <string name="starship_tab_vehicles">Vehicles</string>
+
+    <!-- Starship events tab. Section heading above the event list. -->
+    <string name="starship_events_title">Events</string>
+    <!-- Starship events tab. Section heading above the news list. -->
+    <string name="starship_events_news_title">News &amp; Articles</string>
+    <!-- Starship events tab. Empty state when no event exists. -->
+    <string name="starship_events_empty">No Starship events available</string>
+    <!-- Starship events tab. Shown in place of an event type that is missing. -->
+    <string name="starship_event_type_unknown">Unknown Type</string>
+
+    <!-- Starship timeline. Heading of the program timeline. -->
+    <string name="starship_timeline_title">Program Timeline</string>
+    <!-- Starship timeline. Error line. %1$s is the error message from the server. -->
+    <string name="starship_timeline_error">Error loading history: %1$s</string>
+    <!-- Starship timeline. Badge on the next launch card. Capital letters, one word, max 10 chars. -->
+    <string name="starship_timeline_upcoming">UPCOMING</string>
+    <!-- Starship timeline. Screen reader description of a launch picture. -->
+    <string name="starship_launch_image_description">Launch image</string>
+    <!-- Starship timeline. Line on a failed launch. %1$s is the failure reason. Keep the warning sign. -->
+    <string name="starship_launch_fail_reason">⚠ %1$s</string>
+
+    <!-- Starship overview tab. Shown in place of an error message that is missing. -->
+    <string name="starship_overview_load_failed">Failed to load data</string>
+    <!-- Starship overview tab. Hint under the error message. Tapping retries the load. -->
+    <string name="starship_overview_tap_to_retry">Tap to retry</string>
+    <!-- Starship overview tab. Section heading above the update list. -->
+    <string name="starship_updates_title">Updates</string>
+    <!-- Starship overview tab. Empty state when no update exists. -->
+    <string name="starship_updates_empty">No updates available</string>
+    <!-- Starship overview tab. Empty state when the program has no data. -->
+    <string name="starship_overview_empty">No Starship data available</string>
+    <!-- Starship overview tab. Banner shown when the data comes from the cache. -->
+    <string name="starship_overview_cached">Showing cached data • Pull to refresh</string>
+
+    <!-- Starship vehicles tab. Section heading and name used when a spacecraft configuration has no name. -->
+    <string name="starship_vehicles_spacecraft">Spacecraft</string>
+    <!-- Starship vehicles tab. Line under the spacecraft heading. -->
+    <string name="starship_vehicles_spacecraft_subtitle">Starship vehicles</string>
+    <!-- Starship vehicles tab. Section heading and name used when a booster configuration has no name. -->
+    <string name="starship_vehicles_boosters">Boosters</string>
+    <!-- Starship vehicles tab. Line under the boosters heading. -->
+    <string name="starship_vehicles_boosters_subtitle">Super Heavy first stages</string>
+    <!-- Starship vehicles tab. Empty state when no configuration exists. -->
+    <string name="starship_vehicles_empty">No vehicle configurations found</string>
+    <!-- Starship vehicles tab. Screen reader description of the arrow that goes back to the configuration list. -->
+    <string name="starship_vehicles_back_description">Back to configurations</string>
+    <!-- Starship vehicles tab. Section heading above the list of single vehicles. -->
+    <string name="starship_vehicles_individual">Individual vehicles</string>
+    <!-- Starship vehicles tab. Error line when the spacecraft list fails to load. -->
+    <string name="starship_vehicles_spacecraft_error">Failed to load spacecraft</string>
+    <!-- Starship vehicles tab. Empty state when no spacecraft exists. -->
+    <string name="starship_vehicles_spacecraft_empty">No Starship spacecraft available</string>
+    <!-- Starship vehicles tab. Error line when the booster list fails to load. -->
+    <string name="starship_vehicles_boosters_error">Failed to load boosters</string>
+    <!-- Starship vehicles tab. Empty state when no booster exists. -->
+    <string name="starship_vehicles_boosters_empty">No Super Heavy boosters available</string>
+    <!-- Starship vehicle configuration card. Launch count. %1$d is the number of launches. -->
+    <string name="starship_vehicle_launch_count">%1$d launches</string>
+    <!-- Starship vehicle card. Shown in place of a serial number that is missing. One word. -->
+    <string name="starship_vehicle_serial_unknown">Unknown</string>
+    <!-- Starship vehicle card. Shown for a booster that has not flown. One word. -->
+    <string name="starship_vehicle_unlaunched">Unlaunched</string>
+    <!-- Starship vehicle card. Flight count of a booster that has flown. %1$d is the number of flights. -->
+    <plurals name="starship_vehicle_flights_count">
+        <item quantity="one">%1$d Flight</item>
+        <item quantity="other">%1$d Flights</item>
+    </plurals>
+</resources>

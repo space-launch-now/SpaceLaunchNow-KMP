@@ -46,6 +46,17 @@ import me.calebjones.spacelaunchnow.data.repository.openPlatformNotificationSett
 import me.calebjones.spacelaunchnow.data.repository.requestPlatformNotificationPermission
 import me.calebjones.spacelaunchnow.ui.theme.SpaceLaunchNowPreviewTheme
 import org.jetbrains.compose.ui.tooling.preview.Preview
+import org.jetbrains.compose.resources.stringResource
+import spacelaunchnow_kmp.composeapp.generated.resources.Res
+import spacelaunchnow_kmp.composeapp.generated.resources.onboarding_next
+import spacelaunchnow_kmp.composeapp.generated.resources.onboarding_permission_enable
+import spacelaunchnow_kmp.composeapp.generated.resources.onboarding_permission_icon_description
+import spacelaunchnow_kmp.composeapp.generated.resources.onboarding_permission_maybe_later
+import spacelaunchnow_kmp.composeapp.generated.resources.onboarding_permission_open_settings
+import spacelaunchnow_kmp.composeapp.generated.resources.onboarding_permission_subtitle_ask
+import spacelaunchnow_kmp.composeapp.generated.resources.onboarding_permission_subtitle_granted
+import spacelaunchnow_kmp.composeapp.generated.resources.onboarding_permission_title_ask
+import spacelaunchnow_kmp.composeapp.generated.resources.onboarding_permission_title_granted
 
 private val spaceGradient = Brush.verticalGradient(
     colors = listOf(Color(0xFF0A0E2A), Color(0xFF1A1040), Color(0xFF2A1060))
@@ -122,7 +133,7 @@ fun NotificationPermissionPage(
         // Icon changes based on permission state
         Icon(
             imageVector = if (hasPermission == true) Icons.Default.NotificationsActive else Icons.Default.Notifications,
-            contentDescription = "Notifications",
+            contentDescription = stringResource(Res.string.onboarding_permission_icon_description),
             modifier = Modifier.size(80.dp),
             tint = Color.White
         )
@@ -131,7 +142,7 @@ fun NotificationPermissionPage(
 
         // Title
         Text(
-            text = if (hasPermission == true) "You're All Set!" else "Stay in the Loop",
+            text = if (hasPermission == true) stringResource(Res.string.onboarding_permission_title_granted) else stringResource(Res.string.onboarding_permission_title_ask),
             style = MaterialTheme.typography.headlineSmall,
             fontWeight = FontWeight.Bold,
             color = Color.White,
@@ -143,9 +154,9 @@ fun NotificationPermissionPage(
         // Subtitle
         Text(
             text = if (hasPermission == true)
-                "Notifications are enabled. You'll be notified before launches so you never miss a liftoff."
+                stringResource(Res.string.onboarding_permission_subtitle_granted)
             else
-                "Get notified before launches so you never miss a liftoff. You can customize which notifications you receive.",
+                stringResource(Res.string.onboarding_permission_subtitle_ask),
             style = MaterialTheme.typography.bodyMedium,
             color = Color.White.copy(alpha = 0.7f),
             textAlign = TextAlign.Center,
@@ -166,7 +177,7 @@ fun NotificationPermissionPage(
                     )
                 ) {
                     Text(
-                        text = "Next",
+                        text = stringResource(Res.string.onboarding_next),
                         style = MaterialTheme.typography.labelLarge,
                         fontWeight = FontWeight.Bold,
                         modifier = Modifier.padding(vertical = 8.dp)
@@ -185,7 +196,7 @@ fun NotificationPermissionPage(
                     )
                 ) {
                     Text(
-                        text = "Open Settings",
+                        text = stringResource(Res.string.onboarding_permission_open_settings),
                         style = MaterialTheme.typography.labelLarge,
                         fontWeight = FontWeight.Bold,
                         modifier = Modifier.padding(vertical = 8.dp)
@@ -197,7 +208,7 @@ fun NotificationPermissionPage(
                 // Maybe Later button
                 TextButton(onClick = { onSkip() }) {
                     Text(
-                        text = "Maybe Later",
+                        text = stringResource(Res.string.onboarding_permission_maybe_later),
                         color = Color.White.copy(alpha = 0.6f),
                         style = MaterialTheme.typography.bodyMedium
                     )
@@ -225,7 +236,7 @@ fun NotificationPermissionPage(
                     )
                 ) {
                     Text(
-                        text = "Enable Notifications",
+                        text = stringResource(Res.string.onboarding_permission_enable),
                         style = MaterialTheme.typography.labelLarge,
                         fontWeight = FontWeight.Bold,
                         modifier = Modifier.padding(vertical = 8.dp)
@@ -237,7 +248,7 @@ fun NotificationPermissionPage(
                 // Maybe Later button
                 TextButton(onClick = { onSkip() }) {
                     Text(
-                        text = "Maybe Later",
+                        text = stringResource(Res.string.onboarding_permission_maybe_later),
                         color = Color.White.copy(alpha = 0.6f),
                         style = MaterialTheme.typography.bodyMedium
                     )

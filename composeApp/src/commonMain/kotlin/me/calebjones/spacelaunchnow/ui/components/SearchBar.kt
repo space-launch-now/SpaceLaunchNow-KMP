@@ -22,6 +22,11 @@ import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.unit.dp
 import org.jetbrains.compose.ui.tooling.preview.Preview
+import spacelaunchnow_kmp.composeapp.generated.resources.Res
+import spacelaunchnow_kmp.composeapp.generated.resources.app_components_search_bar_clear_description
+import spacelaunchnow_kmp.composeapp.generated.resources.app_components_search_bar_icon_description
+import spacelaunchnow_kmp.composeapp.generated.resources.app_components_search_bar_placeholder
+import org.jetbrains.compose.resources.stringResource
 
 /**
  * Reusable search bar component with Material3 styling.
@@ -35,7 +40,7 @@ import org.jetbrains.compose.ui.tooling.preview.Preview
 fun SearchBar(
     query: String,
     onQueryChange: (String) -> Unit,
-    placeholder: String = "Search",
+    placeholder: String = stringResource(Res.string.app_components_search_bar_placeholder),
     modifier: Modifier = Modifier
 ) {
     val keyboardController = LocalSoftwareKeyboardController.current
@@ -53,7 +58,7 @@ fun SearchBar(
         leadingIcon = {
             Icon(
                 imageVector = Icons.Default.Search,
-                contentDescription = "Search icon",
+                contentDescription = stringResource(Res.string.app_components_search_bar_icon_description),
                 tint = MaterialTheme.colorScheme.onSurfaceVariant
             )
         },
@@ -62,7 +67,7 @@ fun SearchBar(
                 IconButton(onClick = { onQueryChange("") }) {
                     Icon(
                         imageVector = Icons.Default.Clear,
-                        contentDescription = "Clear search",
+                        contentDescription = stringResource(Res.string.app_components_search_bar_clear_description),
                         tint = MaterialTheme.colorScheme.onSurfaceVariant
                     )
                 }
@@ -97,7 +102,7 @@ private fun SearchBarPreview() {
             SearchBar(
                 query = "",
                 onQueryChange = {},
-                placeholder = "Search rockets",
+                placeholder = "Search rockets", // i18n-ignore: preview sample data
                 modifier = Modifier.padding(16.dp)
             )
         }
@@ -112,7 +117,7 @@ private fun SearchBarWithTextPreview() {
             SearchBar(
                 query = "Falcon",
                 onQueryChange = {},
-                placeholder = "Search rockets",
+                placeholder = "Search rockets", // i18n-ignore: preview sample data
                 modifier = Modifier.padding(16.dp)
             )
         }
