@@ -39,6 +39,9 @@ import me.calebjones.spacelaunchnow.ui.viewmodel.LaunchViewModel
 import me.calebjones.spacelaunchnow.util.logging.SpaceLogger
 import org.koin.compose.koinInject
 import org.koin.compose.viewmodel.koinViewModel
+import org.jetbrains.compose.resources.stringResource
+import spacelaunchnow_kmp.composeapp.generated.resources.Res
+import spacelaunchnow_kmp.composeapp.generated.resources.launch_detail_fullscreen_description
 
 @OptIn(ExperimentalMaterial3ExpressiveApi::class)
 @Composable
@@ -218,7 +221,7 @@ fun LaunchDetailScreen(
             ) {
                 Icon(
                     imageVector = Icons.Default.Fullscreen,
-                    contentDescription = "Open fullscreen",
+                    contentDescription = stringResource(Res.string.launch_detail_fullscreen_description),
                     modifier = Modifier.size(32.dp)
                 )
             }

@@ -85,9 +85,11 @@ import me.calebjones.spacelaunchnow.ui.viewmodel.ThemeOption
 import org.jetbrains.compose.resources.painterResource
 import spacelaunchnow_kmp.composeapp.generated.resources.Res
 import spacelaunchnow_kmp.composeapp.generated.resources.launcher
+import spacelaunchnow_kmp.composeapp.generated.resources.app_layout_desktop_app_icon_description
+import org.jetbrains.compose.resources.stringResource
 
 @Deprecated(
-    message = "Use AdaptiveAppScaffold which automatically selects NavigationBar/Rail/Drawer",
+    message = "Use AdaptiveAppScaffold which automatically selects NavigationBar/Rail/Drawer", // i18n-ignore: @Deprecated message, read by developers only
     replaceWith = ReplaceWith(
         "AdaptiveAppScaffold(navController, themeOption, content)",
         "me.calebjones.spacelaunchnow.ui.layout.AdaptiveAppScaffold"
@@ -156,7 +158,7 @@ fun TabletDesktopLayout(
                                         header = {
                                             Image(
                                                 painter = painterResource(Res.drawable.launcher),
-                                                contentDescription = "App Icon",
+                                                contentDescription = stringResource(Res.string.app_layout_desktop_app_icon_description),
                                                 contentScale = ContentScale.Fit,
                                                 modifier = Modifier
                                                     .size(96.dp)

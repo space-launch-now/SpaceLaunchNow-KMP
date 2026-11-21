@@ -20,6 +20,8 @@ import org.jetbrains.compose.resources.painterResource
 import org.jetbrains.compose.ui.tooling.preview.Preview
 import spacelaunchnow_kmp.composeapp.generated.resources.Res
 import spacelaunchnow_kmp.composeapp.generated.resources.launcher
+import spacelaunchnow_kmp.composeapp.generated.resources.app_components_app_icon_description
+import org.jetbrains.compose.resources.stringResource
 
 /**
  * Reusable component that displays the app launcher icon
@@ -82,7 +84,7 @@ fun AppIconBox(
         ) {
             Image(
                 painter = painterResource(Res.drawable.launcher),
-                contentDescription = "Space Launch Now",
+                contentDescription = stringResource(Res.string.app_components_app_icon_description),
                 modifier = Modifier
                     .size(iconSize)
                     .align(Alignment.Center)

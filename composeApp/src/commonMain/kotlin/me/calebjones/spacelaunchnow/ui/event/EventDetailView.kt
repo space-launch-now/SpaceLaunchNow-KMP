@@ -48,6 +48,7 @@ import coil3.compose.AsyncImage
 import coil3.compose.SubcomposeAsyncImage
 import com.valentinilk.shimmer.shimmer
 import me.calebjones.spacelaunchnow.LocalUseUtc
+import me.calebjones.spacelaunchnow.domain.mapper.launchStatusLabel
 import me.calebjones.spacelaunchnow.domain.model.AstronautSummary
 import me.calebjones.spacelaunchnow.domain.model.Event
 import me.calebjones.spacelaunchnow.domain.model.ExpeditionSummary
@@ -70,6 +71,32 @@ import me.calebjones.spacelaunchnow.ui.viewmodel.LaunchViewModel
 import me.calebjones.spacelaunchnow.util.DateTimeUtil.formatLaunchDateTime
 import me.calebjones.spacelaunchnow.util.parseIsoDurationToHumanReadable
 import org.koin.compose.viewmodel.koinViewModel
+import org.jetbrains.compose.resources.stringResource
+import spacelaunchnow_kmp.composeapp.generated.resources.Res
+import spacelaunchnow_kmp.composeapp.generated.resources.common_back
+import spacelaunchnow_kmp.composeapp.generated.resources.common_loading
+import spacelaunchnow_kmp.composeapp.generated.resources.event_detail_agencies
+import spacelaunchnow_kmp.composeapp.generated.resources.event_detail_agency
+import spacelaunchnow_kmp.composeapp.generated.resources.event_detail_astronauts
+import spacelaunchnow_kmp.composeapp.generated.resources.event_detail_description
+import spacelaunchnow_kmp.composeapp.generated.resources.event_detail_error_title
+import spacelaunchnow_kmp.composeapp.generated.resources.event_detail_event_details
+import spacelaunchnow_kmp.composeapp.generated.resources.event_detail_expedition_fallback
+import spacelaunchnow_kmp.composeapp.generated.resources.event_detail_expeditions
+import spacelaunchnow_kmp.composeapp.generated.resources.event_detail_label_date
+import spacelaunchnow_kmp.composeapp.generated.resources.event_detail_label_duration
+import spacelaunchnow_kmp.composeapp.generated.resources.event_detail_label_last_updated
+import spacelaunchnow_kmp.composeapp.generated.resources.event_detail_label_location
+import spacelaunchnow_kmp.composeapp.generated.resources.event_detail_label_status
+import spacelaunchnow_kmp.composeapp.generated.resources.event_detail_link_fallback
+import spacelaunchnow_kmp.composeapp.generated.resources.event_detail_links
+import spacelaunchnow_kmp.composeapp.generated.resources.event_detail_mission_description
+import spacelaunchnow_kmp.composeapp.generated.resources.event_detail_related_launches
+import spacelaunchnow_kmp.composeapp.generated.resources.event_detail_space_stations
+import spacelaunchnow_kmp.composeapp.generated.resources.event_detail_status_live_now
+import spacelaunchnow_kmp.composeapp.generated.resources.event_detail_try_again
+import spacelaunchnow_kmp.composeapp.generated.resources.event_detail_updates
+import spacelaunchnow_kmp.composeapp.generated.resources.event_detail_updates_more
 
 private val TitleHeight = 110.dp
 
@@ -291,7 +318,7 @@ private fun EventInfoCard(event: Event) {
             event.description?.let { desc ->
                 Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
                     Text(
-                        text = "Description",
+                        text = stringResource(Res.string.event_detail_description),
                         style = MaterialTheme.typography.titleMedium,
                         fontWeight = FontWeight.Bold
                     )
@@ -302,33 +329,33 @@ private fun EventInfoCard(event: Event) {
             // Event Details Grid
             Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
                 Text(
-                    text = "Event Details",
+                    text = stringResource(Res.string.event_detail_event_details),
                     style = MaterialTheme.typography.titleMedium,
                     fontWeight = FontWeight.Bold
                 )
 
                 event.date?.let { date ->
                     InfoRow(
-                        label = "Date",
+                        label = stringResource(Res.string.event_detail_label_date),
                         value = formatLaunchDateTime(date, useUtc)
                     )
                 }
 
                 event.location?.let { location ->
-                    InfoRow(label = "Location", value = location)
+                    InfoRow(label = stringResource(Res.string.event_detail_label_location), value = location)
                 }
 
                 event.duration?.let { duration ->
-                    InfoRow(label = "Duration", value = parseIsoDurationToHumanReadable(duration))
+                    InfoRow(label = stringResource(Res.string.event_detail_label_duration), value = parseIsoDurationToHumanReadable(duration))
                 }
 
                 if (event.webcastLive) {
-                    InfoRow(label = "Status", value = "Live Now 🔴")
+                    InfoRow(label = stringResource(Res.string.event_detail_label_status), value = stringResource(Res.string.event_detail_status_live_now))
                 }
 
                 event.lastUpdated?.let { updated ->
                     InfoRow(
-                        label = "Last Updated",
+                        label = stringResource(Res.string.event_detail_label_last_updated),
                         value = formatLaunchDateTime(updated, useUtc)
                     )
                 }
@@ -348,7 +375,7 @@ private fun EventLinksCard(event: Event, onOpenUrl: (String) -> Unit = {}) {
     ) {
         Column(Modifier.padding(16.dp), verticalArrangement = Arrangement.spacedBy(8.dp)) {
             Text(
-                "Links",
+                stringResource(Res.string.event_detail_links),
                 style = MaterialTheme.typography.titleLarge,
                 fontWeight = FontWeight.Bold
             )
@@ -358,7 +385,7 @@ private fun EventLinksCard(event: Event, onOpenUrl: (String) -> Unit = {}) {
                 }) {
                     Icon(Icons.Filled.OpenInNew, contentDescription = null)
                     Spacer(Modifier.width(8.dp))
-                    Text(u.title ?: "Info", maxLines = 1)
+                    Text(u.title ?: stringResource(Res.string.event_detail_link_fallback), maxLines = 1)
                 }
             }
         }
@@ -376,7 +403,7 @@ private fun AgenciesCard(agencies: List<Provider>, onAgencyClick: ((Int) -> Unit
     ) {
         Column(Modifier.padding(16.dp), verticalArrangement = Arrangement.spacedBy(8.dp)) {
             Text(
-                if (agencies.size == 1) "Agency" else "Agencies",
+                if (agencies.size == 1) stringResource(Res.string.event_detail_agency) else stringResource(Res.string.event_detail_agencies),
                 style = MaterialTheme.typography.titleLarge,
                 fontWeight = FontWeight.Bold
             )
@@ -463,7 +490,7 @@ private fun AstronautsCard(
     ) {
         Column(Modifier.padding(16.dp), verticalArrangement = Arrangement.spacedBy(8.dp)) {
             Text(
-                "Astronauts",
+                stringResource(Res.string.event_detail_astronauts),
                 style = MaterialTheme.typography.titleLarge,
                 fontWeight = FontWeight.Bold
             )
@@ -494,7 +521,7 @@ private fun SpaceStationsCard(
     ) {
         Column(Modifier.padding(16.dp), verticalArrangement = Arrangement.spacedBy(8.dp)) {
             Text(
-                "Space Stations",
+                stringResource(Res.string.event_detail_space_stations),
                 style = MaterialTheme.typography.titleLarge,
                 fontWeight = FontWeight.Bold
             )
@@ -523,7 +550,7 @@ private fun ExpeditionsCard(expeditions: List<ExpeditionSummary>) {
     ) {
         Column(Modifier.padding(16.dp), verticalArrangement = Arrangement.spacedBy(8.dp)) {
             Text(
-                "Expeditions",
+                stringResource(Res.string.event_detail_expeditions),
                 style = MaterialTheme.typography.titleMedium,
                 fontWeight = FontWeight.Bold
             )
@@ -531,7 +558,7 @@ private fun ExpeditionsCard(expeditions: List<ExpeditionSummary>) {
                 val subtitle =
                     exp.end?.let { formatLaunchDateTime(it, useUtc) } ?: (exp.name ?: "")
                 RowWithImage(
-                    title = exp.name ?: "Expedition",
+                    title = exp.name ?: stringResource(Res.string.event_detail_expedition_fallback),
                     subtitle = subtitle,
                     imageUrl = exp.imageUrl,
                     fallbackText = exp.name?.firstOrNull()?.uppercase() ?: "",
@@ -556,14 +583,14 @@ private fun RelatedLaunchesCard(
     ) {
         Column(Modifier.padding(16.dp), verticalArrangement = Arrangement.spacedBy(8.dp)) {
             Text(
-                "Related Launches",
+                stringResource(Res.string.event_detail_related_launches),
                 style = MaterialTheme.typography.titleLarge,
                 fontWeight = FontWeight.Bold
             )
             launches.forEach { l ->
                 RowWithImage(
                     title = l.name,
-                    subtitle = l.status?.name ?: "",
+                    subtitle = l.status?.let { launchStatusLabel(it) } ?: "",
                     imageUrl = l.imageUrl,
                     fallbackText = l.name.firstOrNull()?.uppercase() ?: "",
                     onClick = { onLaunchClick?.invoke(l.id) }
@@ -722,7 +749,7 @@ private fun ProgramsCard(programs: List<ProgramSummary>) {
                                         ) {
                                             Icon(
                                                 imageVector = Icons.Filled.Error,
-                                                contentDescription = "Mission",
+                                                contentDescription = stringResource(Res.string.event_detail_mission_description),
                                                 tint = MaterialTheme.colorScheme.onSurfaceVariant,
                                                 modifier = Modifier.size(32.dp)
                                             )
@@ -765,7 +792,7 @@ private fun UpdatesCard(updates: List<Update>) {
     ) {
         Column(Modifier.padding(16.dp), verticalArrangement = Arrangement.spacedBy(12.dp)) {
             Text(
-                "Updates",
+                stringResource(Res.string.event_detail_updates),
                 style = MaterialTheme.typography.titleLarge,
                 fontWeight = FontWeight.Bold
             )
@@ -845,7 +872,7 @@ private fun UpdatesCard(updates: List<Update>) {
 
             if (updates.size > 10) {
                 Text(
-                    "+ ${updates.size - 10} more updates",
+                    stringResource(Res.string.event_detail_updates_more, updates.size - 10),
                     style = MaterialTheme.typography.labelSmall,
                     color = MaterialTheme.colorScheme.onSurfaceVariant,
                     modifier = Modifier.padding(top = 4.dp)
@@ -875,7 +902,7 @@ fun EventDetailErrorView(
         ) {
             Icon(
                 imageVector = Icons.AutoMirrored.Outlined.ArrowBack,
-                contentDescription = "Back",
+                contentDescription = stringResource(Res.string.common_back),
                 tint = Color.White
             )
         }
@@ -898,7 +925,7 @@ fun EventDetailErrorView(
                     tint = MaterialTheme.colorScheme.error
                 )
                 Text(
-                    text = "Oops! Something went wrong",
+                    text = stringResource(Res.string.event_detail_error_title),
                     style = MaterialTheme.typography.titleMedium,
                     fontWeight = FontWeight.Bold
                 )
@@ -909,7 +936,7 @@ fun EventDetailErrorView(
                     color = MaterialTheme.colorScheme.onSurfaceVariant
                 )
                 Button(onClick = onRetry) {
-                    Text("Try Again")
+                    Text(stringResource(Res.string.event_detail_try_again))
                 }
             }
         }
@@ -923,7 +950,7 @@ fun EventDetailLoadingView(onNavigateBack: () -> Unit) {
     // compact SharedDetailScaffold header on expanded layouts
     if (rememberAdaptiveLayoutState().isExpanded) {
         SharedDetailScaffold(
-            titleText = "Loading...",
+            titleText = stringResource(Res.string.common_loading),
             taglineText = null,
             imageUrl = null,
             onNavigateBack = onNavigateBack,

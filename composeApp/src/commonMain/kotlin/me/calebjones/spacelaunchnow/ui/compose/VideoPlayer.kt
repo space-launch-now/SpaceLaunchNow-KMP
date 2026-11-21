@@ -47,6 +47,18 @@ import coil3.compose.AsyncImage
 import me.calebjones.spacelaunchnow.domain.model.VideoLink
 import me.calebjones.spacelaunchnow.util.VideoUtil
 import me.calebjones.spacelaunchnow.util.openUriSafely
+import spacelaunchnow_kmp.composeapp.generated.resources.Res
+import spacelaunchnow_kmp.composeapp.generated.resources.app_compose_video_player_description_less
+import spacelaunchnow_kmp.composeapp.generated.resources.app_compose_video_player_description_more
+import spacelaunchnow_kmp.composeapp.generated.resources.app_compose_video_player_error_message
+import spacelaunchnow_kmp.composeapp.generated.resources.app_compose_video_player_fullscreen_description
+import spacelaunchnow_kmp.composeapp.generated.resources.app_compose_video_player_open_in_app
+import spacelaunchnow_kmp.composeapp.generated.resources.app_compose_video_player_play_description
+import spacelaunchnow_kmp.composeapp.generated.resources.app_compose_video_player_thumbnail_description
+import spacelaunchnow_kmp.composeapp.generated.resources.common_error
+import spacelaunchnow_kmp.composeapp.generated.resources.common_live
+import spacelaunchnow_kmp.composeapp.generated.resources.common_retry
+import org.jetbrains.compose.resources.stringResource
 
 @Composable
 fun LaunchVideoPlayer(
@@ -101,7 +113,7 @@ fun LaunchVideoPlayer(
                 ) {
                     Icon(
                         imageVector = Icons.Default.Fullscreen,
-                        contentDescription = "Enter fullscreen",
+                        contentDescription = stringResource(Res.string.app_compose_video_player_fullscreen_description),
                         tint = Color.White
                     )
                 }
@@ -127,7 +139,7 @@ fun LaunchVideoPlayer(
                     if (!vidUrl.featureImage.isNullOrBlank()) {
                         AsyncImage(
                             model = vidUrl.featureImage,
-                            contentDescription = "Video thumbnail",
+                            contentDescription = stringResource(Res.string.app_compose_video_player_thumbnail_description),
                             modifier = Modifier.fillMaxSize(),
                             contentScale = ContentScale.Crop
                         )
@@ -153,7 +165,7 @@ fun LaunchVideoPlayer(
                         Box(contentAlignment = Alignment.Center) {
                             Icon(
                                 imageVector = Icons.Default.PlayArrow,
-                                contentDescription = "Play video",
+                                contentDescription = stringResource(Res.string.app_compose_video_player_play_description),
                                 tint = Color.White,
                                 modifier = Modifier.size(36.dp)
                             )
@@ -173,7 +185,7 @@ fun LaunchVideoPlayer(
                                 shape = RoundedCornerShape(4.dp)
                             ) {
                                 Text(
-                                    text = "LIVE",
+                                    text = stringResource(Res.string.common_live),
                                     modifier = Modifier.padding(
                                         horizontal = 8.dp,
                                         vertical = 4.dp
@@ -235,7 +247,7 @@ fun LaunchVideoPlayer(
                                 shape = RoundedCornerShape(4.dp)
                             ) {
                                 Text(
-                                    text = "LIVE",
+                                    text = stringResource(Res.string.common_live),
                                     modifier = Modifier.padding(
                                         horizontal = 6.dp,
                                         vertical = 2.dp
@@ -267,7 +279,7 @@ fun LaunchVideoPlayer(
                     )
                     Spacer(modifier = Modifier.size(4.dp))
                     Text(
-                        text = "Open in App",
+                        text = stringResource(Res.string.app_compose_video_player_open_in_app),
                         style = MaterialTheme.typography.labelMedium
                     )
                 }
@@ -290,7 +302,7 @@ fun LaunchVideoPlayer(
                     )
                     if (hasOverflow || expanded) {
                         Text(
-                            text = if (expanded) "Show less" else "Show more",
+                            text = stringResource(if (expanded) Res.string.app_compose_video_player_description_less else Res.string.app_compose_video_player_description_more),
                             style = MaterialTheme.typography.labelLarge,
                             color = MaterialTheme.colorScheme.primary,
                             modifier = Modifier
@@ -306,7 +318,7 @@ fun LaunchVideoPlayer(
 
 @Composable
 fun VideoPlayerError(
-    message: String = "Unable to load video",
+    message: String = stringResource(Res.string.app_compose_video_player_error_message),
     onRetry: (() -> Unit)? = null,
     modifier: Modifier = Modifier
 ) {
@@ -324,7 +336,7 @@ fun VideoPlayerError(
     ) {
         Icon(
             imageVector = Icons.Default.Error,
-            contentDescription = "Error",
+            contentDescription = stringResource(Res.string.common_error),
             tint = MaterialTheme.colorScheme.error,
             modifier = Modifier.size(48.dp)
         )
@@ -342,7 +354,7 @@ fun VideoPlayerError(
             Spacer(modifier = Modifier.height(16.dp))
 
             Button(onClick = onRetry) {
-                Text("Retry")
+                Text(stringResource(Res.string.common_retry))
             }
         }
     }

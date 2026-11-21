@@ -29,6 +29,11 @@ import me.calebjones.spacelaunchnow.ui.components.webview.WebView
 import me.calebjones.spacelaunchnow.ui.theme.SpaceLaunchNowPreviewTheme
 import me.calebjones.spacelaunchnow.util.ExternalLinkHandler
 import org.jetbrains.compose.ui.tooling.preview.Preview
+import spacelaunchnow_kmp.composeapp.generated.resources.Res
+import spacelaunchnow_kmp.composeapp.generated.resources.app_newsevents_detail_open_in_browser_description
+import spacelaunchnow_kmp.composeapp.generated.resources.app_newsevents_detail_title_fallback
+import spacelaunchnow_kmp.composeapp.generated.resources.common_back
+import org.jetbrains.compose.resources.stringResource
 
 /**
  * In-app news article viewer.
@@ -66,7 +71,7 @@ fun NewsDetailScreen(
             TopAppBar(
                 title = {
                     Text(
-                        text = title.ifBlank { "Article" },
+                        text = title.ifBlank { stringResource(Res.string.app_newsevents_detail_title_fallback) },
                         maxLines = 1,
                         overflow = TextOverflow.Ellipsis,
                     )
@@ -75,7 +80,7 @@ fun NewsDetailScreen(
                     IconButton(onClick = onBack) {
                         Icon(
                             imageVector = Icons.AutoMirrored.Filled.ArrowBack,
-                            contentDescription = "Back",
+                            contentDescription = stringResource(Res.string.common_back),
                         )
                     }
                 },
@@ -83,7 +88,7 @@ fun NewsDetailScreen(
                     IconButton(onClick = { if (url.isNotBlank()) ExternalLinkHandler.openUrl(url) }) {
                         Icon(
                             imageVector = Icons.AutoMirrored.Filled.OpenInNew,
-                            contentDescription = "Open in browser",
+                            contentDescription = stringResource(Res.string.app_newsevents_detail_open_in_browser_description),
                         )
                     }
                 },
@@ -120,7 +125,7 @@ private fun NewsDetailScreenPreview() {
     SpaceLaunchNowPreviewTheme {
         NewsDetailScreen(
             url = "https://example.com/article",
-            title = "Starship completes integrated flight test",
+            title = "Starship completes integrated flight test", // i18n-ignore: preview sample data
             onNavigateBack = {},
         )
     }
@@ -132,7 +137,7 @@ private fun NewsDetailScreenDarkPreview() {
     SpaceLaunchNowPreviewTheme(isDark = true) {
         NewsDetailScreen(
             url = "https://example.com/article",
-            title = "Starship completes integrated flight test",
+            title = "Starship completes integrated flight test", // i18n-ignore: preview sample data
             onNavigateBack = {},
         )
     }

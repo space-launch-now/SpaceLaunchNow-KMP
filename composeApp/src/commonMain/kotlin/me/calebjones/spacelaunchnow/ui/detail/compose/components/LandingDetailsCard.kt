@@ -42,6 +42,28 @@ import me.calebjones.spacelaunchnow.ui.components.InfoTile
 import me.calebjones.spacelaunchnow.ui.components.InfoTileHorizontal
 import me.calebjones.spacelaunchnow.util.DateTimeUtil
 import me.calebjones.spacelaunchnow.util.parseIsoDurationToHumanReadable
+import org.jetbrains.compose.resources.stringResource
+import spacelaunchnow_kmp.composeapp.generated.resources.Res
+import spacelaunchnow_kmp.composeapp.generated.resources.launch_detail_landing_details_heading
+import spacelaunchnow_kmp.composeapp.generated.resources.launch_detail_landing_downrange
+import spacelaunchnow_kmp.composeapp.generated.resources.launch_detail_landing_downrange_value
+import spacelaunchnow_kmp.composeapp.generated.resources.launch_detail_landing_flight_number
+import spacelaunchnow_kmp.composeapp.generated.resources.launch_detail_landing_location
+import spacelaunchnow_kmp.composeapp.generated.resources.launch_detail_landing_previous_flight
+import spacelaunchnow_kmp.composeapp.generated.resources.launch_detail_landing_result_failure
+import spacelaunchnow_kmp.composeapp.generated.resources.launch_detail_landing_result_success
+import spacelaunchnow_kmp.composeapp.generated.resources.launch_detail_landing_stage_number
+import spacelaunchnow_kmp.composeapp.generated.resources.launch_detail_landing_tile_attempt
+import spacelaunchnow_kmp.composeapp.generated.resources.launch_detail_landing_tile_landing_type
+import spacelaunchnow_kmp.composeapp.generated.resources.launch_detail_landing_tile_result
+import spacelaunchnow_kmp.composeapp.generated.resources.launch_detail_landing_tile_stage_type
+import spacelaunchnow_kmp.composeapp.generated.resources.launch_detail_landing_turnaround
+import spacelaunchnow_kmp.composeapp.generated.resources.launch_detail_read_less
+import spacelaunchnow_kmp.composeapp.generated.resources.launch_detail_read_more
+import spacelaunchnow_kmp.composeapp.generated.resources.launch_detail_value_na
+import spacelaunchnow_kmp.composeapp.generated.resources.launch_detail_value_no
+import spacelaunchnow_kmp.composeapp.generated.resources.launch_detail_value_tbd
+import spacelaunchnow_kmp.composeapp.generated.resources.launch_detail_value_yes
 
 @Composable
         fun LandingDetailsCard(launcherStages: List<RocketStage>) {
@@ -68,7 +90,7 @@ import me.calebjones.spacelaunchnow.util.parseIsoDurationToHumanReadable
                     verticalAlignment = Alignment.CenterVertically
                 ) {
                     val header = buildString {
-                        append("Stage #${index + 1}")
+                        append(stringResource(Res.string.launch_detail_landing_stage_number, index + 1))
                         stage.launcher?.serialNumber?.takeIf { it.isNotBlank() }?.let {
                             append(" • ")
                             append(it)
@@ -89,7 +111,7 @@ import me.calebjones.spacelaunchnow.util.parseIsoDurationToHumanReadable
                             color = MaterialTheme.colorScheme.primaryContainer
                         ) {
                             Text(
-                                text = "Flight #$flightNum",
+                                text = stringResource(Res.string.launch_detail_landing_flight_number, flightNum),
                                 style = MaterialTheme.typography.labelMedium,
                                 fontWeight = FontWeight.Medium,
                                 color = MaterialTheme.colorScheme.onPrimaryContainer,
@@ -115,7 +137,7 @@ import me.calebjones.spacelaunchnow.util.parseIsoDurationToHumanReadable
                     if (hasOverflow || expanded) {
                         TextButton(onClick = {
                             expanded = !expanded
-                        }) { Text(if (expanded) "Read less" else "Read more") }
+                        }) { Text(if (expanded) stringResource(Res.string.launch_detail_read_less) else stringResource(Res.string.launch_detail_read_more)) }
                     }
                 }
 
@@ -123,14 +145,14 @@ import me.calebjones.spacelaunchnow.util.parseIsoDurationToHumanReadable
                 stage.previousFlightDate?.let {
                     InfoTileHorizontal(
                         icon = Icons.Filled.Schedule,
-                        label = "Previous Flight",
+                        label = stringResource(Res.string.launch_detail_landing_previous_flight),
                         value = DateTimeUtil.formatLaunchDateTime(it, useUtc)
                     )
                 }
                 stage.turnAroundTime?.takeIf { it.isNotBlank() }?.let {
                     InfoTileHorizontal(
                         icon = Icons.Filled.Timelapse,
-                        label = "Turnaround",
+                        label = stringResource(Res.string.launch_detail_landing_turnaround),
                         value = parseIsoDurationToHumanReadable(it)
                     )
                 }
@@ -150,15 +172,15 @@ fun LandingStageGridContent(stage: RocketStage) {
     val landing = stage.landingAttempt
 
     val tiles = buildList {
-        add(Triple(Icons.Filled.Category, "Stage Type", stage.type))
-        landing?.type?.let { add(Triple(Icons.Filled.FlightLand, "Landing Type", it)) }
+        add(Triple(Icons.Filled.Category, stringResource(Res.string.launch_detail_landing_tile_stage_type), stage.type))
+        landing?.type?.let { add(Triple(Icons.Filled.FlightLand, stringResource(Res.string.launch_detail_landing_tile_landing_type), it)) }
         landing?.attempt?.let {
             if (it) {
                 add(
                     Triple(
                         Icons.Filled.FlightTakeoff,
-                        "Attempt",
-                        if (it) "Yes" else "No"
+                        stringResource(Res.string.launch_detail_landing_tile_attempt),
+                        if (it) stringResource(Res.string.launch_detail_value_yes) else stringResource(Res.string.launch_detail_value_no)
                     )
                 )
 
@@ -166,8 +188,8 @@ fun LandingStageGridContent(stage: RocketStage) {
                     add(
                         Triple(
                             if (success) Icons.Filled.CheckCircle else Icons.Filled.Cancel,
-                            "Result",
-                            if (success) "Success" else "Failure"
+                            stringResource(Res.string.launch_detail_landing_tile_result),
+                            if (success) stringResource(Res.string.launch_detail_landing_result_success) else stringResource(Res.string.launch_detail_landing_result_failure)
                         )
                     )
                 }
@@ -175,8 +197,8 @@ fun LandingStageGridContent(stage: RocketStage) {
                     add(
                         Triple(
                             Icons.Filled.ChangeCircle,
-                            "Result",
-                            "TBD"
+                            stringResource(Res.string.launch_detail_landing_tile_result),
+                            stringResource(Res.string.launch_detail_value_tbd)
                         )
                     )
                 }
@@ -193,19 +215,19 @@ fun LandingStageGridContent(stage: RocketStage) {
             modifier = Modifier.padding(8.dp)
         ) {
             Text(
-                text = "Landing Details",
+                text = stringResource(Res.string.launch_detail_landing_details_heading),
                 style = MaterialTheme.typography.titleMedium,
                 fontWeight = FontWeight.Bold
             )
             InfoTileHorizontal(
                 icon = Icons.Filled.LocationOn,
-                label = "Location",
+                label = stringResource(Res.string.launch_detail_landing_location),
                 value = landing?.landingLocation?.name
             )
             InfoTileHorizontal(
                 icon = Icons.AutoMirrored.Filled.TrendingUp,
-                label = "Downrange",
-                value = "${landing?.downrangeDistance ?: "N/A"} km"
+                label = stringResource(Res.string.launch_detail_landing_downrange),
+                value = stringResource(Res.string.launch_detail_landing_downrange_value, landing?.downrangeDistance ?: stringResource(Res.string.launch_detail_value_na))
             )
             Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
                 tiles.chunked(2).forEach { row ->

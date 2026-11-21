@@ -20,6 +20,9 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.unit.dp
+import org.jetbrains.compose.resources.stringResource
+import spacelaunchnow_kmp.composeapp.generated.resources.Res
+import spacelaunchnow_kmp.composeapp.generated.resources.home_search_label
 
 @Composable
 fun SearchBar() {
@@ -40,12 +43,12 @@ fun SearchBar() {
             ) {
                 Icon(
                     Icons.Default.Search,
-                    contentDescription = "Search",
+                    contentDescription = stringResource(Res.string.home_search_label),
                     modifier = Modifier.size(24.dp)
                 )
                 Spacer(modifier = Modifier.width(8.dp))
                 if (searchQuery.text.isEmpty()) {
-                    Text(text = "Search", color = Color.Gray)
+                    Text(text = stringResource(Res.string.home_search_label), color = Color.Gray)
                 }
                 innerTextField()
             }

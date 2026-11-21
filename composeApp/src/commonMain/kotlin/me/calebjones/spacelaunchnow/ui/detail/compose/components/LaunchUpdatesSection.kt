@@ -22,6 +22,10 @@ import kotlin.time.Clock
 import kotlin.time.Duration.Companion.days
 import kotlin.time.Duration.Companion.hours
 import kotlin.time.Duration.Companion.minutes
+import org.jetbrains.compose.resources.stringResource
+import spacelaunchnow_kmp.composeapp.generated.resources.Res
+import spacelaunchnow_kmp.composeapp.generated.resources.launch_detail_show_less
+import spacelaunchnow_kmp.composeapp.generated.resources.launch_detail_updates_show_more
 
 /**
  * Displays a vertical list of launch updates with expandable show more/less functionality
@@ -65,7 +69,7 @@ fun LaunchUpdatesSection(
                     .padding(horizontal = 16.dp, vertical = 8.dp)
             ) {
                 Text(
-                    text = "Show More (${sortedUpdates.size - 5} more)",
+                    text = stringResource(Res.string.launch_detail_updates_show_more, sortedUpdates.size - 5),
                     style = MaterialTheme.typography.labelLarge
                 )
             }
@@ -80,7 +84,7 @@ fun LaunchUpdatesSection(
                     .padding(horizontal = 16.dp, vertical = 8.dp)
             ) {
                 Text(
-                    text = "Show Less",
+                    text = stringResource(Res.string.launch_detail_show_less),
                     style = MaterialTheme.typography.labelLarge
                 )
             }

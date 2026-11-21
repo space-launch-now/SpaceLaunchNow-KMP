@@ -46,6 +46,7 @@ fun TestLoggingButtons() {
             verticalArrangement = Arrangement.spacedBy(12.dp)
         ) {
             Text(
+                // i18n-ignore: developer-only test button (debug settings), not translated
                 text = "Generate test log messages at different severity levels to verify Datadog logging configuration.",
                 style = MaterialTheme.typography.bodyMedium,
                 color = MaterialTheme.colorScheme.onSurfaceVariant
@@ -68,6 +69,7 @@ fun TestLoggingButtons() {
                         contentColor = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.5f)
                     )
                 ) {
+                    // i18n-ignore: developer-only test button (debug settings), not translated
                     Text("VERBOSE", fontSize = 11.sp)
                 }
 
@@ -84,6 +86,7 @@ fun TestLoggingButtons() {
                         contentColor = MaterialTheme.colorScheme.onSurface
                     )
                 ) {
+                    // i18n-ignore: developer-only test button (debug settings), not translated
                     Text("DEBUG", fontSize = 11.sp)
                 }
             }
@@ -105,6 +108,7 @@ fun TestLoggingButtons() {
                         containerColor = MaterialTheme.colorScheme.primary
                     )
                 ) {
+                    // i18n-ignore: developer-only test button (debug settings), not translated
                     Text("INFO", fontSize = 11.sp)
                 }
 
@@ -121,6 +125,7 @@ fun TestLoggingButtons() {
                         containerColor = MaterialTheme.colorScheme.tertiary
                     )
                 ) {
+                    // i18n-ignore: developer-only test button (debug settings), not translated
                     Text("WARN", fontSize = 11.sp)
                 }
             }
@@ -142,6 +147,7 @@ fun TestLoggingButtons() {
                         containerColor = MaterialTheme.colorScheme.error
                     )
                 ) {
+                    // i18n-ignore: developer-only test button (debug settings), not translated
                     Text("ERROR", fontSize = 11.sp)
                 }
 
@@ -159,11 +165,13 @@ fun TestLoggingButtons() {
                         containerColor = MaterialTheme.colorScheme.error
                     )
                 ) {
+                    // i18n-ignore: developer-only test button (debug settings), not translated
                     Text("ERROR+EX", fontSize = 10.sp)
                 }
             }
 
             Text(
+                // i18n-ignore: developer-only test button (debug settings), not translated
                 text = "💡 Tip: Check your Datadog dashboard or logcat/Xcode console to verify which levels are being logged based on your current configuration.",
                 style = MaterialTheme.typography.bodySmall,
                 color = MaterialTheme.colorScheme.primary,

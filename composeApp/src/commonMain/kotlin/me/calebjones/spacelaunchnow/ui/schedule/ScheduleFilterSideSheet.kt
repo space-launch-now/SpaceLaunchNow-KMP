@@ -29,6 +29,13 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import me.calebjones.spacelaunchnow.data.model.FilterOption
+import org.jetbrains.compose.resources.stringResource
+import spacelaunchnow_kmp.composeapp.generated.resources.Res
+import spacelaunchnow_kmp.composeapp.generated.resources.schedule_filter_apply
+import spacelaunchnow_kmp.composeapp.generated.resources.schedule_filter_apply_count
+import spacelaunchnow_kmp.composeapp.generated.resources.schedule_filter_cancel
+import spacelaunchnow_kmp.composeapp.generated.resources.schedule_filter_close
+import spacelaunchnow_kmp.composeapp.generated.resources.schedule_filter_sheet_title
 
 /**
  * Side sheet for tablet/desktop layout
@@ -88,12 +95,12 @@ fun ScheduleFilterSideSheet(
                     verticalAlignment = Alignment.CenterVertically
                 ) {
                     Text(
-                        text = "Filter Launches",
+                        text = stringResource(Res.string.schedule_filter_sheet_title),
                         style = MaterialTheme.typography.headlineSmall,
                         fontWeight = FontWeight.Bold
                     )
                     TextButton(onClick = onDismiss) {
-                        Text("Close")
+                        Text(stringResource(Res.string.schedule_filter_close))
                     }
                 }
 
@@ -133,7 +140,7 @@ fun ScheduleFilterSideSheet(
                         onClick = onDismiss,
                         modifier = Modifier.weight(1f)
                     ) {
-                        Text("Cancel")
+                        Text(stringResource(Res.string.schedule_filter_cancel))
                     }
                     Button(
                         onClick = {
@@ -143,9 +150,9 @@ fun ScheduleFilterSideSheet(
                     ) {
                         Text(
                             text = if (pendingFilterState.hasActiveFilters())
-                                "Apply (${pendingFilterState.activeFilterCount()})"
+                                stringResource(Res.string.schedule_filter_apply_count, pendingFilterState.activeFilterCount())
                             else
-                                "Apply"
+                                stringResource(Res.string.schedule_filter_apply)
                         )
                     }
                 }

@@ -38,6 +38,12 @@ import me.calebjones.spacelaunchnow.ui.state.VideoPlayerState
 import me.calebjones.spacelaunchnow.util.VideoUtil
 import me.calebjones.spacelaunchnow.util.openUriSafely
 import kotlin.time.Clock
+import org.jetbrains.compose.resources.stringResource
+import spacelaunchnow_kmp.composeapp.generated.resources.Res
+import spacelaunchnow_kmp.composeapp.generated.resources.launch_detail_launch_fallback_name
+import spacelaunchnow_kmp.composeapp.generated.resources.launch_detail_watch_launch
+import spacelaunchnow_kmp.composeapp.generated.resources.launch_detail_watch_live
+import spacelaunchnow_kmp.composeapp.generated.resources.launch_detail_watch_replay
 
 /**
  * Phone-specific layout for launch detail view.
@@ -93,8 +99,8 @@ fun PhoneLaunchDetailContent(
         if (videoPlayerState.availableVideos.isNotEmpty()) {
             val videoTitle = launch.net?.let { net ->
                 val now = Clock.System.now()
-                if (net > now) "Watch Live" else "Watch Replay"
-            } ?: "Watch Launch"
+                if (net > now) stringResource(Res.string.launch_detail_watch_live) else stringResource(Res.string.launch_detail_watch_replay)
+            } ?: stringResource(Res.string.launch_detail_watch_launch)
 
             Text(
                 text = videoTitle,
@@ -104,7 +110,7 @@ fun PhoneLaunchDetailContent(
             Spacer(Modifier.height(16.dp))
             VideoPlayerCard(
                 videoPlayerState = videoPlayerState,
-                launchName = launch.mission?.name ?: "Space Launch",
+                launchName = launch.mission?.name ?: stringResource(Res.string.launch_detail_launch_fallback_name),
                 onSetPlayerVisible = onSetPlayerVisible,
                 onNavigateToFullscreen = onNavigateToFullscreen,
                 onVideoSelected = { /* Alternate videos open externally via AlternateVideosCard below */ },
@@ -118,7 +124,7 @@ fun PhoneLaunchDetailContent(
                 AlternateVideosCard(
                     videos = videoPlayerState.availableVideos,
                     currentlyPlayingIndex = videoPlayerState.selectedVideoIndex,
-                    launchName = launch.mission?.name ?: "Space Launch",
+                    launchName = launch.mission?.name ?: stringResource(Res.string.launch_detail_launch_fallback_name),
                     onOpenExternal = { video ->
                         onExternalVideoOpened?.invoke(
                             video.url,
@@ -148,7 +154,7 @@ fun PhoneLaunchDetailContent(
                 Tab(
                     selected = selectedTabIndex == index,
                     onClick = { selectedTabIndex = index },
-                    text = { Text(tab.displayName, maxLines = 1, overflow = TextOverflow.Ellipsis) }
+                    text = { Text(stringResource(tab.titleRes), maxLines = 1, overflow = TextOverflow.Ellipsis) }
                 )
             }
         }

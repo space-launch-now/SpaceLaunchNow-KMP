@@ -38,6 +38,13 @@ import me.calebjones.spacelaunchnow.ui.compose.HeroDetailScaffold
 import me.calebjones.spacelaunchnow.ui.compose.LocalDetailScaffoldCollapsed
 import me.calebjones.spacelaunchnow.ui.compose.SharedDetailScaffold
 import me.calebjones.spacelaunchnow.ui.layout.rememberAdaptiveLayoutState
+import org.jetbrains.compose.resources.stringResource
+import spacelaunchnow_kmp.composeapp.generated.resources.Res
+import spacelaunchnow_kmp.composeapp.generated.resources.common_back
+import spacelaunchnow_kmp.composeapp.generated.resources.common_error
+import spacelaunchnow_kmp.composeapp.generated.resources.launch_detail_error_title
+import spacelaunchnow_kmp.composeapp.generated.resources.launch_detail_error_try_again
+import spacelaunchnow_kmp.composeapp.generated.resources.launch_detail_quick_facts_heading
 
 /**
  * State views for LaunchDetailScreen
@@ -85,7 +92,7 @@ fun LaunchDetailErrorView(
             ) {
                 Icon(
                     imageVector = Icons.AutoMirrored.Outlined.ArrowBack,
-                    contentDescription = "Back",
+                    contentDescription = stringResource(Res.string.common_back),
                 )
             }
         }
@@ -162,13 +169,13 @@ private fun ErrorCard(
         ) {
             Icon(
                 imageVector = Icons.Filled.Error,
-                contentDescription = "Error",
+                contentDescription = stringResource(Res.string.common_error),
                 tint = MaterialTheme.colorScheme.error,
                 modifier = Modifier.size(48.dp)
             )
 
             Text(
-                text = "Oops! Something went wrong",
+                text = stringResource(Res.string.launch_detail_error_title),
                 style = MaterialTheme.typography.titleLarge,
                 fontWeight = FontWeight.Bold,
                 textAlign = TextAlign.Center
@@ -191,7 +198,7 @@ private fun ErrorCard(
                     modifier = Modifier.size(18.dp)
                 )
                 Spacer(modifier = Modifier.width(8.dp))
-                Text("Try Again")
+                Text(stringResource(Res.string.launch_detail_error_try_again))
             }
         }
     }
@@ -227,7 +234,7 @@ private fun LaunchDetailLoadingContent() {
 
         // 2. Quick Stats Grid shimmer
         Text(
-            text = "Quick Facts",
+            text = stringResource(Res.string.launch_detail_quick_facts_heading),
             style = MaterialTheme.typography.titleLarge,
             fontWeight = FontWeight.Bold
         )

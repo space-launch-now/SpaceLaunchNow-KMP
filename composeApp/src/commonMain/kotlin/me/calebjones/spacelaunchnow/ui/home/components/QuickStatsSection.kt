@@ -33,6 +33,13 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import me.calebjones.spacelaunchnow.ui.theme.SpaceLaunchNowPreviewTheme
 import org.jetbrains.compose.ui.tooling.preview.Preview
+import org.jetbrains.compose.resources.stringResource
+import spacelaunchnow_kmp.composeapp.generated.resources.Res
+import spacelaunchnow_kmp.composeapp.generated.resources.home_history_title
+import spacelaunchnow_kmp.composeapp.generated.resources.home_stats_next_24_hours
+import spacelaunchnow_kmp.composeapp.generated.resources.home_stats_next_30_days
+import spacelaunchnow_kmp.composeapp.generated.resources.home_stats_next_7_days
+import spacelaunchnow_kmp.composeapp.generated.resources.home_stats_title
 
 /**
  * Quick Stats section showing launch count summaries in a grid.
@@ -54,7 +61,7 @@ fun QuickStatsSection(
 ) {
     Column(modifier = modifier) {
         Text(
-            text = "Quick Stats",
+            text = stringResource(Res.string.home_stats_title),
             fontWeight = FontWeight.Bold,
             fontSize = 20.sp
         )
@@ -68,25 +75,25 @@ fun QuickStatsSection(
             ) {
                 StatItem(
                     icon = Icons.Default.Today,
-                    label = "Next 24 Hours",
+                    label = stringResource(Res.string.home_stats_next_24_hours),
                     value = if (next24HoursCount > 0) next24HoursCount.toString() else "-",
                     modifier = Modifier.weight(1f)
                 )
                 StatItem(
                     icon = Icons.Default.DateRange,
-                    label = "Next 7 Days",
+                    label = stringResource(Res.string.home_stats_next_7_days),
                     value = if (nextWeekCount > 0) nextWeekCount.toString() else "-",
                     modifier = Modifier.weight(1f)
                 )
                 StatItem(
                     icon = Icons.Default.Schedule,
-                    label = "Next 30 Days",
+                    label = stringResource(Res.string.home_stats_next_30_days),
                     value = if (nextMonthCount > 0) nextMonthCount.toString() else "-",
                     modifier = Modifier.weight(1f)
                 )
                 StatItem(
                     icon = Icons.Default.History,
-                    label = "This Day in History",
+                    label = stringResource(Res.string.home_history_title),
                     value = if (historyCount > 0) historyCount.toString() else "-",
                     modifier = Modifier.weight(1f)
                 )
@@ -99,13 +106,13 @@ fun QuickStatsSection(
             ) {
                 StatItem(
                     icon = Icons.Default.Today,
-                    label = "Next 24 Hours",
+                    label = stringResource(Res.string.home_stats_next_24_hours),
                     value = if (next24HoursCount > 0) next24HoursCount.toString() else "-",
                     modifier = Modifier.weight(1f)
                 )
                 StatItem(
                     icon = Icons.Default.DateRange,
-                    label = "Next 7 Days",
+                    label = stringResource(Res.string.home_stats_next_7_days),
                     value = if (nextWeekCount > 0) nextWeekCount.toString() else "-",
                     modifier = Modifier.weight(1f)
                 )
@@ -117,13 +124,13 @@ fun QuickStatsSection(
             ) {
                 StatItem(
                     icon = Icons.Default.Schedule,
-                    label = "Next 30 Days",
+                    label = stringResource(Res.string.home_stats_next_30_days),
                     value = if (nextMonthCount > 0) nextMonthCount.toString() else "-",
                     modifier = Modifier.weight(1f)
                 )
                 StatItem(
                     icon = Icons.Default.History,
-                    label = "This Day in History",
+                    label = stringResource(Res.string.home_history_title),
                     value = if (historyCount > 0) historyCount.toString() else "-",
                     modifier = Modifier.weight(1f)
                 )
@@ -261,7 +268,7 @@ private fun StatItemPreview() {
     SpaceLaunchNowPreviewTheme {
         StatItem(
             icon = Icons.Default.Today,
-            label = "Next 24 Hours",
+            label = stringResource(Res.string.home_stats_next_24_hours),
             value = "3",
             modifier = Modifier.width(200.dp)
         )
@@ -274,7 +281,7 @@ private fun StatItemDarkPreview() {
     SpaceLaunchNowPreviewTheme(isDark = true) {
         StatItem(
             icon = Icons.Default.Today,
-            label = "Next 24 Hours",
+            label = stringResource(Res.string.home_stats_next_24_hours),
             value = "3",
             modifier = Modifier.width(200.dp)
         )

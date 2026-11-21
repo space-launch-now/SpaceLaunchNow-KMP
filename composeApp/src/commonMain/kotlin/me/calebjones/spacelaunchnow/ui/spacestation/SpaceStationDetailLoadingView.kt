@@ -24,6 +24,13 @@ import androidx.compose.ui.unit.dp
 import me.calebjones.spacelaunchnow.ui.compose.PlainShimmerCard
 import me.calebjones.spacelaunchnow.ui.compose.LocalDetailScaffoldCollapsed
 import me.calebjones.spacelaunchnow.ui.compose.SharedDetailScaffold
+import spacelaunchnow_kmp.composeapp.generated.resources.Res
+import org.jetbrains.compose.resources.stringResource
+import spacelaunchnow_kmp.composeapp.generated.resources.common_error
+import spacelaunchnow_kmp.composeapp.generated.resources.common_loading
+import spacelaunchnow_kmp.composeapp.generated.resources.common_retry
+import spacelaunchnow_kmp.composeapp.generated.resources.station_detail_error_title
+import spacelaunchnow_kmp.composeapp.generated.resources.station_detail_navigate_back
 
 private val TitleHeight = 110.dp
 
@@ -34,7 +41,7 @@ private val TitleHeight = 110.dp
 @Composable
 fun SpaceStationDetailLoadingView(onNavigateBack: () -> Unit) {
     SharedDetailScaffold(
-        titleText = "Loading...",
+        titleText = stringResource(Res.string.common_loading),
         taglineText = null,
         imageUrl = null,
         onNavigateBack = onNavigateBack,
@@ -88,7 +95,7 @@ fun SpaceStationDetailErrorView(
             ) {
                 Icon(
                     imageVector = Icons.AutoMirrored.Outlined.ArrowBack,
-                    contentDescription = "Navigate back"
+                    contentDescription = stringResource(Res.string.station_detail_navigate_back)
                 )
             }
 
@@ -104,12 +111,12 @@ fun SpaceStationDetailErrorView(
                 ) {
                     Icon(
                         imageVector = Icons.Default.Error,
-                        contentDescription = "Error",
+                        contentDescription = stringResource(Res.string.common_error),
                         tint = MaterialTheme.colorScheme.error,
                         modifier = Modifier.padding(bottom = 8.dp)
                     )
                     Text(
-                        text = "Failed to load station details",
+                        text = stringResource(Res.string.station_detail_error_title),
                         style = MaterialTheme.typography.headlineSmall,
                         textAlign = TextAlign.Center
                     )
@@ -120,7 +127,7 @@ fun SpaceStationDetailErrorView(
                         textAlign = TextAlign.Center
                     )
                     Button(onClick = onRetry) {
-                        Text("Retry")
+                        Text(stringResource(Res.string.common_retry))
                     }
                 }
             }

@@ -1,0 +1,181 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- Launch status, full name. Shown on a launch card or detail page. -->
+    <string name="enum_status_go">Go for Launch</string>
+    <!-- Launch status, short form. Shown on a small badge, often in capitals. -->
+    <string name="enum_status_go_abbrev">Go</string>
+    <!-- Launch status, full name. Shown on a launch card or detail page. -->
+    <string name="enum_status_tbd">To Be Determined</string>
+    <!-- Launch status, short form. Shown on a small badge, often in capitals. -->
+    <string name="enum_status_tbd_abbrev">TBD</string>
+    <!-- Launch status, full name. Shown on a launch card or detail page. -->
+    <string name="enum_status_success">Launch Successful</string>
+    <!-- Launch status, short form. Shown on a small badge, often in capitals. -->
+    <string name="enum_status_success_abbrev">Success</string>
+    <!-- Launch status, full name. Shown on a launch card or detail page. -->
+    <string name="enum_status_failure">Launch Failure</string>
+    <!-- Launch status, short form. Shown on a small badge, often in capitals. -->
+    <string name="enum_status_failure_abbrev">Failure</string>
+    <!-- Launch status, full name. Shown on a launch card or detail page. -->
+    <string name="enum_status_hold">On Hold</string>
+    <!-- Launch status, short form. Shown on a small badge, often in capitals. -->
+    <string name="enum_status_hold_abbrev">Hold</string>
+    <!-- Launch status, full name. Shown on a launch card or detail page. -->
+    <string name="enum_status_in_flight">Launch in Flight</string>
+    <!-- Launch status, short form. Shown on a small badge, often in capitals. -->
+    <string name="enum_status_in_flight_abbrev">In Flight</string>
+    <!-- Launch status, full name. Shown on a launch card or detail page. -->
+    <string name="enum_status_partial_failure">Launch was a Partial Failure</string>
+    <!-- Launch status, short form. Shown on a small badge, often in capitals. -->
+    <string name="enum_status_partial_failure_abbrev">Partial Failure</string>
+    <!-- Launch status, full name. Shown on a launch card or detail page. -->
+    <string name="enum_status_tbc">To Be Confirmed</string>
+    <!-- Launch status, short form. Shown on a small badge, often in capitals. -->
+    <string name="enum_status_tbc_abbrev">TBC</string>
+    <!-- Launch status, full name. Shown on a launch card or detail page. -->
+    <string name="enum_status_deployed">Payload Deployed</string>
+    <!-- Launch status, short form. Shown on a small badge, often in capitals. -->
+    <string name="enum_status_deployed_abbrev">Deployed</string>
+    <!-- Orbit name. Shown as a tag on a mission. -->
+    <string name="enum_orbit_elliptical_orbit">Elliptical Orbit</string>
+    <!-- Orbit name. Shown as a tag on a mission. -->
+    <string name="enum_orbit_geostationary_orbit">Geostationary Orbit</string>
+    <!-- Orbit name. Shown as a tag on a mission. -->
+    <string name="enum_orbit_geostationary_transfer_orbit">Geostationary Transfer Orbit</string>
+    <!-- Orbit name. Shown as a tag on a mission. -->
+    <string name="enum_orbit_geosynchronous_orbit">Geosynchronous Orbit</string>
+    <!-- Orbit name. Shown as a tag on a mission. -->
+    <string name="enum_orbit_geosynchronous_transfer_orbit">Geosynchronous Transfer Orbit</string>
+    <!-- Orbit name. Shown as a tag on a mission. -->
+    <string name="enum_orbit_heliocentric_l1">Heliocentric L1</string>
+    <!-- Orbit name. Shown as a tag on a mission. -->
+    <string name="enum_orbit_heliocentric_n_a">Heliocentric N/A</string>
+    <!-- Orbit name. Shown as a tag on a mission. -->
+    <string name="enum_orbit_high_earth_orbit">High Earth Orbit</string>
+    <!-- Orbit name. Shown as a tag on a mission. -->
+    <string name="enum_orbit_low_earth_orbit">Low Earth Orbit</string>
+    <!-- Orbit name. Shown as a tag on a mission. -->
+    <string name="enum_orbit_lunar_flyby">Lunar flyby</string>
+    <!-- Orbit name. Shown as a tag on a mission. -->
+    <string name="enum_orbit_lunar_impactor">Lunar Impactor</string>
+    <!-- Orbit name. Shown as a tag on a mission. -->
+    <string name="enum_orbit_lunar_orbit">Lunar Orbit</string>
+    <!-- Orbit name. Shown as a tag on a mission. -->
+    <string name="enum_orbit_medium_earth_orbit">Medium Earth Orbit</string>
+    <!-- Orbit name. Shown as a tag on a mission. -->
+    <string name="enum_orbit_polar_orbit">Polar Orbit</string>
+    <!-- Orbit name. Shown as a tag on a mission. -->
+    <string name="enum_orbit_solar_escape_trajectory">Solar Escape Trajectory</string>
+    <!-- Orbit name. Shown as a tag on a mission. -->
+    <string name="enum_orbit_suborbital">Suborbital</string>
+    <!-- Orbit name. Shown as a tag on a mission. -->
+    <string name="enum_orbit_sun_earth_l2">Sun-Earth L2</string>
+    <!-- Orbit name. Shown as a tag on a mission. -->
+    <string name="enum_orbit_sun_synchronous_orbit">Sun-Synchronous Orbit</string>
+    <!-- Orbit name. Shown as a tag on a mission. -->
+    <string name="enum_orbit_supersynchronous_transfer_orbit">Supersynchronous Transfer Orbit</string>
+    <!-- Orbit name. Shown as a tag on a mission. -->
+    <string name="enum_orbit_mars_orbit">Mars Orbit</string>
+    <!-- Orbit name. Shown as a tag on a mission. -->
+    <string name="enum_orbit_venus_orbit">Venus Orbit</string>
+    <!-- Orbit name. Shown as a tag on a mission. -->
+    <string name="enum_orbit_asteroid">Asteroid</string>
+    <!-- Orbit name. Shown as a tag on a mission. -->
+    <string name="enum_orbit_venus_flyby">Venus flyby</string>
+    <!-- Orbit name. Shown as a tag on a mission. -->
+    <string name="enum_orbit_mars_flyby">Mars flyby</string>
+    <!-- Orbit name. Shown as a tag on a mission. -->
+    <string name="enum_orbit_mercury_flyby">Mercury flyby</string>
+    <!-- Orbit name. Shown as a tag on a mission. -->
+    <string name="enum_orbit_unknown">Unknown</string>
+    <!-- Orbit name. Shown as a tag on a mission. -->
+    <string name="enum_orbit_enhanced_geostationary_transfer_orbit">Enhanced Geostationary Transfer Orbit</string>
+    <!-- Orbit name. Shown as a tag on a mission. -->
+    <string name="enum_orbit_jupiter_orbit">Jupiter Orbit</string>
+    <!-- Orbit name. Shown as a tag on a mission. -->
+    <string name="enum_orbit_earth_entry_trajectory">Earth Entry Trajectory</string>
+    <!-- Mission type, shown as a tag on a mission. -->
+    <string name="enum_mission_type_earth_science">Earth Science</string>
+    <!-- Mission type, shown as a tag on a mission. -->
+    <string name="enum_mission_type_planetary_science">Planetary Science</string>
+    <!-- Mission type, shown as a tag on a mission. -->
+    <string name="enum_mission_type_astrophysics">Astrophysics</string>
+    <!-- Mission type, shown as a tag on a mission. -->
+    <string name="enum_mission_type_heliophysics">Heliophysics</string>
+    <!-- Mission type, shown as a tag on a mission. -->
+    <string name="enum_mission_type_human_exploration">Human Exploration</string>
+    <!-- Mission type, shown as a tag on a mission. -->
+    <string name="enum_mission_type_robotic_exploration">Robotic Exploration</string>
+    <!-- Mission type, shown as a tag on a mission. -->
+    <string name="enum_mission_type_government_top_secret">Government/Top Secret</string>
+    <!-- Mission type, shown as a tag on a mission. -->
+    <string name="enum_mission_type_tourism">Tourism</string>
+    <!-- Mission type, shown as a tag on a mission. -->
+    <string name="enum_mission_type_unknown">Unknown</string>
+    <!-- Mission type, shown as a tag on a mission. -->
+    <string name="enum_mission_type_communications">Communications</string>
+    <!-- Mission type, shown as a tag on a mission. -->
+    <string name="enum_mission_type_resupply">Resupply</string>
+    <!-- Mission type, shown as a tag on a mission. -->
+    <string name="enum_mission_type_suborbital">Suborbital</string>
+    <!-- Mission type, shown as a tag on a mission. -->
+    <string name="enum_mission_type_test_flight">Test Flight</string>
+    <!-- Mission type, shown as a tag on a mission. -->
+    <string name="enum_mission_type_dedicated_rideshare">Dedicated Rideshare</string>
+    <!-- Mission type, shown as a tag on a mission. -->
+    <string name="enum_mission_type_navigation">Navigation</string>
+    <!-- Mission type, shown as a tag on a mission. -->
+    <string name="enum_mission_type_test_target">Test Target</string>
+    <!-- Mission type, shown as a tag on a mission. -->
+    <string name="enum_mission_type_lunar_exploration">Lunar Exploration</string>
+    <!-- Mission type, shown as a tag on a mission. -->
+    <string name="enum_mission_type_materials_science">Materials Science</string>
+    <!-- Mission type, shown as a tag on a mission. -->
+    <string name="enum_mission_type_biology">Biology</string>
+    <!-- Mission type, shown as a tag on a mission. -->
+    <string name="enum_mission_type_technology">Technology</string>
+    <!-- Mission type, shown as a tag on a mission. -->
+    <string name="enum_mission_type_mission_extension">Mission Extension</string>
+    <!-- Mission type, shown as a tag on a mission. -->
+    <string name="enum_mission_type_space_situational_awareness">Space Situational Awareness</string>
+    <!-- Country name, as the launch provider or location country. -->
+    <string name="enum_country_us">United States of America</string>
+    <!-- Country name, as the launch provider or location country. -->
+    <string name="enum_country_cn">China</string>
+    <!-- Country name, as the launch provider or location country. -->
+    <string name="enum_country_ru">Russia</string>
+    <!-- Country name, as the launch provider or location country. -->
+    <string name="enum_country_fr">France</string>
+    <!-- Country name, as the launch provider or location country. -->
+    <string name="enum_country_jp">Japan</string>
+    <!-- Country name, as the launch provider or location country. -->
+    <string name="enum_country_in">India</string>
+    <!-- Country name, as the launch provider or location country. -->
+    <string name="enum_country_nz">New Zealand</string>
+    <!-- Country name, as the launch provider or location country. -->
+    <string name="enum_country_gb">United Kingdom</string>
+    <!-- Country name, as the launch provider or location country. -->
+    <string name="enum_country_il">Israel</string>
+    <!-- Country name, as the launch provider or location country. -->
+    <string name="enum_country_ir">Iran</string>
+    <!-- Country name, as the launch provider or location country. -->
+    <string name="enum_country_kr">South Korea</string>
+    <!-- Country name, as the launch provider or location country. -->
+    <string name="enum_country_kp">North Korea</string>
+    <!-- Country name, as the launch provider or location country. -->
+    <string name="enum_country_it">Italy</string>
+    <!-- Country name, as the launch provider or location country. -->
+    <string name="enum_country_de">Germany</string>
+    <!-- Country name, as the launch provider or location country. -->
+    <string name="enum_country_au">Australia</string>
+    <!-- Country name, as the launch provider or location country. -->
+    <string name="enum_country_br">Brazil</string>
+    <!-- Country name, as the launch provider or location country. -->
+    <string name="enum_country_ca">Canada</string>
+    <!-- Country name, as the launch provider or location country. -->
+    <string name="enum_country_kz">Kazakhstan</string>
+    <!-- Country name, as the launch provider or location country. -->
+    <string name="enum_country_es">Spain</string>
+    <!-- Country name, as the launch provider or location country. -->
+    <string name="enum_country_ua">Ukraine</string>
+</resources>

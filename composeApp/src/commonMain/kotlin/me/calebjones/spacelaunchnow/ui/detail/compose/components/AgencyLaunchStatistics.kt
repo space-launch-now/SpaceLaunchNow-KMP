@@ -16,6 +16,12 @@ import me.calebjones.spacelaunchnow.domain.model.ProviderDetail
 import me.calebjones.spacelaunchnow.ui.components.StatCard
 import me.calebjones.spacelaunchnow.ui.icons.CustomIcons
 import me.calebjones.spacelaunchnow.ui.icons.RocketLaunch
+import org.jetbrains.compose.resources.stringResource
+import spacelaunchnow_kmp.composeapp.generated.resources.Res
+import spacelaunchnow_kmp.composeapp.generated.resources.launch_detail_stat_failed_launches
+import spacelaunchnow_kmp.composeapp.generated.resources.launch_detail_stat_success_rate
+import spacelaunchnow_kmp.composeapp.generated.resources.launch_detail_stat_successful_launches
+import spacelaunchnow_kmp.composeapp.generated.resources.launch_detail_stat_total_launches
 
 @Composable
 fun AgencyLaunchStatistics(providerDetail: ProviderDetail?) {
@@ -40,14 +46,14 @@ fun AgencyLaunchStatistics(providerDetail: ProviderDetail?) {
                     modifier = Modifier.weight(1f),
                     icon = Icons.Filled.TrendingUp,
                     value = "${successRate.toInt()}%",
-                    label = "Success\nRate",
+                    label = stringResource(Res.string.launch_detail_stat_success_rate),
                     containerColor = MaterialTheme.colorScheme.surfaceVariant
                 )
                 StatCard(
                     modifier = Modifier.weight(1f),
                     icon = CustomIcons.RocketLaunch,
                     value = "$totalLaunches",
-                    label = "Total\nLaunches",
+                    label = stringResource(Res.string.launch_detail_stat_total_launches),
                     containerColor = MaterialTheme.colorScheme.surfaceVariant
                 )
             }
@@ -60,14 +66,14 @@ fun AgencyLaunchStatistics(providerDetail: ProviderDetail?) {
                     modifier = Modifier.weight(1f),
                     icon = Icons.Filled.CheckCircle,
                     value = "$successfulLaunches",
-                    label = "Successful\nLaunches",
+                    label = stringResource(Res.string.launch_detail_stat_successful_launches),
                     containerColor = MaterialTheme.colorScheme.surfaceVariant
                 )
                 StatCard(
                     modifier = Modifier.weight(1f),
                     icon = Icons.Filled.Cancel,
                     value = "$failedLaunches",
-                    label = "Failed\nLaunches",
+                    label = stringResource(Res.string.launch_detail_stat_failed_launches),
                     containerColor = MaterialTheme.colorScheme.surfaceVariant
                 )
             }

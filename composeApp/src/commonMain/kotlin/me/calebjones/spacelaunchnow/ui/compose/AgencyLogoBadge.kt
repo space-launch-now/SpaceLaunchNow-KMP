@@ -18,6 +18,9 @@ import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import coil3.compose.SubcomposeAsyncImage
 import com.valentinilk.shimmer.shimmer
+import spacelaunchnow_kmp.composeapp.generated.resources.Res
+import spacelaunchnow_kmp.composeapp.generated.resources.app_compose_agency_logo_badge_description
+import org.jetbrains.compose.resources.stringResource
 
 /**
  * Fixed dark tone for logo wells, independent of theme. Agency logo assets are a mix of
@@ -44,7 +47,7 @@ fun AgencyLogoBadge(
     ) {
         SubcomposeAsyncImage(
             model = logoUrl,
-            contentDescription = "Agency logo",
+            contentDescription = stringResource(Res.string.app_compose_agency_logo_badge_description),
             contentScale = ContentScale.Fit,
             modifier = Modifier
                 .fillMaxSize()
