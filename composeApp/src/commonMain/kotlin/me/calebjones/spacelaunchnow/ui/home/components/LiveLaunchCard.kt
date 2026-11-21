@@ -49,6 +49,10 @@ import me.calebjones.spacelaunchnow.ui.theme.SpaceLaunchNowPreviewTheme
 import me.calebjones.spacelaunchnow.util.LaunchFormatUtil
 import me.calebjones.spacelaunchnow.util.StatusColorUtil.getLaunchStatusColor
 import org.jetbrains.compose.ui.tooling.preview.Preview
+import org.jetbrains.compose.resources.stringResource
+import spacelaunchnow_kmp.composeapp.generated.resources.Res
+import spacelaunchnow_kmp.composeapp.generated.resources.home_launch_image_for_title_description
+import spacelaunchnow_kmp.composeapp.generated.resources.home_live_launch_description
 
 /**
  * In Flight status color - Blue 500 (#1976D2)
@@ -77,6 +81,7 @@ fun LiveLaunchCard(
     }
     val statusText = launch.status?.name ?: "In Flight"
     val statusColor = getLaunchStatusColor(launch.status?.id)
+    val cardDescription = stringResource(Res.string.home_live_launch_description, title, statusText)
     val isWebcastLive = launch.webcastLive
 
     Card(
@@ -86,7 +91,7 @@ fun LiveLaunchCard(
             .padding(horizontal = 16.dp)
             .clickable { navController.navigate(LaunchDetail(launch.id)) }
             .semantics {
-                contentDescription = "In-flight launch: $title. Status: $statusText. Tap to view details."
+                contentDescription = cardDescription
             },
         shape = RoundedCornerShape(12.dp),
         colors = CardDefaults.cardColors(
@@ -108,7 +113,7 @@ fun LiveLaunchCard(
                 launch.imageUrl?.let { url ->
                     SubcomposeAsyncImage(
                         model = url,
-                        contentDescription = "Launch image for $title",
+                        contentDescription = stringResource(Res.string.home_launch_image_for_title_description, title),
                         modifier = Modifier.fillMaxSize(),
                         contentScale = ContentScale.Crop,
                         loading = {
@@ -269,6 +274,7 @@ private fun LiveLaunchCardPreviewContent(
     }
     val statusText = launch.status?.name ?: "In Flight"
     val statusColor = getLaunchStatusColor(launch.status?.id)
+    val cardDescription = stringResource(Res.string.home_live_launch_description, title, statusText)
 
     Card(
         modifier = Modifier
@@ -276,7 +282,7 @@ private fun LiveLaunchCardPreviewContent(
             .height(130.dp)
             .padding(horizontal = 16.dp)
             .semantics {
-                contentDescription = "In-flight launch: $title. Status: $statusText. Tap to view details."
+                contentDescription = cardDescription
             },
         shape = RoundedCornerShape(12.dp),
         colors = CardDefaults.cardColors(

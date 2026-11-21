@@ -33,6 +33,11 @@ import me.calebjones.spacelaunchnow.navigation.NotificationSettings
 import me.calebjones.spacelaunchnow.navigation.SupportUs
 import me.calebjones.spacelaunchnow.ui.platformShadowGlow
 import me.calebjones.spacelaunchnow.ui.subscription.rememberIsPremium
+import org.jetbrains.compose.resources.stringResource
+import spacelaunchnow_kmp.composeapp.generated.resources.Res
+import spacelaunchnow_kmp.composeapp.generated.resources.home_top_bar_filters_description
+import spacelaunchnow_kmp.composeapp.generated.resources.home_top_bar_support_description
+import spacelaunchnow_kmp.composeapp.generated.resources.home_top_bar_title
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -43,7 +48,7 @@ fun HomeTopBar(navController: NavController) {
         windowInsets = WindowInsets(0, 0, 0, 0),
         title = {
             Text(
-                text = "Space Launch Now",
+                text = stringResource(Res.string.home_top_bar_title),
                 style = MaterialTheme.typography.headlineMedium,
                 fontWeight = FontWeight.Bold
             )
@@ -59,7 +64,7 @@ fun HomeTopBar(navController: NavController) {
             ) {
                 Icon(
                     Icons.Default.FilterList,
-                    contentDescription = "Filters",
+                    contentDescription = stringResource(Res.string.home_top_bar_filters_description),
                     modifier = Modifier.size(24.dp)
                 )
             }
@@ -75,7 +80,7 @@ fun HomeTopBar(navController: NavController) {
  */
 @Composable
 private fun SupportUsButton(onClick: () -> Unit) {
-    val transition = rememberInfiniteTransition(label = "support-heartbeat")
+    val transition = rememberInfiniteTransition(label = "support-heartbeat") // i18n-ignore: animation label
     val scale by transition.animateFloat(
         initialValue = 1f,
         targetValue = 1f,
@@ -91,7 +96,7 @@ private fun SupportUsButton(onClick: () -> Unit) {
             },
             repeatMode = RepeatMode.Restart
         ),
-        label = "support-heartbeat-scale"
+        label = "support-heartbeat-scale" // i18n-ignore: animation label
     )
 
     val primary = MaterialTheme.colorScheme.primary
@@ -124,7 +129,7 @@ private fun SupportUsButton(onClick: () -> Unit) {
         IconButton(onClick = onClick) {
             Icon(
                 Icons.Default.Favorite,
-                contentDescription = "Support Me",
+                contentDescription = stringResource(Res.string.home_top_bar_support_description),
                 tint = primary,
                 modifier = Modifier
                     .size(24.dp)
