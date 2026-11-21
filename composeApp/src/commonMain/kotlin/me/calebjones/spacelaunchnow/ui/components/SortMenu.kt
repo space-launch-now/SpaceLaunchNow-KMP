@@ -77,7 +77,7 @@ fun SortMenu(
                                     onClick = null
                                 )
                                 Spacer(modifier = Modifier.width(8.dp))
-                                Text(sortField.displayName)
+                                Text(stringResource(sortField.label))
                             }
                         },
                         onClick = {
@@ -124,7 +124,7 @@ fun SortMenu(
                         )
                         Spacer(modifier = Modifier.width(12.dp))
                         Text(
-                            text = sortField.displayName,
+                            text = stringResource(sortField.label),
                             style = MaterialTheme.typography.bodyLarge
                         )
                     }

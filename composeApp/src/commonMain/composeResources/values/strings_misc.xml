@@ -268,4 +268,8 @@
     <string name="app_roadmap_category_design">Design</string>
     <!-- Description of the loading text on the start-up screen. Read by screen readers. -->
     <string name="preload_loading_description">Loading launch data</string>
+    <!-- Tab title on the News and Events screen. One word. -->
+    <string name="app_newsevents_tab_news">News</string>
+    <!-- Tab title on the News and Events screen. One word. -->
+    <string name="app_newsevents_tab_events">Events</string>
 </resources>

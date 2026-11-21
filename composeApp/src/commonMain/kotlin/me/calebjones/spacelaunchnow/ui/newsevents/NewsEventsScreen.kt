@@ -310,7 +310,7 @@ private fun NewsEventsContent(
                                 pagerState.animateScrollToPage(index)
                             }
                         },
-                        text = { Text(tab.displayName) }
+                        text = { Text(stringResource(tab.label)) }
                     )
                 }
             }

@@ -222,4 +222,16 @@
     <string name="rockets_sort_maiden_flight_asc">Maiden Flight (Oldest)</string>
     <!-- Sort option in the rocket filter sheet menu. The text in brackets says the direction. One line. -->
     <string name="rockets_sort_maiden_flight_desc">Maiden Flight (Newest)</string>
+    <!-- Sort option in the rocket sort menu. Short phrase, one line. -->
+    <string name="rockets_sort_field_name_asc">Name (A-Z)</string>
+    <!-- Sort option in the rocket sort menu. Short phrase, one line. -->
+    <string name="rockets_sort_field_name_desc">Name (Z-A)</string>
+    <!-- Sort option in the rocket sort menu. Short phrase, one line. -->
+    <string name="rockets_sort_field_total_launches_desc">Most Launches</string>
+    <!-- Sort option in the rocket sort menu. Short phrase, one line. -->
+    <string name="rockets_sort_field_total_launches_asc">Fewest Launches</string>
+    <!-- Sort option in the rocket sort menu. Short phrase, one line. -->
+    <string name="rockets_sort_field_first_flight_desc">Newest First</string>
+    <!-- Sort option in the rocket sort menu. Short phrase, one line. -->
+    <string name="rockets_sort_field_first_flight_asc">Oldest First</string>
 </resources>

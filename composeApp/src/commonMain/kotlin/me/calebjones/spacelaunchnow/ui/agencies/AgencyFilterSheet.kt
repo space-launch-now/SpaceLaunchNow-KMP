@@ -178,7 +178,7 @@ fun AgencyFilterSheet(
                         onExpandedChange = { sortExpanded = it }
                     ) {
                         OutlinedTextField(
-                            value = selectedSortOrder.displayName,
+                            value = stringResource(selectedSortOrder.label),
                             onValueChange = {},
                             readOnly = true,
                             label = { Text(stringResource(Res.string.agency_filter_order_label)) },
@@ -204,7 +204,7 @@ fun AgencyFilterSheet(
                                             horizontalArrangement = Arrangement.SpaceBetween,
                                             verticalAlignment = Alignment.CenterVertically
                                         ) {
-                                            Text(sortOrder.displayName)
+                                            Text(stringResource(sortOrder.label))
                                             if (sortOrder == selectedSortOrder) {
                                                 Icon(
                                                     imageVector = Icons.Default.Check,

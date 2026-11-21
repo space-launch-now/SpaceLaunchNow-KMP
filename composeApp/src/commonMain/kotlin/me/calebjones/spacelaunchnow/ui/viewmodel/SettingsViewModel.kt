@@ -20,6 +20,8 @@ import me.calebjones.spacelaunchnow.data.repository.NotificationRepository
 import me.calebjones.spacelaunchnow.data.repository.SubscriptionRepository
 import me.calebjones.spacelaunchnow.data.storage.AppPreferences
 import me.calebjones.spacelaunchnow.util.logging.logger
+import org.jetbrains.compose.resources.StringResource
+import spacelaunchnow_kmp.composeapp.generated.resources.*
 
 data class SettingsUiState(
     val notificationSettings: NotificationState = NotificationState.DEFAULT,
@@ -36,10 +38,10 @@ data class SettingsUiState(
     val snackbarMessage: String? = null
 )
 
-enum class ThemeOption(val label: String) {
-    System("System"),
-    Light("Light"),
-    Dark("Dark")
+enum class ThemeOption(val label: StringResource) {
+    System(Res.string.settings_theme_option_system),
+    Light(Res.string.settings_theme_option_light),
+    Dark(Res.string.settings_theme_option_dark)
 }
 
 class AppSettingsViewModel(
