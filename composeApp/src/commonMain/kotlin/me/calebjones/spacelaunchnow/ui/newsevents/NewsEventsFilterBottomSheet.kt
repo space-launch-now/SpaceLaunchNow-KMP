@@ -81,7 +81,7 @@ fun NewsEventsFilterBottomSheet(
                     verticalAlignment = Alignment.CenterVertically
                 ) {
                     Text(
-                        text = if (selectedTab == NewsEventsTab.NEWS) stringResource(Res.string.app_newsevents_filter_sheet_title_news) else stringResource(Res.string.app_newsevents_filter_sheet_title_events),
+                        text = stringResource(if (selectedTab == NewsEventsTab.NEWS) Res.string.app_newsevents_filter_sheet_title_news else Res.string.app_newsevents_filter_sheet_title_events),
                         style = MaterialTheme.typography.headlineSmall,
                         fontWeight = FontWeight.Bold
                     )

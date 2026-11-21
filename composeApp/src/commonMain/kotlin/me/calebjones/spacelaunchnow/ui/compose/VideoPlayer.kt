@@ -302,7 +302,7 @@ fun LaunchVideoPlayer(
                     )
                     if (hasOverflow || expanded) {
                         Text(
-                            text = if (expanded) stringResource(Res.string.app_compose_video_player_description_less) else stringResource(Res.string.app_compose_video_player_description_more),
+                            text = stringResource(if (expanded) Res.string.app_compose_video_player_description_less else Res.string.app_compose_video_player_description_more),
                             style = MaterialTheme.typography.labelLarge,
                             color = MaterialTheme.colorScheme.primary,
                             modifier = Modifier
