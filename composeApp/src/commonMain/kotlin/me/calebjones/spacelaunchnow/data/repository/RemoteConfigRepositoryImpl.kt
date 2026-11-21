@@ -69,6 +69,7 @@ class RemoteConfigRepositoryImpl(
         private const val INTERSTITIAL_VISITS_KEY = "ads_interstitial_visits"
         private const val NOTIFICATION_RATING_PROMPT_KEY = "rating_prompt_after_notification_enabled"
         private const val INTERSTITIAL_MIN_INTERVAL_KEY = "ads_interstitial_min_interval_s"
+        private const val HOME_UPGRADE_ROW_KEY = "home_upgrade_row_enabled"
         const val DEFAULT_INTERSTITIAL_VISITS = 4
         const val DEFAULT_INTERSTITIAL_MIN_INTERVAL_S = 120L
         private val DEFAULT_FETCH_INTERVAL: Duration = 1.hours
@@ -235,6 +236,16 @@ class RemoteConfigRepositoryImpl(
             config.getValue(NOTIFICATION_RATING_PROMPT_KEY).asString().trim().equals("true", ignoreCase = true)
         } catch (e: Exception) {
             log.w(e) { "Failed to read notification rating prompt flag - defaulting to off" }
+            false
+        }
+    }
+
+    override suspend fun getHomeUpgradeRowEnabled(): Boolean {
+        val config = remoteConfig ?: return false
+        return try {
+            config.getValue(HOME_UPGRADE_ROW_KEY).asString().trim().equals("true", ignoreCase = true)
+        } catch (e: Exception) {
+            log.w(e) { "Failed to read home upgrade row flag - defaulting to off" }
             false
         }
     }

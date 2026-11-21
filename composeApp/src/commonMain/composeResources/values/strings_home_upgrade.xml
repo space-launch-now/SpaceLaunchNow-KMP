@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- Home screen upgrade row, one line. Invites free users to see the Support Us (subscription) options. Short. -->
+    <string name="home_upgrade_row_title">Go ad-free and unlock more</string>
+    <!-- Home screen upgrade row, button label. Opens the subscription screen. One or two words. -->
+    <string name="home_upgrade_row_action">See plans</string>
+    <!-- Accessibility label for the close button on the Home upgrade row. Hides the row for good. -->
+    <string name="home_upgrade_row_close">Close upgrade offer</string>
+</resources>

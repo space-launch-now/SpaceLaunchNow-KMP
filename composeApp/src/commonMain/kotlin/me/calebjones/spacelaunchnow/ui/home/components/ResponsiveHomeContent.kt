@@ -317,6 +317,13 @@ fun ResponsiveHomeContent(
             }
         }
 
+        item(key = "upgrade_row") {
+            HomeUpgradeRow(
+                onClick = { navController.navigate(SupportUs(PaywallSource.HOME_UPGRADE_ROW.value)) },
+                modifier = Modifier.padding(horizontal = 16.dp, vertical = 8.dp)
+            )
+        }
+
         // Ad placement (non-premium users only)
         if (!hasAdFree) {
             item(key = "ad_banner") {

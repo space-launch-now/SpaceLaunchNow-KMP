@@ -40,6 +40,7 @@ import me.calebjones.spacelaunchnow.ui.ads.createInterstitialGate
 import me.calebjones.spacelaunchnow.data.storage.DebugPreferences
 import me.calebjones.spacelaunchnow.data.storage.NotificationHistoryStorage
 import me.calebjones.spacelaunchnow.data.storage.NotificationStateStorage
+import me.calebjones.spacelaunchnow.data.storage.HomeUpgradeRowPreferences
 import me.calebjones.spacelaunchnow.data.storage.PinnedContentPreferences
 import me.calebjones.spacelaunchnow.data.storage.TemporaryPremiumAccess
 import me.calebjones.spacelaunchnow.data.storage.ThemePreferences
@@ -291,6 +292,12 @@ val appModule = module {
     single {
         val appDataStore = get<DataStore<Preferences>>(named("AppSettingsDataStore"))
         PinnedContentPreferences(appDataStore)
+    }
+
+    // Persisted close of the Home upgrade row
+    single {
+        val appDataStore = get<DataStore<Preferences>>(named("AppSettingsDataStore"))
+        HomeUpgradeRowPreferences(appDataStore)
     }
 
     // NotificationRepository - new clean architecture

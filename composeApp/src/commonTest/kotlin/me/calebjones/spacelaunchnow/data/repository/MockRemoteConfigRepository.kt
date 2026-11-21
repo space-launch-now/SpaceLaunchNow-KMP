@@ -19,6 +19,7 @@ class MockRemoteConfigRepository : RemoteConfigRepository {
     var onboardingVariant: OnboardingVariant = OnboardingVariant.CONTROL
     var dataBackend: DataBackend = DataBackend.DEFAULT
     var notificationRatingPromptEnabled = false
+    var homeUpgradeRowEnabled = false
     var fetchAndActivateCalled = false
     var setDefaultsCalled = false
     var lastForceRefresh: Boolean? = null
@@ -68,6 +69,8 @@ class MockRemoteConfigRepository : RemoteConfigRepository {
 
     override suspend fun getInterstitialMinIntervalSeconds(): Long = 120L
 
+    override suspend fun getHomeUpgradeRowEnabled(): Boolean = homeUpgradeRowEnabled
+
     fun reset() {
         shouldFail = false
         failureException = Exception("Mock failure")
@@ -76,6 +79,7 @@ class MockRemoteConfigRepository : RemoteConfigRepository {
         mockDiagnosticsConfigJson = null
         onboardingVariant = OnboardingVariant.CONTROL
         notificationRatingPromptEnabled = false
+        homeUpgradeRowEnabled = false
         fetchAndActivateCalled = false
         setDefaultsCalled = false
         lastForceRefresh = null

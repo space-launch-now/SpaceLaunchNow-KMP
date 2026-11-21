@@ -98,4 +98,10 @@ interface RemoteConfigRepository {
      * Default 120.
      */
     suspend fun getInterstitialMinIntervalSeconds(): Long
+
+    /**
+     * Whether the dismissible upgrade row on Home is on, from 'home_upgrade_row_enabled'.
+     * Default false; false on read failure.
+     */
+    suspend fun getHomeUpgradeRowEnabled(): Boolean
 }
