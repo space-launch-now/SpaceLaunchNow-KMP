@@ -78,7 +78,7 @@ fun StationReportsCard(
                 }
             }
 
-            // Show stringResource(Res.string.station_reports_show_less) button if currently showing all
+            // Show "Show Less" button if currently showing all
             if (showAll && articles.size > 5) {
                 TextButton(
                     onClick = { showAll = false },

@@ -174,7 +174,7 @@ fun StarshipHistoryTimeline(
 }
 
 /**
- * Next launch card with highlighted stringResource(Res.string.starship_timeline_upcoming) badge and accent border
+ * Next launch card with highlighted "UPCOMING" badge and accent border
  */
 @Composable
 private fun NextLaunchTimelineCard(
@@ -198,7 +198,7 @@ private fun NextLaunchTimelineCard(
             modifier = Modifier.padding(12.dp),
             verticalArrangement = Arrangement.spacedBy(8.dp)
         ) {
-            // stringResource(Res.string.starship_timeline_upcoming) badge
+            // "UPCOMING" badge
             StatusChip(
                 text = stringResource(Res.string.starship_timeline_upcoming),
                 color = MaterialTheme.colorScheme.primary
