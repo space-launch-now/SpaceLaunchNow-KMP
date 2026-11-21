@@ -343,4 +343,12 @@
     <string name="launch_detail_tab_agency">Agency</string>
     <!-- Tab title on the phone launch detail screen. One word, max 10 chars. -->
     <string name="launch_detail_tab_rocket">Rocket</string>
+    <!-- Title of the dialog that explains the launch status shown on the countdown. One line. -->
+    <string name="launch_countdown_status_dialog_title">Launch Status</string>
+    <!-- Description of the info icon in the launch status dialog. Read by screen readers. -->
+    <string name="launch_countdown_status_info_description">Status information</string>
+    <!-- Small heading above the launch status explanation in the status dialog. One line. -->
+    <string name="launch_countdown_status_description_heading">Description</string>
+    <!-- Button that closes the launch status dialog. One word. -->
+    <string name="launch_countdown_status_dialog_ok">OK</string>
 </resources>

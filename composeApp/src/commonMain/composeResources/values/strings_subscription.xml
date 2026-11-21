@@ -183,6 +183,8 @@
     </plurals>
     <!-- Plan status for a person who is not a member. -->
     <string name="support_us_free_user">Free User</string>
+    <!-- Plan status for a subscriber. %1$s is the plan name, such as Pro or Lifetime. -->
+    <string name="support_us_member_plan">%1$s Member</string>
     <!-- Line on the current plan card. %1$s is the store product name. -->
     <string name="support_us_product_line">Product: %1$s</string>
     <!-- Line on the current plan card for a person who is not a member. One or two lines. -->
@@ -193,4 +195,26 @@
     <string name="support_us_legacy_banner_body">Your legacy purchase helped build Space Launch Now into what it is today. I am incredibly grateful for your early support!</string>
     <!-- Text of the legacy banner, under the continue button. One or two lines. -->
     <string name="support_us_legacy_banner_prompt">Choose a plan below to continue supporting development!</string>
+    <!-- Heading of the fine print on subscription screens. One line. -->
+    <string name="fine_print_secure_billing_title">Secure Billing</string>
+    <!-- Billing note. %1$s is a store name, filled in from one of the next three strings (fine_print_store_*). Translate the sentence around it; the store name arrives as the form that sentence needs. -->
+    <string name="fine_print_billing_note">Purchases are processed securely through %1$s.</string>
+    <!-- Store name on Android. Used only in fine_print_billing_note, as %1$s. Write the store name in the form that sentence needs, with its article where the language has one. -->
+    <string name="fine_print_store_google_play">Google Play</string>
+    <!-- Store name on iOS. Used only in fine_print_billing_note, as %1$s, where it reads after "through". Write the store name in the form that sentence needs, with its article where the language has one (English: "the App Store"). -->
+    <string name="fine_print_store_app_store">the App Store</string>
+    <!-- Store name on other platforms, such as desktop. Used only in fine_print_billing_note, as %1$s. Write the store name in the form that sentence needs, with its article where the language has one. -->
+    <string name="fine_print_store_other">your platform's store</string>
+    <!-- Free trial disclosure required by store policy. %1$s is the price after the trial, such as $9.99/year. %2$s is the trial length, such as 3-day. -->
+    <string name="fine_print_trial_disclosure">Free trial will automatically convert to a paid subscription at %1$s unless canceled before the trial ends. You won't be charged if you cancel during the %2$s trial period.</string>
+    <!-- Auto-renew notice under the plans. Three sentences. -->
+    <string name="fine_print_auto_renew_notice">Any purchase unlocks all premium features. Subscriptions auto-renew unless cancelled. You can manage or cancel your subscription at any time by following the link below.</string>
+    <!-- Button that opens the Google Play subscriptions page. One line. -->
+    <string name="fine_print_manage_google_play">Manage Subscriptions on Google Play</string>
+    <!-- Button that opens the App Store subscriptions page. One line. -->
+    <string name="fine_print_manage_app_store">Manage Subscriptions in App Store</string>
+    <!-- Generic button for managing subscriptions. One line. -->
+    <string name="fine_print_manage_generic">Manage Subscriptions</string>
+    <!-- Button under a banner ad card. Opens the screen where the user can pay to remove ads. One or two words. -->
+    <string name="ads_remove_ads_button">Remove Ads</string>
 </resources>

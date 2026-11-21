@@ -16,7 +16,9 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
+import androidx.navigation.NavDestination.Companion.hasRoute
 import androidx.navigation.compose.NavHost
+import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.toRoute
 import androidx.window.core.layout.WindowWidthSizeClass
@@ -78,6 +80,7 @@ import me.calebjones.spacelaunchnow.ui.newsevents.NewsEventsScreen
 import me.calebjones.spacelaunchnow.ui.layout.phone.composableWithCompositionLocal
 import me.calebjones.spacelaunchnow.ui.onboarding.LiveOnboardingScreen
 import me.calebjones.spacelaunchnow.ui.onboarding.OnboardingPaywallScreen
+import me.calebjones.spacelaunchnow.ui.winback.WinbackSheetHost
 import me.calebjones.spacelaunchnow.ui.preload.PreloadScreen
 import me.calebjones.spacelaunchnow.ui.roadmap.RoadmapScreen
 import me.calebjones.spacelaunchnow.ui.rockets.RocketDetailScreen
@@ -119,7 +122,7 @@ val LocalContextFactory =
     compositionLocalOf<ContextFactory?> { null }
 
 @Deprecated(
-    message = "Use rememberAdaptiveLayoutState() from ui.layout instead",
+    message = "Use rememberAdaptiveLayoutState() from ui.layout instead", // i18n-ignore: deprecation message for developers
     replaceWith = ReplaceWith(
         "rememberAdaptiveLayoutState()",
         "me.calebjones.spacelaunchnow.ui.layout.rememberAdaptiveLayoutState"
@@ -738,6 +741,10 @@ fun SpaceLaunchNowApp(
                         },
                         content = navHostContent
                     )
+
+                    // Day-7 win-back offer (Tasks#1175): checks once the user is on Home
+                    val currentEntry by navController.currentBackStackEntryAsState()
+                    WinbackSheetHost(isOnHome = currentEntry?.destination?.hasRoute<Home>() == true)
                 } // end else — onboarding state resolved
             }
         }

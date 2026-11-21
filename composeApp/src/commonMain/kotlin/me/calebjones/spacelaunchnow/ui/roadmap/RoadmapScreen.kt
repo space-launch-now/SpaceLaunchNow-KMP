@@ -257,7 +257,7 @@ private fun RoadmapTimelineItem(
             ) {
                 Icon(
                     imageVector = getStatusIcon(item.status),
-                    contentDescription = item.status.displayName,
+                    contentDescription = stringResource(item.status.label),
                     tint = Color.White,
                     modifier = Modifier.size(20.dp)
                 )
@@ -331,7 +331,7 @@ private fun RoadmapTimelineItem(
                         )
                         
                         Text(
-                            text = item.category.displayName,
+                            text = stringResource(item.category.label),
                             style = MaterialTheme.typography.labelMedium,
                             color = MaterialTheme.colorScheme.onSurfaceVariant
                         )
@@ -351,7 +351,7 @@ private fun StatusBadge(status: RoadmapStatus) {
             .padding(horizontal = 8.dp, vertical = 4.dp)
     ) {
         Text(
-            text = status.displayName,
+            text = stringResource(status.label),
             style = MaterialTheme.typography.labelSmall,
             color = getStatusColor(status),
             fontWeight = FontWeight.Bold

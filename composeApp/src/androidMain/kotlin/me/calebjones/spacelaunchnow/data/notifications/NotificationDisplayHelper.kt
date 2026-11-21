@@ -371,7 +371,7 @@ object NotificationDisplayHelper {
      * Draw a "🔴 LIVE" badge on the bitmap for webcasts
      * Creates a red badge with white text in the top-right corner
      */
-    private fun drawLiveBadge(originalBitmap: Bitmap): Bitmap {
+    private fun drawLiveBadge(context: Context, originalBitmap: Bitmap): Bitmap {
         log.d("🎨 [LiveBadge] Drawing LIVE badge on bitmap...")
 
         // Create a mutable copy of the bitmap
@@ -417,7 +417,7 @@ object NotificationDisplayHelper {
             textAlign = Paint.Align.CENTER
         }
 
-        val text = "🔴 LIVE"
+        val text = context.getString(R.string.notification_live_badge)
         val textBounds = Rect()
         textPaint.getTextBounds(text, 0, text.length, textBounds)
 
@@ -597,7 +597,7 @@ object NotificationDisplayHelper {
         // Add LIVE badge if webcast is available
         if (imageBitmap != null && notificationData.isWebcastLive()) {
             log.d("📱 [Notification] 🔴 Adding LIVE badge (webcast available)")
-            imageBitmap = drawLiveBadge(imageBitmap)
+            imageBitmap = drawLiveBadge(context, imageBitmap)
         }
 
         if (imageBitmap != null) {
@@ -779,7 +779,7 @@ object NotificationDisplayHelper {
 
         // Add LIVE badge if webcast is live
         if (imageBitmap != null && payload.webcastLive) {
-            imageBitmap = drawLiveBadge(imageBitmap)
+            imageBitmap = drawLiveBadge(context, imageBitmap)
         }
 
         if (imageBitmap != null) {
@@ -888,7 +888,7 @@ object NotificationDisplayHelper {
         // Add LIVE badge if webcast is live
         if (imageBitmap != null && payload.eventWebcastLive) {
             log.d("📱 [Event Notification] 🔴 Adding LIVE badge")
-            imageBitmap = drawLiveBadge(imageBitmap)
+            imageBitmap = drawLiveBadge(context, imageBitmap)
         }
 
         if (imageBitmap != null) {

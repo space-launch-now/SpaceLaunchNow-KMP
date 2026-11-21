@@ -43,6 +43,9 @@ import me.calebjones.spacelaunchnow.ui.viewmodel.PreloadViewModel
 import org.jetbrains.compose.ui.tooling.preview.Preview
 import org.koin.compose.koinInject
 import org.koin.compose.viewmodel.koinViewModel
+import org.jetbrains.compose.resources.stringResource
+import spacelaunchnow_kmp.composeapp.generated.resources.Res
+import spacelaunchnow_kmp.composeapp.generated.resources.preload_loading_description
 
 private val spaceGradient = Brush.verticalGradient(
     colors = listOf(Color(0xFF0A0E2A), Color(0xFF1A1040), Color(0xFF2A1060))
@@ -129,6 +132,7 @@ private fun PreloadScreenContent(
 
             Spacer(modifier = Modifier.height(32.dp))
 
+            val loadingDescription = stringResource(Res.string.preload_loading_description)
             Text(
                 text = currentMessage,
                 style = MaterialTheme.typography.labelSmall,
@@ -137,7 +141,7 @@ private fun PreloadScreenContent(
                 modifier = Modifier
                     .padding(bottom = 24.dp)
                     .semantics {
-                        contentDescription = "Loading launch data"
+                        contentDescription = loadingDescription
                     }
             )
 

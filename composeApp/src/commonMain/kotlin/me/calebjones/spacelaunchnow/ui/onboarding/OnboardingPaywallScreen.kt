@@ -63,6 +63,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import coil3.compose.SubcomposeAsyncImage
 import kotlinx.coroutines.launch
+import kotlin.time.Clock
 import kotlin.time.TimeSource
 import me.calebjones.spacelaunchnow.analytics.DatadogLogger
 import me.calebjones.spacelaunchnow.domain.model.Launch
@@ -198,10 +199,14 @@ fun OnboardingPaywallScreen(
         },
         onRestorePurchases = { viewModel.restorePurchases(source = source) },
         onDismiss = {
-            if (!subscriptionState.isSubscribed) {
+            val dismissedWithoutSubscribing = !subscriptionState.isSubscribed
+            if (dismissedWithoutSubscribing) {
                 viewModel.trackPaywallDismissed(source, shownAt.elapsedNow().inWholeSeconds)
             }
             coroutineScope.launch {
+                if (dismissedWithoutSubscribing) {
+                    appPreferences.markOnboardingPaywallDismissed(Clock.System.now().toEpochMilliseconds())
+                }
                 appPreferences.setOnboardingCompleted(true)
                 appPreferences.setOnboardingPaywallV1Shown(true)
                 onComplete()

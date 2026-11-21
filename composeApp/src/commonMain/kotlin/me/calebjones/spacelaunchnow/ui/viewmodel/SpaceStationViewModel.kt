@@ -25,6 +25,9 @@ import me.calebjones.spacelaunchnow.util.LatLng
 import me.calebjones.spacelaunchnow.util.YouTubeApiUtil
 import me.calebjones.spacelaunchnow.util.logging.logger
 import kotlin.time.Clock
+import org.jetbrains.compose.resources.getString
+import spacelaunchnow_kmp.composeapp.generated.resources.Res
+import spacelaunchnow_kmp.composeapp.generated.resources.station_iss_live_stream_description
 
 /**
  * Complete ISS position data including location, velocity, altitude, and visibility
@@ -225,7 +228,7 @@ class SpaceStationViewModel(
                 url = videoUrl,
                 title = videoTitle,
                 source = "NASA",
-                description = "Live HD views of Earth from the International Space Station",
+                description = getString(Res.string.station_iss_live_stream_description),
                 featureImage = thumbnailUrl,
                 live = true,
                 priority = 0
