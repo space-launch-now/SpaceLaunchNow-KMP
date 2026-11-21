@@ -12,6 +12,9 @@ STRINGS_XML = """<?xml version="1.0" encoding="utf-8"?>
     <string name="about_title">About</string>
     <string name="version">Version: %1$s (%2$d)</string>
     <string name="quote">It\\'s &amp; \\"fine\\"</string>
+    <string name="about_alt">About</string>
+    <string name="other_title">Other</string>
+    <string name="version_short">Version: %1$s</string>
     <string name="two_lines">One\\nTwo</string>
     <plurals name="launches"><item quantity="one">%d launch</item></plurals>
 </resources>
@@ -127,6 +130,37 @@ class VerifyMoveTest(unittest.TestCase):
         finally:
             os.chdir(cwd)
         self.assertEqual(["strings.xml", "strings_time.xml"], found)
+
+    def test_key_swap_with_equal_english_passes(self):
+        out = self.run_diff(["Text(stringResource(Res.string.about_alt))"],
+                            ["Text(stringResource(Res.string.about_title))"])
+        self.assertEqual([], out)
+
+    def test_key_swap_with_different_english_fails(self):
+        out = self.run_diff(["Text(stringResource(Res.string.other_title))"],
+                            ["Text(stringResource(Res.string.about_title))"])
+        self.assertEqual(1, len(out))
+        self.assertIn("about_title", out[0])
+
+    def test_key_swap_with_different_placeholder_fails(self):
+        out = self.run_diff(["Text(stringResource(Res.string.version_short, name))"],
+                            ["Text(stringResource(Res.string.version, name, build))"])
+        self.assertEqual(1, len(out))
+
+    def test_key_swap_passes_when_old_key_is_deleted_in_the_same_diff(self):
+        xml = "composeApp/src/commonMain/composeResources/values/strings.xml"
+        diff = (diff_of(["Text(stringResource(Res.string.gone_key))"], ["Text(stringResource(Res.string.about_title))"])
+                + f"diff --git a/{xml} b/{xml}\n--- a/{xml}\n+++ b/{xml}\n@@ -9 +8,0 @@\n"
+                  '-    <string name="gone_key">About</string>\n')
+        self.assertEqual([], failures_of(diff, self.strings, self.other))
+        # the same swap fails when the removed XML line holds different English
+        bad = diff.replace(">About</string>", ">Elsewhere</string>")
+        self.assertEqual(1, len(failures_of(bad, self.strings, self.other)))
+
+    def test_key_swap_passes_when_old_key_is_only_in_the_base_revision(self):
+        diff = diff_of(["Text(stringResource(Res.string.gone_key))"], ["Text(stringResource(Res.string.about_title))"])
+        self.assertEqual([], verify_move.verify(diff, self.strings, self.other, {"gone_key": "About"})[0])
+        self.assertEqual(1, len(verify_move.verify(diff, self.strings, self.other, {"gone_key": "Nope"})[0]))
 
     @staticmethod
     def hoisted_diff(removed_text):
