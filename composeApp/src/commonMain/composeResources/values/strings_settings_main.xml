@@ -282,4 +282,10 @@
     <string name="settings_logging_description">Help us debug issues by sharing diagnostic logs. Standard sends warnings and notification delivery decisions; Verbose sends detailed logs. Off keeps logs on this device only. Verbose switches back automatically after 72 hours.</string>
     <!-- Text button. Opens the diagnostics screen. One line. -->
     <string name="settings_logging_open_diagnostics">Open Diagnostics</string>
+    <!-- Theme choice in the theme dropdown. One word. -->
+    <string name="settings_theme_option_system">System</string>
+    <!-- Theme choice in the theme dropdown. One word. -->
+    <string name="settings_theme_option_light">Light</string>
+    <!-- Theme choice in the theme dropdown. One word. -->
+    <string name="settings_theme_option_dark">Dark</string>
 </resources>

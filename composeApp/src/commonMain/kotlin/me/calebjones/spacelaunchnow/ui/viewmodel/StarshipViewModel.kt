@@ -38,9 +38,9 @@ import me.calebjones.spacelaunchnow.util.StarshipConstants
 /**
  * Vehicle type selector for the Vehicles tab
  */
-enum class VehicleType(val label: String) {
-    SPACECRAFT("Ships"),      // Starship vehicles (S24, S25, etc.)
-    LAUNCHERS("Boosters")     // Super Heavy boosters (B7, B9, etc.)
+enum class VehicleType {
+    SPACECRAFT,   // Starship vehicles (S24, S25, etc.)
+    LAUNCHERS     // Super Heavy boosters (B7, B9, etc.)
 }
 
 /**

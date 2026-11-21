@@ -59,6 +59,7 @@ import spacelaunchnow_kmp.composeapp.generated.resources.agency_filter_search_ti
 import spacelaunchnow_kmp.composeapp.generated.resources.agency_filter_selected_description
 import spacelaunchnow_kmp.composeapp.generated.resources.agency_filter_sort_title
 import spacelaunchnow_kmp.composeapp.generated.resources.agency_filter_title
+import spacelaunchnow_kmp.composeapp.generated.resources.*
 
 /**
  * Filter and sort bottom sheet content for agency list.
@@ -178,7 +179,7 @@ fun AgencyFilterSheet(
                         onExpandedChange = { sortExpanded = it }
                     ) {
                         OutlinedTextField(
-                            value = selectedSortOrder.displayName,
+                            value = stringResource(selectedSortOrder.label),
                             onValueChange = {},
                             readOnly = true,
                             label = { Text(stringResource(Res.string.agency_filter_order_label)) },
@@ -204,7 +205,7 @@ fun AgencyFilterSheet(
                                             horizontalArrangement = Arrangement.SpaceBetween,
                                             verticalAlignment = Alignment.CenterVertically
                                         ) {
-                                            Text(sortOrder.displayName)
+                                            Text(stringResource(sortOrder.label))
                                             if (sortOrder == selectedSortOrder) {
                                                 Icon(
                                                     imageVector = Icons.Default.Check,

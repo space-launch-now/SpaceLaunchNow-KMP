@@ -152,6 +152,7 @@ import spacelaunchnow_kmp.composeapp.generated.resources.settings_theme_widget_r
 import spacelaunchnow_kmp.composeapp.generated.resources.settings_theme_widget_subtitle
 import spacelaunchnow_kmp.composeapp.generated.resources.settings_theme_widget_transparency_hint
 import spacelaunchnow_kmp.composeapp.generated.resources.settings_theme_widget_transparency_title
+import spacelaunchnow_kmp.composeapp.generated.resources.*
 
 /**
  * Platform-specific widget update composable.
@@ -646,7 +647,7 @@ private fun ThemeSettingRow(
         modifier = modifier.fillMaxWidth()
     ) {
         OutlinedTextField(
-            value = selected.label,
+            value = stringResource(selected.label),
             onValueChange = {},
             readOnly = true,
             label = { Text(stringResource(Res.string.settings_theme_tab_label)) },
@@ -661,7 +662,7 @@ private fun ThemeSettingRow(
         ) {
             ThemeOption.entries.forEach { option ->
                 DropdownMenuItem(
-                    text = { Text(option.label) },
+                    text = { Text(stringResource(option.label)) },
                     onClick = {
                         onSelected(option)
                         expanded = false

@@ -22,6 +22,8 @@ import me.calebjones.spacelaunchnow.navigation.Screen
 import me.calebjones.spacelaunchnow.navigation.Settings
 import me.calebjones.spacelaunchnow.ui.ads.SmartBannerAd
 import me.calebjones.spacelaunchnow.ui.ads.AdPlacementType
+import org.jetbrains.compose.resources.stringResource
+import spacelaunchnow_kmp.composeapp.generated.resources.*
 
 @Deprecated(
     message = "Navigation is now handled by NavigationSuiteScaffold inside AdaptiveAppScaffold" // i18n-ignore: @Deprecated message, read by developers only
@@ -59,8 +61,8 @@ fun BottomNavigationBar(navController: NavHostController) {
 
                 items.forEachIndexed { index, screen ->
                     NavigationBarItem(
-                        icon = { Icon(screen.icon, contentDescription = screen.label) },
-                        label = { Text(screen.label) },
+                        icon = { Icon(screen.icon, contentDescription = stringResource(screen.label)) },
+                        label = { Text(stringResource(screen.label)) },
                         selected = currentDestination?.hierarchy?.any { it.route == routes[index]::class.qualifiedName } == true,
                         onClick = {
                             // Navigate only if not already on the destination

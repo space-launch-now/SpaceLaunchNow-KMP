@@ -26,6 +26,8 @@ import me.calebjones.spacelaunchnow.domain.model.EventType
 import me.calebjones.spacelaunchnow.ui.newsevents.NewsEventsFilterState
 import me.calebjones.spacelaunchnow.util.logging.isCoroutineCancellation
 import me.calebjones.spacelaunchnow.util.logging.logger
+import org.jetbrains.compose.resources.StringResource
+import spacelaunchnow_kmp.composeapp.generated.resources.*
 
 /**
  * ViewModel for the combined News and Events screen.
@@ -558,9 +560,9 @@ class NewsEventsViewModel(
 /**
  * Tabs for the News and Events screen.
  */
-enum class NewsEventsTab(val displayName: String) {
-    NEWS("News"),
-    EVENTS("Events")
+enum class NewsEventsTab(val label: StringResource) {
+    NEWS(Res.string.app_newsevents_tab_news),
+    EVENTS(Res.string.app_newsevents_tab_events)
 }
 
 /**

@@ -30,6 +30,7 @@ import org.jetbrains.compose.ui.tooling.preview.Preview
 import spacelaunchnow_kmp.composeapp.generated.resources.Res
 import spacelaunchnow_kmp.composeapp.generated.resources.app_components_sort_menu_title
 import org.jetbrains.compose.resources.stringResource
+import spacelaunchnow_kmp.composeapp.generated.resources.*
 
 /**
  * Sort menu component that adapts to platform:
@@ -77,7 +78,7 @@ fun SortMenu(
                                     onClick = null
                                 )
                                 Spacer(modifier = Modifier.width(8.dp))
-                                Text(sortField.displayName)
+                                Text(stringResource(sortField.label))
                             }
                         },
                         onClick = {
@@ -124,7 +125,7 @@ fun SortMenu(
                         )
                         Spacer(modifier = Modifier.width(12.dp))
                         Text(
-                            text = sortField.displayName,
+                            text = stringResource(sortField.label),
                             style = MaterialTheme.typography.bodyLarge
                         )
                     }

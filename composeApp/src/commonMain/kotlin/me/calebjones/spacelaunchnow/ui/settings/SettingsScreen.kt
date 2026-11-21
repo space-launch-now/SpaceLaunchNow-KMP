@@ -147,6 +147,7 @@ import spacelaunchnow_kmp.composeapp.generated.resources.settings_main_wear_earl
 import spacelaunchnow_kmp.composeapp.generated.resources.settings_main_wear_early_release_body
 import spacelaunchnow_kmp.composeapp.generated.resources.settings_theme_tab_label
 import spacelaunchnow_kmp.composeapp.generated.resources.settings_theme_title
+import spacelaunchnow_kmp.composeapp.generated.resources.*
 
 @OptIn(ExperimentalMaterial3Api::class, androidx.compose.material3.ExperimentalMaterial3ExpressiveApi::class)
 @Composable
@@ -899,7 +900,7 @@ private fun ThemeSettingRow(
         modifier = Modifier.fillMaxWidth()
     ) {
         OutlinedTextField(
-            value = selected.label,
+            value = stringResource(selected.label),
             onValueChange = {},
             readOnly = true,
             label = { Text(stringResource(Res.string.settings_theme_tab_label)) },
@@ -914,7 +915,7 @@ private fun ThemeSettingRow(
         ) {
             ThemeOption.entries.forEach { option ->
                 DropdownMenuItem(
-                    text = { Text(option.label) },
+                    text = { Text(stringResource(option.label)) },
                     onClick = {
                         onSelected(option)
                         expanded = false

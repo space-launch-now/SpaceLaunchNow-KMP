@@ -255,4 +255,56 @@
     <string name="astronaut_stats_eva_time">EVA Time</string>
     <!-- Astronaut detail screen, overview card, tile value when the time is not known. Value text, one line, max 8 characters. -->
     <string name="astronaut_stats_not_available">N/A</string>
+    <!-- Sort option in the agency filter sheet menu. The text in brackets says the direction. One line. -->
+    <string name="agencies_sort_name_asc">Name (A-Z)</string>
+    <!-- Sort option in the agency filter sheet menu. The text in brackets says the direction. One line. -->
+    <string name="agencies_sort_name_desc">Name (Z-A)</string>
+    <!-- Sort option in the agency filter sheet menu. The text in brackets says the direction. One line. -->
+    <string name="agencies_sort_total_launches_asc">Total Launches (Low to High)</string>
+    <!-- Sort option in the agency filter sheet menu. The text in brackets says the direction. One line. -->
+    <string name="agencies_sort_total_launches_desc">Total Launches (High to Low)</string>
+    <!-- Sort option in the agency filter sheet menu. The text in brackets says the direction. One line. -->
+    <string name="agencies_sort_successful_launches_asc">Successful Launches (Low to High)</string>
+    <!-- Sort option in the agency filter sheet menu. The text in brackets says the direction. One line. -->
+    <string name="agencies_sort_successful_launches_desc">Successful Launches (High to Low)</string>
+    <!-- Sort option in the agency filter sheet menu. The text in brackets says the direction. One line. -->
+    <string name="agencies_sort_failed_launches_asc">Failed Launches (Low to High)</string>
+    <!-- Sort option in the agency filter sheet menu. The text in brackets says the direction. One line. -->
+    <string name="agencies_sort_failed_launches_desc">Failed Launches (High to Low)</string>
+    <!-- Sort option in the agency filter sheet menu. The text in brackets says the direction. One line. -->
+    <string name="agencies_sort_pending_launches_asc">Pending Launches (Low to High)</string>
+    <!-- Sort option in the agency filter sheet menu. The text in brackets says the direction. One line. -->
+    <string name="agencies_sort_pending_launches_desc">Pending Launches (High to Low)</string>
+    <!-- Sort option in the agency filter sheet menu. The text in brackets says the direction. One line. -->
+    <string name="agencies_sort_consecutive_successful_launches_asc">Consecutive Successes (Low to High)</string>
+    <!-- Sort option in the agency filter sheet menu. The text in brackets says the direction. One line. -->
+    <string name="agencies_sort_consecutive_successful_launches_desc">Consecutive Successes (High to Low)</string>
+    <!-- Sort option in the agency filter sheet menu. The text in brackets says the direction. One line. -->
+    <string name="agencies_sort_attempted_landings_asc">Attempted Landings (Low to High)</string>
+    <!-- Sort option in the agency filter sheet menu. The text in brackets says the direction. One line. -->
+    <string name="agencies_sort_attempted_landings_desc">Attempted Landings (High to Low)</string>
+    <!-- Sort option in the agency filter sheet menu. The text in brackets says the direction. One line. -->
+    <string name="agencies_sort_successful_landings_asc">Successful Landings (Low to High)</string>
+    <!-- Sort option in the agency filter sheet menu. The text in brackets says the direction. One line. -->
+    <string name="agencies_sort_successful_landings_desc">Successful Landings (High to Low)</string>
+    <!-- Sort option in the agency filter sheet menu. The text in brackets says the direction. One line. -->
+    <string name="agencies_sort_failed_landings_asc">Failed Landings (Low to High)</string>
+    <!-- Sort option in the agency filter sheet menu. The text in brackets says the direction. One line. -->
+    <string name="agencies_sort_failed_landings_desc">Failed Landings (High to Low)</string>
+    <!-- Sort option in the agency filter sheet menu. The text in brackets says the direction. One line. -->
+    <string name="agencies_sort_consecutive_successful_landings_asc">Consecutive Landing Successes (Low to High)</string>
+    <!-- Sort option in the agency filter sheet menu. The text in brackets says the direction. One line. -->
+    <string name="agencies_sort_consecutive_successful_landings_desc">Consecutive Landing Successes (High to Low)</string>
+    <!-- Sort option in the astronaut filter sheet menu. The text in brackets says the direction. One line. -->
+    <string name="astronauts_sort_name_asc">Name (A-Z)</string>
+    <!-- Sort option in the astronaut filter sheet menu. The text in brackets says the direction. One line. -->
+    <string name="astronauts_sort_name_desc">Name (Z-A)</string>
+    <!-- Sort option in the astronaut filter sheet menu. The text in brackets says the direction. One line. -->
+    <string name="astronauts_sort_flights_asc">Flights (Low to High)</string>
+    <!-- Sort option in the astronaut filter sheet menu. The text in brackets says the direction. One line. -->
+    <string name="astronauts_sort_flights_desc">Flights (High to Low)</string>
+    <!-- Sort option in the astronaut filter sheet menu. The text in brackets says the direction. One line. -->
+    <string name="astronauts_sort_first_flight_asc">First Flight (Oldest)</string>
+    <!-- Sort option in the astronaut filter sheet menu. The text in brackets says the direction. One line. -->
+    <string name="astronauts_sort_first_flight_desc">First Flight (Newest)</string>
 </resources>
