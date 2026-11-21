@@ -32,6 +32,12 @@ import androidx.compose.ui.unit.dp
 import me.calebjones.spacelaunchnow.ui.layout.rememberAdaptiveLayoutState
 import me.calebjones.spacelaunchnow.ui.theme.SpaceLaunchNowPreviewTheme
 import org.jetbrains.compose.ui.tooling.preview.Preview
+import org.jetbrains.compose.resources.stringResource
+import spacelaunchnow_kmp.composeapp.generated.resources.Res
+import spacelaunchnow_kmp.composeapp.generated.resources.onboarding_launch_card_subtitle
+import spacelaunchnow_kmp.composeapp.generated.resources.onboarding_launch_card_title
+import spacelaunchnow_kmp.composeapp.generated.resources.onboarding_schedule_subtitle
+import spacelaunchnow_kmp.composeapp.generated.resources.onboarding_schedule_title
 
 /**
  * Data class for each onboarding carousel page's metadata.
@@ -337,14 +343,15 @@ private fun OnboardingPageCompact(
 private fun OnboardingPagePreview() {
     SpaceLaunchNowPreviewTheme {
         OnboardingPage(
-            title = "Track Every Launch",
-            subtitle = "Get real-time updates on upcoming rocket launches from agencies worldwide.",
+            title = stringResource(Res.string.onboarding_launch_card_title),
+            subtitle = stringResource(Res.string.onboarding_launch_card_subtitle),
             deviceFrameStyle = DeviceFrameStyle.Android
         ) {
             Box(
                 modifier = Modifier.fillMaxSize().background(MaterialTheme.colorScheme.surface),
                 contentAlignment = Alignment.Center
             ) {
+                // i18n-ignore: preview-only placeholder
                 Text("Launch Card Preview", style = MaterialTheme.typography.bodyLarge)
             }
         }
@@ -356,14 +363,15 @@ private fun OnboardingPagePreview() {
 private fun OnboardingPageDarkPreview() {
     SpaceLaunchNowPreviewTheme(isDark = true) {
         OnboardingPage(
-            title = "Your Launch Schedule",
-            subtitle = "Browse upcoming and previous launches in a clean, organized timeline.",
+            title = stringResource(Res.string.onboarding_schedule_title),
+            subtitle = stringResource(Res.string.onboarding_schedule_subtitle),
             deviceFrameStyle = DeviceFrameStyle.Android
         ) {
             Box(
                 modifier = Modifier.fillMaxSize().background(MaterialTheme.colorScheme.surface),
                 contentAlignment = Alignment.Center
             ) {
+                // i18n-ignore: preview-only placeholder
                 Text("Schedule Preview", style = MaterialTheme.typography.bodyLarge)
             }
         }

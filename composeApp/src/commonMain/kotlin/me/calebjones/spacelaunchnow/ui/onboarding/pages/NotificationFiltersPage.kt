@@ -23,6 +23,18 @@ import me.calebjones.spacelaunchnow.ui.onboarding.DeviceFrameStyle
 import me.calebjones.spacelaunchnow.ui.onboarding.OnboardingPage
 import me.calebjones.spacelaunchnow.ui.theme.SpaceLaunchNowPreviewTheme
 import org.jetbrains.compose.ui.tooling.preview.Preview
+import org.jetbrains.compose.resources.stringResource
+import spacelaunchnow_kmp.composeapp.generated.resources.Res
+import spacelaunchnow_kmp.composeapp.generated.resources.onboarding_filters_10min
+import spacelaunchnow_kmp.composeapp.generated.resources.onboarding_filters_24h
+import spacelaunchnow_kmp.composeapp.generated.resources.onboarding_filters_agencies
+import spacelaunchnow_kmp.composeapp.generated.resources.onboarding_filters_california
+import spacelaunchnow_kmp.composeapp.generated.resources.onboarding_filters_florida
+import spacelaunchnow_kmp.composeapp.generated.resources.onboarding_filters_locations
+import spacelaunchnow_kmp.composeapp.generated.resources.onboarding_filters_subtitle
+import spacelaunchnow_kmp.composeapp.generated.resources.onboarding_filters_texas
+import spacelaunchnow_kmp.composeapp.generated.resources.onboarding_filters_timing
+import spacelaunchnow_kmp.composeapp.generated.resources.onboarding_filters_title
 
 /**
  * Onboarding page 3 — shows mock notification filter options with
@@ -31,8 +43,8 @@ import org.jetbrains.compose.ui.tooling.preview.Preview
 @Composable
 fun NotificationFiltersPage(modifier: Modifier = Modifier) {
     OnboardingPage(
-        title = "Customize Notifications",
-        subtitle = "Choose which agencies, locations, and events you want to hear about.",
+        title = stringResource(Res.string.onboarding_filters_title),
+        subtitle = stringResource(Res.string.onboarding_filters_subtitle),
         modifier = modifier
     ) {
         NotificationFiltersPreviewContent()
@@ -56,26 +68,30 @@ private fun NotificationFiltersPreviewContent() {
             verticalArrangement = Arrangement.spacedBy(4.dp)
         ) {
             // Agency section
-            SectionHeader("Agencies")
+            SectionHeader(stringResource(Res.string.onboarding_filters_agencies))
+            // i18n-ignore: agency proper name in static preview
             CheckboxItem(label = "SpaceX", checked = true)
+            // i18n-ignore: agency proper name in static preview
             CheckboxItem(label = "NASA", checked = true)
+            // i18n-ignore: agency proper name in static preview
             CheckboxItem(label = "Blue Origin", checked = false)
+            // i18n-ignore: agency proper name in static preview
             CheckboxItem(label = "ULA", checked = false)
 
             HorizontalDivider(modifier = Modifier.padding(vertical = 8.dp))
 
             // Location section
-            SectionHeader("Locations")
-            CheckboxItem(label = "Florida", checked = true)
-            CheckboxItem(label = "Texas", checked = false)
-            CheckboxItem(label = "California", checked = false)
+            SectionHeader(stringResource(Res.string.onboarding_filters_locations))
+            CheckboxItem(label = stringResource(Res.string.onboarding_filters_florida), checked = true)
+            CheckboxItem(label = stringResource(Res.string.onboarding_filters_texas), checked = false)
+            CheckboxItem(label = stringResource(Res.string.onboarding_filters_california), checked = false)
 
             HorizontalDivider(modifier = Modifier.padding(vertical = 8.dp))
 
             // Topic toggles
-            SectionHeader("Timing Alerts")
-            ToggleItem(label = "24h Before Launch", checked = true)
-            ToggleItem(label = "10min Before Launch", checked = true)
+            SectionHeader(stringResource(Res.string.onboarding_filters_timing))
+            ToggleItem(label = stringResource(Res.string.onboarding_filters_24h), checked = true)
+            ToggleItem(label = stringResource(Res.string.onboarding_filters_10min), checked = true)
         }
     }
 }
