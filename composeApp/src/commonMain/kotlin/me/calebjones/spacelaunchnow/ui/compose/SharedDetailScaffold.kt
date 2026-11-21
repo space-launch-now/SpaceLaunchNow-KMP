@@ -13,6 +13,7 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.RowScope
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -84,8 +85,11 @@ private val MinTitleOffset = 64.dp
 private val MinImageOffset = 12.dp
 private val MaxTitleOffset = ImageOverlap + MinTitleOffset + GradientScroll
 private val ExpandedImageSize = 300.dp
+private val LargeScreenImageSize = 80.dp
 private val CollapsedImageSize = 100.dp
 private val HzPadding = 24.dp
+private val LargeScreenActionButtonSize = 36.dp
+private val ActionsReservedWidth = LargeScreenActionButtonSize + 8.dp
 
 
 /**
@@ -125,6 +129,8 @@ private val HzPadding = 24.dp
  * @param onNavigateBack Callback when back button is pressed
  * @param backgroundColors Optional custom gradient colors for background
  * @param scrollEnabled Whether scrolling is enabled (default: true)
+ * @param actions Optional action buttons pinned at the top end of the header, left of the image on
+ *   large screens. Null (default) shows nothing and reserves no title space.
  * @param content The scrollable content - MUST include top spacer as noted above
  */
 @OptIn(ExperimentalSharedTransitionApi::class)
@@ -138,6 +144,7 @@ fun SharedDetailScaffold(
     backgroundColors: List<Color>? = null,
     scrollEnabled: Boolean = true,
     forcePhoneLayout: Boolean = false,
+    actions: (@Composable RowScope.() -> Unit)? = null,
     content: @Composable () -> Unit,
 ) {
 
@@ -169,6 +176,7 @@ fun SharedDetailScaffold(
             logoUrl = logoUrl,
             forceNoCollapse = forceNoCollapse,
             showBackButton = onNavigateBack != null,
+            hasActions = actions != null,
             forcePhoneLayout = forcePhoneLayout
         )
         SharedDetailImage(
@@ -179,6 +187,9 @@ fun SharedDetailScaffold(
         )
         if (onNavigateBack != null) {
             SharedDetailUp(onNavigateBack, forcePhoneLayout = forcePhoneLayout)
+        }
+        if (actions != null) {
+            SharedDetailActions(actions, forcePhoneLayout = forcePhoneLayout)
         }
     }
 }
@@ -285,6 +296,7 @@ private fun SharedDetailTitle(
     logoUrl: String? = null,
     forceNoCollapse: Boolean = false,
     showBackButton: Boolean = true,
+    hasActions: Boolean = false,
     forcePhoneLayout: Boolean = false,
 ) {
     val isLargeScreen = rememberAdaptiveLayoutState().isMediumOrLarger && !forcePhoneLayout
@@ -299,7 +311,7 @@ private fun SharedDetailTitle(
     // Calculate current image size and position
     val imageMaxSize = with(LocalDensity.current) { ExpandedImageSize.toPx() }
     // Use smaller collapsed size for large screen devices
-    val baseCollapsedSize = if (isLargeScreen) 80.dp else CollapsedImageSize
+    val baseCollapsedSize = if (isLargeScreen) LargeScreenImageSize else CollapsedImageSize
     val imageMinSize = with(LocalDensity.current) { baseCollapsedSize.toPx() }
     val currentImageSize = lerp(imageMaxSize, imageMinSize, collapseFraction)
 
@@ -311,7 +323,9 @@ private fun SharedDetailTitle(
         horizontalPaddingPx
     }
     val rightPaddingPx = if (forceNoCollapse || collapseFraction > 0.5f) {
-        horizontalPaddingPx + currentImageSize + with(LocalDensity.current) { 16.dp.toPx() }
+        // Reserve room for the image and, when present, the action buttons beside it
+        val actionsWidth = if (hasActions && isLargeScreen) ActionsReservedWidth else 0.dp
+        horizontalPaddingPx + currentImageSize + with(LocalDensity.current) { (16.dp + actionsWidth).toPx() }
     } else {
         horizontalPaddingPx
     }
@@ -489,6 +503,36 @@ private fun SharedDetailUp(upPress: () -> Unit, forcePhoneLayout: Boolean = fals
     }
 }
 
+/**
+ * Pins [actions] at the top end of the header. On large screens the row sits left of the collapsed
+ * image, vertically centered in the compact header like the back button.
+ */
+@Composable
+private fun SharedDetailActions(
+    actions: @Composable RowScope.() -> Unit,
+    forcePhoneLayout: Boolean = false,
+) {
+    val isLargeScreen = rememberAdaptiveLayoutState().isMediumOrLarger && !forcePhoneLayout
+    // Image sits at the end with HzPadding; keep the buttons clear of it
+    val endPadding = if (isLargeScreen) HzPadding + LargeScreenImageSize + 12.dp else 16.dp
+    Row(
+        modifier = Modifier
+            .statusBarsPadding()
+            .fillMaxWidth()
+            .let {
+                if (isLargeScreen) {
+                    it.height(CompactTitleHeight)
+                } else {
+                    it.padding(vertical = 10.dp)
+                }
+            }
+            .padding(end = endPadding),
+        horizontalArrangement = Arrangement.spacedBy(8.dp, Alignment.End),
+        verticalAlignment = Alignment.CenterVertically,
+        content = actions,
+    )
+}
+
 @Composable
 private fun CollapsingImageLayout(
     collapseFractionProvider: () -> Float,
@@ -508,7 +552,7 @@ private fun CollapsingImageLayout(
 
         val imageMaxSize = min(ExpandedImageSize.roundToPx(), constraints.maxWidth)
         // Use smaller collapsed size for landscape tablets
-        val baseCollapsedSize = if (isLargeScreen) 80.dp else CollapsedImageSize
+        val baseCollapsedSize = if (isLargeScreen) LargeScreenImageSize else CollapsedImageSize
         val imageMinSize = max(baseCollapsedSize.roundToPx(), constraints.minWidth)
         val imageWidth =
             lerp(imageMaxSize.toFloat(), imageMinSize.toFloat(), collapseFraction).roundToInt()

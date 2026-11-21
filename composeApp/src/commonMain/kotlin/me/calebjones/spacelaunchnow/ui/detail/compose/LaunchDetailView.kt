@@ -191,6 +191,7 @@ private fun TabletLaunchDetailView(
         logoUrl = launch.provider?.socialLogo ?: launch.provider?.logoUrl,
         onNavigateBack = onNavigateBack,
         scrollEnabled = true, // Tablet uses scrollable layout
+        actions = { LaunchShareButton(launch, compact = true) },
         backgroundColors = listOf(
             getLaunchStatusColor(launch.status?.id),
             MaterialTheme.colorScheme.primaryContainer,
@@ -257,37 +258,13 @@ private fun PhoneLaunchDetailView(
     onOpenUrl: (String) -> Unit = {},
     onExternalVideoOpened: ((String, String) -> Unit)? = null
 ) {
-    val useUtc = LocalUseUtc.current
-    val analyticsManager: AnalyticsManager = koinInject()
-    val shareTitle = stringResource(Res.string.launch_detail_share_title)
     HeroDetailScaffold(
         titleText = launch.name,
         taglineText = launch.provider?.name ?: "",
         imageUrl = launch.imageUrl,
         logoUrl = launch.provider?.socialLogo ?: launch.provider?.logoUrl,
         onNavigateBack = onNavigateBack,
-        actions = {
-            IconButton(
-                onClick = {
-                    analyticsManager.track(AnalyticsEvent.LaunchShared(launch.id.toString(), "share_sheet"))
-                    sharePlainText(
-                        SharingFormatUtil.formatLaunchShareText(launch, useUtc),
-                        shareTitle
-                    )
-                },
-                modifier = Modifier
-                    .size(48.dp)
-                    .clip(CircleShape)
-                    .background(color = Color(0xff121212).copy(alpha = 0.32f), shape = CircleShape)
-            ) {
-                Icon(
-                    imageVector = Icons.Filled.Share,
-                    contentDescription = stringResource(Res.string.launch_detail_share_description),
-                    tint = Color.White,
-                    modifier = Modifier.size(24.dp)
-                )
-            }
-        },
+        actions = { LaunchShareButton(launch) },
     ) {
         // Column provides layout for content, parent scaffold handles scrolling
         Column(
@@ -318,5 +295,43 @@ private fun PhoneLaunchDetailView(
 
             Spacer(Modifier.height(200.dp))
         }
+    }
+}
+
+/**
+ * Share button for the launch detail header, used by the phone and tablet layouts.
+ * [compact] matches the smaller tablet back button style.
+ */
+@Composable
+private fun LaunchShareButton(launch: Launch, compact: Boolean = false) {
+    val useUtc = LocalUseUtc.current
+    val analyticsManager: AnalyticsManager = koinInject()
+    val shareTitle = stringResource(Res.string.launch_detail_share_title)
+    IconButton(
+        onClick = {
+            analyticsManager.track(AnalyticsEvent.LaunchShared(launch.id.toString(), "share_sheet"))
+            sharePlainText(
+                SharingFormatUtil.formatLaunchShareText(launch, useUtc),
+                shareTitle
+            )
+        },
+        modifier = Modifier
+            .size(if (compact) 36.dp else 48.dp)
+            .clip(CircleShape)
+            .background(
+                color = if (compact) {
+                    MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.9f)
+                } else {
+                    Color(0xff121212).copy(alpha = 0.32f)
+                },
+                shape = CircleShape
+            )
+    ) {
+        Icon(
+            imageVector = Icons.Filled.Share,
+            contentDescription = stringResource(Res.string.launch_detail_share_description),
+            tint = if (compact) MaterialTheme.colorScheme.onSurface else Color.White,
+            modifier = Modifier.size(if (compact) 20.dp else 24.dp)
+        )
     }
 }
