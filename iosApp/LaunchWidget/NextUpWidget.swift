@@ -10,8 +10,8 @@ struct NextUpWidget: Widget {
         StaticConfiguration(kind: kind, provider: LaunchProvider()) { entry in
             NextUpWidgetView(entry: entry)
         }
-        .configurationDisplayName("Next Launch")
-        .description("Shows the next upcoming space launch")
+        .configurationDisplayName("widget_next_up_name")
+        .description("widget_next_up_description")
         .supportedFamilies([.systemSmall, .systemMedium, .systemLarge])
     }
 }
@@ -99,7 +99,7 @@ struct NextUpWidgetView: View {
                     VStack(alignment: .leading, spacing: 8) {
                         // Header row
                         HStack {
-                            Text("NEXT LAUNCH")
+                            Text("widget_next_up_header")
                                 .font(.caption)
                                 .fontWeight(.bold)
                                 .foregroundStyle(.secondary)
@@ -171,7 +171,7 @@ struct NextUpWidgetView: View {
                     // Content (right side)
                     VStack(alignment: .leading, spacing: 0) {
                         // Section label
-                        Text("NEXT LAUNCH")
+                        Text("widget_next_up_header")
                             .font(adaptiveHeaderFont(for: geometry.size))
                             .fontWeight(.bold)
                             .foregroundStyle(.secondary)
@@ -213,7 +213,7 @@ struct NextUpWidgetView: View {
                                 .font(adaptiveDetailFont(for: geometry.size))
                             Text(launch.displayAgency)
                                 .font(adaptiveDetailFont(for: geometry.size))
-                            Text("·")
+                            Text(verbatim: "·")
                                 .font(adaptiveDetailFont(for: geometry.size))
                             Image(systemName: "location")
                                 .font(adaptiveDetailFont(for: geometry.size))
@@ -240,7 +240,7 @@ struct NextUpWidgetView: View {
                         Image(systemName: "paperplane.fill")
                             .font(.caption)
                             .foregroundStyle(.orange)
-                        Text("Go")
+                        Text("widget_next_up_status_go")
                             .font(.caption2)
                             .fontWeight(.medium)
                             .foregroundStyle(.orange)
@@ -250,7 +250,7 @@ struct NextUpWidgetView: View {
                     Spacer()
 
                     // Launch name (very compact)
-                    Text("Loading Launch...")
+                    Text("widget_next_up_loading_launch")
                         .font(.footnote)
                         .fontWeight(.medium)
                         .lineLimit(3)
@@ -259,7 +259,7 @@ struct NextUpWidgetView: View {
                     Spacer()
 
                     // Prominent countdown
-                    Text("One day 2 hr, 45 min")
+                    Text(verbatim: "One day 2 hr, 45 min")
                         .font(.title3)
                         .fontWeight(.bold)
                         .foregroundStyle(.primary)
@@ -277,30 +277,30 @@ struct NextUpWidgetView: View {
                         Image(systemName: "rocket.fill")
                             .foregroundStyle(.orange)
                             .font(adaptiveHeaderFont(for: geometry.size))
-                        Text("NEXT LAUNCH")
+                        Text("widget_next_up_header")
                             .font(adaptiveHeaderFont(for: geometry.size))
                             .fontWeight(.bold)
                             .foregroundStyle(.secondary)
                         Spacer()
                         // Status with orange color (placeholder)
-                        Text("Go")
+                        Text("widget_next_up_status_go")
                             .font(adaptiveHeaderFont(for: geometry.size))
                             .fontWeight(.medium)
                             .foregroundStyle(.orange)
                     }
 
-                    Text("Loading Launch...")
+                    Text("widget_next_up_loading_launch")
                         .font(adaptiveTitleFont(for: geometry.size))
                         .redacted(reason: .placeholder)
 
                     // Countdown section with better visual hierarchy (placeholder)
                     VStack(alignment: .leading, spacing: 2) {
-                        Text("In")
+                        Text("widget_next_up_in")
                             .font(.caption)
                             .foregroundStyle(.secondary)
                             .fontWeight(.medium)
 
-                        Text("One day 2 hr, 45 min")
+                        Text(verbatim: "One day 2 hr, 45 min")
                             .font(adaptiveCountdownFont(for: geometry.size))
                             .fontWeight(.bold)
                             .foregroundStyle(.primary)
@@ -312,7 +312,7 @@ struct NextUpWidgetView: View {
                     if shouldShowDetails(for: geometry.size) {
                         HStack {
                             Image(systemName: "building.2")
-                            Text("Space Agency")
+                            Text("widget_next_up_label_space_agency")
                                 .font(adaptiveDetailFont(for: geometry.size))
                         }
                         .foregroundStyle(.secondary)
@@ -320,7 +320,7 @@ struct NextUpWidgetView: View {
 
                         HStack {
                             Image(systemName: "location")
-                            Text("Launch Location")
+                            Text("widget_next_up_label_location")
                                 .font(adaptiveDetailFont(for: geometry.size))
                         }
                         .foregroundStyle(.secondary)
@@ -328,7 +328,7 @@ struct NextUpWidgetView: View {
                     } else {
                         HStack {
                             Image(systemName: "building.2")
-                            Text("Agency")
+                            Text("widget_next_up_label_agency")
                                 .font(adaptiveDetailFont(for: geometry.size))
                         }
                         .foregroundStyle(.secondary)
@@ -349,7 +349,7 @@ struct NextUpWidgetView: View {
                 .font(.largeTitle)
                 .foregroundStyle(.orange)
 
-            Text("Error")
+            Text("widget_next_up_error_title")
                 .font(.headline)
 
             Text(message)
@@ -366,10 +366,10 @@ struct NextUpWidgetView: View {
                 .font(.largeTitle)
                 .foregroundStyle(.secondary)
 
-            Text("No Launches")
+            Text("widget_no_launches")
                 .font(.headline)
 
-            Text("No upcoming launches found")
+            Text("widget_next_up_empty_body")
                 .font(.caption)
                 .foregroundStyle(.secondary)
         }
@@ -388,13 +388,13 @@ struct NextUpWidgetView: View {
                     .font(.system(size: compact ? 28 : (large ? 40 : 32)))
                     .foregroundStyle(.orange)
 
-                Text("Premium Widget")
+                Text("widget_premium_title")
                     .font(compact ? .subheadline : .headline)
                     .fontWeight(.bold)
                     .foregroundStyle(.primary)
 
                 if !compact {
-                    Text("Upgrade to Premium to unlock the Next Launch widget")
+                    Text("widget_premium_next_up_body")
                         .font(.caption)
                         .foregroundStyle(.secondary)
                         .multilineTextAlignment(.center)
@@ -410,7 +410,7 @@ struct NextUpWidgetView: View {
                 HStack(spacing: 4) {
                     Image(systemName: "arrow.up.circle.fill")
                         .font(.caption2)
-                    Text("Tap to upgrade")
+                    Text("widget_premium_cta")
                         .font(.caption2)
                         .fontWeight(.medium)
                 }
