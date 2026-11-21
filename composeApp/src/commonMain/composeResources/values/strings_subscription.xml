@@ -181,8 +181,6 @@
         <item quantity="one">Free Trial – %1$d day remaining</item>
         <item quantity="other">Free Trial – %1$d days remaining</item>
     </plurals>
-    <!-- Plan status for a member. %1$s is the plan type with a capital first letter, such as Premium. -->
-    <string name="support_us_member_status">%1$s Member</string>
     <!-- Plan status for a person who is not a member. -->
     <string name="support_us_free_user">Free User</string>
     <!-- Line on the current plan card. %1$s is the store product name. -->
