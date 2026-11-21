@@ -43,6 +43,19 @@ import me.calebjones.spacelaunchnow.analytics.events.AnalyticsEvent
 import me.calebjones.spacelaunchnow.ui.ads.RewardedAdHandler
 import me.calebjones.spacelaunchnow.util.logging.SpaceLogger
 import org.koin.compose.koinInject
+import org.jetbrains.compose.resources.stringResource
+import spacelaunchnow_kmp.composeapp.generated.resources.Res
+import spacelaunchnow_kmp.composeapp.generated.resources.temp_premium_default_description
+import spacelaunchnow_kmp.composeapp.generated.resources.temp_premium_default_title
+import spacelaunchnow_kmp.composeapp.generated.resources.temp_premium_extend_button
+import spacelaunchnow_kmp.composeapp.generated.resources.temp_premium_loading_ad
+import spacelaunchnow_kmp.composeapp.generated.resources.temp_premium_time_hours
+import spacelaunchnow_kmp.composeapp.generated.resources.temp_premium_time_hours_minutes
+import spacelaunchnow_kmp.composeapp.generated.resources.temp_premium_time_minutes
+import spacelaunchnow_kmp.composeapp.generated.resources.temp_premium_time_none
+import spacelaunchnow_kmp.composeapp.generated.resources.temp_premium_time_remaining
+import spacelaunchnow_kmp.composeapp.generated.resources.temp_premium_time_under_minute
+import spacelaunchnow_kmp.composeapp.generated.resources.temp_premium_watch_ad_button
 
 /**
  * Card component for temporary premium access via rewarded ads.
@@ -57,8 +70,8 @@ fun TemporaryPremiumCard(
         PremiumFeature.ADVANCED_WIDGETS,
         PremiumFeature.WIDGETS_CUSTOMIZATION
     ),
-    title: String = "24h Premium Access",
-    description: String = "Watch an ad to unlock all premium features for 24 hours",
+    title: String = stringResource(Res.string.temp_premium_default_title),
+    description: String = stringResource(Res.string.temp_premium_default_description),
     icon: ImageVector,
     hasPermanentPremium: Boolean = false,
     modifier: Modifier = Modifier
@@ -192,7 +205,10 @@ fun TemporaryPremiumCard(
                         tint = MaterialTheme.colorScheme.onTertiaryContainer
                     )
                     Text(
-                        text = "Time remaining: ${formatTimeRemaining(earliestExpiration?.timeRemaining)}",
+                        text = stringResource(
+                            Res.string.temp_premium_time_remaining,
+                            formatTimeRemaining(earliestExpiration?.timeRemaining)
+                        ),
                         style = MaterialTheme.typography.bodyMedium,
                         fontWeight = FontWeight.Medium,
                         color = MaterialTheme.colorScheme.onTertiaryContainer
@@ -221,7 +237,7 @@ fun TemporaryPremiumCard(
                             strokeWidth = 2.dp
                         )
                         Spacer(modifier = Modifier.width(8.dp))
-                        Text("Loading ad…")
+                        Text(stringResource(Res.string.temp_premium_loading_ad))
                     } else {
                         Icon(
                             imageVector = Icons.Default.PlayArrow,
@@ -230,7 +246,7 @@ fun TemporaryPremiumCard(
                         )
                         Spacer(modifier = Modifier.width(8.dp))
                         Text(
-                            "Extend All Access (+24h)",
+                            stringResource(Res.string.temp_premium_extend_button),
                             color = MaterialTheme.colorScheme.onTertiaryFixedVariant
                         )
                     }
@@ -257,7 +273,7 @@ fun TemporaryPremiumCard(
                             strokeWidth = 2.dp
                         )
                         Spacer(modifier = Modifier.width(8.dp))
-                        Text("Loading ad…")
+                        Text(stringResource(Res.string.temp_premium_loading_ad))
                     } else {
                         Icon(
                             imageVector = Icons.Default.PlayArrow,
@@ -265,7 +281,7 @@ fun TemporaryPremiumCard(
                             modifier = Modifier.size(18.dp)
                         )
                         Spacer(modifier = Modifier.width(8.dp))
-                        Text("Watch Ad for 24h Premium Access")
+                        Text(stringResource(Res.string.temp_premium_watch_ad_button))
                     }
                 }
             }
@@ -326,16 +342,17 @@ fun TemporaryPremiumCard(
  * Formats time remaining in a user-friendly format.
  * Examples: "23h 45m", "2h 15m", "45m", "5m"
  */
+@Composable
 private fun formatTimeRemaining(period: DateTimePeriod?): String {
-    if (period == null) return "0m"
+    if (period == null) return stringResource(Res.string.temp_premium_time_none)
 
     val hours = period.hours
     val minutes = period.minutes
 
     return when {
-        hours > 0 && minutes > 0 -> "${hours}h ${minutes}m"
-        hours > 0 -> "${hours}h"
-        minutes > 0 -> "${minutes}m"
-        else -> "Less than 1m"
+        hours > 0 && minutes > 0 -> stringResource(Res.string.temp_premium_time_hours_minutes, hours, minutes)
+        hours > 0 -> stringResource(Res.string.temp_premium_time_hours, hours)
+        minutes > 0 -> stringResource(Res.string.temp_premium_time_minutes, minutes)
+        else -> stringResource(Res.string.temp_premium_time_under_minute)
     }
 }

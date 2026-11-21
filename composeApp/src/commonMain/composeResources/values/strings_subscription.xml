@@ -1,0 +1,198 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- Heading on the locked-feature card. One line, large. -->
+    <string name="premium_gate_title">Premium Feature</string>
+    <!-- Button on the locked-feature card and the premium prompt. One line. Opens the paywall. -->
+    <string name="premium_gate_upgrade_button">Upgrade to Premium</string>
+    <!-- Small badge text with a star icon, and content description of the lock icon. One word. -->
+    <string name="premium_badge_label">Premium</string>
+    <!-- Premium feature description. One sentence under the locked-feature heading. -->
+    <string name="premium_feature_description_ad_free">Enjoy an ad-free experience throughout the app</string>
+    <!-- Premium feature description. One sentence under the locked-feature heading. -->
+    <string name="premium_feature_description_custom_themes">Personalize your app with custom color themes</string>
+    <!-- Premium feature description. One sentence under the locked-feature heading. -->
+    <string name="premium_feature_description_advanced_widgets">Access the launch list widget</string>
+    <!-- Premium feature description. One sentence under the locked-feature heading. -->
+    <string name="premium_feature_description_widgets_customization">Customize your widgets look and feel</string>
+    <!-- Premium feature description. One sentence under the locked-feature heading. -->
+    <string name="premium_feature_description_cal_sync">Access to Calendar Sync Link for syncing launches and events</string>
+    <!-- Premium feature description. One sentence under the locked-feature heading. -->
+    <string name="premium_feature_description_notification_customization">Customize your notification preferences</string>
+    <!-- Premium feature description. One sentence under the locked-feature heading. -->
+    <string name="premium_feature_description_wear_os">Access Space Launch Now on your Wear OS watch</string>
+    <!-- Premium feature name in a list of benefits. Short, one line. -->
+    <string name="premium_feature_title_ad_free">Ad-Free Experience</string>
+    <!-- Premium feature name in a list of benefits. Short, one line. -->
+    <string name="premium_feature_title_custom_themes">Custom Themes</string>
+    <!-- Premium feature name in a list of benefits. Short, one line. -->
+    <string name="premium_feature_title_advanced_widgets">Advanced Widget</string>
+    <!-- Premium feature name in a list of benefits. Short, one line. -->
+    <string name="premium_feature_title_widgets_customization">Widget Customization</string>
+    <!-- Premium feature name in a list of benefits. Short, one line. Also the name of the calendar sync perk. -->
+    <string name="premium_feature_title_cal_sync">Calendar Sync</string>
+    <!-- Premium feature name in a list of benefits. Short, one line. -->
+    <string name="premium_feature_title_notification_customization">Notification Customization</string>
+    <!-- Premium feature name in a list of benefits. Short, one line. Wear OS is a product name. -->
+    <string name="premium_feature_title_wear_os">Wear OS</string>
+
+    <!-- Title of the 24-hour access card when the caller gives none. One line. -->
+    <string name="temp_premium_default_title">24h Premium Access</string>
+    <!-- Text under the card title when the caller gives none. One or two lines. -->
+    <string name="temp_premium_default_description">Watch an ad to unlock all premium features for 24 hours</string>
+    <!-- Status line with a clock icon. %1$s is the time left, such as 23h 45m. -->
+    <string name="temp_premium_time_remaining">Time remaining: %1$s</string>
+    <!-- Button label while a rewarded ad loads. One line, max 20 chars. -->
+    <string name="temp_premium_loading_ad">Loading ad…</string>
+    <!-- Button. Watching an ad adds 24 hours to the premium access that is active. One line. -->
+    <string name="temp_premium_extend_button">Extend All Access (+24h)</string>
+    <!-- Button. Watching an ad gives 24 hours of premium access. One line. -->
+    <string name="temp_premium_watch_ad_button">Watch Ad for 24h Premium Access</string>
+    <!-- Time left. %1$d is hours, %2$d is minutes. Example: 2h 15m. Keep it short. -->
+    <string name="temp_premium_time_hours_minutes">%1$dh %2$dm</string>
+    <!-- Time left. %1$d is hours. Example: 2h. Keep it short. -->
+    <string name="temp_premium_time_hours">%1$dh</string>
+    <!-- Time left. %1$d is minutes. Example: 45m. Keep it short. -->
+    <string name="temp_premium_time_minutes">%1$dm</string>
+    <!-- Time left when under one minute. Short. -->
+    <string name="temp_premium_time_under_minute">Less than 1m</string>
+    <!-- Time left when there is no expiry date. Short. -->
+    <string name="temp_premium_time_none">0m</string>
+
+    <!-- Small note under the plan cards while the store prices load. Starts with an emoji. One line. -->
+    <string name="support_us_loading_pricing">💰 Loading pricing from store...</string>
+    <!-- Heading above the perk cards for a legacy supporter, and heading of the legacy banner. One line, large. -->
+    <string name="support_us_continue_support">Continue Your Support</string>
+    <!-- Heading above the perk cards for a monthly or yearly member. One line, large. -->
+    <string name="support_us_upgrade_to_lifetime">Upgrade to Lifetime</string>
+    <!-- Perk card title and active perk title. Widget is the home screen widget. One line. -->
+    <string name="support_us_perk_widget_title">Premium Widget</string>
+    <!-- Perk card text on iOS. One or two lines. -->
+    <string name="support_us_perk_widget_description_ios">Lock Screen &amp; Home Screen widgets to track launches at a glance</string>
+    <!-- Perk card text on Android. One or two lines. -->
+    <string name="support_us_perk_widget_description_android">Unlock additional Launch List widget for your home screen</string>
+    <!-- Perk card title and active perk title. One line. -->
+    <string name="support_us_perk_themes_title">Premium Themes</string>
+    <!-- Perk card text. One or two lines. -->
+    <string name="support_us_perk_themes_description">Utilize premium themes to customize your app experience</string>
+    <!-- Perk card title and active perk title. One line. -->
+    <string name="support_us_perk_no_ads_title">No Ads</string>
+    <!-- Perk card text. Two lines. -->
+    <string name="support_us_perk_no_ads_description">Enjoy an uninterrupted, ad-free experience throughout the entire app</string>
+    <!-- Perk card title. One line. -->
+    <string name="support_us_perk_support_title">Support Development</string>
+    <!-- Perk card text. Two lines. -->
+    <string name="support_us_perk_support_description">Help us continue improving the app and adding new features</string>
+    <!-- Heading above the plan cards for a member who can still upgrade. One line. -->
+    <string name="support_us_choose_upgrade">Choose an upgrade!</string>
+    <!-- Heading above the plan cards for a new user. One line. -->
+    <string name="support_us_choose_plan">Choose Your Plan</string>
+    <!-- Plan card title for the yearly plan. One word. -->
+    <string name="support_us_plan_yearly">Yearly</string>
+    <!-- Plan card title for the monthly plan. One word. -->
+    <string name="support_us_plan_monthly">Monthly</string>
+    <!-- Shown right after the price, for a yearly plan. Short, keeps the slash. -->
+    <string name="support_us_period_year">/year</string>
+    <!-- Shown right after the price, for a monthly plan. Short, keeps the slash. -->
+    <string name="support_us_period_month">/month</string>
+    <!-- Divider text between the plan cards and the lifetime card. Two spaces on each side keep it away from the lines. -->
+    <string name="support_us_or_go_lifetime">"  Or go lifetime  "</string>
+    <!-- Text button under the plans. For a person who is not a member yet. One line. -->
+    <string name="support_us_restore_purchases_member">Already a member? Restore Purchases</string>
+    <!-- Text button under the plans. For a person who is a member. One line. -->
+    <string name="support_us_restore_purchases">Restore Purchases</string>
+    <!-- Header of the Support Us screen for a member. One line, large. -->
+    <string name="support_us_header_thank_you">Thank You! 🎉</string>
+    <!-- Line under the header for a member. %1$s is the plan type in lower case, such as premium or lifetime. -->
+    <string name="support_us_header_member_type">You\'re a %1$s member!</string>
+    <!-- Header of the Support Us screen for a person who is not a member. One line, large. -->
+    <string name="support_us_header_love_title">Love Space Launch Now?</string>
+    <!-- Line under the header for a person who is not a member. One or two lines. -->
+    <string name="support_us_header_join_subtitle">Join as a member to unlock premium features</string>
+    <!-- Button on a plan card with a free trial. One line. -->
+    <string name="support_us_start_free_trial">Start Free Trial</string>
+    <!-- Button on a plan card with no free trial. One line. -->
+    <string name="support_us_subscribe_now">Subscribe Now</string>
+    <!-- Badge on the recommended plan. Capital letters. Short. -->
+    <string name="support_us_best_value">BEST VALUE</string>
+    <!-- Badge on a plan with a free trial. %1$s is the length, such as 3-day. -->
+    <string name="support_us_free_trial_badge">%1$s free trial</string>
+    <!-- Line under the trial badge. %1$s is the price, %2$s is the period such as /year. -->
+    <string name="support_us_then_price_after_trial">then %1$s%2$s after trial</string>
+    <!-- Content description of the app logo on the thank-you card. Read by screen readers. -->
+    <string name="support_us_logo_description">Space Launch Now</string>
+    <!-- Heading of the thank-you card for a member. One line. -->
+    <string name="support_us_making_difference">You\'re Making a Difference!</string>
+    <!-- Text on the thank-you card for a legacy supporter. Two or three lines. -->
+    <string name="support_us_thanks_legacy">Thank you for your legacy support of Space Launch Now. You have ad-free access.</string>
+    <!-- Text on the thank-you card for a member. %1$s is the plan type in lower case, such as premium. -->
+    <string name="support_us_thanks_member">Thank you for supporting Space Launch Now. Your %1$s membership helps us continue developing features and keeping the app running.</string>
+    <!-- Heading above the list of benefits of a legacy supporter. One line, ends with a colon. -->
+    <string name="support_us_legacy_benefits_heading">Your Legacy Benefits:</string>
+    <!-- Heading above the list of benefits of a member. One line, ends with a colon. -->
+    <string name="support_us_premium_features_heading">Your Premium Features:</string>
+    <!-- Active perk text on iOS. One line. -->
+    <string name="support_us_active_widget_ios">Lock Screen &amp; Home Screen widgets</string>
+    <!-- Active perk text on Android. One line. -->
+    <string name="support_us_active_widget_android">Additional Launch List widget</string>
+    <!-- Active perk text. One line. -->
+    <string name="support_us_active_no_ads">Ad-free experience</string>
+    <!-- Active perk text. ICS is the calendar file format. One line. -->
+    <string name="support_us_active_calendar_sync">Access to ICS Sync</string>
+    <!-- Active perk title. One line. -->
+    <string name="support_us_active_supporting_title">Supporting Development</string>
+    <!-- Active perk text. One short line. -->
+    <string name="support_us_active_supporting_description">Thank you!</string>
+    <!-- Active perk text. One line. -->
+    <string name="support_us_active_themes">Customize your app</string>
+    <!-- Small label above the user id. One line. -->
+    <string name="support_us_user_id_label">User ID</string>
+    <!-- Shown in place of the user id when the store gives none. One line. -->
+    <string name="support_us_user_id_unavailable">Not available</string>
+    <!-- Content description of the copy icon next to the user id. Read by screen readers. -->
+    <string name="support_us_copy_user_id_description">Copy User ID</string>
+    <!-- Title of the help card. A question. One line. -->
+    <string name="support_us_restore_help_title">Unable to Restore Purchase?</string>
+    <!-- Text of the help card. Opens a feedback form. One line. -->
+    <string name="support_us_restore_help_body">Let me know and I\'ll help you out</string>
+    <!-- Content description of the open-in-browser icon on the help card. Read by screen readers. -->
+    <string name="support_us_open_form_description">Open form</string>
+    <!-- Title of the lifetime plan card. Pro is the name of the tier. One line. -->
+    <string name="support_us_lifetime_title">Pro Lifetime</string>
+    <!-- Line under the lifetime plan title. One line. -->
+    <string name="support_us_lifetime_tagline">Buy once, own forever</string>
+    <!-- Shown right after the lifetime price. Short. -->
+    <string name="support_us_lifetime_one_time">one time</string>
+    <!-- Badge on the lifetime card. Emoji on both sides. Capital letters. -->
+    <string name="support_us_lifetime_max_support">✨ MAX SUPPORT ✨</string>
+    <!-- Check-list line on the lifetime card. -->
+    <string name="support_us_lifetime_perk_subscriptions">Everything in Subscriptions</string>
+    <!-- Check-list line on the lifetime card. -->
+    <string name="support_us_lifetime_perk_access">Lifetime Access</string>
+    <!-- Check-list line on the lifetime card. -->
+    <string name="support_us_lifetime_perk_support">Support Independent Developer</string>
+    <!-- Button on the lifetime card. One line. -->
+    <string name="support_us_unlock_pro_forever">Unlock Pro Forever</string>
+    <!-- Heading of the current plan card. One line. -->
+    <string name="support_us_current_plan">Current Plan</string>
+    <!-- Plan status during a free trial. Shown when the days left are not known. -->
+    <string name="support_us_free_trial">Free Trial</string>
+    <!-- Plan status during a free trial with days left. %1$d is the count of days. -->
+    <plurals name="support_us_free_trial_days_remaining">
+        <item quantity="one">Free Trial – %1$d day remaining</item>
+        <item quantity="other">Free Trial – %1$d days remaining</item>
+    </plurals>
+    <!-- Plan status for a member. %1$s is the plan type with a capital first letter, such as Premium. -->
+    <string name="support_us_member_status">%1$s Member</string>
+    <!-- Plan status for a person who is not a member. -->
+    <string name="support_us_free_user">Free User</string>
+    <!-- Line on the current plan card. %1$s is the store product name. -->
+    <string name="support_us_product_line">Product: %1$s</string>
+    <!-- Line on the current plan card for a person who is not a member. One or two lines. -->
+    <string name="support_us_upgrade_prompt">Upgrade to unlock premium features and support development</string>
+    <!-- Heading of the legacy banner. One line. -->
+    <string name="support_us_legacy_banner_title">Thank You, Early Supporter!</string>
+    <!-- Text of the legacy banner. First person, from the developer. Three or four lines. -->
+    <string name="support_us_legacy_banner_body">Your legacy purchase helped build Space Launch Now into what it is today. I am incredibly grateful for your early support!</string>
+    <!-- Text of the legacy banner, under the continue button. One or two lines. -->
+    <string name="support_us_legacy_banner_prompt">Choose a plan below to continue supporting development!</string>
+</resources>

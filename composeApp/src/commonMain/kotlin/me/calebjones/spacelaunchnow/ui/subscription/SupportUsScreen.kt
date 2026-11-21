@@ -80,6 +80,77 @@ import org.jetbrains.compose.ui.tooling.preview.Preview
 import org.koin.compose.koinInject
 import spacelaunchnow_kmp.composeapp.generated.resources.Res
 import spacelaunchnow_kmp.composeapp.generated.resources.launcher
+import org.jetbrains.compose.resources.stringResource
+import org.jetbrains.compose.resources.pluralStringResource
+import spacelaunchnow_kmp.composeapp.generated.resources.common_back
+import spacelaunchnow_kmp.composeapp.generated.resources.premium_feature_title_cal_sync
+import spacelaunchnow_kmp.composeapp.generated.resources.support_us_active_calendar_sync
+import spacelaunchnow_kmp.composeapp.generated.resources.support_us_active_no_ads
+import spacelaunchnow_kmp.composeapp.generated.resources.support_us_active_supporting_description
+import spacelaunchnow_kmp.composeapp.generated.resources.support_us_active_supporting_title
+import spacelaunchnow_kmp.composeapp.generated.resources.support_us_active_themes
+import spacelaunchnow_kmp.composeapp.generated.resources.support_us_active_widget_android
+import spacelaunchnow_kmp.composeapp.generated.resources.support_us_active_widget_ios
+import spacelaunchnow_kmp.composeapp.generated.resources.support_us_best_value
+import spacelaunchnow_kmp.composeapp.generated.resources.support_us_choose_plan
+import spacelaunchnow_kmp.composeapp.generated.resources.support_us_choose_upgrade
+import spacelaunchnow_kmp.composeapp.generated.resources.support_us_continue_support
+import spacelaunchnow_kmp.composeapp.generated.resources.support_us_copy_user_id_description
+import spacelaunchnow_kmp.composeapp.generated.resources.support_us_current_plan
+import spacelaunchnow_kmp.composeapp.generated.resources.support_us_free_trial
+import spacelaunchnow_kmp.composeapp.generated.resources.support_us_free_trial_badge
+import spacelaunchnow_kmp.composeapp.generated.resources.support_us_free_trial_days_remaining
+import spacelaunchnow_kmp.composeapp.generated.resources.support_us_free_user
+import spacelaunchnow_kmp.composeapp.generated.resources.support_us_header_join_subtitle
+import spacelaunchnow_kmp.composeapp.generated.resources.support_us_header_love_title
+import spacelaunchnow_kmp.composeapp.generated.resources.support_us_header_member_type
+import spacelaunchnow_kmp.composeapp.generated.resources.support_us_header_thank_you
+import spacelaunchnow_kmp.composeapp.generated.resources.support_us_legacy_banner_body
+import spacelaunchnow_kmp.composeapp.generated.resources.support_us_legacy_banner_prompt
+import spacelaunchnow_kmp.composeapp.generated.resources.support_us_legacy_banner_title
+import spacelaunchnow_kmp.composeapp.generated.resources.support_us_legacy_benefits_heading
+import spacelaunchnow_kmp.composeapp.generated.resources.support_us_lifetime_max_support
+import spacelaunchnow_kmp.composeapp.generated.resources.support_us_lifetime_one_time
+import spacelaunchnow_kmp.composeapp.generated.resources.support_us_lifetime_perk_access
+import spacelaunchnow_kmp.composeapp.generated.resources.support_us_lifetime_perk_subscriptions
+import spacelaunchnow_kmp.composeapp.generated.resources.support_us_lifetime_perk_support
+import spacelaunchnow_kmp.composeapp.generated.resources.support_us_lifetime_tagline
+import spacelaunchnow_kmp.composeapp.generated.resources.support_us_lifetime_title
+import spacelaunchnow_kmp.composeapp.generated.resources.support_us_loading_pricing
+import spacelaunchnow_kmp.composeapp.generated.resources.support_us_logo_description
+import spacelaunchnow_kmp.composeapp.generated.resources.support_us_making_difference
+import spacelaunchnow_kmp.composeapp.generated.resources.support_us_member_status
+import spacelaunchnow_kmp.composeapp.generated.resources.support_us_open_form_description
+import spacelaunchnow_kmp.composeapp.generated.resources.support_us_or_go_lifetime
+import spacelaunchnow_kmp.composeapp.generated.resources.support_us_period_month
+import spacelaunchnow_kmp.composeapp.generated.resources.support_us_period_year
+import spacelaunchnow_kmp.composeapp.generated.resources.support_us_perk_no_ads_description
+import spacelaunchnow_kmp.composeapp.generated.resources.support_us_perk_no_ads_title
+import spacelaunchnow_kmp.composeapp.generated.resources.support_us_perk_support_description
+import spacelaunchnow_kmp.composeapp.generated.resources.support_us_perk_support_title
+import spacelaunchnow_kmp.composeapp.generated.resources.support_us_perk_themes_description
+import spacelaunchnow_kmp.composeapp.generated.resources.support_us_perk_themes_title
+import spacelaunchnow_kmp.composeapp.generated.resources.support_us_perk_widget_description_android
+import spacelaunchnow_kmp.composeapp.generated.resources.support_us_perk_widget_description_ios
+import spacelaunchnow_kmp.composeapp.generated.resources.support_us_perk_widget_title
+import spacelaunchnow_kmp.composeapp.generated.resources.support_us_plan_monthly
+import spacelaunchnow_kmp.composeapp.generated.resources.support_us_plan_yearly
+import spacelaunchnow_kmp.composeapp.generated.resources.support_us_premium_features_heading
+import spacelaunchnow_kmp.composeapp.generated.resources.support_us_product_line
+import spacelaunchnow_kmp.composeapp.generated.resources.support_us_restore_help_body
+import spacelaunchnow_kmp.composeapp.generated.resources.support_us_restore_help_title
+import spacelaunchnow_kmp.composeapp.generated.resources.support_us_restore_purchases
+import spacelaunchnow_kmp.composeapp.generated.resources.support_us_restore_purchases_member
+import spacelaunchnow_kmp.composeapp.generated.resources.support_us_start_free_trial
+import spacelaunchnow_kmp.composeapp.generated.resources.support_us_subscribe_now
+import spacelaunchnow_kmp.composeapp.generated.resources.support_us_thanks_legacy
+import spacelaunchnow_kmp.composeapp.generated.resources.support_us_thanks_member
+import spacelaunchnow_kmp.composeapp.generated.resources.support_us_then_price_after_trial
+import spacelaunchnow_kmp.composeapp.generated.resources.support_us_unlock_pro_forever
+import spacelaunchnow_kmp.composeapp.generated.resources.support_us_upgrade_prompt
+import spacelaunchnow_kmp.composeapp.generated.resources.support_us_upgrade_to_lifetime
+import spacelaunchnow_kmp.composeapp.generated.resources.support_us_user_id_label
+import spacelaunchnow_kmp.composeapp.generated.resources.support_us_user_id_unavailable
 
 /**
  * "Support Us" screen - Encouraging membership with focused perks
@@ -141,7 +212,7 @@ fun SupportUsScreen(
                     IconButton(onClick = onNavigateBack) {
                         Icon(
                             imageVector = Icons.AutoMirrored.Filled.ArrowBack,
-                            contentDescription = "Back"
+                            contentDescription = stringResource(Res.string.common_back)
                         )
                     }
                 },
@@ -179,7 +250,7 @@ fun SupportUsScreen(
                         verticalAlignment = Alignment.CenterVertically
                     ) {
                         Text(
-                            text = "💰 Loading pricing from store...",
+                            text = stringResource(Res.string.support_us_loading_pricing),
                             style = MaterialTheme.typography.bodySmall,
                             color = MaterialTheme.colorScheme.onSurfaceVariant
                         )
@@ -212,8 +283,8 @@ fun SupportUsScreen(
                 if (canUpgrade) {
                     item {
                         val headerText = when (subscriptionState.subscriptionType) {
-                            SubscriptionType.LEGACY -> "Continue Your Support"
-                            SubscriptionType.PREMIUM -> "Upgrade to Lifetime"
+                            SubscriptionType.LEGACY -> stringResource(Res.string.support_us_continue_support)
+                            SubscriptionType.PREMIUM -> stringResource(Res.string.support_us_upgrade_to_lifetime)
                             SubscriptionType.LIFETIME -> ""
                             else -> ""
                         }
@@ -235,11 +306,11 @@ fun SupportUsScreen(
                         Spacer(Modifier.height(24.dp))
                         PremiumPerkCard(
                             icon = Icons.Default.Widgets,
-                            title = "Premium Widget",
+                            title = stringResource(Res.string.support_us_perk_widget_title),
                             description = if (getPlatform().type.isIOS)
-                                "Lock Screen & Home Screen widgets to track launches at a glance"
+                                stringResource(Res.string.support_us_perk_widget_description_ios)
                             else
-                                "Unlock additional Launch List widget for your home screen",
+                                stringResource(Res.string.support_us_perk_widget_description_android),
                             gradient = listOf(
                                 MaterialTheme.colorScheme.primary,
                                 MaterialTheme.colorScheme.tertiary
@@ -251,8 +322,8 @@ fun SupportUsScreen(
                         Spacer(Modifier.height(16.dp))
                         PremiumPerkCard(
                             icon = Icons.Default.FormatPaint,
-                            title = "Premium Themes",
-                            description = "Utilize premium themes to customize your app experience",
+                            title = stringResource(Res.string.support_us_perk_themes_title),
+                            description = stringResource(Res.string.support_us_perk_themes_description),
                             gradient = listOf(
                                 MaterialTheme.colorScheme.error,
                                 MaterialTheme.colorScheme.inversePrimary
@@ -265,8 +336,8 @@ fun SupportUsScreen(
                         Spacer(Modifier.height(16.dp))
                         PremiumPerkCard(
                             icon = Icons.Default.Block,
-                            title = "No Ads",
-                            description = "Enjoy an uninterrupted, ad-free experience throughout the entire app",
+                            title = stringResource(Res.string.support_us_perk_no_ads_title),
+                            description = stringResource(Res.string.support_us_perk_no_ads_description),
                             gradient = listOf(
                                 MaterialTheme.colorScheme.secondary,
                                 MaterialTheme.colorScheme.tertiary
@@ -279,8 +350,8 @@ fun SupportUsScreen(
                         Spacer(Modifier.height(16.dp))
                         PremiumPerkCard(
                             icon = Icons.Default.Favorite,
-                            title = "Support Development",
-                            description = "Help us continue improving the app and adding new features",
+                            title = stringResource(Res.string.support_us_perk_support_title),
+                            description = stringResource(Res.string.support_us_perk_support_description),
                             gradient = listOf(
                                 MaterialTheme.colorScheme.error,
                                 MaterialTheme.colorScheme.primary
@@ -294,7 +365,7 @@ fun SupportUsScreen(
                 item {
                     Spacer(Modifier.height(32.dp))
                     Text(
-                        text = if (subscriptionState.isSubscribed) "Choose an upgrade!" else "Choose Your Plan",
+                        text = if (subscriptionState.isSubscribed) stringResource(Res.string.support_us_choose_upgrade) else stringResource(Res.string.support_us_choose_plan),
                         style = MaterialTheme.typography.headlineSmall,
                         fontWeight = FontWeight.Bold,
                         modifier = Modifier.padding(horizontal = 24.dp)
@@ -307,9 +378,9 @@ fun SupportUsScreen(
             if (packagesToShow.showAnnual) {
                 item {
                     PricingCard(
-                        title = "Yearly",
+                        title = stringResource(Res.string.support_us_plan_yearly),
                         price = annualProduct?.formattedPrice ?: "$-.--",
-                        period = "/year",
+                        period = stringResource(Res.string.support_us_period_year),
                         savings = uiState.getAnnualMonthlyEquivalent(),
                         isRecommended = true,
                         isProcessing = uiState.isProcessing,
@@ -332,9 +403,9 @@ fun SupportUsScreen(
                     Spacer(Modifier.height(12.dp))
 
                     PricingCard(
-                        title = "Monthly",
+                        title = stringResource(Res.string.support_us_plan_monthly),
                         price = monthlyProduct?.formattedPrice ?: "$-.--",
-                        period = "/month",
+                        period = stringResource(Res.string.support_us_period_month),
                         isRecommended = false,
                         isProcessing = uiState.isProcessing,
                         onSubscribe = {
@@ -362,7 +433,7 @@ fun SupportUsScreen(
                         ) {
                             HorizontalDivider(modifier = Modifier.weight(1f))
                             Text(
-                                text = "  Or go lifetime  ",
+                                text = stringResource(Res.string.support_us_or_go_lifetime),
                                 style = MaterialTheme.typography.bodyMedium,
                                 color = MaterialTheme.colorScheme.onSurfaceVariant
                             )
@@ -420,7 +491,10 @@ fun SupportUsScreen(
                     modifier = Modifier.padding(horizontal = 24.dp),
                     enabled = !uiState.isProcessing
                 ) {
-                    Text(if (!subscriptionState.isSubscribed) "Already a member? Restore Purchases" else "Restore Purchases")
+                    Text(
+                        if (!subscriptionState.isSubscribed) stringResource(Res.string.support_us_restore_purchases_member)
+                        else stringResource(Res.string.support_us_restore_purchases)
+                    )
                 }
             }
 
@@ -508,26 +582,29 @@ private fun HeroSection(
 
             if (isSubscribed) {
                 Text(
-                    text = "Thank You! 🎉",
+                    text = stringResource(Res.string.support_us_header_thank_you),
                     style = MaterialTheme.typography.headlineLarge,
                     fontWeight = FontWeight.Bold,
                     textAlign = TextAlign.Center
                 )
                 Text(
-                    text = "You're a ${subscriptionType.name.lowercase()} member!",
+                    text = stringResource(
+                        Res.string.support_us_header_member_type,
+                        subscriptionType.name.lowercase()
+                    ),
                     style = MaterialTheme.typography.titleMedium,
                     color = MaterialTheme.colorScheme.primary,
                     textAlign = TextAlign.Center
                 )
             } else {
                 Text(
-                    text = "Love Space Launch Now?",
+                    text = stringResource(Res.string.support_us_header_love_title),
                     style = MaterialTheme.typography.headlineLarge,
                     fontWeight = FontWeight.Bold,
                     textAlign = TextAlign.Center
                 )
                 Text(
-                    text = "Join as a member to unlock premium features",
+                    text = stringResource(Res.string.support_us_header_join_subtitle),
                     style = MaterialTheme.typography.titleMedium,
                     color = MaterialTheme.colorScheme.onSurfaceVariant,
                     textAlign = TextAlign.Center
@@ -605,7 +682,7 @@ private fun PricingCard(
     enabled: Boolean = true,
     hasFreeTrial: Boolean = false,
     freeTrialPeriodDisplay: String? = null,
-    subscribeButtonText: String = if (hasFreeTrial) "Start Free Trial" else "Subscribe Now"
+    subscribeButtonText: String = if (hasFreeTrial) stringResource(Res.string.support_us_start_free_trial) else stringResource(Res.string.support_us_subscribe_now)
 ) {
     val glowPrimary = MaterialTheme.colorScheme.primary
     val glowTertiary = MaterialTheme.colorScheme.tertiary
@@ -660,7 +737,7 @@ private fun PricingCard(
                         shape = MaterialTheme.shapes.small
                     ) {
                         Text(
-                            text = "BEST VALUE",
+                            text = stringResource(Res.string.support_us_best_value),
                             modifier = Modifier.padding(horizontal = 12.dp, vertical = 6.dp),
                             style = MaterialTheme.typography.labelSmall,
                             fontWeight = FontWeight.Bold,
@@ -706,7 +783,7 @@ private fun PricingCard(
                     shape = MaterialTheme.shapes.small
                 ) {
                     Text(
-                        text = "$freeTrialPeriodDisplay free trial",
+                        text = stringResource(Res.string.support_us_free_trial_badge, freeTrialPeriodDisplay),
                         modifier = Modifier.padding(horizontal = 12.dp, vertical = 6.dp),
                         style = MaterialTheme.typography.labelMedium,
                         fontWeight = FontWeight.Bold,
@@ -714,7 +791,7 @@ private fun PricingCard(
                     )
                 }
                 Text(
-                    text = "then $price$period after trial",
+                    text = stringResource(Res.string.support_us_then_price_after_trial, price, period),
                     style = MaterialTheme.typography.bodySmall,
                     color = if (isRecommended) MaterialTheme.colorScheme.onPrimaryFixedVariant else MaterialTheme.colorScheme.onSurfaceVariant
                 )
@@ -787,12 +864,12 @@ private fun ThankYouSection(
         ) {
             Image(
                 painter = painterResource(Res.drawable.launcher),
-                contentDescription = "Space Launch Now",
+                contentDescription = stringResource(Res.string.support_us_logo_description),
                 modifier = Modifier.size(64.dp)
             )
 
             Text(
-                text = "You're Making a Difference!",
+                text = stringResource(Res.string.support_us_making_difference),
                 style = MaterialTheme.typography.headlineSmall,
                 fontWeight = FontWeight.Bold,
                 textAlign = TextAlign.Center,
@@ -801,9 +878,12 @@ private fun ThankYouSection(
 
             Text(
                 text = if (isLegacy) {
-                    "Thank you for your legacy support of Space Launch Now. You have ad-free access."
+                    stringResource(Res.string.support_us_thanks_legacy)
                 } else {
-                    "Thank you for supporting Space Launch Now. Your ${subscriptionType.name.lowercase()} membership helps us continue developing features and keeping the app running."
+                    stringResource(
+                        Res.string.support_us_thanks_member,
+                        subscriptionType.name.lowercase()
+                    )
                 },
                 style = MaterialTheme.typography.bodyLarge,
                 textAlign = TextAlign.Center,
@@ -813,7 +893,7 @@ private fun ThankYouSection(
             HorizontalDivider(modifier = Modifier.padding(vertical = 8.dp))
 
             Text(
-                text = if (isLegacy) "Your Legacy Benefits:" else "Your Premium Features:",
+                text = if (isLegacy) stringResource(Res.string.support_us_legacy_benefits_heading) else stringResource(Res.string.support_us_premium_features_heading),
                 style = MaterialTheme.typography.titleMedium,
                 fontWeight = FontWeight.Bold,
                 color = textColor
@@ -823,56 +903,56 @@ private fun ThankYouSection(
                 if (isLegacy) {
                     ActivePerkItem(
                         icon = Icons.Default.Widgets,
-                        title = "Premium Widget",
+                        title = stringResource(Res.string.support_us_perk_widget_title),
                         description = if (getPlatform().type.isIOS)
-                            "Lock Screen & Home Screen widgets"
+                            stringResource(Res.string.support_us_active_widget_ios)
                         else
-                            "Additional Launch List widget"
+                            stringResource(Res.string.support_us_active_widget_android)
                     )
                     ActivePerkItem(
                         icon = Icons.Default.Block,
-                        title = "No Ads",
-                        description = "Ad-free experience"
+                        title = stringResource(Res.string.support_us_perk_no_ads_title),
+                        description = stringResource(Res.string.support_us_active_no_ads)
                     )
                     ActivePerkItem(
                         icon = Icons.Default.CalendarMonth,
-                        title = "Calendar Sync",
-                        description = "Access to ICS Sync"
+                        title = stringResource(Res.string.premium_feature_title_cal_sync),
+                        description = stringResource(Res.string.support_us_active_calendar_sync)
                     )
                     ActivePerkItem(
                         icon = Icons.Default.Favorite,
-                        title = "Supporting Development",
-                        description = "Thank you!"
+                        title = stringResource(Res.string.support_us_active_supporting_title),
+                        description = stringResource(Res.string.support_us_active_supporting_description)
                     )
                 } else {
                     // Current premium users get full features
                     ActivePerkItem(
                         icon = Icons.Default.Widgets,
-                        title = "Premium Widget",
+                        title = stringResource(Res.string.support_us_perk_widget_title),
                         description = if (getPlatform().type.isIOS)
-                            "Lock Screen & Home Screen widgets"
+                            stringResource(Res.string.support_us_active_widget_ios)
                         else
-                            "Additional Launch List widget"
+                            stringResource(Res.string.support_us_active_widget_android)
                     )
                     ActivePerkItem(
                         icon = Icons.Default.FormatPaint,
-                        title = "Premium Themes",
-                        description = "Customize your app"
+                        title = stringResource(Res.string.support_us_perk_themes_title),
+                        description = stringResource(Res.string.support_us_active_themes)
                     )
                     ActivePerkItem(
                         icon = Icons.Default.Block,
-                        title = "No Ads",
-                        description = "Ad-free experience"
+                        title = stringResource(Res.string.support_us_perk_no_ads_title),
+                        description = stringResource(Res.string.support_us_active_no_ads)
                     )
                     ActivePerkItem(
                         icon = Icons.Default.CalendarMonth,
-                        title = "Calendar Sync",
-                        description = "Access to ICS Sync"
+                        title = stringResource(Res.string.premium_feature_title_cal_sync),
+                        description = stringResource(Res.string.support_us_active_calendar_sync)
                     )
                     ActivePerkItem(
                         icon = Icons.Default.Favorite,
-                        title = "Supporting Development",
-                        description = "Thank you!"
+                        title = stringResource(Res.string.support_us_active_supporting_title),
+                        description = stringResource(Res.string.support_us_active_supporting_description)
                     )
                 }
             }
@@ -980,13 +1060,15 @@ private fun RevenueCatUserIdCard(viewModel: SubscriptionViewModel) {
     val billingManager = koinInject<me.calebjones.spacelaunchnow.data.billing.BillingManager>()
     val clipboardManager = androidx.compose.ui.platform.LocalClipboardManager.current
 
-    val userId = remember { billingManager.getAppUserId() } ?: "Not available"
+    val appUserId = remember { billingManager.getAppUserId() }
+    val hasUserId = appUserId != null
+    val userId = appUserId ?: stringResource(Res.string.support_us_user_id_unavailable)
 
     Card(
         modifier = Modifier
             .fillMaxWidth()
             .padding(horizontal = 24.dp)
-            .clickable(enabled = userId != "Not available") {
+            .clickable(enabled = hasUserId) {
                 clipboardManager.setText(androidx.compose.ui.text.AnnotatedString(userId))
             },
         colors = CardDefaults.cardColors(
@@ -1002,7 +1084,7 @@ private fun RevenueCatUserIdCard(viewModel: SubscriptionViewModel) {
         ) {
             Column(modifier = Modifier.weight(1f)) {
                 Text(
-                    text = "User ID",
+                    text = stringResource(Res.string.support_us_user_id_label),
                     style = MaterialTheme.typography.labelSmall,
                     color = MaterialTheme.colorScheme.onSurfaceVariant
                 )
@@ -1014,10 +1096,10 @@ private fun RevenueCatUserIdCard(viewModel: SubscriptionViewModel) {
                 )
             }
 
-            if (userId != "Not available") {
+            if (hasUserId) {
                 Icon(
                     imageVector = Icons.Default.ContentCopy,
-                    contentDescription = "Copy User ID",
+                    contentDescription = stringResource(Res.string.support_us_copy_user_id_description),
                     modifier = Modifier.size(20.dp),
                     tint = MaterialTheme.colorScheme.primary
                 )
@@ -1058,13 +1140,13 @@ private fun GoogleFormLinkCard() {
 
             Column(modifier = Modifier.weight(1f)) {
                 Text(
-                    text = "Unable to Restore Purchase?",
+                    text = stringResource(Res.string.support_us_restore_help_title),
                     style = MaterialTheme.typography.titleMedium,
                     fontWeight = FontWeight.Bold,
                     color = MaterialTheme.colorScheme.onSurface
                 )
                 Text(
-                    text = "Let me know and I'll help you out",
+                    text = stringResource(Res.string.support_us_restore_help_body),
                     style = MaterialTheme.typography.bodySmall,
                     color = MaterialTheme.colorScheme.onSurfaceVariant
                 )
@@ -1072,7 +1154,7 @@ private fun GoogleFormLinkCard() {
 
             Icon(
                 imageVector = Icons.Default.OpenInNew,
-                contentDescription = "Open form",
+                contentDescription = stringResource(Res.string.support_us_open_form_description),
                 modifier = Modifier.size(20.dp),
                 tint = MaterialTheme.colorScheme.onSurfaceVariant
             )
@@ -1145,13 +1227,13 @@ private fun ProLifetimeCard(
                 )
                 Column {
                     Text(
-                        text = "Pro Lifetime",
+                        text = stringResource(Res.string.support_us_lifetime_title),
                         style = MaterialTheme.typography.headlineSmall,
                         fontWeight = FontWeight.Bold,
                         color = Color(0xFFB8860B) // Dark goldenrod
                     )
                     Text(
-                        text = "Buy once, own forever",
+                        text = stringResource(Res.string.support_us_lifetime_tagline),
                         style = MaterialTheme.typography.bodyMedium,
                         color = MaterialTheme.colorScheme.onSurfaceVariant
                     )
@@ -1170,7 +1252,7 @@ private fun ProLifetimeCard(
                     color = Color(0xFFB8860B) // Dark goldenrod
                 )
                 Text(
-                    text = "one time",
+                    text = stringResource(Res.string.support_us_lifetime_one_time),
                     style = MaterialTheme.typography.titleMedium,
                     color = MaterialTheme.colorScheme.onSurfaceVariant,
                     modifier = Modifier.padding(bottom = 8.dp)
@@ -1184,7 +1266,7 @@ private fun ProLifetimeCard(
                 modifier = Modifier.align(Alignment.CenterHorizontally)
             ) {
                 Text(
-                    text = "✨ MAX SUPPORT ✨",
+                    text = stringResource(Res.string.support_us_lifetime_max_support),
                     style = MaterialTheme.typography.labelLarge,
                     fontWeight = FontWeight.Bold,
                     color = Color(0xFFB8860B),
@@ -1194,9 +1276,9 @@ private fun ProLifetimeCard(
 
             // Premium Features List
             Column(verticalArrangement = Arrangement.spacedBy(12.dp)) {
-                ProPerkCheckmark("Everything in Subscriptions")
-                ProPerkCheckmark("Lifetime Access")
-                ProPerkCheckmark("Support Independent Developer")
+                ProPerkCheckmark(stringResource(Res.string.support_us_lifetime_perk_subscriptions))
+                ProPerkCheckmark(stringResource(Res.string.support_us_lifetime_perk_access))
+                ProPerkCheckmark(stringResource(Res.string.support_us_lifetime_perk_support))
             }
 
             // Purchase Button with Gold Gradient
@@ -1213,7 +1295,7 @@ private fun ProLifetimeCard(
                 shape = RoundedCornerShape(12.dp)
             ) {
                 Text(
-                    text = "Unlock Pro Forever",
+                    text = stringResource(Res.string.support_us_unlock_pro_forever),
                     style = MaterialTheme.typography.titleLarge,
                     fontWeight = FontWeight.ExtraBold
                 )
@@ -1280,7 +1362,7 @@ private fun CurrentPlanCard(
                 verticalAlignment = Alignment.CenterVertically
             ) {
                 Text(
-                    text = "Current Plan",
+                    text = stringResource(Res.string.support_us_current_plan),
                     style = MaterialTheme.typography.titleLarge,
                     fontWeight = FontWeight.Bold,
                     color = textColor
@@ -1314,14 +1396,21 @@ private fun CurrentPlanCard(
                                 days
                             }
                             if (daysLeft != null && daysLeft > 0) {
-                                "Free Trial – $daysLeft day${if (daysLeft == 1L) "" else "s"} remaining"
+                                pluralStringResource(
+                                    Res.plurals.support_us_free_trial_days_remaining,
+                                    daysLeft.toInt(),
+                                    daysLeft.toInt()
+                                )
                             } else {
-                                "Free Trial"
+                                stringResource(Res.string.support_us_free_trial)
                             }
                         }
 
-                        subscriptionState.isSubscribed -> "${subscriptionState.subscriptionType.name.replaceFirstChar { it.uppercase() }} Member"
-                        else -> "Free User"
+                        subscriptionState.isSubscribed -> stringResource(
+                            Res.string.support_us_member_status,
+                            subscriptionState.subscriptionType.name.replaceFirstChar { it.uppercase() }
+                        )
+                        else -> stringResource(Res.string.support_us_free_user)
                     },
                     style = MaterialTheme.typography.headlineSmall,
                     fontWeight = FontWeight.Bold,
@@ -1333,14 +1422,17 @@ private fun CurrentPlanCard(
             if (subscriptionState.isSubscribed) {
                 subscriptionState.productId?.let { productId ->
                     Text(
-                        text = "Product: ${getProductDisplayName(productId)}",
+                        text = stringResource(
+                            Res.string.support_us_product_line,
+                            getProductDisplayName(productId)
+                        ),
                         style = MaterialTheme.typography.labelMedium,
                         color = textColor
                     )
                 }
             } else {
                 Text(
-                    text = "Upgrade to unlock premium features and support development",
+                    text = stringResource(Res.string.support_us_upgrade_prompt),
                     style = MaterialTheme.typography.bodyMedium,
                     color = textColor
                 )
@@ -1403,7 +1495,7 @@ private fun LegacyUserUpgradeBanner() {
                     modifier = Modifier.size(28.dp)
                 )
                 Text(
-                    text = "Thank You, Early Supporter!",
+                    text = stringResource(Res.string.support_us_legacy_banner_title),
                     style = MaterialTheme.typography.titleLarge,
                     fontWeight = FontWeight.Bold,
                     color = MaterialTheme.colorScheme.onTertiaryContainer
@@ -1412,7 +1504,7 @@ private fun LegacyUserUpgradeBanner() {
 
             // Appreciation message
             Text(
-                text = "Your legacy purchase helped build Space Launch Now into what it is today. I am incredibly grateful for your early support!",
+                text = stringResource(Res.string.support_us_legacy_banner_body),
                 style = MaterialTheme.typography.bodyMedium,
                 color = MaterialTheme.colorScheme.onTertiaryContainer,
                 lineHeight = 22.sp
@@ -1426,7 +1518,7 @@ private fun LegacyUserUpgradeBanner() {
 
             // Benefits of upgrading
             Text(
-                text = "Continue Your Support",
+                text = stringResource(Res.string.support_us_continue_support),
                 style = MaterialTheme.typography.titleMedium,
                 fontWeight = FontWeight.SemiBold,
                 color = MaterialTheme.colorScheme.onTertiaryContainer
@@ -1434,7 +1526,7 @@ private fun LegacyUserUpgradeBanner() {
 
             // Call to action
             Text(
-                text = "Choose a plan below to continue supporting development!",
+                text = stringResource(Res.string.support_us_legacy_banner_prompt),
                 style = MaterialTheme.typography.bodySmall,
                 fontWeight = FontWeight.Medium,
                 color = MaterialTheme.colorScheme.onTertiaryContainer,
@@ -1585,9 +1677,9 @@ private fun PricingCardTrialPreview() {
     SpaceLaunchNowPreviewTheme {
         Surface {
             PricingCard(
-                title = "Yearly",
+                title = stringResource(Res.string.support_us_plan_yearly),
                 price = "$9.99",
-                period = "/year",
+                period = stringResource(Res.string.support_us_period_year),
                 savings = "Save 58%!",
                 isRecommended = true,
                 isProcessing = false,
@@ -1606,9 +1698,9 @@ private fun PricingCardTrialDarkPreview() {
     SpaceLaunchNowPreviewTheme(isDark = true) {
         Surface {
             PricingCard(
-                title = "Yearly",
+                title = stringResource(Res.string.support_us_plan_yearly),
                 price = "$9.99",
-                period = "/year",
+                period = stringResource(Res.string.support_us_period_year),
                 savings = "Save 58%!",
                 isRecommended = true,
                 isProcessing = false,
@@ -1627,9 +1719,9 @@ private fun PricingCardNoTrialPreview() {
     SpaceLaunchNowPreviewTheme {
         Surface {
             PricingCard(
-                title = "Monthly",
+                title = stringResource(Res.string.support_us_plan_monthly),
                 price = "$2.99",
-                period = "/month",
+                period = stringResource(Res.string.support_us_period_month),
                 isRecommended = false,
                 isProcessing = false,
                 onSubscribe = {},
