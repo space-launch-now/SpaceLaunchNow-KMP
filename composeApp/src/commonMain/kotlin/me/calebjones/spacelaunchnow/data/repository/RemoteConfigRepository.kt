@@ -106,6 +106,12 @@ interface RemoteConfigRepository {
     suspend fun getInterstitialMinIntervalSeconds(): Long
 
     /**
+     * Whether the dismissible upgrade row on Home is on, from 'home_upgrade_row_enabled'.
+     * Default false; false on read failure.
+     */
+    suspend fun getHomeUpgradeRowEnabled(): Boolean
+
+    /**
      * Whether a tap on a locked notification control opens the paywall, from
      * 'paywall_locked_notification_tap_enabled'. Default false; false on read failure.
      */

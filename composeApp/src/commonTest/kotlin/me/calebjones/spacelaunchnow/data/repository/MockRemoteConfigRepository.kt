@@ -21,6 +21,7 @@ class MockRemoteConfigRepository : RemoteConfigRepository {
     var notificationRatingPromptEnabled = false
     var winbackSheetEnabled = false
     var lockedNotificationTapPaywallEnabled = false
+    var homeUpgradeRowEnabled = false
     var fetchAndActivateCalled = false
     var setDefaultsCalled = false
     var lastForceRefresh: Boolean? = null
@@ -73,6 +74,7 @@ class MockRemoteConfigRepository : RemoteConfigRepository {
     override suspend fun getInterstitialMinIntervalSeconds(): Long = 120L
 
     override suspend fun getLockedNotificationTapPaywallEnabled(): Boolean = lockedNotificationTapPaywallEnabled
+    override suspend fun getHomeUpgradeRowEnabled(): Boolean = homeUpgradeRowEnabled
 
     fun reset() {
         shouldFail = false
@@ -84,6 +86,7 @@ class MockRemoteConfigRepository : RemoteConfigRepository {
         notificationRatingPromptEnabled = false
         winbackSheetEnabled = false
         lockedNotificationTapPaywallEnabled = false
+        homeUpgradeRowEnabled = false
         fetchAndActivateCalled = false
         setDefaultsCalled = false
         lastForceRefresh = null

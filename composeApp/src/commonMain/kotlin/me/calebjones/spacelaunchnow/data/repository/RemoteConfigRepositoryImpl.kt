@@ -71,6 +71,7 @@ class RemoteConfigRepositoryImpl(
         private const val LOCKED_NOTIFICATION_TAP_PAYWALL_KEY = "paywall_locked_notification_tap_enabled"
         private const val WINBACK_SHEET_KEY = "winback_sheet_enabled"
         private const val INTERSTITIAL_MIN_INTERVAL_KEY = "ads_interstitial_min_interval_s"
+        private const val HOME_UPGRADE_ROW_KEY = "home_upgrade_row_enabled"
         const val DEFAULT_INTERSTITIAL_VISITS = 4
         const val DEFAULT_INTERSTITIAL_MIN_INTERVAL_S = 120L
         private val DEFAULT_FETCH_INTERVAL: Duration = 1.hours
@@ -241,6 +242,9 @@ class RemoteConfigRepositoryImpl(
 
     override suspend fun getWinbackSheetEnabled(): Boolean =
         readBooleanFlag(WINBACK_SHEET_KEY, "win-back sheet")
+
+    override suspend fun getHomeUpgradeRowEnabled(): Boolean =
+        readBooleanFlag(HOME_UPGRADE_ROW_KEY, "home upgrade row")
 
     /** A boolean flag that is off when unset, unrecognized, or unreadable. */
     private fun readBooleanFlag(key: String, label: String): Boolean {
