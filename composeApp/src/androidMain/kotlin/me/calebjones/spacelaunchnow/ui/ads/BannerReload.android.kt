@@ -4,9 +4,12 @@ import android.view.ViewGroup
 import app.lexilabs.basic.ads.AdSize
 import app.lexilabs.basic.ads.BannerAdHandler
 import app.lexilabs.basic.ads.DependsOnGoogleMobileAds
+import co.touchlab.kermit.Logger
 import com.google.android.gms.ads.AdListener
 import com.google.android.gms.ads.AdView
 import com.google.android.gms.ads.LoadAdError
+
+private val log = Logger.withTag("BannerReload")
 
 /**
  * Reloads this handler with this app's ad unit and [loadSize], by default the handler's own
@@ -32,6 +35,11 @@ internal fun BannerAdHandler.reloadBannerView(placement: String, loadSize: AdSiz
         onClick = { AdTelemetry.clicked("banner", size, placement) }
     )
     installCodeReporting(size, placement)
+    // basic-ads 1.1.1 swaps bannerView inside load(). A later version that swaps it later would
+    // leave the replaced AdView alive here, so say so instead of leaking silently.
+    if (!bannerViewSwapped(previous, bannerView)) {
+        log.w { "load() did not swap bannerView for $placement: the replaced AdView is not retired" }
+    }
     retireBannerView(previous, bannerView)
 }
 
