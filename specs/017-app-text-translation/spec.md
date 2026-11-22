@@ -239,7 +239,10 @@ Three layers, cheapest first:
 
 1. **Literal-to-key equality script** (new, `scripts/i18n/verify_move.py`, in task T2). For each hunk it
    pairs a removed literal with the added `Res.string.<key>` and checks that the key's English value is
-   equal to the literal after XML unescaping and `%1$s`/`$var` mapping. Run in CI on every move PR.
+   equal to the literal after XML unescaping and `%1$s`/`$var` mapping. A worker runs it by hand on a move
+   branch; it is not a CI gate (removed from `pr-validation.yml` in Tasks#1284, after every move had merged,
+   because it rejects any later key swap). After the moves, CI guards the strings with
+   `check_hardcoded_text.py` (6.3) and the placeholder, plural and shared-key checks.
    This proves "same text" for every moved string, not only for the screens a person opens.
 2. **Text-tree snapshot per screen.** A `desktopTest` (JVM) renders each screen that already has a
    `@Preview` (180 exist) with `runComposeUiTest`, dumps the semantics tree (text and content
