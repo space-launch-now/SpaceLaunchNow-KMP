@@ -63,6 +63,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import coil3.compose.SubcomposeAsyncImage
 import kotlinx.coroutines.launch
+import kotlin.time.Clock
 import kotlin.time.TimeSource
 import me.calebjones.spacelaunchnow.analytics.DatadogLogger
 import me.calebjones.spacelaunchnow.domain.model.Launch
@@ -84,27 +85,27 @@ import org.koin.compose.koinInject
 import org.koin.compose.viewmodel.koinViewModel
 import org.jetbrains.compose.resources.stringResource
 import spacelaunchnow_kmp.composeapp.generated.resources.Res
+import spacelaunchnow_kmp.composeapp.generated.resources.common_ad_free_experience
+import spacelaunchnow_kmp.composeapp.generated.resources.common_calendar_sync
+import spacelaunchnow_kmp.composeapp.generated.resources.common_launch_placeholder
+import spacelaunchnow_kmp.composeapp.generated.resources.common_start_free_trial
+import spacelaunchnow_kmp.composeapp.generated.resources.common_timeline
 import spacelaunchnow_kmp.composeapp.generated.resources.onboarding_feature_alerts
 import spacelaunchnow_kmp.composeapp.generated.resources.onboarding_feature_countdown
 import spacelaunchnow_kmp.composeapp.generated.resources.onboarding_feature_map
-import spacelaunchnow_kmp.composeapp.generated.resources.onboarding_feature_timeline
 import spacelaunchnow_kmp.composeapp.generated.resources.onboarding_feature_trajectory
 import spacelaunchnow_kmp.composeapp.generated.resources.onboarding_paywall_billing_unavailable
 import spacelaunchnow_kmp.composeapp.generated.resources.onboarding_paywall_continue_app
 import spacelaunchnow_kmp.composeapp.generated.resources.onboarding_paywall_continue_free
-import spacelaunchnow_kmp.composeapp.generated.resources.onboarding_paywall_cta_default
 import spacelaunchnow_kmp.composeapp.generated.resources.onboarding_paywall_cta_trial
 import spacelaunchnow_kmp.composeapp.generated.resources.onboarding_paywall_disclosure
 import spacelaunchnow_kmp.composeapp.generated.resources.onboarding_paywall_features_heading
 import spacelaunchnow_kmp.composeapp.generated.resources.onboarding_paywall_features_more
-import spacelaunchnow_kmp.composeapp.generated.resources.onboarding_paywall_launch_placeholder
 import spacelaunchnow_kmp.composeapp.generated.resources.onboarding_paywall_monthly
 import spacelaunchnow_kmp.composeapp.generated.resources.onboarding_paywall_monthly_per_month
 import spacelaunchnow_kmp.composeapp.generated.resources.onboarding_paywall_next_launch_image
 import spacelaunchnow_kmp.composeapp.generated.resources.onboarding_paywall_perk_adfree_subtitle
-import spacelaunchnow_kmp.composeapp.generated.resources.onboarding_paywall_perk_adfree_title
 import spacelaunchnow_kmp.composeapp.generated.resources.onboarding_paywall_perk_calendar_subtitle
-import spacelaunchnow_kmp.composeapp.generated.resources.onboarding_paywall_perk_calendar_title
 import spacelaunchnow_kmp.composeapp.generated.resources.onboarding_paywall_perk_themes_subtitle
 import spacelaunchnow_kmp.composeapp.generated.resources.onboarding_paywall_perk_themes_title
 import spacelaunchnow_kmp.composeapp.generated.resources.onboarding_paywall_perk_widgets_subtitle_android
@@ -198,10 +199,14 @@ fun OnboardingPaywallScreen(
         },
         onRestorePurchases = { viewModel.restorePurchases(source = source) },
         onDismiss = {
-            if (!subscriptionState.isSubscribed) {
+            val dismissedWithoutSubscribing = !subscriptionState.isSubscribed
+            if (dismissedWithoutSubscribing) {
                 viewModel.trackPaywallDismissed(source, shownAt.elapsedNow().inWholeSeconds)
             }
             coroutineScope.launch {
+                if (dismissedWithoutSubscribing) {
+                    appPreferences.markOnboardingPaywallDismissed(Clock.System.now().toEpochMilliseconds())
+                }
                 appPreferences.setOnboardingCompleted(true)
                 appPreferences.setOnboardingPaywallV1Shown(true)
                 onComplete()
@@ -306,7 +311,7 @@ fun OnboardingContent(
 
                     OnboardingPerkCard(
                         icon = Icons.Default.Block,
-                        title = stringResource(Res.string.onboarding_paywall_perk_adfree_title),
+                        title = stringResource(Res.string.common_ad_free_experience),
                         subtitle = stringResource(Res.string.onboarding_paywall_perk_adfree_subtitle)
                     )
                     Spacer(modifier = Modifier.height(10.dp))
@@ -327,7 +332,7 @@ fun OnboardingContent(
                     Spacer(modifier = Modifier.height(10.dp))
                     OnboardingPerkCard(
                         icon = Icons.Default.CalendarMonth,
-                        title = stringResource(Res.string.onboarding_paywall_perk_calendar_title),
+                        title = stringResource(Res.string.common_calendar_sync),
                         subtitle = stringResource(Res.string.onboarding_paywall_perk_calendar_subtitle)
                     )
                     Spacer(modifier = Modifier.height(10.dp))
@@ -351,7 +356,7 @@ fun OnboardingContent(
                 if (annualProduct != null) {
                     val trialLabel = annualProduct.freeTrialPeriodDisplay
                     val ctaLabel =
-                        if (trialLabel != null) stringResource(Res.string.onboarding_paywall_cta_trial, trialLabel) else stringResource(Res.string.onboarding_paywall_cta_default)
+                        if (trialLabel != null) stringResource(Res.string.onboarding_paywall_cta_trial, trialLabel) else stringResource(Res.string.common_start_free_trial)
                     val disclosureText =
                         stringResource(Res.string.onboarding_paywall_disclosure, annualProduct.formattedPrice)
 
@@ -772,7 +777,7 @@ internal fun OnboardingNextLaunchCard(launch: Launch) {
                         ) {
                             Icon(
                                 imageVector = CustomIcons.RocketLaunch,
-                                contentDescription = stringResource(Res.string.onboarding_paywall_launch_placeholder),
+                                contentDescription = stringResource(Res.string.common_launch_placeholder),
                                 modifier = Modifier.size(72.dp),
                                 tint = MaterialTheme.colorScheme.primary.copy(alpha = 0.6f)
                             )
@@ -795,7 +800,7 @@ internal fun OnboardingNextLaunchCard(launch: Launch) {
                 ) {
                     Icon(
                         imageVector = CustomIcons.RocketLaunch,
-                        contentDescription = stringResource(Res.string.onboarding_paywall_launch_placeholder),
+                        contentDescription = stringResource(Res.string.common_launch_placeholder),
                         modifier = Modifier.size(72.dp),
                         tint = MaterialTheme.colorScheme.primary.copy(alpha = 0.6f)
                     )
@@ -819,7 +824,7 @@ internal fun OnboardingTrackingFeatureRow() {
         Pair(Icons.Default.Timer, stringResource(Res.string.onboarding_feature_countdown)),
         Pair(Icons.Default.Map, stringResource(Res.string.onboarding_feature_map)),
         Pair(Icons.Default.TravelExplore, stringResource(Res.string.onboarding_feature_trajectory)),
-        Pair(Icons.Default.Timeline, stringResource(Res.string.onboarding_feature_timeline)),
+        Pair(Icons.Default.Timeline, stringResource(Res.string.common_timeline)),
         Pair(Icons.Default.Notifications, stringResource(Res.string.onboarding_feature_alerts)),
     )
     Row(

@@ -40,7 +40,7 @@ fun main() {
             size = DpSize(1280.dp, 900.dp)
         )
         Window(
-            title = "Space Launch Now",
+            title = "Space Launch Now", // i18n-ignore: brand name, not translated
             onCloseRequest = ::exitApplication,
             state = windowState
         ) {

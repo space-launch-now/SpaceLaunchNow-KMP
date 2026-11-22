@@ -44,12 +44,12 @@ import me.calebjones.spacelaunchnow.ui.viewmodel.VehicleType
 import me.calebjones.spacelaunchnow.ui.viewmodel.ViewState
 import spacelaunchnow_kmp.composeapp.generated.resources.Res
 import org.jetbrains.compose.resources.stringResource
+import spacelaunchnow_kmp.composeapp.generated.resources.common_spacecraft
 import spacelaunchnow_kmp.composeapp.generated.resources.starship_vehicles_back_description
 import spacelaunchnow_kmp.composeapp.generated.resources.starship_vehicles_boosters
 import spacelaunchnow_kmp.composeapp.generated.resources.starship_vehicles_boosters_subtitle
 import spacelaunchnow_kmp.composeapp.generated.resources.starship_vehicles_empty
 import spacelaunchnow_kmp.composeapp.generated.resources.starship_vehicles_individual
-import spacelaunchnow_kmp.composeapp.generated.resources.starship_vehicles_spacecraft
 import spacelaunchnow_kmp.composeapp.generated.resources.starship_vehicles_spacecraft_subtitle
 
 /**
@@ -166,7 +166,7 @@ private fun ConfigurationsView(
                     if (spacecraftConfigs.isNotEmpty() || spacecraftConfigsState.isLoading) {
                         item(span = { GridItemSpan(maxLineSpan) }) {
                             VehicleSectionHeader(
-                                title = stringResource(Res.string.starship_vehicles_spacecraft),
+                                title = stringResource(Res.string.common_spacecraft),
                                 subtitle = stringResource(Res.string.starship_vehicles_spacecraft_subtitle)
                             )
                         }
@@ -279,7 +279,7 @@ private fun VehiclesView(
     modifier: Modifier = Modifier
 ) {
     val configName = when (vehicleType) {
-        VehicleType.SPACECRAFT -> selectedSpacecraftConfig?.name ?: stringResource(Res.string.starship_vehicles_spacecraft)
+        VehicleType.SPACECRAFT -> selectedSpacecraftConfig?.name ?: stringResource(Res.string.common_spacecraft)
         VehicleType.LAUNCHERS -> selectedLauncherConfig?.name ?: stringResource(Res.string.starship_vehicles_boosters)
     }
 

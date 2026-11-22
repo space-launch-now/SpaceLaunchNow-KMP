@@ -25,12 +25,12 @@ import me.calebjones.spacelaunchnow.ui.theme.SpaceLaunchNowPreviewTheme
 import org.jetbrains.compose.ui.tooling.preview.Preview
 import org.jetbrains.compose.resources.stringResource
 import spacelaunchnow_kmp.composeapp.generated.resources.Res
+import spacelaunchnow_kmp.composeapp.generated.resources.common_agencies
+import spacelaunchnow_kmp.composeapp.generated.resources.common_locations
 import spacelaunchnow_kmp.composeapp.generated.resources.onboarding_filters_10min
 import spacelaunchnow_kmp.composeapp.generated.resources.onboarding_filters_24h
-import spacelaunchnow_kmp.composeapp.generated.resources.onboarding_filters_agencies
 import spacelaunchnow_kmp.composeapp.generated.resources.onboarding_filters_california
 import spacelaunchnow_kmp.composeapp.generated.resources.onboarding_filters_florida
-import spacelaunchnow_kmp.composeapp.generated.resources.onboarding_filters_locations
 import spacelaunchnow_kmp.composeapp.generated.resources.onboarding_filters_subtitle
 import spacelaunchnow_kmp.composeapp.generated.resources.onboarding_filters_texas
 import spacelaunchnow_kmp.composeapp.generated.resources.onboarding_filters_timing
@@ -68,7 +68,7 @@ private fun NotificationFiltersPreviewContent() {
             verticalArrangement = Arrangement.spacedBy(4.dp)
         ) {
             // Agency section
-            SectionHeader(stringResource(Res.string.onboarding_filters_agencies))
+            SectionHeader(stringResource(Res.string.common_agencies))
             // i18n-ignore: agency proper name in static preview
             CheckboxItem(label = "SpaceX", checked = true)
             // i18n-ignore: agency proper name in static preview
@@ -81,7 +81,7 @@ private fun NotificationFiltersPreviewContent() {
             HorizontalDivider(modifier = Modifier.padding(vertical = 8.dp))
 
             // Location section
-            SectionHeader(stringResource(Res.string.onboarding_filters_locations))
+            SectionHeader(stringResource(Res.string.common_locations))
             CheckboxItem(label = stringResource(Res.string.onboarding_filters_florida), checked = true)
             CheckboxItem(label = stringResource(Res.string.onboarding_filters_texas), checked = false)
             CheckboxItem(label = stringResource(Res.string.onboarding_filters_california), checked = false)

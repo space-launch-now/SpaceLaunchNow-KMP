@@ -44,26 +44,26 @@ import me.calebjones.spacelaunchnow.util.DateTimeUtil
 import me.calebjones.spacelaunchnow.util.parseIsoDurationToHumanReadable
 import org.jetbrains.compose.resources.stringResource
 import spacelaunchnow_kmp.composeapp.generated.resources.Res
-import spacelaunchnow_kmp.composeapp.generated.resources.launch_detail_landing_details_heading
+import spacelaunchnow_kmp.composeapp.generated.resources.common_attempt
+import spacelaunchnow_kmp.composeapp.generated.resources.common_landing_details
+import spacelaunchnow_kmp.composeapp.generated.resources.common_location
+import spacelaunchnow_kmp.composeapp.generated.resources.common_no
+import spacelaunchnow_kmp.composeapp.generated.resources.common_not_available
+import spacelaunchnow_kmp.composeapp.generated.resources.common_tbd
+import spacelaunchnow_kmp.composeapp.generated.resources.common_value_kilometers
+import spacelaunchnow_kmp.composeapp.generated.resources.common_yes
 import spacelaunchnow_kmp.composeapp.generated.resources.launch_detail_landing_downrange
-import spacelaunchnow_kmp.composeapp.generated.resources.launch_detail_landing_downrange_value
 import spacelaunchnow_kmp.composeapp.generated.resources.launch_detail_landing_flight_number
-import spacelaunchnow_kmp.composeapp.generated.resources.launch_detail_landing_location
 import spacelaunchnow_kmp.composeapp.generated.resources.launch_detail_landing_previous_flight
 import spacelaunchnow_kmp.composeapp.generated.resources.launch_detail_landing_result_failure
 import spacelaunchnow_kmp.composeapp.generated.resources.launch_detail_landing_result_success
 import spacelaunchnow_kmp.composeapp.generated.resources.launch_detail_landing_stage_number
-import spacelaunchnow_kmp.composeapp.generated.resources.launch_detail_landing_tile_attempt
 import spacelaunchnow_kmp.composeapp.generated.resources.launch_detail_landing_tile_landing_type
 import spacelaunchnow_kmp.composeapp.generated.resources.launch_detail_landing_tile_result
 import spacelaunchnow_kmp.composeapp.generated.resources.launch_detail_landing_tile_stage_type
 import spacelaunchnow_kmp.composeapp.generated.resources.launch_detail_landing_turnaround
 import spacelaunchnow_kmp.composeapp.generated.resources.launch_detail_read_less
 import spacelaunchnow_kmp.composeapp.generated.resources.launch_detail_read_more
-import spacelaunchnow_kmp.composeapp.generated.resources.launch_detail_value_na
-import spacelaunchnow_kmp.composeapp.generated.resources.launch_detail_value_no
-import spacelaunchnow_kmp.composeapp.generated.resources.launch_detail_value_tbd
-import spacelaunchnow_kmp.composeapp.generated.resources.launch_detail_value_yes
 
 @Composable
         fun LandingDetailsCard(launcherStages: List<RocketStage>) {
@@ -179,8 +179,8 @@ fun LandingStageGridContent(stage: RocketStage) {
                 add(
                     Triple(
                         Icons.Filled.FlightTakeoff,
-                        stringResource(Res.string.launch_detail_landing_tile_attempt),
-                        if (it) stringResource(Res.string.launch_detail_value_yes) else stringResource(Res.string.launch_detail_value_no)
+                        stringResource(Res.string.common_attempt),
+                        if (it) stringResource(Res.string.common_yes) else stringResource(Res.string.common_no)
                     )
                 )
 
@@ -198,7 +198,7 @@ fun LandingStageGridContent(stage: RocketStage) {
                         Triple(
                             Icons.Filled.ChangeCircle,
                             stringResource(Res.string.launch_detail_landing_tile_result),
-                            stringResource(Res.string.launch_detail_value_tbd)
+                            stringResource(Res.string.common_tbd)
                         )
                     )
                 }
@@ -215,19 +215,19 @@ fun LandingStageGridContent(stage: RocketStage) {
             modifier = Modifier.padding(8.dp)
         ) {
             Text(
-                text = stringResource(Res.string.launch_detail_landing_details_heading),
+                text = stringResource(Res.string.common_landing_details),
                 style = MaterialTheme.typography.titleMedium,
                 fontWeight = FontWeight.Bold
             )
             InfoTileHorizontal(
                 icon = Icons.Filled.LocationOn,
-                label = stringResource(Res.string.launch_detail_landing_location),
+                label = stringResource(Res.string.common_location),
                 value = landing?.landingLocation?.name
             )
             InfoTileHorizontal(
                 icon = Icons.AutoMirrored.Filled.TrendingUp,
                 label = stringResource(Res.string.launch_detail_landing_downrange),
-                value = stringResource(Res.string.launch_detail_landing_downrange_value, landing?.downrangeDistance ?: stringResource(Res.string.launch_detail_value_na))
+                value = stringResource(Res.string.common_value_kilometers, landing?.downrangeDistance ?: stringResource(Res.string.common_not_available))
             )
             Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
                 tiles.chunked(2).forEach { row ->

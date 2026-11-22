@@ -21,12 +21,12 @@ import me.calebjones.spacelaunchnow.util.LatLng
 import me.calebjones.spacelaunchnow.util.NumberFormatUtil
 import spacelaunchnow_kmp.composeapp.generated.resources.Res
 import org.jetbrains.compose.resources.stringResource
+import spacelaunchnow_kmp.composeapp.generated.resources.common_location
+import spacelaunchnow_kmp.composeapp.generated.resources.common_value_kilometers
 import spacelaunchnow_kmp.composeapp.generated.resources.station_position_altitude
-import spacelaunchnow_kmp.composeapp.generated.resources.station_position_altitude_value
 import spacelaunchnow_kmp.composeapp.generated.resources.station_position_degrees
 import spacelaunchnow_kmp.composeapp.generated.resources.station_position_latitude
 import spacelaunchnow_kmp.composeapp.generated.resources.station_position_loading
-import spacelaunchnow_kmp.composeapp.generated.resources.station_position_location
 import spacelaunchnow_kmp.composeapp.generated.resources.station_position_longitude
 import spacelaunchnow_kmp.composeapp.generated.resources.station_position_orbit
 import spacelaunchnow_kmp.composeapp.generated.resources.station_position_speed_value
@@ -64,7 +64,7 @@ fun PositionCard(
                         Row(verticalAlignment = Alignment.CenterVertically) {
                             Icon(
                                 imageVector = Icons.Default.LocationOn,
-                                contentDescription = stringResource(Res.string.station_position_location),
+                                contentDescription = stringResource(Res.string.common_location),
                                 tint = MaterialTheme.colorScheme.primary
                             )
                             Column(modifier = Modifier.padding(start = 8.dp)) {
@@ -85,7 +85,7 @@ fun PositionCard(
                         Row(verticalAlignment = Alignment.CenterVertically) {
                             Icon(
                                 imageVector = Icons.Default.LocationOn,
-                                contentDescription = stringResource(Res.string.station_position_location),
+                                contentDescription = stringResource(Res.string.common_location),
                                 tint = MaterialTheme.colorScheme.primary
                             )
                             Column(modifier = Modifier.padding(start = 8.dp)) {
@@ -139,7 +139,7 @@ fun PositionCard(
                                     color = MaterialTheme.colorScheme.onSurfaceVariant
                                 )
                                 Text(
-                                    text = stringResource(Res.string.station_position_altitude_value, NumberFormatUtil.formatDecimal(it, 1)),
+                                    text = stringResource(Res.string.common_value_kilometers, NumberFormatUtil.formatDecimal(it, 1)),
                                     style = MaterialTheme.typography.bodyMedium
                                 )
                             }

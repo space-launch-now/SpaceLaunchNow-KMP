@@ -46,7 +46,7 @@ import org.jetbrains.compose.resources.painterResource
 import org.jetbrains.compose.ui.tooling.preview.Preview
 import spacelaunchnow_kmp.composeapp.generated.resources.Res
 import spacelaunchnow_kmp.composeapp.generated.resources.launcher
-import spacelaunchnow_kmp.composeapp.generated.resources.app_layout_scaffold_logo_description
+import spacelaunchnow_kmp.composeapp.generated.resources.common_app_name
 import org.jetbrains.compose.resources.stringResource
 
 /**
@@ -128,7 +128,7 @@ fun AdaptiveAppScaffold(
                                             ) {
                                                 Image(
                                                     painter = painterResource(Res.drawable.launcher),
-                                                    contentDescription = stringResource(Res.string.app_layout_scaffold_logo_description),
+                                                    contentDescription = stringResource(Res.string.common_app_name),
                                                     contentScale = ContentScale.Fit,
                                                     modifier = Modifier
                                                         .size(48.dp)

@@ -45,6 +45,11 @@ class AppPreferences(private val dataStore: DataStore<Preferences>) {
         // onboarding paywall at least once after this version ships.
         private val ONBOARDING_PAYWALL_V1_SHOWN = booleanPreferencesKey("onboarding_paywall_v1_shown")
 
+        // Day-7 win-back sheet: when the user dismissed the onboarding paywall (epoch ms), and
+        // whether the sheet was already shown. Both are written once and never reset.
+        private val ONBOARDING_PAYWALL_DISMISSED_AT_MS = longPreferencesKey("onboarding_paywall_dismissed_at_ms")
+        private val WINBACK_SHEET_SHOWN = booleanPreferencesKey("winback_sheet_shown")
+
         // Live onboarding (feature preview carousel) completed flag
         private val LIVE_ONBOARDING_COMPLETED = booleanPreferencesKey("live_onboarding_completed")
 
@@ -195,6 +200,26 @@ class AppPreferences(private val dataStore: DataStore<Preferences>) {
         dataStore.edit { preferences ->
             preferences[ONBOARDING_PAYWALL_V1_SHOWN] = shown
         }
+    }
+
+    // Day-7 win-back sheet methods
+    suspend fun getOnboardingPaywallDismissedAtMs(): Long? =
+        dataStore.data.map { it[ONBOARDING_PAYWALL_DISMISSED_AT_MS] }.first()
+
+    /** Records the first dismissal only; a later call never moves the date. */
+    suspend fun markOnboardingPaywallDismissed(nowMs: Long) {
+        dataStore.edit { preferences ->
+            if (preferences[ONBOARDING_PAYWALL_DISMISSED_AT_MS] == null) {
+                preferences[ONBOARDING_PAYWALL_DISMISSED_AT_MS] = nowMs
+            }
+        }
+    }
+
+    suspend fun isWinbackSheetShown(): Boolean =
+        dataStore.data.map { it[WINBACK_SHEET_SHOWN] }.first() ?: false
+
+    suspend fun markWinbackSheetShown() {
+        dataStore.edit { preferences -> preferences[WINBACK_SHEET_SHOWN] = true }
     }
 
     // Live onboarding completed methods

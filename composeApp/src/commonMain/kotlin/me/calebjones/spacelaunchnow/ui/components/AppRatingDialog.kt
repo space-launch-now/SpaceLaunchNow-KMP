@@ -14,7 +14,6 @@ import spacelaunchnow_kmp.composeapp.generated.resources.Res
 import spacelaunchnow_kmp.composeapp.generated.resources.app_components_feedback_button_discord
 import spacelaunchnow_kmp.composeapp.generated.resources.app_components_feedback_button_email
 import spacelaunchnow_kmp.composeapp.generated.resources.app_components_feedback_button_github
-import spacelaunchnow_kmp.composeapp.generated.resources.app_components_feedback_button_later
 import spacelaunchnow_kmp.composeapp.generated.resources.app_components_feedback_message
 import spacelaunchnow_kmp.composeapp.generated.resources.app_components_feedback_title
 import spacelaunchnow_kmp.composeapp.generated.resources.app_components_rating_button_later
@@ -22,6 +21,7 @@ import spacelaunchnow_kmp.composeapp.generated.resources.app_components_rating_b
 import spacelaunchnow_kmp.composeapp.generated.resources.app_components_rating_button_yes
 import spacelaunchnow_kmp.composeapp.generated.resources.app_components_rating_message
 import spacelaunchnow_kmp.composeapp.generated.resources.app_components_rating_title
+import spacelaunchnow_kmp.composeapp.generated.resources.common_maybe_later
 import org.jetbrains.compose.resources.stringResource
 
 /**
@@ -167,7 +167,7 @@ fun FeedbackDialog(
                     onClick = onDismiss,
                     modifier = Modifier.fillMaxWidth()
                 ) {
-                    Text(stringResource(Res.string.app_components_feedback_button_later))
+                    Text(stringResource(Res.string.common_maybe_later))
                 }
             }
         },

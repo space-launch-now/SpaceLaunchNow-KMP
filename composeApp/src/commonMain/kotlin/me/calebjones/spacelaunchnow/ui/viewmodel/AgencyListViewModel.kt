@@ -16,6 +16,8 @@ import me.calebjones.spacelaunchnow.data.repository.AgencyRepository
 import me.calebjones.spacelaunchnow.domain.model.Agency
 import me.calebjones.spacelaunchnow.util.logging.isCoroutineCancellation
 import me.calebjones.spacelaunchnow.util.logging.logger
+import org.jetbrains.compose.resources.StringResource
+import spacelaunchnow_kmp.composeapp.generated.resources.*
 
 /**
  * ViewModel for displaying a paginated list of agencies.
@@ -323,25 +325,25 @@ data class AgencyListUiState(
 /**
  * Sort order options for agency list.
  */
-enum class AgencySortOrder(val apiValue: String, val displayName: String) {
-    NAME_ASC("name", "Name (A-Z)"),
-    NAME_DESC("-name", "Name (Z-A)"),
-    TOTAL_LAUNCHES_ASC("total_launch_count", "Total Launches (Low to High)"),
-    TOTAL_LAUNCHES_DESC("-total_launch_count", "Total Launches (High to Low)"),
-    SUCCESSFUL_LAUNCHES_ASC("successful_launches", "Successful Launches (Low to High)"),
-    SUCCESSFUL_LAUNCHES_DESC("-successful_launches", "Successful Launches (High to Low)"),
-    FAILED_LAUNCHES_ASC("failed_launches", "Failed Launches (Low to High)"),
-    FAILED_LAUNCHES_DESC("-failed_launches", "Failed Launches (High to Low)"),
-    PENDING_LAUNCHES_ASC("pending_launches", "Pending Launches (Low to High)"),
-    PENDING_LAUNCHES_DESC("-pending_launches", "Pending Launches (High to Low)"),
-    CONSECUTIVE_SUCCESSFUL_LAUNCHES_ASC("consecutive_successful_launches", "Consecutive Successes (Low to High)"),
-    CONSECUTIVE_SUCCESSFUL_LAUNCHES_DESC("-consecutive_successful_launches", "Consecutive Successes (High to Low)"),
-    ATTEMPTED_LANDINGS_ASC("attempted_landings", "Attempted Landings (Low to High)"),
-    ATTEMPTED_LANDINGS_DESC("-attempted_landings", "Attempted Landings (High to Low)"),
-    SUCCESSFUL_LANDINGS_ASC("successful_landings", "Successful Landings (Low to High)"),
-    SUCCESSFUL_LANDINGS_DESC("-successful_landings", "Successful Landings (High to Low)"),
-    FAILED_LANDINGS_ASC("failed_landings", "Failed Landings (Low to High)"),
-    FAILED_LANDINGS_DESC("-failed_landings", "Failed Landings (High to Low)"),
-    CONSECUTIVE_SUCCESSFUL_LANDINGS_ASC("consecutive_successful_landings", "Consecutive Landing Successes (Low to High)"),
-    CONSECUTIVE_SUCCESSFUL_LANDINGS_DESC("-consecutive_successful_landings", "Consecutive Landing Successes (High to Low)")
+enum class AgencySortOrder(val apiValue: String, val label: StringResource) {
+    NAME_ASC("name", Res.string.common_sort_name_asc),
+    NAME_DESC("-name", Res.string.common_sort_name_desc),
+    TOTAL_LAUNCHES_ASC("total_launch_count", Res.string.common_sort_total_launches_asc),
+    TOTAL_LAUNCHES_DESC("-total_launch_count", Res.string.common_sort_total_launches_desc),
+    SUCCESSFUL_LAUNCHES_ASC("successful_launches", Res.string.common_sort_successful_launches_asc),
+    SUCCESSFUL_LAUNCHES_DESC("-successful_launches", Res.string.common_sort_successful_launches_desc),
+    FAILED_LAUNCHES_ASC("failed_launches", Res.string.common_sort_failed_launches_asc),
+    FAILED_LAUNCHES_DESC("-failed_launches", Res.string.common_sort_failed_launches_desc),
+    PENDING_LAUNCHES_ASC("pending_launches", Res.string.common_sort_pending_launches_asc),
+    PENDING_LAUNCHES_DESC("-pending_launches", Res.string.common_sort_pending_launches_desc),
+    CONSECUTIVE_SUCCESSFUL_LAUNCHES_ASC("consecutive_successful_launches", Res.string.common_sort_consecutive_successes_asc),
+    CONSECUTIVE_SUCCESSFUL_LAUNCHES_DESC("-consecutive_successful_launches", Res.string.common_sort_consecutive_successes_desc),
+    ATTEMPTED_LANDINGS_ASC("attempted_landings", Res.string.common_sort_attempted_landings_asc),
+    ATTEMPTED_LANDINGS_DESC("-attempted_landings", Res.string.common_sort_attempted_landings_desc),
+    SUCCESSFUL_LANDINGS_ASC("successful_landings", Res.string.common_sort_successful_landings_asc),
+    SUCCESSFUL_LANDINGS_DESC("-successful_landings", Res.string.common_sort_successful_landings_desc),
+    FAILED_LANDINGS_ASC("failed_landings", Res.string.common_sort_failed_landings_asc),
+    FAILED_LANDINGS_DESC("-failed_landings", Res.string.common_sort_failed_landings_desc),
+    CONSECUTIVE_SUCCESSFUL_LANDINGS_ASC("consecutive_successful_landings", Res.string.common_sort_consecutive_landing_successes_asc),
+    CONSECUTIVE_SUCCESSFUL_LANDINGS_DESC("-consecutive_successful_landings", Res.string.common_sort_consecutive_landing_successes_desc)
 }

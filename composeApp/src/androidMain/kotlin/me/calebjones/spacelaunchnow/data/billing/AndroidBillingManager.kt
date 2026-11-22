@@ -182,7 +182,7 @@ class AndroidBillingManager(
                     productId = product.id,
                     basePlanId = pkg.identifier,
                     title = product.title,
-                    description = "${pkg.packageType} - ${product.period?.unit?.name ?: "One-time"}",
+                    description = "${pkg.packageType} - ${product.period?.unit?.name ?: "One-time"}", // i18n-ignore: debug product summary, shown only in Debug settings
                     formattedPrice = product.price.formatted,
                     priceAmountMicros = product.price.amountMicros.toLong(),
                     currencyCode = product.price.currencyCode,

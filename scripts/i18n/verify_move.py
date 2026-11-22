@@ -4,7 +4,10 @@
 Spec 017, section 6.2, layer 1. For each diff hunk, every added Res.string.<key>
 must match a removed Kotlin string literal: the key's English value, after XML and
 Android unescaping, equals the literal, with $var and ${expr} mapped to %1$s style
-placeholders. A key with no equal literal fails the check.
+placeholders. A key with no equal literal fails the check. A swap of one key for another also passes:
+a removed Res.string.<old> whose English value equals the added key's value counts as
+a match. The old value comes from the diff's removed XML lines, the base revision, or
+the current strings, in that order.
 
 Usage:
   python3 scripts/i18n/verify_move.py [--base origin/main] [--diff FILE|-]
@@ -92,14 +95,19 @@ def load_strings(paths):
     """Return ({key: raw value} for <string>, {names of plurals and arrays})."""
     strings, other = {}, set()
     for path in paths:
-        for el in ET.parse(path).getroot():
-            if not isinstance(el.tag, str) or "name" not in el.attrib:
-                continue
-            if el.tag == "string":
-                strings[el.get("name")] = "".join(el.itertext())
-            else:
-                other.add(el.get("name"))
+        parse_strings(ET.parse(path).getroot(), strings, other)
     return strings, other
+
+
+def parse_strings(root, strings, other):
+    """Add the <string> entries of one resources element to `strings` and other names to `other`."""
+    for el in root:
+        if not isinstance(el.tag, str) or "name" not in el.attrib:
+            continue
+        if el.tag == "string":
+            strings[el.get("name")] = "".join(el.itertext())
+        else:
+            other.add(el.get("name"))
 
 
 def parse_hunks(diff: str):
@@ -126,6 +134,19 @@ def parse_hunks(diff: str):
         yield path, removed, added
 
 
+REMOVED_XML_RE = re.compile(r'<string\s+name="([^"]+)"[^>]*>(.*?)</string>')
+
+
+def removed_xml_strings(diff: str):
+    """{key: raw value} for single-line <string> entries removed from a strings*.xml in the diff."""
+    out = {}
+    for path, removed, _ in parse_hunks(diff):
+        if re.search(r"strings[^/]*\.xml$", path or ""):
+            for m in REMOVED_XML_RE.finditer("\n".join(removed)):
+                out[m.group(1)] = "".join(ET.fromstring(f"<s>{m.group(2)}</s>").itertext())
+    return out
+
+
 def removed_literals(removed):
     """Normalized Kotlin literals in removed lines; `"a" +` newline `"b"` counts as one."""
     text = CONCAT_RE.sub("", "\n".join(removed))
@@ -136,6 +157,12 @@ def removed_literals(removed):
         for expr in KT_VAR_RE.finditer(m.group(1)):
             out += [normalize_literal(n.group(1)) for n in LITERAL_RE.finditer(expr.group(1) or "")]
     return out
+
+
+def removed_key_values(removed, old_strings):
+    """Normalized English values of `Res.string.<old>` keys in removed lines; unknown keys are skipped."""
+    return [normalize_resource(old_strings[k]) for line in removed for k in KEY_RE.findall(line)
+            if k in old_strings]
 
 
 def check_hunk(pool, added, strings, other):
@@ -162,12 +189,15 @@ def new_files(diff: str):
     return set(re.findall(r"^--- /dev/null\n\+\+\+ b/(\S+)", diff, re.M))
 
 
-def verify(diff: str, strings, other):
+def verify(diff: str, strings, other, base=None):
     """Return (failures, new_text). Keys added in a file that is new in the diff go to
     `new_text`: no text was removed from such a file, so there is nothing to compare. They
     count as new text, not as a move, and do not fail. Elsewhere, match added keys to
     removed literals per file, so a literal hoisted into a `val` in another hunk of the
-    same file still counts."""
+    same file still counts. A removed `Res.string.<old>` adds its English value to the pool,
+    so a swap between keys with equal text passes; the value is read from the removed XML
+    lines, then `base` (the base revision strings), then `strings`."""
+    old_strings = {**strings, **(base or {}), **removed_xml_strings(diff)}
     created = new_files(diff)
     by_file = {}
     for path, removed, added in parse_hunks(diff):
@@ -178,7 +208,8 @@ def verify(diff: str, strings, other):
         if path in created:
             new_text += [f"{path}: {k}" for _, added in hunks for line in added for k in KEY_RE.findall(line)]
             continue
-        pool = removed_literals([line for removed, _ in hunks for line in removed])
+        removed_lines = [line for removed, _ in hunks for line in removed]
+        pool = removed_literals(removed_lines) + removed_key_values(removed_lines, old_strings)
         for _, added in hunks:
             failures += [f"{path}: {p}" for p in check_hunk(pool, added, strings, other)]
     return failures, new_text
@@ -187,6 +218,20 @@ def verify(diff: str, strings, other):
 def git_diff(base: str) -> str:
     cmd = ["git", "diff", "--no-color", "-U0", f"{base}...HEAD"]
     return subprocess.run(cmd, check=True, capture_output=True, text=True, encoding="utf-8").stdout
+
+
+def load_base_strings(base: str, paths):
+    """{key: raw value} from the strings files at the merge base; files absent there are skipped."""
+    merge_base = subprocess.run(["git", "merge-base", base, "HEAD"], capture_output=True, text=True)
+    if merge_base.returncode:
+        return {}
+    out = {}
+    for path in paths:
+        shown = subprocess.run(["git", "show", f"{merge_base.stdout.strip()}:{Path(path).as_posix()}"],
+                               capture_output=True, text=True, encoding="utf-8")
+        if shown.returncode == 0:
+            parse_strings(ET.fromstring(shown.stdout), out, set())
+    return out
 
 
 def touches_strings(diff: str) -> bool:
@@ -210,8 +255,11 @@ def main(argv=None) -> int:
         print("verify_move: no strings*.xml in the diff, skipped")
         return 0
 
-    strings, other = load_strings(args.strings or default_strings())
-    failures, new_text = verify(diff, strings, other)
+    paths = args.strings or default_strings()
+    strings, other = load_strings(paths)
+    # With --diff there is no git base to read, so only the diff and HEAD strings are used.
+    base = {} if args.diff else load_base_strings(args.base, paths)
+    failures, new_text = verify(diff, strings, other, base)
     for f in failures:
         print(f"FAIL {f}")
     if new_text:

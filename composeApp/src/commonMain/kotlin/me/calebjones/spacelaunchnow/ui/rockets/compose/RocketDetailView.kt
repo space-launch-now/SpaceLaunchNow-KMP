@@ -23,44 +23,44 @@ import me.calebjones.spacelaunchnow.ui.compose.SharedDetailScaffold
 import me.calebjones.spacelaunchnow.util.NumberFormatUtil
 import org.jetbrains.compose.resources.stringResource
 import spacelaunchnow_kmp.composeapp.generated.resources.Res
+import spacelaunchnow_kmp.composeapp.generated.resources.common_active
+import spacelaunchnow_kmp.composeapp.generated.resources.common_attempted
+import spacelaunchnow_kmp.composeapp.generated.resources.common_description
+import spacelaunchnow_kmp.composeapp.generated.resources.common_diameter
+import spacelaunchnow_kmp.composeapp.generated.resources.common_failed
+import spacelaunchnow_kmp.composeapp.generated.resources.common_geo
+import spacelaunchnow_kmp.composeapp.generated.resources.common_gto
+import spacelaunchnow_kmp.composeapp.generated.resources.common_inactive
+import spacelaunchnow_kmp.composeapp.generated.resources.common_landing_statistics
+import spacelaunchnow_kmp.composeapp.generated.resources.common_launch_cost
+import spacelaunchnow_kmp.composeapp.generated.resources.common_launch_mass
+import spacelaunchnow_kmp.composeapp.generated.resources.common_launch_statistics
+import spacelaunchnow_kmp.composeapp.generated.resources.common_length
+import spacelaunchnow_kmp.composeapp.generated.resources.common_leo
+import spacelaunchnow_kmp.composeapp.generated.resources.common_maiden_flight
+import spacelaunchnow_kmp.composeapp.generated.resources.common_manufacturer
+import spacelaunchnow_kmp.composeapp.generated.resources.common_no
+import spacelaunchnow_kmp.composeapp.generated.resources.common_reusable
+import spacelaunchnow_kmp.composeapp.generated.resources.common_sso
+import spacelaunchnow_kmp.composeapp.generated.resources.common_stages
+import spacelaunchnow_kmp.composeapp.generated.resources.common_status
+import spacelaunchnow_kmp.composeapp.generated.resources.common_successful
+import spacelaunchnow_kmp.composeapp.generated.resources.common_value_kilograms
+import spacelaunchnow_kmp.composeapp.generated.resources.common_value_meters
+import spacelaunchnow_kmp.composeapp.generated.resources.common_variant
+import spacelaunchnow_kmp.composeapp.generated.resources.common_yes
 import spacelaunchnow_kmp.composeapp.generated.resources.rockets_detail_capacity_title
-import spacelaunchnow_kmp.composeapp.generated.resources.rockets_detail_description_title
 import spacelaunchnow_kmp.composeapp.generated.resources.rockets_detail_info_title
-import spacelaunchnow_kmp.composeapp.generated.resources.rockets_detail_label_attempted
 import spacelaunchnow_kmp.composeapp.generated.resources.rockets_detail_label_consecutive_successes
-import spacelaunchnow_kmp.composeapp.generated.resources.rockets_detail_label_diameter
-import spacelaunchnow_kmp.composeapp.generated.resources.rockets_detail_label_failed
 import spacelaunchnow_kmp.composeapp.generated.resources.rockets_detail_label_format
 import spacelaunchnow_kmp.composeapp.generated.resources.rockets_detail_label_full_name
-import spacelaunchnow_kmp.composeapp.generated.resources.rockets_detail_label_geo
-import spacelaunchnow_kmp.composeapp.generated.resources.rockets_detail_label_gto
-import spacelaunchnow_kmp.composeapp.generated.resources.rockets_detail_label_launch_cost
-import spacelaunchnow_kmp.composeapp.generated.resources.rockets_detail_label_launch_mass
-import spacelaunchnow_kmp.composeapp.generated.resources.rockets_detail_label_length
-import spacelaunchnow_kmp.composeapp.generated.resources.rockets_detail_label_leo
 import spacelaunchnow_kmp.composeapp.generated.resources.rockets_detail_label_liftoff_thrust
-import spacelaunchnow_kmp.composeapp.generated.resources.rockets_detail_label_maiden_flight
-import spacelaunchnow_kmp.composeapp.generated.resources.rockets_detail_label_manufacturer
 import spacelaunchnow_kmp.composeapp.generated.resources.rockets_detail_label_pending
-import spacelaunchnow_kmp.composeapp.generated.resources.rockets_detail_label_reusable
-import spacelaunchnow_kmp.composeapp.generated.resources.rockets_detail_label_sso
-import spacelaunchnow_kmp.composeapp.generated.resources.rockets_detail_label_stages
-import spacelaunchnow_kmp.composeapp.generated.resources.rockets_detail_label_status
-import spacelaunchnow_kmp.composeapp.generated.resources.rockets_detail_label_successful
 import spacelaunchnow_kmp.composeapp.generated.resources.rockets_detail_label_total_launches
-import spacelaunchnow_kmp.composeapp.generated.resources.rockets_detail_label_variant
-import spacelaunchnow_kmp.composeapp.generated.resources.rockets_detail_landing_stats_title
-import spacelaunchnow_kmp.composeapp.generated.resources.rockets_detail_launch_stats_title
 import spacelaunchnow_kmp.composeapp.generated.resources.rockets_detail_performance_title
 import spacelaunchnow_kmp.composeapp.generated.resources.rockets_detail_stages_range
 import spacelaunchnow_kmp.composeapp.generated.resources.rockets_detail_value_cost_millions
-import spacelaunchnow_kmp.composeapp.generated.resources.rockets_detail_value_kilograms
 import spacelaunchnow_kmp.composeapp.generated.resources.rockets_detail_value_kilonewtons
-import spacelaunchnow_kmp.composeapp.generated.resources.rockets_detail_value_meters
-import spacelaunchnow_kmp.composeapp.generated.resources.rockets_detail_value_no
-import spacelaunchnow_kmp.composeapp.generated.resources.rockets_detail_value_yes
-import spacelaunchnow_kmp.composeapp.generated.resources.rockets_status_active
-import spacelaunchnow_kmp.composeapp.generated.resources.rockets_status_inactive
 
 private val TitleHeight = 110.dp
 
@@ -164,15 +164,15 @@ private fun RocketInfoCard(rocket: VehicleConfig) {
             Spacer(modifier = Modifier.height(12.dp))
 
             InfoRow(label = stringResource(Res.string.rockets_detail_label_full_name), value = rocket.fullName ?: rocket.name)
-            rocket.variant?.let { InfoRow(label = stringResource(Res.string.rockets_detail_label_variant), value = it) }
-            rocket.manufacturerName?.let { InfoRow(label = stringResource(Res.string.rockets_detail_label_manufacturer), value = it) }
-            rocket.maidenFlight?.let { InfoRow(label = stringResource(Res.string.rockets_detail_label_maiden_flight), value = it.toString()) }
-            InfoRow(label = stringResource(Res.string.rockets_detail_label_status), value = if (rocket.active == true) stringResource(Res.string.rockets_status_active) else stringResource(Res.string.rockets_status_inactive))
-            InfoRow(label = stringResource(Res.string.rockets_detail_label_reusable), value = if (rocket.reusable == true) stringResource(Res.string.rockets_detail_value_yes) else stringResource(Res.string.rockets_detail_value_no))
+            rocket.variant?.let { InfoRow(label = stringResource(Res.string.common_variant), value = it) }
+            rocket.manufacturerName?.let { InfoRow(label = stringResource(Res.string.common_manufacturer), value = it) }
+            rocket.maidenFlight?.let { InfoRow(label = stringResource(Res.string.common_maiden_flight), value = it.toString()) }
+            InfoRow(label = stringResource(Res.string.common_status), value = if (rocket.active == true) stringResource(Res.string.common_active) else stringResource(Res.string.common_inactive))
+            InfoRow(label = stringResource(Res.string.common_reusable), value = if (rocket.reusable == true) stringResource(Res.string.common_yes) else stringResource(Res.string.common_no))
 
             rocket.minStage?.let { min ->
                 rocket.maxStage?.let { max ->
-                    InfoRow(label = stringResource(Res.string.rockets_detail_label_stages), value = if (min == max) min.toString() else stringResource(Res.string.rockets_detail_stages_range, min, max))
+                    InfoRow(label = stringResource(Res.string.common_stages), value = if (min == max) min.toString() else stringResource(Res.string.rockets_detail_stages_range, min, max))
                 }
             }
         }
@@ -191,7 +191,7 @@ private fun DescriptionCard(description: String) {
                 .padding(16.dp)
         ) {
             Text(
-                text = stringResource(Res.string.rockets_detail_description_title),
+                text = stringResource(Res.string.common_description),
                 style = MaterialTheme.typography.titleMedium,
                 fontWeight = FontWeight.Bold
             )
@@ -224,12 +224,12 @@ private fun PerformanceCard(rocket: VehicleConfig) {
 
             Spacer(modifier = Modifier.height(12.dp))
 
-            rocket.length?.let { InfoRow(label = stringResource(Res.string.rockets_detail_label_length), value = stringResource(Res.string.rockets_detail_value_meters, NumberFormatUtil.formatDecimal(it, 1))) }
-            rocket.diameter?.let { InfoRow(label = stringResource(Res.string.rockets_detail_label_diameter), value = stringResource(Res.string.rockets_detail_value_meters, NumberFormatUtil.formatDecimal(it, 1))) }
+            rocket.length?.let { InfoRow(label = stringResource(Res.string.common_length), value = stringResource(Res.string.common_value_meters, NumberFormatUtil.formatDecimal(it, 1))) }
+            rocket.diameter?.let { InfoRow(label = stringResource(Res.string.common_diameter), value = stringResource(Res.string.common_value_meters, NumberFormatUtil.formatDecimal(it, 1))) }
             rocket.launchMass?.let {
                 InfoRow(
-                    label = stringResource(Res.string.rockets_detail_label_launch_mass),
-                    value = stringResource(Res.string.rockets_detail_value_kilograms, NumberFormatUtil.formatDecimal(it, 0))
+                    label = stringResource(Res.string.common_launch_mass),
+                    value = stringResource(Res.string.common_value_kilograms, NumberFormatUtil.formatDecimal(it, 0))
                 )
             }
             rocket.toThrust?.let {
@@ -240,7 +240,7 @@ private fun PerformanceCard(rocket: VehicleConfig) {
             }
             rocket.launchCost?.let {
                 InfoRow(
-                    label = stringResource(Res.string.rockets_detail_label_launch_cost),
+                    label = stringResource(Res.string.common_launch_cost),
                     value = stringResource(Res.string.rockets_detail_value_cost_millions, NumberFormatUtil.formatDecimal(it.toDouble(), 0))
                 )
             }
@@ -267,10 +267,10 @@ private fun CapacityCard(rocket: VehicleConfig) {
 
             Spacer(modifier = Modifier.height(12.dp))
 
-            rocket.leoCapacity?.let { InfoRow(label = stringResource(Res.string.rockets_detail_label_leo), value = stringResource(Res.string.rockets_detail_value_kilograms, NumberFormatUtil.formatDecimal(it, 0))) }
-            rocket.gtoCapacity?.let { InfoRow(label = stringResource(Res.string.rockets_detail_label_gto), value = stringResource(Res.string.rockets_detail_value_kilograms, NumberFormatUtil.formatDecimal(it, 0))) }
-            rocket.geoCapacity?.let { InfoRow(label = stringResource(Res.string.rockets_detail_label_geo), value = stringResource(Res.string.rockets_detail_value_kilograms, NumberFormatUtil.formatDecimal(it, 0))) }
-            rocket.ssoCapacity?.let { InfoRow(label = stringResource(Res.string.rockets_detail_label_sso), value = stringResource(Res.string.rockets_detail_value_kilograms, NumberFormatUtil.formatDecimal(it, 0))) }
+            rocket.leoCapacity?.let { InfoRow(label = stringResource(Res.string.common_leo), value = stringResource(Res.string.common_value_kilograms, NumberFormatUtil.formatDecimal(it, 0))) }
+            rocket.gtoCapacity?.let { InfoRow(label = stringResource(Res.string.common_gto), value = stringResource(Res.string.common_value_kilograms, NumberFormatUtil.formatDecimal(it, 0))) }
+            rocket.geoCapacity?.let { InfoRow(label = stringResource(Res.string.common_geo), value = stringResource(Res.string.common_value_kilograms, NumberFormatUtil.formatDecimal(it, 0))) }
+            rocket.ssoCapacity?.let { InfoRow(label = stringResource(Res.string.common_sso), value = stringResource(Res.string.common_value_kilograms, NumberFormatUtil.formatDecimal(it, 0))) }
         }
     }
 }
@@ -287,7 +287,7 @@ private fun LaunchStatsCard(rocket: VehicleConfig) {
                 .padding(16.dp)
         ) {
             Text(
-                text = stringResource(Res.string.rockets_detail_launch_stats_title),
+                text = stringResource(Res.string.common_launch_statistics),
                 style = MaterialTheme.typography.titleMedium,
                 fontWeight = FontWeight.Bold
             )
@@ -300,8 +300,8 @@ private fun LaunchStatsCard(rocket: VehicleConfig) {
                     value = it.toString()
                 )
             }
-            rocket.successfulLaunches?.let { InfoRow(label = stringResource(Res.string.rockets_detail_label_successful), value = it.toString()) }
-            rocket.failedLaunches?.let { InfoRow(label = stringResource(Res.string.rockets_detail_label_failed), value = it.toString()) }
+            rocket.successfulLaunches?.let { InfoRow(label = stringResource(Res.string.common_successful), value = it.toString()) }
+            rocket.failedLaunches?.let { InfoRow(label = stringResource(Res.string.common_failed), value = it.toString()) }
             rocket.pendingLaunches?.let { InfoRow(label = stringResource(Res.string.rockets_detail_label_pending), value = it.toString()) }
             rocket.consecutiveSuccessfulLaunches?.let {
                 InfoRow(
@@ -325,16 +325,16 @@ private fun LandingStatsCard(rocket: VehicleConfig) {
                 .padding(16.dp)
         ) {
             Text(
-                text = stringResource(Res.string.rockets_detail_landing_stats_title),
+                text = stringResource(Res.string.common_landing_statistics),
                 style = MaterialTheme.typography.titleMedium,
                 fontWeight = FontWeight.Bold
             )
 
             Spacer(modifier = Modifier.height(12.dp))
 
-            rocket.attemptedLandings?.let { InfoRow(label = stringResource(Res.string.rockets_detail_label_attempted), value = it.toString()) }
-            rocket.successfulLandings?.let { InfoRow(label = stringResource(Res.string.rockets_detail_label_successful), value = it.toString()) }
-            rocket.failedLandings?.let { InfoRow(label = stringResource(Res.string.rockets_detail_label_failed), value = it.toString()) }
+            rocket.attemptedLandings?.let { InfoRow(label = stringResource(Res.string.common_attempted), value = it.toString()) }
+            rocket.successfulLandings?.let { InfoRow(label = stringResource(Res.string.common_successful), value = it.toString()) }
+            rocket.failedLandings?.let { InfoRow(label = stringResource(Res.string.common_failed), value = it.toString()) }
             rocket.consecutiveSuccessfulLandings?.let {
                 InfoRow(
                     label = stringResource(Res.string.rockets_detail_label_consecutive_successes),

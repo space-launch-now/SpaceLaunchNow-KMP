@@ -52,15 +52,15 @@ import me.calebjones.spacelaunchnow.domain.model.Country
 import org.jetbrains.compose.ui.tooling.preview.Preview
 import org.jetbrains.compose.resources.stringResource
 import spacelaunchnow_kmp.composeapp.generated.resources.Res
-import spacelaunchnow_kmp.composeapp.generated.resources.agency_list_country_unknown
 import spacelaunchnow_kmp.composeapp.generated.resources.agency_list_empty_description
 import spacelaunchnow_kmp.composeapp.generated.resources.agency_list_empty_title
 import spacelaunchnow_kmp.composeapp.generated.resources.agency_list_error_heading
-import spacelaunchnow_kmp.composeapp.generated.resources.agency_list_logo_description
-import spacelaunchnow_kmp.composeapp.generated.resources.agency_list_title
+import spacelaunchnow_kmp.composeapp.generated.resources.common_agencies
+import spacelaunchnow_kmp.composeapp.generated.resources.common_agency_logo
 import spacelaunchnow_kmp.composeapp.generated.resources.common_back
 import spacelaunchnow_kmp.composeapp.generated.resources.common_error
 import spacelaunchnow_kmp.composeapp.generated.resources.common_retry
+import spacelaunchnow_kmp.composeapp.generated.resources.common_unknown
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -75,7 +75,7 @@ fun AgencyListView(
     Scaffold(
         topBar = {
             TopAppBar(
-                title = { Text(stringResource(Res.string.agency_list_title)) },
+                title = { Text(stringResource(Res.string.common_agencies)) },
                 navigationIcon = {
                     IconButton(onClick = onNavigateBack) {
                         Icon(
@@ -174,7 +174,7 @@ fun AgencyListItem(
                     ) {
                         AsyncImage(
                             model = logoUrl,
-                            contentDescription = stringResource(Res.string.agency_list_logo_description),
+                            contentDescription = stringResource(Res.string.common_agency_logo),
                             contentScale = ContentScale.Crop,
                             modifier = Modifier
                                 .size(64.dp)
@@ -230,7 +230,7 @@ fun AgencyListItem(
                                 onClick = { },
                                 label = {
                                     Text(
-                                        text = countryLabel(country) ?: stringResource(Res.string.agency_list_country_unknown),
+                                        text = countryLabel(country) ?: stringResource(Res.string.common_unknown),
                                         style = MaterialTheme.typography.labelSmall
                                     )
                                 }

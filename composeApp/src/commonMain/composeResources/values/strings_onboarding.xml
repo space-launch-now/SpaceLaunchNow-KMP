@@ -7,8 +7,6 @@
 
     <!-- Welcome page. Small line above the app name. One line. -->
     <string name="onboarding_welcome_greeting">Welcome to</string>
-    <!-- Welcome page. App name, large heading. One line. -->
-    <string name="onboarding_welcome_app_name">Space Launch Now</string>
     <!-- Welcome page. Tagline under the app name. Two lines; the line break after the comma is on purpose. -->
     <string name="onboarding_welcome_tagline">Your guide to every rocket launch,\nright from your pocket.</string>
     <!-- Welcome page. Small caps label above the next launch card. -->
@@ -23,8 +21,6 @@
     <!-- Welcome page. Caption under a feature icon. One word. -->
     <string name="onboarding_feature_trajectory">Trajectory</string>
     <!-- Welcome page. Caption under a feature icon. One word. -->
-    <string name="onboarding_feature_timeline">Timeline</string>
-    <!-- Welcome page. Caption under a feature icon. One word. -->
     <string name="onboarding_feature_alerts">Alerts</string>
 
     <!-- Launch card page. Page title. One line. -->
@@ -36,28 +32,14 @@
     <string name="onboarding_schedule_title">Your Launch Schedule</string>
     <!-- Schedule page. Text under the title. One or two lines. -->
     <string name="onboarding_schedule_subtitle">Browse upcoming and previous launches in a clean, organized timeline.</string>
-    <!-- Schedule page. Tab label for launches that have not happened yet. One word. -->
-    <string name="onboarding_schedule_upcoming">Upcoming</string>
-    <!-- Schedule page. Tab label for launches that already happened. One word. -->
-    <string name="onboarding_schedule_previous">Previous</string>
 
-    <!-- News and events page. Page title. One line. -->
-    <string name="onboarding_news_title">News &amp; Events</string>
     <!-- News and events page. Text under the title. One or two lines. -->
     <string name="onboarding_news_subtitle">Read the latest space news and follow live events from launches to spacewalks.</string>
-    <!-- News and events page. Heading above the sample news list. One line. -->
-    <string name="onboarding_news_latest">Latest News</string>
 
     <!-- Explore page. Page title. One line. -->
     <string name="onboarding_explore_title">Explore Space</string>
     <!-- Explore page. Text under the title. One or two lines. -->
     <string name="onboarding_explore_subtitle">Dive into the world of spaceflight with detailed profiles and data.</string>
-    <!-- Explore page. Section heading above sample astronauts. One word. -->
-    <string name="onboarding_explore_astronauts">Astronauts</string>
-    <!-- Explore page. Section heading above sample rockets. One word. -->
-    <string name="onboarding_explore_rockets">Rockets</string>
-    <!-- Explore page. Section heading above sample space agencies. One word. -->
-    <string name="onboarding_explore_agencies">Agencies</string>
 
     <!-- Widgets page. Page title. One line. -->
     <string name="onboarding_widgets_title">Widgets at a Glance</string>
@@ -73,17 +55,11 @@
     <string name="onboarding_widget_go">Go</string>
     <!-- Widget picture on the widgets page. Heading of the sample Android widget. -->
     <string name="onboarding_widget_upcoming_launches">Upcoming Launches</string>
-    <!-- Widget picture on the widgets page. Launch status at the end of each sample row. -->
-    <string name="onboarding_widget_status_go">Go for Launch</string>
 
     <!-- Notification filters page. Page title. One line. -->
     <string name="onboarding_filters_title">Customize Notifications</string>
     <!-- Notification filters page. Text under the title. One or two lines. -->
     <string name="onboarding_filters_subtitle">Choose which agencies, locations, and events you want to hear about.</string>
-    <!-- Notification filters page. Section heading above sample agency checkboxes. One word. -->
-    <string name="onboarding_filters_agencies">Agencies</string>
-    <!-- Notification filters page. Section heading above sample location checkboxes. One word. -->
-    <string name="onboarding_filters_locations">Locations</string>
     <!-- Notification filters page. Section heading above sample timing switches. One or two words. -->
     <string name="onboarding_filters_timing">Timing Alerts</string>
     <!-- Notification filters page. Sample location checkbox label. US state name. -->
@@ -97,8 +73,6 @@
     <!-- Notification filters page. Sample switch label. Alert ten minutes before a launch. -->
     <string name="onboarding_filters_10min">10min Before Launch</string>
 
-    <!-- Notification permission page. Content description of the bell icon. Read by screen readers. -->
-    <string name="onboarding_permission_icon_description">Notifications</string>
     <!-- Notification permission page. Title when notifications are already on. One line. -->
     <string name="onboarding_permission_title_granted">You're All Set!</string>
     <!-- Notification permission page. Title when the app asks for permission. One line. -->
@@ -107,10 +81,6 @@
     <string name="onboarding_permission_subtitle_granted">Notifications are enabled. You'll be notified before launches so you never miss a liftoff.</string>
     <!-- Notification permission page. Text under the title when the app asks for permission. Two or three lines. -->
     <string name="onboarding_permission_subtitle_ask">Get notified before launches so you never miss a liftoff. You can customize which notifications you receive.</string>
-    <!-- Notification permission page. Button that opens the system settings after the user denied permission. -->
-    <string name="onboarding_permission_open_settings">Open Settings</string>
-    <!-- Notification permission page. Text button that skips the permission request. -->
-    <string name="onboarding_permission_maybe_later">Maybe Later</string>
     <!-- Notification permission page. Button that shows the system permission dialog. -->
     <string name="onboarding_permission_enable">Enable Notifications</string>
 
@@ -126,8 +96,6 @@
     <string name="onboarding_paywall_features_heading">PREMIUM FEATURES INCLUDE</string>
     <!-- Premium offer page. Small caps line under the list of Premium perks. -->
     <string name="onboarding_paywall_features_more">AND MUCH MORE!</string>
-    <!-- Premium offer page. Perk title. One line. -->
-    <string name="onboarding_paywall_perk_adfree_title">Ad-Free Experience</string>
     <!-- Premium offer page. Perk text under its title. One or two lines. -->
     <string name="onboarding_paywall_perk_adfree_subtitle">Browse launches and news without interruptions.</string>
     <!-- Premium offer page. Perk title. One line. -->
@@ -140,14 +108,10 @@
     <string name="onboarding_paywall_perk_themes_title">Themes Customization</string>
     <!-- Premium offer page. Perk text under its title. One or two lines. -->
     <string name="onboarding_paywall_perk_themes_subtitle">Personalize your app with exclusive themes.</string>
-    <!-- Premium offer page. Perk title. One line. -->
-    <string name="onboarding_paywall_perk_calendar_title">Calendar Sync</string>
     <!-- Premium offer page. Perk text under its title. One or two lines. -->
     <string name="onboarding_paywall_perk_calendar_subtitle">Add launches directly to your calendar so you never miss one.</string>
     <!-- Premium offer page. Main button when the store gives a free trial length. %1$s is the length, such as 2-week. -->
     <string name="onboarding_paywall_cta_trial">Start Your %1$s Free Trial</string>
-    <!-- Premium offer page. Main button when the store gives no free trial length. -->
-    <string name="onboarding_paywall_cta_default">Start Free Trial</string>
     <!-- Premium offer page. Small line under the main button text. %1$s is the yearly price with currency, such as $29.99. -->
     <string name="onboarding_paywall_disclosure">Then %1$s/year. Cancel anytime.</string>
     <!-- Premium offer page. Small badge on the main button. %1$s is a percentage, such as 50%. -->
@@ -164,6 +128,4 @@
     <string name="onboarding_paywall_continue_app">Continue to App</string>
     <!-- Premium offer page. Content description of the next launch image. Read by screen readers. -->
     <string name="onboarding_paywall_next_launch_image">Next launch image</string>
-    <!-- Premium offer page. Content description of the rocket icon shown when the launch image fails. Read by screen readers. -->
-    <string name="onboarding_paywall_launch_placeholder">Launch placeholder</string>
 </resources>

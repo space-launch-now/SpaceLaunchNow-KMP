@@ -34,7 +34,7 @@ import spacelaunchnow_kmp.composeapp.generated.resources.astronaut_info_age
 import spacelaunchnow_kmp.composeapp.generated.resources.astronaut_info_age_value
 import spacelaunchnow_kmp.composeapp.generated.resources.astronaut_info_died
 import spacelaunchnow_kmp.composeapp.generated.resources.astronaut_info_nationality
-import spacelaunchnow_kmp.composeapp.generated.resources.astronaut_info_status
+import spacelaunchnow_kmp.composeapp.generated.resources.common_status
 
 /**
  * Card displaying astronaut personal information including status, age, nationality, and death date if applicable.
@@ -63,7 +63,7 @@ fun AstronautPersonalInfoCard(
             astronaut.statusName?.let { statusName ->
                 InfoTile(
                     icon = Icons.Default.EmojiEvents,
-                    label = stringResource(Res.string.astronaut_info_status),
+                    label = stringResource(Res.string.common_status),
                     modifier = Modifier.weight(1f),
                     customComposable = {
                         StatusChip(

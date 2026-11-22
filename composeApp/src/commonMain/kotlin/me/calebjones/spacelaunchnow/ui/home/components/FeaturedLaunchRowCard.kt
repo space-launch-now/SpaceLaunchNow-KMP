@@ -57,9 +57,9 @@ import kotlin.time.Duration.Companion.days
 import kotlin.time.Duration.Companion.hours
 import org.jetbrains.compose.resources.stringResource
 import spacelaunchnow_kmp.composeapp.generated.resources.Res
-import spacelaunchnow_kmp.composeapp.generated.resources.home_launch_date_tbd
+import spacelaunchnow_kmp.composeapp.generated.resources.common_launch_placeholder
+import spacelaunchnow_kmp.composeapp.generated.resources.common_tbd
 import spacelaunchnow_kmp.composeapp.generated.resources.home_launch_image_description
-import spacelaunchnow_kmp.composeapp.generated.resources.home_launch_placeholder_description
 
 /**
  * A compact, wide card for displaying featured launches in a horizontal row.
@@ -131,7 +131,7 @@ fun FeaturedLaunchRowCard(
                             ) {
                                 Icon(
                                     imageVector = CustomIcons.RocketLaunch,
-                                    contentDescription = stringResource(Res.string.home_launch_placeholder_description),
+                                    contentDescription = stringResource(Res.string.common_launch_placeholder),
                                     modifier = Modifier.size(36.dp),
                                     tint = MaterialTheme.colorScheme.primary.copy(alpha = 0.6f)
                                 )
@@ -147,7 +147,7 @@ fun FeaturedLaunchRowCard(
                     ) {
                         Icon(
                             imageVector = CustomIcons.RocketLaunch,
-                            contentDescription = stringResource(Res.string.home_launch_placeholder_description),
+                            contentDescription = stringResource(Res.string.common_launch_placeholder),
                             modifier = Modifier.size(36.dp),
                             tint = MaterialTheme.colorScheme.primary.copy(alpha = 0.6f)
                         )
@@ -236,7 +236,7 @@ fun FeaturedLaunchRowCard(
                             }
                         )
                     } else {
-                        LaunchDateRow(text = stringResource(Res.string.home_launch_date_tbd))
+                        LaunchDateRow(text = stringResource(Res.string.common_tbd))
                     }
 
                 }

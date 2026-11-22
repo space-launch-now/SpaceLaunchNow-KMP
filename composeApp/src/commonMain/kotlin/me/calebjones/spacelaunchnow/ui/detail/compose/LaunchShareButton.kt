@@ -22,7 +22,7 @@ import me.calebjones.spacelaunchnow.util.sharePlainText
 import org.jetbrains.compose.resources.stringResource
 import org.koin.compose.koinInject
 import spacelaunchnow_kmp.composeapp.generated.resources.Res
-import spacelaunchnow_kmp.composeapp.generated.resources.launch_detail_share_description
+import spacelaunchnow_kmp.composeapp.generated.resources.common_share
 import spacelaunchnow_kmp.composeapp.generated.resources.launch_detail_share_title
 
 /**
@@ -56,7 +56,7 @@ internal fun LaunchShareButton(launch: Launch, compact: Boolean = false) {
     ) {
         Icon(
             imageVector = Icons.Filled.Share,
-            contentDescription = stringResource(Res.string.launch_detail_share_description),
+            contentDescription = stringResource(Res.string.common_share),
             tint = if (compact) MaterialTheme.colorScheme.onSurface else Color.White,
             modifier = Modifier.size(if (compact) 20.dp else 24.dp)
         )

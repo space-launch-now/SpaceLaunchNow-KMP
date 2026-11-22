@@ -33,10 +33,10 @@ import me.calebjones.spacelaunchnow.ui.theme.SpaceLaunchNowPreviewTheme
 import org.jetbrains.compose.ui.tooling.preview.Preview
 import org.jetbrains.compose.resources.stringResource
 import spacelaunchnow_kmp.composeapp.generated.resources.Res
-import spacelaunchnow_kmp.composeapp.generated.resources.onboarding_schedule_previous
+import spacelaunchnow_kmp.composeapp.generated.resources.common_previous
+import spacelaunchnow_kmp.composeapp.generated.resources.common_upcoming
 import spacelaunchnow_kmp.composeapp.generated.resources.onboarding_schedule_subtitle
 import spacelaunchnow_kmp.composeapp.generated.resources.onboarding_schedule_title
-import spacelaunchnow_kmp.composeapp.generated.resources.onboarding_schedule_upcoming
 
 /**
  * Onboarding page 2 — shows a schedule screen with live launch data,
@@ -80,12 +80,12 @@ private fun SchedulePreviewContent(
                 Tab(
                     selected = selectedTabIndex == 0,
                     onClick = { selectedTabIndex = 0 },
-                    text = { Text(stringResource(Res.string.onboarding_schedule_upcoming)) }
+                    text = { Text(stringResource(Res.string.common_upcoming)) }
                 )
                 Tab(
                     selected = selectedTabIndex == 1,
                     onClick = { selectedTabIndex = 1 },
-                    text = { Text(stringResource(Res.string.onboarding_schedule_previous)) }
+                    text = { Text(stringResource(Res.string.common_previous)) }
                 )
             }
 

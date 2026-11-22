@@ -6,6 +6,7 @@ import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.SideEffect
+import androidx.compose.runtime.rememberUpdatedState
 import androidx.compose.runtime.getValue
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.LifecycleEventObserver
@@ -160,72 +161,20 @@ actual fun WithPreloadedAds(
         return
     }
 
-    // Primary banner ad (most common — used in content areas, phone CONTENT/NAVIGATION)
-    val preloadedBannerAd by rememberBannerAd(
-        adUnitId = GlobalAdManager.getPlatformAdUnitId(AdType.BANNER),
-        adSize = AdSize.BANNER,
-        onLoad = { AdTelemetry.loaded("banner", AdSize.BANNER.label(), "BANNER") },
-        onFailure = { /* reported with its code by CodeReportingAdListener */ },
-        onShown = {},
-        onDismissed = {},
-        onImpression = { AdTelemetry.impression("banner", AdSize.BANNER.label(), "BANNER") },
-        onClick = { AdTelemetry.clicked("banner", AdSize.BANNER.label(), "BANNER") }
-    )
-
-    // Large banner for FEED placements and tablet NAVIGATION
-    val preloadedLargeBannerAd by rememberBannerAd(
-        adUnitId = GlobalAdManager.getPlatformAdUnitId(AdType.BANNER),
-        adSize = AdSize.LARGE_BANNER,
-        onLoad = { AdTelemetry.loaded("banner", AdSize.LARGE_BANNER.label(), "LARGE_BANNER") },
-        onFailure = { /* reported with its code by CodeReportingAdListener */ },
-        onShown = {},
-        onDismissed = {},
-        onImpression = { AdTelemetry.impression("banner", AdSize.LARGE_BANNER.label(), "LARGE_BANNER") },
-        onClick = { AdTelemetry.clicked("banner", AdSize.LARGE_BANNER.label(), "LARGE_BANNER") }
-    )
-
-    // Medium rectangle for tablet FEED/CONTENT and phone INTERSTITIAL placement type
-    val preloadedMediumRectangleAd by rememberBannerAd(
-        adUnitId = GlobalAdManager.getPlatformAdUnitId(AdType.BANNER),
-        adSize = AdSize.MEDIUM_RECTANGLE,
-        onLoad = { AdTelemetry.loaded("banner", AdSize.MEDIUM_RECTANGLE.label(), "MEDIUM_RECTANGLE") },
-        onFailure = { /* reported with its code by CodeReportingAdListener */ },
-        onShown = {},
-        onDismissed = {},
-        onImpression = { AdTelemetry.impression("banner", AdSize.MEDIUM_RECTANGLE.label(), "MEDIUM_RECTANGLE") },
-        onClick = { AdTelemetry.clicked("banner", AdSize.MEDIUM_RECTANGLE.label(), "MEDIUM_RECTANGLE") }
-    )
-
-    // Dedicated navigation banner — separate request to avoid recomposition fights
-    // with the content banner when transitioning between screens.
-    val preloadedNavigationBannerAd by rememberBannerAd(
-        adUnitId = GlobalAdManager.getPlatformAdUnitId(AdType.BANNER),
-        adSize = AdSize.BANNER,
-        onLoad = { AdTelemetry.loaded("banner", AdSize.BANNER.label(), "NAVIGATION") },
-        onFailure = { /* reported with its code by CodeReportingAdListener */ },
-        onShown = {},
-        onDismissed = {},
-        onImpression = { AdTelemetry.impression("banner", AdSize.BANNER.label(), "NAVIGATION") },
-        onClick = { AdTelemetry.clicked("banner", AdSize.BANNER.label(), "NAVIGATION") }
-    )
+    // One list of preloaded handlers: load, code reporting, display-change reload and destroy
+    // all walk it, so a new slot cannot be added to one path and missed in another.
+    val handlers = PreloadedBannerSlot.entries.associateWith { rememberPreloadedBanner(it) }
+    val allHandlers by rememberUpdatedState(handlers.entries.toList())
 
     // The library's rememberBannerAd loads inside composition. Wrap each new AdView's listener
     // so a failed load reports its AdMob error code.
-    PreloadedBannerSetup(preloadedBannerAd, AdSize.BANNER, "BANNER")
-    PreloadedBannerSetup(preloadedLargeBannerAd, AdSize.LARGE_BANNER, "LARGE_BANNER")
-    PreloadedBannerSetup(preloadedMediumRectangleAd, AdSize.MEDIUM_RECTANGLE, "MEDIUM_RECTANGLE")
-    PreloadedBannerSetup(preloadedNavigationBannerAd, AdSize.BANNER, "NAVIGATION")
+    allHandlers.forEach { (slot, handler) -> PreloadedBannerSetup(handler, slot.size, slot.placement) }
 
     // Density, font scale or window size class changed: the loaded AdViews have a stale pixel
     // size, so load fresh ones (the old ones are destroyed). Skips the first composition.
     ReloadOnDisplayChange {
-        listOf(
-            preloadedBannerAd to "BANNER",
-            preloadedLargeBannerAd to "LARGE_BANNER",
-            preloadedMediumRectangleAd to "MEDIUM_RECTANGLE",
-            preloadedNavigationBannerAd to "NAVIGATION"
-        ).forEach { (handler, placement) ->
-            if (isBannerLoaded(handler.state)) handler.reloadBannerView(placement)
+        allHandlers.forEach { (slot, handler) ->
+            if (isBannerLoaded(handler.state)) handler.reloadBannerView(slot.placement)
         }
     }
 
@@ -234,17 +183,17 @@ actual fun WithPreloadedAds(
     DisposableEffect(activityOwner) {
         val observer = LifecycleEventObserver { _, event ->
             if (event == Lifecycle.Event.ON_DESTROY) {
-                listOf(
-                    preloadedBannerAd,
-                    preloadedLargeBannerAd,
-                    preloadedMediumRectangleAd,
-                    preloadedNavigationBannerAd
-                ).forEach { it.bannerView?.destroy() }
+                allHandlers.forEach { (_, handler) -> handler.bannerView?.destroy() }
             }
         }
         activityOwner?.lifecycle?.addObserver(observer)
         onDispose { activityOwner?.lifecycle?.removeObserver(observer) }
     }
+
+    val preloadedBannerAd = handlers.getValue(PreloadedBannerSlot.BANNER)
+    val preloadedLargeBannerAd = handlers.getValue(PreloadedBannerSlot.LARGE_BANNER)
+    val preloadedMediumRectangleAd = handlers.getValue(PreloadedBannerSlot.MEDIUM_RECTANGLE)
+    val preloadedNavigationBannerAd = handlers.getValue(PreloadedBannerSlot.NAVIGATION)
 
     // Aliased fallbacks for sizes/placements that produced ~$0 in production.
     // SmartBannerAd's fallback picker still resolves to a usable banner.
@@ -315,6 +264,40 @@ actual fun rememberPrivacyOptionsRequired(): Boolean {
 @Composable
 private fun PreloadedBannerSetup(handler: BannerAdHandler, size: AdSize, placement: String) {
     SideEffect { handler.installCodeReporting(size.label(), placement) }
+}
+
+/**
+ * The preloaded banner handlers, in one place. [placement] is the telemetry placement label;
+ * NAVIGATION is a second BANNER-size request so the persistent bottom bar does not fight the
+ * content banner while screens change.
+ */
+@OptIn(DependsOnGoogleMobileAds::class)
+private enum class PreloadedBannerSlot(val size: AdSize, val placement: String) {
+    /** Most common: content areas, phone CONTENT. */
+    BANNER(AdSize.BANNER, "BANNER"),
+    /** FEED placements and tablet NAVIGATION. */
+    LARGE_BANNER(AdSize.LARGE_BANNER, "LARGE_BANNER"),
+    /** Tablet FEED/CONTENT and phone INTERSTITIAL placement type. */
+    MEDIUM_RECTANGLE(AdSize.MEDIUM_RECTANGLE, "MEDIUM_RECTANGLE"),
+    /** The persistent bottom navigation banner. */
+    NAVIGATION(AdSize.BANNER, "NAVIGATION")
+}
+
+@OptIn(DependsOnGoogleMobileAds::class)
+@Composable
+private fun rememberPreloadedBanner(slot: PreloadedBannerSlot): BannerAdHandler {
+    val size = slot.size.label()
+    val handler by rememberBannerAd(
+        adUnitId = GlobalAdManager.getPlatformAdUnitId(AdType.BANNER),
+        adSize = slot.size,
+        onLoad = { AdTelemetry.loaded("banner", size, slot.placement) },
+        onFailure = { /* reported with its code by CodeReportingAdListener */ },
+        onShown = {},
+        onDismissed = {},
+        onImpression = { AdTelemetry.impression("banner", size, slot.placement) },
+        onClick = { AdTelemetry.clicked("banner", size, slot.placement) }
+    )
+    return handler
 }
 
 private fun AdSize.label(): String = AdTelemetry.sizeLabel(width, height)

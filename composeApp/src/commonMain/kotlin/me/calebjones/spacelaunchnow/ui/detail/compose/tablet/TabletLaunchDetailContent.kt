@@ -42,19 +42,19 @@ import kotlin.time.Clock.System
 import org.koin.compose.koinInject
 import org.jetbrains.compose.resources.stringResource
 import spacelaunchnow_kmp.composeapp.generated.resources.Res
+import spacelaunchnow_kmp.composeapp.generated.resources.common_landing_details
+import spacelaunchnow_kmp.composeapp.generated.resources.common_launch_location
+import spacelaunchnow_kmp.composeapp.generated.resources.common_overview
+import spacelaunchnow_kmp.composeapp.generated.resources.common_timeline
+import spacelaunchnow_kmp.composeapp.generated.resources.common_updates
 import spacelaunchnow_kmp.composeapp.generated.resources.launch_detail_launch_fallback_name
-import spacelaunchnow_kmp.composeapp.generated.resources.launch_detail_section_landing_details
-import spacelaunchnow_kmp.composeapp.generated.resources.launch_detail_section_launch_location
 import spacelaunchnow_kmp.composeapp.generated.resources.launch_detail_section_launch_service_provider
 import spacelaunchnow_kmp.composeapp.generated.resources.launch_detail_section_launch_service_provider_statistics
 import spacelaunchnow_kmp.composeapp.generated.resources.launch_detail_section_launch_vehicle_details
 import spacelaunchnow_kmp.composeapp.generated.resources.launch_detail_section_mission_details
-import spacelaunchnow_kmp.composeapp.generated.resources.launch_detail_section_overview
 import spacelaunchnow_kmp.composeapp.generated.resources.launch_detail_section_related_events
 import spacelaunchnow_kmp.composeapp.generated.resources.launch_detail_section_related_news
 import spacelaunchnow_kmp.composeapp.generated.resources.launch_detail_section_spacecraft_details
-import spacelaunchnow_kmp.composeapp.generated.resources.launch_detail_section_timeline
-import spacelaunchnow_kmp.composeapp.generated.resources.launch_detail_section_updates
 import spacelaunchnow_kmp.composeapp.generated.resources.launch_detail_watch_launch
 import spacelaunchnow_kmp.composeapp.generated.resources.launch_detail_watch_live
 import spacelaunchnow_kmp.composeapp.generated.resources.launch_detail_watch_replay
@@ -100,7 +100,7 @@ fun TabletLaunchDetailContent(
         ) {
             // 1. Combined Launch Overview Card
             Text(
-                text = stringResource(Res.string.launch_detail_section_overview),
+                text = stringResource(Res.string.common_overview),
                 style = MaterialTheme.typography.titleLarge,
                 fontWeight = FontWeight.Bold
             )
@@ -124,7 +124,7 @@ fun TabletLaunchDetailContent(
             // Timeline Card
             if (launch.timeline.isNotEmpty()) {
                 Text(
-                    text = stringResource(Res.string.launch_detail_section_timeline),
+                    text = stringResource(Res.string.common_timeline),
                     style = MaterialTheme.typography.titleLarge,
                     fontWeight = FontWeight.Bold
                 )
@@ -151,7 +151,7 @@ fun TabletLaunchDetailContent(
             // Updates Section
             if (launch.updates.isNotEmpty()) {
                 Text(
-                    text = stringResource(Res.string.launch_detail_section_updates),
+                    text = stringResource(Res.string.common_updates),
                     style = MaterialTheme.typography.titleLarge,
                     fontWeight = FontWeight.Bold,
                     modifier = Modifier.padding(top = 16.dp)
@@ -207,7 +207,7 @@ fun TabletLaunchDetailContent(
             // Launch Location
             launch.pad?.let { pad ->
                 Text(
-                    text = stringResource(Res.string.launch_detail_section_launch_location),
+                    text = stringResource(Res.string.common_launch_location),
                     style = MaterialTheme.typography.titleLarge,
                     fontWeight = FontWeight.Bold
                 )
@@ -287,7 +287,7 @@ fun TabletLaunchDetailContent(
                 val landingStages = launch.rocketDetail?.stages ?: emptyList()
                 if (landingStages.any { it.landingAttempt != null }) {
                     Text(
-                        text = stringResource(Res.string.launch_detail_section_landing_details),
+                        text = stringResource(Res.string.common_landing_details),
                         style = MaterialTheme.typography.titleLarge,
                         fontWeight = FontWeight.Bold
                     )

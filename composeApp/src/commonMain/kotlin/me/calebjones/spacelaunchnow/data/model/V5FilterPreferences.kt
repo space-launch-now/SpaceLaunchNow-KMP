@@ -26,7 +26,7 @@ import kotlinx.serialization.Serializable
  * - Flexible (OR): ANY active filter can match (default)
  */
 @Deprecated(
-    message = "V5 now uses NotificationState directly instead of V5FilterPreferences. " +
+    message = "V5 now uses NotificationState directly instead of V5FilterPreferences. " + // i18n-ignore: deprecation message for developers
         "This class is kept for backward compatibility only.",
     replaceWith = ReplaceWith("NotificationState"),
     level = DeprecationLevel.WARNING

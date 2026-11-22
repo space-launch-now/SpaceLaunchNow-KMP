@@ -13,8 +13,6 @@
 
     <!-- Station position card. Heading of the card, one line. -->
     <string name="station_position_title">Current Position</string>
-    <!-- Station position card. Screen reader description of the pin icon next to latitude and longitude. -->
-    <string name="station_position_location">Location</string>
     <!-- Station position card. Small label above the latitude value. One word. -->
     <string name="station_position_latitude">Latitude</string>
     <!-- Station position card. Small label above the longitude value. One word. -->
@@ -23,8 +21,6 @@
     <string name="station_position_degrees">%1$s°</string>
     <!-- Station position card. Small label above the altitude value, and its icon description. One word. -->
     <string name="station_position_altitude">Altitude</string>
-    <!-- Station position card. Altitude value. %1$s is a number, such as 408.3. Keep the unit short. -->
-    <string name="station_position_altitude_value">%1$s km</string>
     <!-- Station position card. Small label above the speed value, and its icon description. One word. -->
     <string name="station_position_velocity">Velocity</string>
     <!-- Station position card. Speed value. %1$s is a number, such as 27580. Keep the unit short. -->
@@ -50,8 +46,6 @@
     <!-- Station docking card. Small line under a vehicle. %1$s is a date such as Nov 3, 2026. -->
     <string name="station_docking_since">Since %1$s</string>
 
-    <!-- Expedition card. Screen reader description of the mission patch image. -->
-    <string name="station_expedition_patch_description">Mission Patch</string>
     <!-- Expedition card. Screen reader description of the expedition icon. -->
     <string name="station_expedition_icon_description">Expedition Icon</string>
     <!-- Expedition card. Small label above the start date. One word. -->
@@ -67,20 +61,12 @@
 
     <!-- Station owners card. Heading of the card. -->
     <string name="station_agencies_title">Operating Agencies</string>
-    <!-- Station owners card. Screen reader description of an agency logo. %1$s is the agency name. -->
-    <string name="station_agency_logo_description">%1$s logo</string>
 
     <!-- Station news card. Heading of the card. -->
     <string name="station_reports_title">News and Reports</string>
-    <!-- Station news card. Button that shows more articles. One line. %1$d is how many more articles it shows. -->
-    <string name="station_reports_load_more">Load More (%1$d more)</string>
-    <!-- Station news card. Button that shows fewer articles. One line. -->
-    <string name="station_reports_show_less">Show Less</string>
 
     <!-- Station statistics card. Heading of the card. -->
     <string name="station_specs_title">Station Statistics</string>
-    <!-- Station statistics card. Label above the number of people on board. -->
-    <string name="station_specs_crew">Onboard Crew</string>
     <!-- Station statistics card. Label above the station height. One word. -->
     <string name="station_specs_height">Height</string>
     <!-- Station statistics card. Label above the station width. One word. -->
@@ -89,26 +75,12 @@
     <string name="station_specs_mass">Mass</string>
     <!-- Station statistics card. Label above the station volume. One word. -->
     <string name="station_specs_volume">Volume</string>
-    <!-- Station statistics card. Label above the date the station was founded. One word. -->
-    <string name="station_specs_founded">Founded</string>
-    <!-- Station statistics card. Length in metres. %1$s is a number, such as 109.0. -->
-    <string name="station_specs_meters_value">%1$s m</string>
-    <!-- Station statistics card. Mass in kilograms. %1$s is a number with thousands separators. -->
-    <string name="station_specs_kilograms_value">%1$s kg</string>
     <!-- Station statistics card. Volume in cubic metres. %1$s is a number. -->
     <string name="station_specs_cubic_meters_value">%1$s m³</string>
 
-    <!-- Starship screen. Top bar title and name used when the program has no name. One line. -->
-    <string name="starship_title">Starship</string>
-    <!-- Starship screen. Tab label. One word. -->
-    <string name="starship_tab_overview">Overview</string>
-    <!-- Starship screen. Tab label. One word. -->
-    <string name="starship_tab_events">Events</string>
     <!-- Starship screen. Tab label. One word. -->
     <string name="starship_tab_vehicles">Vehicles</string>
 
-    <!-- Starship events tab. Section heading above the event list. -->
-    <string name="starship_events_title">Events</string>
     <!-- Starship events tab. Section heading above the news list. -->
     <string name="starship_events_news_title">News &amp; Articles</string>
     <!-- Starship events tab. Empty state when no event exists. -->
@@ -131,17 +103,11 @@
     <string name="starship_overview_load_failed">Failed to load data</string>
     <!-- Starship overview tab. Hint under the error message. Tapping retries the load. -->
     <string name="starship_overview_tap_to_retry">Tap to retry</string>
-    <!-- Starship overview tab. Section heading above the update list. -->
-    <string name="starship_updates_title">Updates</string>
-    <!-- Starship overview tab. Empty state when no update exists. -->
-    <string name="starship_updates_empty">No updates available</string>
     <!-- Starship overview tab. Empty state when the program has no data. -->
     <string name="starship_overview_empty">No Starship data available</string>
     <!-- Starship overview tab. Banner shown when the data comes from the cache. -->
     <string name="starship_overview_cached">Showing cached data • Pull to refresh</string>
 
-    <!-- Starship vehicles tab. Section heading and name used when a spacecraft configuration has no name. -->
-    <string name="starship_vehicles_spacecraft">Spacecraft</string>
     <!-- Starship vehicles tab. Line under the spacecraft heading. -->
     <string name="starship_vehicles_spacecraft_subtitle">Starship vehicles</string>
     <!-- Starship vehicles tab. Section heading and name used when a booster configuration has no name. -->
@@ -173,4 +139,6 @@
         <item quantity="one">%1$d Flight</item>
         <item quantity="other">%1$d Flights</item>
     </plurals>
+    <!-- Description of the NASA live video stream of Earth from the International Space Station. One sentence. -->
+    <string name="station_iss_live_stream_description">Live HD views of Earth from the International Space Station</string>
 </resources>

@@ -48,13 +48,13 @@ import me.calebjones.spacelaunchnow.ui.state.VideoPlayerState
 import me.calebjones.spacelaunchnow.ui.viewmodel.ViewState
 import spacelaunchnow_kmp.composeapp.generated.resources.Res
 import org.jetbrains.compose.resources.stringResource
+import spacelaunchnow_kmp.composeapp.generated.resources.common_no_updates_available
+import spacelaunchnow_kmp.composeapp.generated.resources.common_starship
+import spacelaunchnow_kmp.composeapp.generated.resources.common_updates
 import spacelaunchnow_kmp.composeapp.generated.resources.starship_overview_cached
 import spacelaunchnow_kmp.composeapp.generated.resources.starship_overview_empty
 import spacelaunchnow_kmp.composeapp.generated.resources.starship_overview_load_failed
 import spacelaunchnow_kmp.composeapp.generated.resources.starship_overview_tap_to_retry
-import spacelaunchnow_kmp.composeapp.generated.resources.starship_title
-import spacelaunchnow_kmp.composeapp.generated.resources.starship_updates_empty
-import spacelaunchnow_kmp.composeapp.generated.resources.starship_updates_title
 
 /**
  * Overview tab for Starship Dashboard
@@ -208,7 +208,7 @@ private fun TabletOverviewLayout(
                     ) {
                         VideoPlayer(
                             videoPlayerState = videoPlayerState,
-                            launchName = programState.data?.name ?: stringResource(Res.string.starship_title),
+                            launchName = programState.data?.name ?: stringResource(Res.string.common_starship),
                             onSetPlayerVisible = onSetPlayerVisible,
                             onNavigateToFullscreen = onNavigateToFullscreen,
                             onVideoSelected = onVideoSelected
@@ -250,7 +250,7 @@ private fun TabletOverviewLayout(
                 verticalArrangement = Arrangement.spacedBy(12.dp)
             ) {
                 SectionTitle(
-                    title = stringResource(Res.string.starship_updates_title),
+                    title = stringResource(Res.string.common_updates),
                     hasAction = false
                 )
                 
@@ -264,7 +264,7 @@ private fun TabletOverviewLayout(
                     }
                 } else {
                     Text(
-                        text = stringResource(Res.string.starship_updates_empty),
+                        text = stringResource(Res.string.common_no_updates_available),
                         style = MaterialTheme.typography.bodyMedium,
                         color = MaterialTheme.colorScheme.onSurfaceVariant
                     )
@@ -327,7 +327,7 @@ private fun PhoneOverviewLayout(
                 Column {
                     VideoPlayer(
                         videoPlayerState = videoPlayerState,
-                        launchName = programState.data?.name ?: stringResource(Res.string.starship_title),
+                        launchName = programState.data?.name ?: stringResource(Res.string.common_starship),
                         onSetPlayerVisible = onSetPlayerVisible,
                         onNavigateToFullscreen = onNavigateToFullscreen,
                         onVideoSelected = onVideoSelected
@@ -352,7 +352,7 @@ private fun PhoneOverviewLayout(
                 Column {
                     Box(modifier = Modifier.padding(horizontal = 16.dp)) {
                         SectionTitle(
-                            title = stringResource(Res.string.starship_updates_title),
+                            title = stringResource(Res.string.common_updates),
                             hasAction = false
                         )
                     }

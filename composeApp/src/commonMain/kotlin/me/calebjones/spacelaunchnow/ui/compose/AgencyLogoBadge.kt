@@ -19,7 +19,7 @@ import androidx.compose.ui.unit.dp
 import coil3.compose.SubcomposeAsyncImage
 import com.valentinilk.shimmer.shimmer
 import spacelaunchnow_kmp.composeapp.generated.resources.Res
-import spacelaunchnow_kmp.composeapp.generated.resources.app_compose_agency_logo_badge_description
+import spacelaunchnow_kmp.composeapp.generated.resources.common_agency_logo
 import org.jetbrains.compose.resources.stringResource
 
 /**
@@ -47,7 +47,7 @@ fun AgencyLogoBadge(
     ) {
         SubcomposeAsyncImage(
             model = logoUrl,
-            contentDescription = stringResource(Res.string.app_compose_agency_logo_badge_description),
+            contentDescription = stringResource(Res.string.common_agency_logo),
             contentScale = ContentScale.Fit,
             modifier = Modifier
                 .fillMaxSize()

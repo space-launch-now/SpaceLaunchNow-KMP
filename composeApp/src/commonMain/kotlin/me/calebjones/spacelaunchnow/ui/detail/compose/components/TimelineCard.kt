@@ -41,8 +41,8 @@ import me.calebjones.spacelaunchnow.util.resolve
 import org.jetbrains.compose.ui.tooling.preview.Preview
 import org.jetbrains.compose.resources.stringResource
 import spacelaunchnow_kmp.composeapp.generated.resources.Res
-import spacelaunchnow_kmp.composeapp.generated.resources.launch_detail_show_less_lower
-import spacelaunchnow_kmp.composeapp.generated.resources.launch_detail_show_more_lower
+import spacelaunchnow_kmp.composeapp.generated.resources.common_show_less_lower
+import spacelaunchnow_kmp.composeapp.generated.resources.common_show_more_lower
 import spacelaunchnow_kmp.composeapp.generated.resources.launch_detail_timeline_event_fallback
 
 @Composable
@@ -91,7 +91,7 @@ fun TimelineCard(timeline: List<TimelineEntry>, net: Instant? = null) {
                     TextButton(
                         onClick = { expanded = !expanded }
                     ) {
-                        Text(if (expanded) stringResource(Res.string.launch_detail_show_less_lower) else stringResource(Res.string.launch_detail_show_more_lower))
+                        Text(if (expanded) stringResource(Res.string.common_show_less_lower) else stringResource(Res.string.common_show_more_lower))
                     }
                 }
             }

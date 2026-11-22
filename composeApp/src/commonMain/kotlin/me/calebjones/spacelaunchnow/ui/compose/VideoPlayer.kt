@@ -48,8 +48,6 @@ import me.calebjones.spacelaunchnow.domain.model.VideoLink
 import me.calebjones.spacelaunchnow.util.VideoUtil
 import me.calebjones.spacelaunchnow.util.openUriSafely
 import spacelaunchnow_kmp.composeapp.generated.resources.Res
-import spacelaunchnow_kmp.composeapp.generated.resources.app_compose_video_player_description_less
-import spacelaunchnow_kmp.composeapp.generated.resources.app_compose_video_player_description_more
 import spacelaunchnow_kmp.composeapp.generated.resources.app_compose_video_player_error_message
 import spacelaunchnow_kmp.composeapp.generated.resources.app_compose_video_player_fullscreen_description
 import spacelaunchnow_kmp.composeapp.generated.resources.app_compose_video_player_open_in_app
@@ -58,6 +56,8 @@ import spacelaunchnow_kmp.composeapp.generated.resources.app_compose_video_playe
 import spacelaunchnow_kmp.composeapp.generated.resources.common_error
 import spacelaunchnow_kmp.composeapp.generated.resources.common_live
 import spacelaunchnow_kmp.composeapp.generated.resources.common_retry
+import spacelaunchnow_kmp.composeapp.generated.resources.common_show_less_lower
+import spacelaunchnow_kmp.composeapp.generated.resources.common_show_more_lower
 import org.jetbrains.compose.resources.stringResource
 
 @Composable
@@ -302,7 +302,7 @@ fun LaunchVideoPlayer(
                     )
                     if (hasOverflow || expanded) {
                         Text(
-                            text = stringResource(if (expanded) Res.string.app_compose_video_player_description_less else Res.string.app_compose_video_player_description_more),
+                            text = stringResource(if (expanded) Res.string.common_show_less_lower else Res.string.common_show_more_lower),
                             style = MaterialTheme.typography.labelLarge,
                             color = MaterialTheme.colorScheme.primary,
                             modifier = Modifier

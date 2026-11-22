@@ -16,22 +16,22 @@ import me.calebjones.spacelaunchnow.navigation.Starship
 import spacelaunchnow_kmp.composeapp.generated.resources.Res
 import spacelaunchnow_kmp.composeapp.generated.resources.app_explore_card_agencies_content_description
 import spacelaunchnow_kmp.composeapp.generated.resources.app_explore_card_agencies_description
-import spacelaunchnow_kmp.composeapp.generated.resources.app_explore_card_agencies_title
 import spacelaunchnow_kmp.composeapp.generated.resources.app_explore_card_astronauts_content_description
 import spacelaunchnow_kmp.composeapp.generated.resources.app_explore_card_astronauts_description
-import spacelaunchnow_kmp.composeapp.generated.resources.app_explore_card_astronauts_title
 import spacelaunchnow_kmp.composeapp.generated.resources.app_explore_card_iss_content_description
 import spacelaunchnow_kmp.composeapp.generated.resources.app_explore_card_iss_description
 import spacelaunchnow_kmp.composeapp.generated.resources.app_explore_card_iss_title
 import spacelaunchnow_kmp.composeapp.generated.resources.app_explore_card_news_events_content_description
 import spacelaunchnow_kmp.composeapp.generated.resources.app_explore_card_news_events_description
-import spacelaunchnow_kmp.composeapp.generated.resources.app_explore_card_news_events_title
 import spacelaunchnow_kmp.composeapp.generated.resources.app_explore_card_rockets_content_description
 import spacelaunchnow_kmp.composeapp.generated.resources.app_explore_card_rockets_description
-import spacelaunchnow_kmp.composeapp.generated.resources.app_explore_card_rockets_title
 import spacelaunchnow_kmp.composeapp.generated.resources.app_explore_card_starship_content_description
 import spacelaunchnow_kmp.composeapp.generated.resources.app_explore_card_starship_description
-import spacelaunchnow_kmp.composeapp.generated.resources.app_explore_card_starship_title
+import spacelaunchnow_kmp.composeapp.generated.resources.common_agencies
+import spacelaunchnow_kmp.composeapp.generated.resources.common_astronauts
+import spacelaunchnow_kmp.composeapp.generated.resources.common_news_and_events
+import spacelaunchnow_kmp.composeapp.generated.resources.common_rockets
+import spacelaunchnow_kmp.composeapp.generated.resources.common_starship
 
 object ExploreSections {
     val sections = listOf(
@@ -45,7 +45,7 @@ object ExploreSections {
         ),
         ExploreSection(
             id = "agencies",
-            title = Res.string.app_explore_card_agencies_title,
+            title = Res.string.common_agencies,
             description = Res.string.app_explore_card_agencies_description,
             icon = Icons.Filled.Business,
             route = Agencies,
@@ -53,7 +53,7 @@ object ExploreSections {
         ),
         ExploreSection(
             id = "astronauts",
-            title = Res.string.app_explore_card_astronauts_title,
+            title = Res.string.common_astronauts,
             description = Res.string.app_explore_card_astronauts_description,
             icon = Icons.Filled.Person,
             route = Astronauts,
@@ -61,7 +61,7 @@ object ExploreSections {
         ),
         ExploreSection(
             id = "rockets",
-            title = Res.string.app_explore_card_rockets_title,
+            title = Res.string.common_rockets,
             description = Res.string.app_explore_card_rockets_description,
             icon = Icons.Filled.Rocket,
             route = Rockets,
@@ -69,7 +69,7 @@ object ExploreSections {
         ),
         ExploreSection(
             id = "starship",
-            title = Res.string.app_explore_card_starship_title,
+            title = Res.string.common_starship,
             description = Res.string.app_explore_card_starship_description,
             icon = Icons.Filled.RocketLaunch,
             route = Starship,
@@ -77,7 +77,7 @@ object ExploreSections {
         ),
         ExploreSection(
             id = "news_events",
-            title = Res.string.app_explore_card_news_events_title,
+            title = Res.string.common_news_and_events,
             description = Res.string.app_explore_card_news_events_description,
             icon = Icons.Filled.Newspaper,
             route = NewsEvents(),

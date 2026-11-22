@@ -1,42 +1,44 @@
 package me.calebjones.spacelaunchnow.data.model
 
 import kotlinx.serialization.Serializable
+import org.jetbrains.compose.resources.StringResource
+import spacelaunchnow_kmp.composeapp.generated.resources.*
 
 /**
  * Enum representing sort options for rocket lists.
  * Each enum value maps to a specific API ordering parameter.
  * 
  * @property apiParam The parameter value sent to Launch Library API
- * @property displayName Human-readable name for UI display
+ * @property label String resource for the name shown in the UI
  */
 @Serializable
 enum class SortField(
     val apiParam: String,
-    val displayName: String
+    val label: StringResource
 ) {
     NAME_ASC(
         apiParam = "name",
-        displayName = "Name (A-Z)"
+        label = Res.string.common_sort_name_asc
     ),
     NAME_DESC(
         apiParam = "-name",
-        displayName = "Name (Z-A)"
+        label = Res.string.common_sort_name_desc
     ),
     TOTAL_LAUNCHES_DESC(
         apiParam = "-total_launch_count",
-        displayName = "Most Launches"
+        label = Res.string.rockets_sort_field_total_launches_desc
     ),
     TOTAL_LAUNCHES_ASC(
         apiParam = "total_launch_count",
-        displayName = "Fewest Launches"
+        label = Res.string.rockets_sort_field_total_launches_asc
     ),
     FIRST_FLIGHT_DESC(
         apiParam = "-maiden_flight",
-        displayName = "Newest First"
+        label = Res.string.rockets_sort_field_first_flight_desc
     ),
     FIRST_FLIGHT_ASC(
         apiParam = "maiden_flight",
-        displayName = "Oldest First"
+        label = Res.string.rockets_sort_field_first_flight_asc
     );
     
     companion object {

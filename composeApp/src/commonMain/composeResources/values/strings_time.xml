@@ -23,8 +23,6 @@
     <!-- Weekday name, full form. Capitalised as at the start of a line. -->
     <string name="time_weekday_sunday">Sunday</string>
 
-    <!-- Launch date when no date is known yet. Short, one word or an abbreviation. "To be determined". -->
-    <string name="time_tbd">TBD</string>
     <!-- Launch date with first-half-of-year precision. %1$s is the four-digit year. H1 = first half. Keep short. -->
     <string name="time_half_1_year">H1 %1$s</string>
     <!-- Launch date with second-half-of-year precision. %1$s is the four-digit year. H2 = second half. Keep short. -->

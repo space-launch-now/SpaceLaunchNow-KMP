@@ -59,10 +59,10 @@ import kotlin.time.ExperimentalTime
 import kotlin.time.Instant
 import org.jetbrains.compose.resources.stringResource
 import spacelaunchnow_kmp.composeapp.generated.resources.Res
+import spacelaunchnow_kmp.composeapp.generated.resources.common_no_updates_available
 import spacelaunchnow_kmp.composeapp.generated.resources.common_retry
 import spacelaunchnow_kmp.composeapp.generated.resources.home_cached_data_notice
 import spacelaunchnow_kmp.composeapp.generated.resources.home_updates_author_profile_description
-import spacelaunchnow_kmp.composeapp.generated.resources.home_updates_empty
 import spacelaunchnow_kmp.composeapp.generated.resources.home_updates_error
 import spacelaunchnow_kmp.composeapp.generated.resources.home_updates_profile_placeholder_description
 import spacelaunchnow_kmp.composeapp.generated.resources.home_updates_source_description
@@ -636,7 +636,7 @@ fun EmptyUpdatesCard(
             contentAlignment = Alignment.Center
         ) {
             Text(
-                text = stringResource(Res.string.home_updates_empty),
+                text = stringResource(Res.string.common_no_updates_available),
                 color = MaterialTheme.colorScheme.onSurfaceVariant
             )
         }

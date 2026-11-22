@@ -42,10 +42,10 @@ import me.calebjones.spacelaunchnow.ui.viewmodel.ViewState
 import me.calebjones.spacelaunchnow.util.DateTimeUtil.formatLaunchDateTime
 import spacelaunchnow_kmp.composeapp.generated.resources.Res
 import org.jetbrains.compose.resources.stringResource
+import spacelaunchnow_kmp.composeapp.generated.resources.common_events
 import spacelaunchnow_kmp.composeapp.generated.resources.starship_event_type_unknown
 import spacelaunchnow_kmp.composeapp.generated.resources.starship_events_empty
 import spacelaunchnow_kmp.composeapp.generated.resources.starship_events_news_title
-import spacelaunchnow_kmp.composeapp.generated.resources.starship_events_title
 
 /**
  * Events tab for Starship Dashboard
@@ -92,7 +92,7 @@ fun StarshipEventsTab(
                                 )
                             ) {
                                 SectionTitle(
-                                    title = stringResource(Res.string.starship_events_title),
+                                    title = stringResource(Res.string.common_events),
                                     hasAction = false
                                 )
                                 // Staleness indicator for events

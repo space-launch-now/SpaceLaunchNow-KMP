@@ -38,9 +38,9 @@ import me.calebjones.spacelaunchnow.ui.theme.SpaceLaunchNowPreviewTheme
 import org.jetbrains.compose.ui.tooling.preview.Preview
 import org.jetbrains.compose.resources.stringResource
 import spacelaunchnow_kmp.composeapp.generated.resources.Res
-import spacelaunchnow_kmp.composeapp.generated.resources.onboarding_explore_agencies
-import spacelaunchnow_kmp.composeapp.generated.resources.onboarding_explore_astronauts
-import spacelaunchnow_kmp.composeapp.generated.resources.onboarding_explore_rockets
+import spacelaunchnow_kmp.composeapp.generated.resources.common_agencies
+import spacelaunchnow_kmp.composeapp.generated.resources.common_astronauts
+import spacelaunchnow_kmp.composeapp.generated.resources.common_rockets
 import spacelaunchnow_kmp.composeapp.generated.resources.onboarding_explore_subtitle
 import spacelaunchnow_kmp.composeapp.generated.resources.onboarding_explore_title
 
@@ -96,7 +96,7 @@ private fun ExplorePreviewContent(
                     item {
                         SectionHeader(
                             icon = Icons.Default.Person,
-                            title = stringResource(Res.string.onboarding_explore_astronauts)
+                            title = stringResource(Res.string.common_astronauts)
                         )
                     }
                     items(astronauts) { astronaut ->
@@ -114,7 +114,7 @@ private fun ExplorePreviewContent(
                         Spacer(modifier = Modifier.height(8.dp))
                         SectionHeader(
                             icon = Icons.Default.Rocket,
-                            title = stringResource(Res.string.onboarding_explore_rockets)
+                            title = stringResource(Res.string.common_rockets)
                         )
                     }
                     items(rockets) { rocket ->
@@ -132,7 +132,7 @@ private fun ExplorePreviewContent(
                         Spacer(modifier = Modifier.height(8.dp))
                         SectionHeader(
                             icon = Icons.Default.Business,
-                            title = stringResource(Res.string.onboarding_explore_agencies)
+                            title = stringResource(Res.string.common_agencies)
                         )
                     }
                     items(agencies) { agency ->

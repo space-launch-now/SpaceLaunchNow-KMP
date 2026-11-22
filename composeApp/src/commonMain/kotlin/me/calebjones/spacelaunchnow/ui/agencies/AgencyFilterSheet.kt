@@ -43,22 +43,22 @@ import androidx.compose.ui.unit.dp
 import me.calebjones.spacelaunchnow.ui.viewmodel.AgencySortOrder
 import org.jetbrains.compose.resources.stringResource
 import spacelaunchnow_kmp.composeapp.generated.resources.Res
-import spacelaunchnow_kmp.composeapp.generated.resources.agency_filter_clear_all
-import spacelaunchnow_kmp.composeapp.generated.resources.agency_filter_done
 import spacelaunchnow_kmp.composeapp.generated.resources.agency_filter_featured_all
 import spacelaunchnow_kmp.composeapp.generated.resources.agency_filter_featured_none
 import spacelaunchnow_kmp.composeapp.generated.resources.agency_filter_featured_only
 import spacelaunchnow_kmp.composeapp.generated.resources.agency_filter_featured_title
-import spacelaunchnow_kmp.composeapp.generated.resources.agency_filter_filters_title
 import spacelaunchnow_kmp.composeapp.generated.resources.agency_filter_name_label
 import spacelaunchnow_kmp.composeapp.generated.resources.agency_filter_name_placeholder
-import spacelaunchnow_kmp.composeapp.generated.resources.agency_filter_order_label
-import spacelaunchnow_kmp.composeapp.generated.resources.agency_filter_search_apply
-import spacelaunchnow_kmp.composeapp.generated.resources.agency_filter_search_clear
-import spacelaunchnow_kmp.composeapp.generated.resources.agency_filter_search_title
-import spacelaunchnow_kmp.composeapp.generated.resources.agency_filter_selected_description
-import spacelaunchnow_kmp.composeapp.generated.resources.agency_filter_sort_title
-import spacelaunchnow_kmp.composeapp.generated.resources.agency_filter_title
+import spacelaunchnow_kmp.composeapp.generated.resources.common_apply
+import spacelaunchnow_kmp.composeapp.generated.resources.common_clear
+import spacelaunchnow_kmp.composeapp.generated.resources.common_clear_all
+import spacelaunchnow_kmp.composeapp.generated.resources.common_done
+import spacelaunchnow_kmp.composeapp.generated.resources.common_filter_and_sort
+import spacelaunchnow_kmp.composeapp.generated.resources.common_filters
+import spacelaunchnow_kmp.composeapp.generated.resources.common_order
+import spacelaunchnow_kmp.composeapp.generated.resources.common_search_title
+import spacelaunchnow_kmp.composeapp.generated.resources.common_selected
+import spacelaunchnow_kmp.composeapp.generated.resources.common_sort_by
 
 /**
  * Filter and sort bottom sheet content for agency list.
@@ -98,12 +98,12 @@ fun AgencyFilterSheet(
                 verticalAlignment = Alignment.CenterVertically
             ) {
                 Text(
-                    text = stringResource(Res.string.agency_filter_title),
+                    text = stringResource(Res.string.common_filter_and_sort),
                     style = MaterialTheme.typography.titleLarge,
                     fontWeight = FontWeight.Bold
                 )
                 TextButton(onClick = onClearAll) {
-                    Text(stringResource(Res.string.agency_filter_clear_all))
+                    Text(stringResource(Res.string.common_clear_all))
                 }
             }
         }
@@ -118,7 +118,7 @@ fun AgencyFilterSheet(
             ) {
                 Column(modifier = Modifier.padding(16.dp)) {
                     Text(
-                        text = stringResource(Res.string.agency_filter_search_title),
+                        text = stringResource(Res.string.common_search_title),
                         style = MaterialTheme.typography.titleMedium,
                         fontWeight = FontWeight.SemiBold,
                         modifier = Modifier.padding(bottom = 8.dp)
@@ -144,13 +144,13 @@ fun AgencyFilterSheet(
                             },
                             modifier = Modifier.weight(1f)
                         ) {
-                            Text(stringResource(Res.string.agency_filter_search_clear))
+                            Text(stringResource(Res.string.common_clear))
                         }
                         Button(
                             onClick = { onSearchQueryChange(localSearchQuery) },
                             modifier = Modifier.weight(1f)
                         ) {
-                            Text(stringResource(Res.string.agency_filter_search_apply))
+                            Text(stringResource(Res.string.common_apply))
                         }
                     }
                 }
@@ -167,7 +167,7 @@ fun AgencyFilterSheet(
             ) {
                 Column(modifier = Modifier.padding(16.dp)) {
                     Text(
-                        text = stringResource(Res.string.agency_filter_sort_title),
+                        text = stringResource(Res.string.common_sort_by),
                         style = MaterialTheme.typography.titleMedium,
                         fontWeight = FontWeight.SemiBold,
                         modifier = Modifier.padding(bottom = 8.dp)
@@ -178,10 +178,10 @@ fun AgencyFilterSheet(
                         onExpandedChange = { sortExpanded = it }
                     ) {
                         OutlinedTextField(
-                            value = selectedSortOrder.displayName,
+                            value = stringResource(selectedSortOrder.label),
                             onValueChange = {},
                             readOnly = true,
-                            label = { Text(stringResource(Res.string.agency_filter_order_label)) },
+                            label = { Text(stringResource(Res.string.common_order)) },
                             trailingIcon = {
                                 ExposedDropdownMenuDefaults.TrailingIcon(expanded = sortExpanded)
                             },
@@ -204,11 +204,11 @@ fun AgencyFilterSheet(
                                             horizontalArrangement = Arrangement.SpaceBetween,
                                             verticalAlignment = Alignment.CenterVertically
                                         ) {
-                                            Text(sortOrder.displayName)
+                                            Text(stringResource(sortOrder.label))
                                             if (sortOrder == selectedSortOrder) {
                                                 Icon(
                                                     imageVector = Icons.Default.Check,
-                                                    contentDescription = stringResource(Res.string.agency_filter_selected_description),
+                                                    contentDescription = stringResource(Res.string.common_selected),
                                                     tint = MaterialTheme.colorScheme.primary
                                                 )
                                             }
@@ -239,7 +239,7 @@ fun AgencyFilterSheet(
                     verticalArrangement = Arrangement.spacedBy(12.dp)
                 ) {
                     Text(
-                        text = stringResource(Res.string.agency_filter_filters_title),
+                        text = stringResource(Res.string.common_filters),
                         style = MaterialTheme.typography.titleMedium,
                         fontWeight = FontWeight.SemiBold
                     )
@@ -289,7 +289,7 @@ fun AgencyFilterSheet(
                         containerColor = MaterialTheme.colorScheme.primary
                     )
                 ) {
-                    Text(stringResource(Res.string.agency_filter_done))
+                    Text(stringResource(Res.string.common_done))
                 }
             }
         }

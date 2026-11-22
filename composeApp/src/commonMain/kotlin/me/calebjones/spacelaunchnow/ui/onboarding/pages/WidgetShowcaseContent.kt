@@ -33,10 +33,10 @@ import me.calebjones.spacelaunchnow.ui.theme.SpaceLaunchNowPreviewTheme
 import org.jetbrains.compose.ui.tooling.preview.Preview
 import org.jetbrains.compose.resources.stringResource
 import spacelaunchnow_kmp.composeapp.generated.resources.Res
+import spacelaunchnow_kmp.composeapp.generated.resources.common_go_for_launch
 import spacelaunchnow_kmp.composeapp.generated.resources.onboarding_widget_go
 import spacelaunchnow_kmp.composeapp.generated.resources.onboarding_widget_go_for_launch_badge
 import spacelaunchnow_kmp.composeapp.generated.resources.onboarding_widget_next_launch
-import spacelaunchnow_kmp.composeapp.generated.resources.onboarding_widget_status_go
 import spacelaunchnow_kmp.composeapp.generated.resources.onboarding_widget_upcoming_launches
 
 private val WidgetDark = Color(0xFF1C1C1E)
@@ -348,7 +348,7 @@ fun AndroidLaunchListWidgetMockup(modifier: Modifier = Modifier) {
             agency = "National Aeronautics and Space Administration",
             location = "Kennedy Space Center, FL, USA",
             countdown = "1h 24m",
-            status = stringResource(Res.string.onboarding_widget_status_go),
+            status = stringResource(Res.string.common_go_for_launch),
             accentColor = widgetGreen
         )
         AndroidWidgetLaunchItem(
@@ -356,7 +356,7 @@ fun AndroidLaunchListWidgetMockup(modifier: Modifier = Modifier) {
             agency = "SpaceX",
             location = "Cape Canaveral SFS, FL, USA",
             countdown = "14h 52m",
-            status = stringResource(Res.string.onboarding_widget_status_go),
+            status = stringResource(Res.string.common_go_for_launch),
             accentColor = widgetGreen
         )
         AndroidWidgetLaunchItem(
@@ -364,7 +364,7 @@ fun AndroidLaunchListWidgetMockup(modifier: Modifier = Modifier) {
             agency = "SpaceX",
             location = "Vandenberg SFB, CA, USA",
             countdown = "1d 2h",
-            status = stringResource(Res.string.onboarding_widget_status_go),
+            status = stringResource(Res.string.common_go_for_launch),
             accentColor = widgetGreen
         )
         AndroidWidgetLaunchItem(
@@ -372,7 +372,7 @@ fun AndroidLaunchListWidgetMockup(modifier: Modifier = Modifier) {
             agency = "Space Pioneer",
             location = "Jiuquan Satellite Launch Center, People's Republic of China",
             countdown = "1d 7h",
-            status = stringResource(Res.string.onboarding_widget_status_go),
+            status = stringResource(Res.string.common_go_for_launch),
             accentColor = widgetGreen
         )
     }

@@ -54,9 +54,9 @@ import spacelaunchnow_kmp.composeapp.generated.resources.Res
 import spacelaunchnow_kmp.composeapp.generated.resources.app_roadmap_error_title
 import spacelaunchnow_kmp.composeapp.generated.resources.app_roadmap_last_updated
 import spacelaunchnow_kmp.composeapp.generated.resources.app_roadmap_loading
-import spacelaunchnow_kmp.composeapp.generated.resources.app_roadmap_title
 import spacelaunchnow_kmp.composeapp.generated.resources.common_back
 import spacelaunchnow_kmp.composeapp.generated.resources.common_retry
+import spacelaunchnow_kmp.composeapp.generated.resources.common_roadmap
 import org.jetbrains.compose.resources.stringResource
 
 /**
@@ -83,7 +83,7 @@ fun RoadmapScreen(
             CenterAlignedTopAppBar(
                 title = {
                     Text(
-                        text = stringResource(Res.string.app_roadmap_title),
+                        text = stringResource(Res.string.common_roadmap),
                         style = MaterialTheme.typography.headlineMedium,
                         fontWeight = FontWeight.Bold,
                         fontSize = 36.sp
@@ -257,7 +257,7 @@ private fun RoadmapTimelineItem(
             ) {
                 Icon(
                     imageVector = getStatusIcon(item.status),
-                    contentDescription = item.status.displayName,
+                    contentDescription = stringResource(item.status.label),
                     tint = Color.White,
                     modifier = Modifier.size(20.dp)
                 )
@@ -331,7 +331,7 @@ private fun RoadmapTimelineItem(
                         )
                         
                         Text(
-                            text = item.category.displayName,
+                            text = stringResource(item.category.label),
                             style = MaterialTheme.typography.labelMedium,
                             color = MaterialTheme.colorScheme.onSurfaceVariant
                         )
@@ -351,7 +351,7 @@ private fun StatusBadge(status: RoadmapStatus) {
             .padding(horizontal = 8.dp, vertical = 4.dp)
     ) {
         Text(
-            text = status.displayName,
+            text = stringResource(status.label),
             style = MaterialTheme.typography.labelSmall,
             color = getStatusColor(status),
             fontWeight = FontWeight.Bold

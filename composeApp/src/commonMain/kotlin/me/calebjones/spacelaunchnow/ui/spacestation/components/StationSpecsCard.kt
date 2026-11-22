@@ -25,14 +25,14 @@ import me.calebjones.spacelaunchnow.util.DateTimeUtil
 import me.calebjones.spacelaunchnow.util.NumberFormatUtil
 import spacelaunchnow_kmp.composeapp.generated.resources.Res
 import org.jetbrains.compose.resources.stringResource
+import spacelaunchnow_kmp.composeapp.generated.resources.common_founded
+import spacelaunchnow_kmp.composeapp.generated.resources.common_onboard_crew
+import spacelaunchnow_kmp.composeapp.generated.resources.common_value_kilograms
+import spacelaunchnow_kmp.composeapp.generated.resources.common_value_meters
 import spacelaunchnow_kmp.composeapp.generated.resources.station_docked_vehicles
-import spacelaunchnow_kmp.composeapp.generated.resources.station_specs_crew
 import spacelaunchnow_kmp.composeapp.generated.resources.station_specs_cubic_meters_value
-import spacelaunchnow_kmp.composeapp.generated.resources.station_specs_founded
 import spacelaunchnow_kmp.composeapp.generated.resources.station_specs_height
-import spacelaunchnow_kmp.composeapp.generated.resources.station_specs_kilograms_value
 import spacelaunchnow_kmp.composeapp.generated.resources.station_specs_mass
-import spacelaunchnow_kmp.composeapp.generated.resources.station_specs_meters_value
 import spacelaunchnow_kmp.composeapp.generated.resources.station_specs_title
 import spacelaunchnow_kmp.composeapp.generated.resources.station_specs_volume
 import spacelaunchnow_kmp.composeapp.generated.resources.station_specs_width
@@ -70,7 +70,7 @@ fun StationSpecsCard(
             ) {
                 station.onboardCrew?.let { crew ->
                     StatItem(
-                        label = stringResource(Res.string.station_specs_crew),
+                        label = stringResource(Res.string.common_onboard_crew),
                         value = "$crew",
                         modifier = Modifier.weight(1f)
                     )
@@ -101,7 +101,7 @@ fun StationSpecsCard(
                 station.height?.let { height ->
                     StatItem(
                         label = stringResource(Res.string.station_specs_height),
-                        value = stringResource(Res.string.station_specs_meters_value, NumberFormatUtil.formatDecimal(height, 1)),
+                        value = stringResource(Res.string.common_value_meters, NumberFormatUtil.formatDecimal(height, 1)),
                         modifier = Modifier.weight(1f)
                     )
                 }
@@ -113,7 +113,7 @@ fun StationSpecsCard(
                 station.width?.let { width ->
                     StatItem(
                         label = stringResource(Res.string.station_specs_width),
-                        value = stringResource(Res.string.station_specs_meters_value, NumberFormatUtil.formatDecimal(width, 1)),
+                        value = stringResource(Res.string.common_value_meters, NumberFormatUtil.formatDecimal(width, 1)),
                         modifier = Modifier.weight(1f)
                     )
                 }
@@ -131,7 +131,7 @@ fun StationSpecsCard(
                 station.mass?.let { mass ->
                     StatItem(
                         label = stringResource(Res.string.station_specs_mass),
-                        value = stringResource(Res.string.station_specs_kilograms_value, NumberFormatUtil.formatNumber(mass)),
+                        value = stringResource(Res.string.common_value_kilograms, NumberFormatUtil.formatNumber(mass)),
                         modifier = Modifier.weight(1f)
                     )
                 }
@@ -154,7 +154,7 @@ fun StationSpecsCard(
                 val tz = if (useUtc) TimeZone.UTC else TimeZone.currentSystemDefault()
                 val foundedInstant = founded.atStartOfDayIn(tz)
                 StatItem(
-                    label = stringResource(Res.string.station_specs_founded),
+                    label = stringResource(Res.string.common_founded),
                     value = DateTimeUtil.formatLaunchDate(foundedInstant, useUtc)
                 )
             }

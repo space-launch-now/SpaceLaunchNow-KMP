@@ -100,6 +100,20 @@ object DateTimeUtil {
         }
     }
 
+    /**
+     * The date part of [relativeLaunchDateTime], without the clock time: "Today at", "Monday at".
+     * It reuses the same strings with an empty time, so the caller trims the resolved text.
+     * A launch more than a week away gives its formatted date and time without the last word.
+     *
+     * Read the result with [resolve] in a composable or [load] in a coroutine.
+     */
+    fun relativeLaunchDateLead(instant: Instant, useUtc: Boolean = false): LocalizedText =
+        when (val full = relativeLaunchDateTime(instant, useUtc)) {
+            is LocalizedText.Str -> full.copy(args = full.args.dropLast(1) + "")
+            is LocalizedText.Plain -> LocalizedText.Plain(full.value.substringBeforeLast(" "))
+            is LocalizedText.Joined -> full
+        }
+
     private fun weekdayName(day: DayOfWeek): StringResource = when (day) {
         DayOfWeek.MONDAY -> Res.string.time_weekday_monday
         DayOfWeek.TUESDAY -> Res.string.time_weekday_tuesday
@@ -292,7 +306,7 @@ object DateTimeUtil {
      * Read the result with [resolve] in a composable or [load] in a coroutine.
      */
     fun dateWithPrecisionFallback(launch: me.calebjones.spacelaunchnow.domain.model.Launch, useUtc: Boolean = false): LocalizedText {
-        val net = launch.net ?: return LocalizedText.Str(Res.string.time_tbd)
+        val net = launch.net ?: return LocalizedText.Str(Res.string.common_tbd)
         val precisionId = launch.netPrecision?.id
 
         return dateWithPrecisionFallback(net, precisionId, useUtc)

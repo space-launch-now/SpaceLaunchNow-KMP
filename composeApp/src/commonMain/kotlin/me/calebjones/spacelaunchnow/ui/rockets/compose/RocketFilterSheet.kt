@@ -54,36 +54,36 @@ import me.calebjones.spacelaunchnow.data.model.FilterOption
 import me.calebjones.spacelaunchnow.ui.viewmodel.RocketSortOrder
 import org.jetbrains.compose.resources.stringResource
 import spacelaunchnow_kmp.composeapp.generated.resources.Res
+import spacelaunchnow_kmp.composeapp.generated.resources.common_apply
+import spacelaunchnow_kmp.composeapp.generated.resources.common_clear
+import spacelaunchnow_kmp.composeapp.generated.resources.common_clear_all
+import spacelaunchnow_kmp.composeapp.generated.resources.common_close
+import spacelaunchnow_kmp.composeapp.generated.resources.common_collapse
+import spacelaunchnow_kmp.composeapp.generated.resources.common_expand
+import spacelaunchnow_kmp.composeapp.generated.resources.common_expendable
+import spacelaunchnow_kmp.composeapp.generated.resources.common_families
+import spacelaunchnow_kmp.composeapp.generated.resources.common_filter_and_sort
+import spacelaunchnow_kmp.composeapp.generated.resources.common_filters
+import spacelaunchnow_kmp.composeapp.generated.resources.common_no_results_found
+import spacelaunchnow_kmp.composeapp.generated.resources.common_programs
+import spacelaunchnow_kmp.composeapp.generated.resources.common_remove_filter
+import spacelaunchnow_kmp.composeapp.generated.resources.common_reusable
+import spacelaunchnow_kmp.composeapp.generated.resources.common_search_title
+import spacelaunchnow_kmp.composeapp.generated.resources.common_select_options
+import spacelaunchnow_kmp.composeapp.generated.resources.common_selected
+import spacelaunchnow_kmp.composeapp.generated.resources.common_selected_count
+import spacelaunchnow_kmp.composeapp.generated.resources.common_sort_by
 import spacelaunchnow_kmp.composeapp.generated.resources.rockets_filter_active_only
 import spacelaunchnow_kmp.composeapp.generated.resources.rockets_filter_active_title
-import spacelaunchnow_kmp.composeapp.generated.resources.rockets_filter_clear_all
-import spacelaunchnow_kmp.composeapp.generated.resources.rockets_filter_close
-import spacelaunchnow_kmp.composeapp.generated.resources.rockets_filter_collapse_description
-import spacelaunchnow_kmp.composeapp.generated.resources.rockets_filter_expand_description
-import spacelaunchnow_kmp.composeapp.generated.resources.rockets_filter_expendable
-import spacelaunchnow_kmp.composeapp.generated.resources.rockets_filter_families_title
 import spacelaunchnow_kmp.composeapp.generated.resources.rockets_filter_loading
-import spacelaunchnow_kmp.composeapp.generated.resources.rockets_filter_no_results
 import spacelaunchnow_kmp.composeapp.generated.resources.rockets_filter_none_loaded
 import spacelaunchnow_kmp.composeapp.generated.resources.rockets_filter_option_all
-import spacelaunchnow_kmp.composeapp.generated.resources.rockets_filter_programs_title
 import spacelaunchnow_kmp.composeapp.generated.resources.rockets_filter_refresh
 import spacelaunchnow_kmp.composeapp.generated.resources.rockets_filter_reload
-import spacelaunchnow_kmp.composeapp.generated.resources.rockets_filter_remove_description
 import spacelaunchnow_kmp.composeapp.generated.resources.rockets_filter_retired
-import spacelaunchnow_kmp.composeapp.generated.resources.rockets_filter_reusable
 import spacelaunchnow_kmp.composeapp.generated.resources.rockets_filter_reusable_title
-import spacelaunchnow_kmp.composeapp.generated.resources.rockets_filter_search_apply
-import spacelaunchnow_kmp.composeapp.generated.resources.rockets_filter_search_clear
 import spacelaunchnow_kmp.composeapp.generated.resources.rockets_filter_search_label
 import spacelaunchnow_kmp.composeapp.generated.resources.rockets_filter_search_placeholder
-import spacelaunchnow_kmp.composeapp.generated.resources.rockets_filter_search_title
-import spacelaunchnow_kmp.composeapp.generated.resources.rockets_filter_section_title
-import spacelaunchnow_kmp.composeapp.generated.resources.rockets_filter_select_placeholder
-import spacelaunchnow_kmp.composeapp.generated.resources.rockets_filter_selected_count
-import spacelaunchnow_kmp.composeapp.generated.resources.rockets_filter_selected_description
-import spacelaunchnow_kmp.composeapp.generated.resources.rockets_filter_sort_title
-import spacelaunchnow_kmp.composeapp.generated.resources.rockets_filter_title
 
 /**
  * Filter and sort bottom sheet content for rocket list.
@@ -132,12 +132,12 @@ fun RocketFilterSheet(
                 verticalAlignment = Alignment.CenterVertically
             ) {
                 Text(
-                    text = stringResource(Res.string.rockets_filter_title),
+                    text = stringResource(Res.string.common_filter_and_sort),
                     style = MaterialTheme.typography.titleLarge,
                     fontWeight = FontWeight.Bold
                 )
                 TextButton(onClick = onClearAll) {
-                    Text(stringResource(Res.string.rockets_filter_clear_all))
+                    Text(stringResource(Res.string.common_clear_all))
                 }
             }
         }
@@ -152,7 +152,7 @@ fun RocketFilterSheet(
             ) {
                 Column(modifier = Modifier.padding(16.dp)) {
                     Text(
-                        text = stringResource(Res.string.rockets_filter_search_title),
+                        text = stringResource(Res.string.common_search_title),
                         style = MaterialTheme.typography.titleMedium,
                         fontWeight = FontWeight.SemiBold,
                         modifier = Modifier.padding(bottom = 8.dp)
@@ -178,13 +178,13 @@ fun RocketFilterSheet(
                             },
                             modifier = Modifier.weight(1f)
                         ) {
-                            Text(stringResource(Res.string.rockets_filter_search_clear))
+                            Text(stringResource(Res.string.common_clear))
                         }
                         Button(
                             onClick = { onSearchQueryChange(localSearchQuery) },
                             modifier = Modifier.weight(1f)
                         ) {
-                            Text(stringResource(Res.string.rockets_filter_search_apply))
+                            Text(stringResource(Res.string.common_apply))
                         }
                     }
                 }
@@ -201,7 +201,7 @@ fun RocketFilterSheet(
             ) {
                 Column(modifier = Modifier.padding(16.dp)) {
                     Text(
-                        text = stringResource(Res.string.rockets_filter_sort_title),
+                        text = stringResource(Res.string.common_sort_by),
                         style = MaterialTheme.typography.titleMedium,
                         fontWeight = FontWeight.SemiBold,
                         modifier = Modifier.padding(bottom = 8.dp)
@@ -211,7 +211,7 @@ fun RocketFilterSheet(
                         onExpandedChange = { sortExpanded = !sortExpanded }
                     ) {
                         OutlinedTextField(
-                            value = selectedSortOrder.displayName,
+                            value = stringResource(selectedSortOrder.label),
                             onValueChange = {},
                             readOnly = true,
                             trailingIcon = {
@@ -229,7 +229,7 @@ fun RocketFilterSheet(
                         ) {
                             RocketSortOrder.entries.forEach { sortOrder ->
                                 DropdownMenuItem(
-                                    text = { Text(sortOrder.displayName) },
+                                    text = { Text(stringResource(sortOrder.label)) },
                                     onClick = {
                                         onSortOrderChange(sortOrder)
                                         sortExpanded = false
@@ -255,7 +255,7 @@ fun RocketFilterSheet(
                     verticalArrangement = Arrangement.spacedBy(12.dp)
                 ) {
                     Text(
-                        text = stringResource(Res.string.rockets_filter_section_title),
+                        text = stringResource(Res.string.common_filters),
                         style = MaterialTheme.typography.titleMedium,
                         fontWeight = FontWeight.SemiBold
                     )
@@ -307,13 +307,13 @@ fun RocketFilterSheet(
                                 selected = reusableFilter == true,
                                 onClick = { onReusableChange(true) },
                                 shape = SegmentedButtonDefaults.itemShape(index = 1, count = 3),
-                                label = { Text(stringResource(Res.string.rockets_filter_reusable)) }
+                                label = { Text(stringResource(Res.string.common_reusable)) }
                             )
                             SegmentedButton(
                                 selected = reusableFilter == false,
                                 onClick = { onReusableChange(false) },
                                 shape = SegmentedButtonDefaults.itemShape(index = 2, count = 3),
-                                label = { Text(stringResource(Res.string.rockets_filter_expendable)) }
+                                label = { Text(stringResource(Res.string.common_expendable)) }
                             )
                         }
                     }
@@ -321,7 +321,7 @@ fun RocketFilterSheet(
                     // Program Filter
                     if (programOptions.isNotEmpty()) {
                         FilterSection(
-                            title = stringResource(Res.string.rockets_filter_programs_title),
+                            title = stringResource(Res.string.common_programs),
                             options = programOptions,
                             selectedIds = selectedProgramIds,
                             onSelectionChange = onProgramsChange
@@ -331,7 +331,7 @@ fun RocketFilterSheet(
                     // Family Filter
                     if (familyOptions.isNotEmpty()) {
                         FilterSectionByName(
-                            title = stringResource(Res.string.rockets_filter_families_title),
+                            title = stringResource(Res.string.common_families),
                             options = familyOptions,
                             selectedNames = selectedFamilies,
                             onSelectionChange = onFamiliesChange
@@ -376,7 +376,7 @@ fun RocketFilterSheet(
                 onClick = onClose,
                 modifier = Modifier.fillMaxWidth()
             ) {
-                Text(stringResource(Res.string.rockets_filter_close))
+                Text(stringResource(Res.string.common_close))
             }
         }
     }
@@ -452,7 +452,7 @@ private fun FilterSection(
                         trailingIcon = {
                             Icon(
                                 imageVector = Icons.Default.Close,
-                                contentDescription = stringResource(Res.string.rockets_filter_remove_description),
+                                contentDescription = stringResource(Res.string.common_remove_filter),
                                 modifier = Modifier.size(16.dp)
                             )
                         }
@@ -469,14 +469,14 @@ private fun FilterSection(
                 modifier = Modifier.fillMaxWidth(),
                 placeholder = {
                     Text(
-                        if (selectedIds.isEmpty()) stringResource(Res.string.rockets_filter_select_placeholder)
-                        else stringResource(Res.string.rockets_filter_selected_count, selectedIds.size)
+                        if (selectedIds.isEmpty()) stringResource(Res.string.common_select_options)
+                        else stringResource(Res.string.common_selected_count, selectedIds.size)
                     )
                 },
                 trailingIcon = {
                     Icon(
                         imageVector = Icons.Default.ArrowDropDown,
-                        contentDescription = if (expanded) stringResource(Res.string.rockets_filter_collapse_description) else stringResource(Res.string.rockets_filter_expand_description),
+                        contentDescription = if (expanded) stringResource(Res.string.common_collapse) else stringResource(Res.string.common_expand),
                         modifier = Modifier.clickable { expanded = !expanded }
                     )
                 },
@@ -496,7 +496,7 @@ private fun FilterSection(
             ) {
                 if (filteredOptions.isEmpty()) {
                     DropdownMenuItem(
-                        text = { Text(stringResource(Res.string.rockets_filter_no_results)) },
+                        text = { Text(stringResource(Res.string.common_no_results_found)) },
                         onClick = { },
                         enabled = false
                     )
@@ -517,7 +517,7 @@ private fun FilterSection(
                                     if (isSelected) {
                                         Icon(
                                             imageVector = Icons.Default.Check,
-                                            contentDescription = stringResource(Res.string.rockets_filter_selected_description),
+                                            contentDescription = stringResource(Res.string.common_selected),
                                             tint = MaterialTheme.colorScheme.primary
                                         )
                                     }
@@ -609,7 +609,7 @@ private fun FilterSectionByName(
                         trailingIcon = {
                             Icon(
                                 imageVector = Icons.Default.Close,
-                                contentDescription = stringResource(Res.string.rockets_filter_remove_description),
+                                contentDescription = stringResource(Res.string.common_remove_filter),
                                 modifier = Modifier.size(16.dp)
                             )
                         }
@@ -626,14 +626,14 @@ private fun FilterSectionByName(
                 modifier = Modifier.fillMaxWidth(),
                 placeholder = {
                     Text(
-                        if (selectedNames.isEmpty()) stringResource(Res.string.rockets_filter_select_placeholder)
-                        else stringResource(Res.string.rockets_filter_selected_count, selectedNames.size)
+                        if (selectedNames.isEmpty()) stringResource(Res.string.common_select_options)
+                        else stringResource(Res.string.common_selected_count, selectedNames.size)
                     )
                 },
                 trailingIcon = {
                     Icon(
                         imageVector = Icons.Default.ArrowDropDown,
-                        contentDescription = if (expanded) stringResource(Res.string.rockets_filter_collapse_description) else stringResource(Res.string.rockets_filter_expand_description),
+                        contentDescription = if (expanded) stringResource(Res.string.common_collapse) else stringResource(Res.string.common_expand),
                         modifier = Modifier.clickable { expanded = !expanded }
                     )
                 },
@@ -653,7 +653,7 @@ private fun FilterSectionByName(
             ) {
                 if (filteredOptions.isEmpty()) {
                     DropdownMenuItem(
-                        text = { Text(stringResource(Res.string.rockets_filter_no_results)) },
+                        text = { Text(stringResource(Res.string.common_no_results_found)) },
                         onClick = { },
                         enabled = false
                     )
@@ -674,7 +674,7 @@ private fun FilterSectionByName(
                                     if (isSelected) {
                                         Icon(
                                             imageVector = Icons.Default.Check,
-                                            contentDescription = stringResource(Res.string.rockets_filter_selected_description),
+                                            contentDescription = stringResource(Res.string.common_selected),
                                             tint = MaterialTheme.colorScheme.primary
                                         )
                                     }

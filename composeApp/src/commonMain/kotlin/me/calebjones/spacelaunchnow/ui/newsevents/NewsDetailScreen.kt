@@ -30,9 +30,9 @@ import me.calebjones.spacelaunchnow.ui.theme.SpaceLaunchNowPreviewTheme
 import me.calebjones.spacelaunchnow.util.ExternalLinkHandler
 import org.jetbrains.compose.ui.tooling.preview.Preview
 import spacelaunchnow_kmp.composeapp.generated.resources.Res
-import spacelaunchnow_kmp.composeapp.generated.resources.app_newsevents_detail_open_in_browser_description
 import spacelaunchnow_kmp.composeapp.generated.resources.app_newsevents_detail_title_fallback
 import spacelaunchnow_kmp.composeapp.generated.resources.common_back
+import spacelaunchnow_kmp.composeapp.generated.resources.common_open_in_browser
 import org.jetbrains.compose.resources.stringResource
 
 /**
@@ -88,7 +88,7 @@ fun NewsDetailScreen(
                     IconButton(onClick = { if (url.isNotBlank()) ExternalLinkHandler.openUrl(url) }) {
                         Icon(
                             imageVector = Icons.AutoMirrored.Filled.OpenInNew,
-                            contentDescription = stringResource(Res.string.app_newsevents_detail_open_in_browser_description),
+                            contentDescription = stringResource(Res.string.common_open_in_browser),
                         )
                     }
                 },

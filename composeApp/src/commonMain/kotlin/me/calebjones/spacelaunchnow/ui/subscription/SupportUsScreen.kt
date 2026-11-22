@@ -84,7 +84,7 @@ import spacelaunchnow_kmp.composeapp.generated.resources.launcher
 import org.jetbrains.compose.resources.stringResource
 import org.jetbrains.compose.resources.pluralStringResource
 import spacelaunchnow_kmp.composeapp.generated.resources.common_back
-import spacelaunchnow_kmp.composeapp.generated.resources.premium_feature_title_cal_sync
+import spacelaunchnow_kmp.composeapp.generated.resources.common_calendar_sync
 import spacelaunchnow_kmp.composeapp.generated.resources.support_us_active_calendar_sync
 import spacelaunchnow_kmp.composeapp.generated.resources.support_us_active_no_ads
 import spacelaunchnow_kmp.composeapp.generated.resources.support_us_active_supporting_description
@@ -118,8 +118,9 @@ import spacelaunchnow_kmp.composeapp.generated.resources.support_us_lifetime_per
 import spacelaunchnow_kmp.composeapp.generated.resources.support_us_lifetime_tagline
 import spacelaunchnow_kmp.composeapp.generated.resources.support_us_lifetime_title
 import spacelaunchnow_kmp.composeapp.generated.resources.support_us_loading_pricing
-import spacelaunchnow_kmp.composeapp.generated.resources.support_us_logo_description
+import spacelaunchnow_kmp.composeapp.generated.resources.common_app_name
 import spacelaunchnow_kmp.composeapp.generated.resources.support_us_making_difference
+import spacelaunchnow_kmp.composeapp.generated.resources.support_us_member_plan
 import spacelaunchnow_kmp.composeapp.generated.resources.support_us_open_form_description
 import spacelaunchnow_kmp.composeapp.generated.resources.support_us_or_go_lifetime
 import spacelaunchnow_kmp.composeapp.generated.resources.support_us_period_month
@@ -141,7 +142,7 @@ import spacelaunchnow_kmp.composeapp.generated.resources.support_us_restore_help
 import spacelaunchnow_kmp.composeapp.generated.resources.support_us_restore_help_title
 import spacelaunchnow_kmp.composeapp.generated.resources.support_us_restore_purchases
 import spacelaunchnow_kmp.composeapp.generated.resources.support_us_restore_purchases_member
-import spacelaunchnow_kmp.composeapp.generated.resources.support_us_start_free_trial
+import spacelaunchnow_kmp.composeapp.generated.resources.common_start_free_trial
 import spacelaunchnow_kmp.composeapp.generated.resources.support_us_subscribe_now
 import spacelaunchnow_kmp.composeapp.generated.resources.support_us_thanks_legacy
 import spacelaunchnow_kmp.composeapp.generated.resources.support_us_thanks_member
@@ -202,7 +203,7 @@ fun SupportUsScreen(
             CenterAlignedTopAppBar(
                 title = {
 //                    Text(
-//                        text = "Space Launch Now",
+//                        text = "Space Launch Now", // i18n-ignore: commented-out code
 //                        style = MaterialTheme.typography.headlineMedium,
 //                        fontWeight = FontWeight.Bold,
 //                        fontSize = 36.sp,
@@ -683,7 +684,7 @@ private fun PricingCard(
     enabled: Boolean = true,
     hasFreeTrial: Boolean = false,
     freeTrialPeriodDisplay: String? = null,
-    subscribeButtonText: String = if (hasFreeTrial) stringResource(Res.string.support_us_start_free_trial) else stringResource(Res.string.support_us_subscribe_now)
+    subscribeButtonText: String = if (hasFreeTrial) stringResource(Res.string.common_start_free_trial) else stringResource(Res.string.support_us_subscribe_now)
 ) {
     val glowPrimary = MaterialTheme.colorScheme.primary
     val glowTertiary = MaterialTheme.colorScheme.tertiary
@@ -865,7 +866,7 @@ private fun ThankYouSection(
         ) {
             Image(
                 painter = painterResource(Res.drawable.launcher),
-                contentDescription = stringResource(Res.string.support_us_logo_description),
+                contentDescription = stringResource(Res.string.common_app_name),
                 modifier = Modifier.size(64.dp)
             )
 
@@ -917,7 +918,7 @@ private fun ThankYouSection(
                     )
                     ActivePerkItem(
                         icon = Icons.Default.CalendarMonth,
-                        title = stringResource(Res.string.premium_feature_title_cal_sync),
+                        title = stringResource(Res.string.common_calendar_sync),
                         description = stringResource(Res.string.support_us_active_calendar_sync)
                     )
                     ActivePerkItem(
@@ -947,7 +948,7 @@ private fun ThankYouSection(
                     )
                     ActivePerkItem(
                         icon = Icons.Default.CalendarMonth,
-                        title = stringResource(Res.string.premium_feature_title_cal_sync),
+                        title = stringResource(Res.string.common_calendar_sync),
                         description = stringResource(Res.string.support_us_active_calendar_sync)
                     )
                     ActivePerkItem(
@@ -1407,7 +1408,10 @@ private fun CurrentPlanCard(
                             }
                         }
 
-                        subscriptionState.isSubscribed -> "${subscriptionState.subscriptionType.name.replaceFirstChar { it.uppercase() }} Member"
+                        subscriptionState.isSubscribed -> stringResource(
+                            Res.string.support_us_member_plan,
+                            subscriptionState.subscriptionType.name.replaceFirstChar { it.uppercase() }
+                        )
                         else -> stringResource(Res.string.support_us_free_user)
                     },
                     style = MaterialTheme.typography.headlineSmall,

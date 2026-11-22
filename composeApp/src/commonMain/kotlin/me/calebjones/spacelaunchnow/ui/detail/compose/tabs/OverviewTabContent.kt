@@ -27,10 +27,10 @@ import me.calebjones.spacelaunchnow.ui.state.VideoPlayerState
 import org.koin.compose.koinInject
 import org.jetbrains.compose.resources.stringResource
 import spacelaunchnow_kmp.composeapp.generated.resources.Res
+import spacelaunchnow_kmp.composeapp.generated.resources.common_timeline
+import spacelaunchnow_kmp.composeapp.generated.resources.common_updates
 import spacelaunchnow_kmp.composeapp.generated.resources.launch_detail_section_related_events
 import spacelaunchnow_kmp.composeapp.generated.resources.launch_detail_section_related_news
-import spacelaunchnow_kmp.composeapp.generated.resources.launch_detail_section_timeline
-import spacelaunchnow_kmp.composeapp.generated.resources.launch_detail_section_updates
 
 /**
  * Overview tab content for launch detail view.
@@ -74,7 +74,7 @@ fun OverviewTabContent(
         // Timeline Card
         if (launch.timeline.isNotEmpty()) {
             Text(
-                text = stringResource(Res.string.launch_detail_section_timeline),
+                text = stringResource(Res.string.common_timeline),
                 style = MaterialTheme.typography.titleLarge,
                 fontWeight = FontWeight.Bold
             )
@@ -103,7 +103,7 @@ fun OverviewTabContent(
         // Launch Updates Section
         if (launch.updates.isNotEmpty()) {
             Text(
-                text = stringResource(Res.string.launch_detail_section_updates),
+                text = stringResource(Res.string.common_updates),
                 style = MaterialTheme.typography.titleLarge,
                 fontWeight = FontWeight.Bold
             )

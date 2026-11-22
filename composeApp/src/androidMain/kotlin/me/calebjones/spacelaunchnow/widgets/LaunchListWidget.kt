@@ -159,14 +159,14 @@ fun LaunchListWidgetLockedContent(
         ) {
             Image(
                 provider = ImageProvider(R.mipmap.ic_launcher_monochrome),
-                contentDescription = "Space Launch Now",
+                contentDescription = context.getString(R.string.app_name),
                 modifier = GlanceModifier.size(64.dp)
             )
 
             Spacer(modifier = GlanceModifier.height(12.dp))
 
             Text(
-                text = "🔒 Premium Widget",
+                text = context.getString(R.string.widget_premium_title),
                 style = TextStyle(
                     fontSize = 16.sp,
                     fontWeight = FontWeight.Bold,
@@ -177,7 +177,7 @@ fun LaunchListWidgetLockedContent(
             Spacer(modifier = GlanceModifier.height(8.dp))
 
             Text(
-                text = "Upgrade to Premium to unlock the Launch List widget",
+                text = context.getString(R.string.widget_premium_message),
                 style = TextStyle(
                     fontSize = 12.sp,
                     color = GlanceTheme.colors.onBackground
@@ -187,7 +187,7 @@ fun LaunchListWidgetLockedContent(
             Spacer(modifier = GlanceModifier.height(8.dp))
 
             Text(
-                text = "Tap to upgrade",
+                text = context.getString(R.string.widget_premium_tap_to_upgrade),
                 style = TextStyle(
                     fontSize = 11.sp,
                     color = GlanceTheme.colors.secondary
@@ -227,7 +227,7 @@ fun LaunchListWidgetContent(
                 verticalAlignment = Alignment.CenterVertically
             ) {
                 Text(
-                    text = "Upcoming Launches",
+                    text = context.getString(R.string.widget_upcoming_launches_title),
                     style = TextStyle(
                         fontSize = 14.sp,
                         fontWeight = FontWeight.Bold,
@@ -257,12 +257,12 @@ fun LaunchListWidgetContent(
                     ) {
                         Image(
                             provider = ImageProvider(R.mipmap.ic_launcher_monochrome),
-                            contentDescription = "Space Launch Now",
+                            contentDescription = context.getString(R.string.app_name),
                             modifier = GlanceModifier.size(32.dp)
                         )
                         Spacer(modifier = GlanceModifier.height(8.dp))
                         Text(
-                            text = "No upcoming launches",
+                            text = context.getString(R.string.widget_no_upcoming_launches),
                             style = TextStyle(
                                 fontSize = 11.sp,
                                 color = GlanceTheme.colors.onBackground
@@ -339,7 +339,7 @@ fun LaunchListItem(launch: Launch) {
         ) {
             // Countdown
             launch.net?.let { netTime ->
-                val countdown = formatCountdownCompact(netTime)
+                val countdown = formatCountdownCompact(context, netTime)
                 Text(
                     text = countdown,
                     style = TextStyle(
@@ -372,12 +372,12 @@ fun LaunchListItem(launch: Launch) {
     }
 }
 
-private fun formatCountdownCompact(netTime: Instant): String {
+private fun formatCountdownCompact(context: Context, netTime: Instant): String {
     val now = Clock.System.now()
     val duration = netTime - now
 
     return when {
-        duration.isNegative() -> "Launched"
+        duration.isNegative() -> context.getString(R.string.widget_launched)
         duration < 1.minutes -> "<1m"
         duration < 1.hours -> {
             val mins = duration.inWholeMinutes

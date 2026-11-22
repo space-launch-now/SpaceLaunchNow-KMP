@@ -43,10 +43,10 @@ import spacelaunchnow_kmp.composeapp.generated.resources.astronaut_stats_eva_tim
 import spacelaunchnow_kmp.composeapp.generated.resources.astronaut_stats_evas
 import spacelaunchnow_kmp.composeapp.generated.resources.astronaut_stats_flights
 import spacelaunchnow_kmp.composeapp.generated.resources.astronaut_info_nationality
-import spacelaunchnow_kmp.composeapp.generated.resources.astronaut_stats_not_available
-import spacelaunchnow_kmp.composeapp.generated.resources.astronaut_info_status
-import spacelaunchnow_kmp.composeapp.generated.resources.astronaut_stats_time_in_space
-import spacelaunchnow_kmp.composeapp.generated.resources.astronaut_stats_title
+import spacelaunchnow_kmp.composeapp.generated.resources.common_not_available
+import spacelaunchnow_kmp.composeapp.generated.resources.common_status
+import spacelaunchnow_kmp.composeapp.generated.resources.common_time_in_space
+import spacelaunchnow_kmp.composeapp.generated.resources.common_overview
 
 /**
  * Card displaying astronaut career statistics.
@@ -75,7 +75,7 @@ fun AstronautStatsCard(
             verticalArrangement = Arrangement.spacedBy(12.dp)
         ) {
             Text(
-                text = stringResource(Res.string.astronaut_stats_title),
+                text = stringResource(Res.string.common_overview),
                 style = MaterialTheme.typography.titleMedium,
                 fontWeight = FontWeight.Bold,
                 color = MaterialTheme.colorScheme.onSurfaceVariant
@@ -90,7 +90,7 @@ fun AstronautStatsCard(
                 astronaut.statusName?.let { statusName ->
                     InfoTile(
                         icon = Icons.Default.EmojiEvents,
-                        label = stringResource(Res.string.astronaut_info_status),
+                        label = stringResource(Res.string.common_status),
                         modifier = Modifier.weight(1f),
                         color = color,
                         customComposable = {
@@ -159,10 +159,10 @@ fun AstronautStatsCard(
                 // Time in Space
                 InfoTile(
                     icon = Icons.Default.Timer,
-                    label = stringResource(Res.string.astronaut_stats_time_in_space),
+                    label = stringResource(Res.string.common_time_in_space),
                     value = astronaut.timeInSpace?.let { 
                         parseIsoDurationToHumanReadable(it)
-                    } ?: stringResource(Res.string.astronaut_stats_not_available),
+                    } ?: stringResource(Res.string.common_not_available),
                     modifier = Modifier.weight(1f),
                     color = color
                 )
@@ -188,7 +188,7 @@ fun AstronautStatsCard(
                     label = stringResource(Res.string.astronaut_stats_eva_time),
                     value = astronaut.evaTime?.let {
                         parseIsoDurationToHumanReadable(it)
-                    } ?: stringResource(Res.string.astronaut_stats_not_available),
+                    } ?: stringResource(Res.string.common_not_available),
                     modifier = Modifier.weight(1f),
                     color = color
                 )

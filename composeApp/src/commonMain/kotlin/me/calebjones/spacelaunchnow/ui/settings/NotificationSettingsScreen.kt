@@ -41,6 +41,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.produceState
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
@@ -65,21 +66,25 @@ import me.calebjones.spacelaunchnow.data.repository.getPlatformNotificationPermi
 import me.calebjones.spacelaunchnow.data.repository.openPlatformNotificationSettings
 import me.calebjones.spacelaunchnow.data.repository.remedy
 import me.calebjones.spacelaunchnow.data.repository.requestPlatformNotificationPermission
+import me.calebjones.spacelaunchnow.data.repository.RemoteConfigRepository
 import me.calebjones.spacelaunchnow.navigation.SupportUs
 import me.calebjones.spacelaunchnow.ui.subscription.PremiumBadge
 import me.calebjones.spacelaunchnow.ui.subscription.PremiumPromptCard
 import me.calebjones.spacelaunchnow.ui.viewmodel.SettingsViewModel
+import org.koin.compose.koinInject
 import org.koin.compose.viewmodel.koinViewModel
 import org.jetbrains.compose.resources.stringResource
 import spacelaunchnow_kmp.composeapp.generated.resources.Res
 import spacelaunchnow_kmp.composeapp.generated.resources.common_back
+import spacelaunchnow_kmp.composeapp.generated.resources.common_enable
+import spacelaunchnow_kmp.composeapp.generated.resources.common_notification_filters
+import spacelaunchnow_kmp.composeapp.generated.resources.common_notifications_disabled
+import spacelaunchnow_kmp.composeapp.generated.resources.common_open_settings
 import spacelaunchnow_kmp.composeapp.generated.resources.notification_settings_announcements_description
 import spacelaunchnow_kmp.composeapp.generated.resources.notification_settings_announcements_title
 import spacelaunchnow_kmp.composeapp.generated.resources.notification_settings_countdown_description
 import spacelaunchnow_kmp.composeapp.generated.resources.notification_settings_countdown_title
 import spacelaunchnow_kmp.composeapp.generated.resources.notification_settings_disabled_message
-import spacelaunchnow_kmp.composeapp.generated.resources.notification_settings_disabled_title
-import spacelaunchnow_kmp.composeapp.generated.resources.notification_settings_enable_button
 import spacelaunchnow_kmp.composeapp.generated.resources.notification_settings_event_description
 import spacelaunchnow_kmp.composeapp.generated.resources.notification_settings_event_title
 import spacelaunchnow_kmp.composeapp.generated.resources.notification_settings_flexible_bullets
@@ -113,7 +118,6 @@ import spacelaunchnow_kmp.composeapp.generated.resources.notification_settings_n
 import spacelaunchnow_kmp.composeapp.generated.resources.notification_settings_notice_1m_title
 import spacelaunchnow_kmp.composeapp.generated.resources.notification_settings_notice_24h_description
 import spacelaunchnow_kmp.composeapp.generated.resources.notification_settings_notice_24h_title
-import spacelaunchnow_kmp.composeapp.generated.resources.notification_settings_open_settings_button
 import spacelaunchnow_kmp.composeapp.generated.resources.notification_settings_premium_description
 import spacelaunchnow_kmp.composeapp.generated.resources.notification_settings_premium_title
 import spacelaunchnow_kmp.composeapp.generated.resources.notification_settings_providers_description
@@ -124,7 +128,6 @@ import spacelaunchnow_kmp.composeapp.generated.resources.notification_settings_s
 import spacelaunchnow_kmp.composeapp.generated.resources.notification_settings_strict_example
 import spacelaunchnow_kmp.composeapp.generated.resources.notification_settings_strict_matching_title
 import spacelaunchnow_kmp.composeapp.generated.resources.notification_settings_strict_summary
-import spacelaunchnow_kmp.composeapp.generated.resources.notification_settings_title
 import spacelaunchnow_kmp.composeapp.generated.resources.notification_settings_topics_title
 import spacelaunchnow_kmp.composeapp.generated.resources.notification_settings_webcast_description
 import spacelaunchnow_kmp.composeapp.generated.resources.notification_settings_webcast_title
@@ -144,6 +147,18 @@ fun NotificationSettingsScreen(
     LaunchedEffect(Unit) {
         permissionStatus = getPlatformNotificationPermissionStatus()
     }
+
+    // Locked controls open the paywall only while the Remote Config flag is on (default off).
+    val remoteConfig = koinInject<RemoteConfigRepository>()
+    val lockedTapFlag by produceState(initialValue = false, remoteConfig) {
+        value = remoteConfig.getLockedNotificationTapPaywallEnabled()
+    }
+    val onLockedControlClick: (() -> Unit)? =
+        if (shouldOpenPaywallOnLockedTap(lockedTapFlag, uiState.hasNotificationCustomization)) {
+            { navController.navigate(SupportUs(PaywallSource.LOCKED_NOTIFICATION_CONTROL.value)) }
+        } else {
+            null
+        }
 
     // Re-check permission when returning from system permission dialog
     val lifecycleOwner = LocalLifecycleOwner.current
@@ -184,7 +199,7 @@ fun NotificationSettingsScreen(
             TopAppBar(
                 title = {
                     Text(
-                        text = stringResource(Res.string.notification_settings_title),
+                        text = stringResource(Res.string.common_notification_filters),
                         style = MaterialTheme.typography.headlineMedium,
                         fontWeight = FontWeight.Bold,
                         fontSize = 24.sp,
@@ -231,7 +246,7 @@ fun NotificationSettingsScreen(
                             Spacer(modifier = Modifier.width(12.dp))
                             Column(modifier = Modifier.weight(1f)) {
                                 Text(
-                                    text = stringResource(Res.string.notification_settings_disabled_title),
+                                    text = stringResource(Res.string.common_notifications_disabled),
                                     style = MaterialTheme.typography.titleSmall,
                                     fontWeight = FontWeight.Bold,
                                     color = MaterialTheme.colorScheme.onErrorContainer
@@ -262,9 +277,9 @@ fun NotificationSettingsScreen(
                             ) {
                                 Text(
                                     if (permissionRemedy == NotificationPermissionRemedy.REQUEST_PERMISSION) {
-                                        stringResource(Res.string.notification_settings_enable_button)
+                                        stringResource(Res.string.common_enable)
                                     } else {
-                                        stringResource(Res.string.notification_settings_open_settings_button)
+                                        stringResource(Res.string.common_open_settings)
                                     }
                                 )
                             }
@@ -525,7 +540,15 @@ fun NotificationSettingsScreen(
                         if (spaceXFollowed) {
                             HorizontalDivider(modifier = Modifier.padding(vertical = 8.dp))
                             Row(
-                                modifier = Modifier.fillMaxWidth(),
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .then(
+                                        if (onLockedControlClick != null) {
+                                            Modifier.clickable(onClick = onLockedControlClick)
+                                        } else {
+                                            Modifier
+                                        }
+                                    ),
                                 verticalAlignment = Alignment.CenterVertically,
                                 horizontalArrangement = Arrangement.spacedBy(12.dp)
                             ) {
@@ -548,7 +571,11 @@ fun NotificationSettingsScreen(
                                 }
                                 Switch(
                                     checked = uiState.notificationSettings.muteStarlink,
-                                    onCheckedChange = { viewModel.toggleMuteStarlink() },
+                                    onCheckedChange = if (uiState.hasNotificationCustomization) {
+                                        { viewModel.toggleMuteStarlink() }
+                                    } else {
+                                        null // locked: the row handles the tap
+                                    },
                                     enabled = uiState.hasNotificationCustomization
                                 )
                             }
@@ -709,7 +736,8 @@ fun NotificationSettingsScreen(
                             description = stringResource(Res.string.notification_settings_net_change_description),
                             checked = uiState.notificationSettings.isTopicEnabled(NotificationTopic.NETSTAMP_CHANGED),
                             onCheckedChange = viewModel::updateNetstampChanged,
-                            enabled = uiState.hasNotificationCustomization
+                            enabled = uiState.hasNotificationCustomization,
+                            onLockedClick = onLockedControlClick
                         )
 
                         NotificationTopicToggle(
@@ -724,7 +752,8 @@ fun NotificationSettingsScreen(
                             description = stringResource(Res.string.notification_settings_notice_1h_description),
                             checked = uiState.notificationSettings.isTopicEnabled(NotificationTopic.ONE_HOUR),
                             onCheckedChange = viewModel::updateOneHour,
-                            enabled = uiState.hasNotificationCustomization
+                            enabled = uiState.hasNotificationCustomization,
+                            onLockedClick = onLockedControlClick
                         )
 
                         NotificationTopicToggle(
@@ -739,7 +768,8 @@ fun NotificationSettingsScreen(
                             description = stringResource(Res.string.notification_settings_notice_1m_description),
                             checked = uiState.notificationSettings.isTopicEnabled(NotificationTopic.ONE_MINUTE),
                             onCheckedChange = viewModel::updateOneMinute,
-                            enabled = uiState.hasNotificationCustomization
+                            enabled = uiState.hasNotificationCustomization,
+                            onLockedClick = onLockedControlClick
                         )
                     }
                 }
@@ -782,7 +812,8 @@ fun NotificationSettingsScreen(
                             description = stringResource(Res.string.notification_settings_webcast_description),
                             checked = uiState.notificationSettings.isTopicEnabled(NotificationTopic.WEBCAST_ONLY),
                             onCheckedChange = viewModel::updateWebcastOnly,
-                            enabled = uiState.hasNotificationCustomization
+                            enabled = uiState.hasNotificationCustomization,
+                            onLockedClick = onLockedControlClick
                         )
 
                         NotificationTopicToggle(
@@ -790,7 +821,8 @@ fun NotificationSettingsScreen(
                             description = stringResource(Res.string.notification_settings_in_flight_description),
                             checked = uiState.notificationSettings.isTopicEnabled(NotificationTopic.IN_FLIGHT),
                             onCheckedChange = viewModel::updateInFlight,
-                            enabled = uiState.hasNotificationCustomization
+                            enabled = uiState.hasNotificationCustomization,
+                            onLockedClick = onLockedControlClick
                         )
 
                         NotificationTopicToggle(
@@ -879,7 +911,9 @@ fun NotificationTopicToggle(
     checked: Boolean,
     onCheckedChange: (Boolean) -> Unit,
     enabled: Boolean = true,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
+    /** When set, a tap on this locked (disabled) control calls it, e.g. to open the paywall. */
+    onLockedClick: (() -> Unit)? = null
 ) {
     Row(
         modifier = modifier
@@ -887,6 +921,8 @@ fun NotificationTopicToggle(
             .then(
                 if (enabled) {
                     Modifier.clickable { onCheckedChange(!checked) }
+                } else if (onLockedClick != null) {
+                    Modifier.clickable(onClick = onLockedClick)
                 } else {
                     Modifier
                 }
@@ -919,10 +955,8 @@ fun NotificationTopicToggle(
         }
         Switch(
             checked = checked,
-            onCheckedChange = {
-                if (enabled) onCheckedChange(it) else {
-                }
-            },
+            // A locked switch is not interactive itself; the row handles the tap.
+            onCheckedChange = if (enabled) onCheckedChange else null,
             enabled = enabled
         )
     }

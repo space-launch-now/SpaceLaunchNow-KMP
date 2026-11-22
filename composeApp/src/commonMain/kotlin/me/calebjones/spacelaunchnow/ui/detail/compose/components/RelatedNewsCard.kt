@@ -47,12 +47,12 @@ import me.calebjones.spacelaunchnow.LocalUseUtc
 import me.calebjones.spacelaunchnow.util.DateTimeUtil
 import org.jetbrains.compose.resources.stringResource
 import spacelaunchnow_kmp.composeapp.generated.resources.Res
+import spacelaunchnow_kmp.composeapp.generated.resources.common_article_icon
+import spacelaunchnow_kmp.composeapp.generated.resources.common_article_image
+import spacelaunchnow_kmp.composeapp.generated.resources.common_load_more_count
+import spacelaunchnow_kmp.composeapp.generated.resources.common_show_less
 import spacelaunchnow_kmp.composeapp.generated.resources.launch_detail_news_empty
-import spacelaunchnow_kmp.composeapp.generated.resources.launch_detail_news_icon_description
-import spacelaunchnow_kmp.composeapp.generated.resources.launch_detail_news_image_description
-import spacelaunchnow_kmp.composeapp.generated.resources.launch_detail_news_load_more
 import spacelaunchnow_kmp.composeapp.generated.resources.launch_detail_news_loading
-import spacelaunchnow_kmp.composeapp.generated.resources.launch_detail_show_less
 
 @Composable
 fun RelatedNewsCard(
@@ -89,7 +89,7 @@ fun RelatedNewsCard(
                             .padding(horizontal = 16.dp, vertical = 8.dp)
                     ) {
                         Text(
-                            text = stringResource(Res.string.launch_detail_news_load_more, articles.size - 5),
+                            text = stringResource(Res.string.common_load_more_count, articles.size - 5),
                             style = MaterialTheme.typography.labelLarge
                         )
                     }
@@ -104,7 +104,7 @@ fun RelatedNewsCard(
                             .padding(horizontal = 16.dp, vertical = 8.dp)
                     ) {
                         Text(
-                            text = stringResource(Res.string.launch_detail_show_less),
+                            text = stringResource(Res.string.common_show_less),
                             style = MaterialTheme.typography.labelLarge
                         )
                     }
@@ -153,7 +153,7 @@ fun RelatedNewsItem(
             val image = article.imageUrl
             SubcomposeAsyncImage(
                 model = image,
-                contentDescription = stringResource(Res.string.launch_detail_news_image_description),
+                contentDescription = stringResource(Res.string.common_article_image),
                 modifier = Modifier
                     .size(96.dp)
                     .clip(shape = RoundedCornerShape(2.dp)),
@@ -181,7 +181,7 @@ fun RelatedNewsItem(
                     ) {
                         Icon(
                             imageVector = FontAwesomeIcons.Solid.Newspaper,
-                            contentDescription = stringResource(Res.string.launch_detail_news_icon_description),
+                            contentDescription = stringResource(Res.string.common_article_icon),
                             modifier = Modifier.size(48.dp),
                             tint = MaterialTheme.colorScheme.primary.copy(alpha = 0.6f)
                         )

@@ -66,8 +66,8 @@ import kotlin.math.max
 import kotlin.math.min
 import kotlin.math.roundToInt
 import spacelaunchnow_kmp.composeapp.generated.resources.Res
-import spacelaunchnow_kmp.composeapp.generated.resources.app_compose_shared_detail_image_placeholder_description
 import spacelaunchnow_kmp.composeapp.generated.resources.common_back
+import spacelaunchnow_kmp.composeapp.generated.resources.common_image_placeholder
 import org.jetbrains.compose.resources.stringResource
 
 /**
@@ -448,7 +448,7 @@ private fun SharedDetailImage(
                 ) {
                     Icon(
                         imageVector = Icons.Filled.Image,
-                        contentDescription = stringResource(Res.string.app_compose_shared_detail_image_placeholder_description),
+                        contentDescription = stringResource(Res.string.common_image_placeholder),
                         modifier = Modifier.size(64.dp),
                         tint = MaterialTheme.colorScheme.primary.copy(alpha = 0.6f)
                     )

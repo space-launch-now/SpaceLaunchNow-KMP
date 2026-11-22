@@ -26,9 +26,9 @@ import me.calebjones.spacelaunchnow.ui.theme.SpaceLaunchNowPreviewTheme
 import org.jetbrains.compose.ui.tooling.preview.Preview
 import org.jetbrains.compose.resources.stringResource
 import spacelaunchnow_kmp.composeapp.generated.resources.Res
-import spacelaunchnow_kmp.composeapp.generated.resources.onboarding_news_latest
+import spacelaunchnow_kmp.composeapp.generated.resources.common_latest_news
+import spacelaunchnow_kmp.composeapp.generated.resources.common_news_and_events
 import spacelaunchnow_kmp.composeapp.generated.resources.onboarding_news_subtitle
-import spacelaunchnow_kmp.composeapp.generated.resources.onboarding_news_title
 
 /**
  * Onboarding page — shows live news articles inside a device frame.
@@ -39,7 +39,7 @@ fun NewsEventsPage(
     articles: List<Article> = emptyList()
 ) {
     OnboardingPage(
-        title = stringResource(Res.string.onboarding_news_title),
+        title = stringResource(Res.string.common_news_and_events),
         subtitle = stringResource(Res.string.onboarding_news_subtitle),
         icon = Icons.Default.Newspaper,
         modifier = modifier
@@ -57,7 +57,7 @@ private fun NewsPreviewContent(articles: List<Article>) {
     ) {
         Column(modifier = Modifier.fillMaxSize()) {
             Text(
-                text = stringResource(Res.string.onboarding_news_latest),
+                text = stringResource(Res.string.common_latest_news),
                 style = MaterialTheme.typography.titleMedium,
                 fontWeight = FontWeight.Bold,
                 modifier = Modifier.padding(horizontal = 16.dp, vertical = 12.dp)

@@ -72,9 +72,9 @@ import me.calebjones.spacelaunchnow.util.StatusColorUtil.getLaunchStatusColor
 import org.jetbrains.compose.ui.tooling.preview.Preview
 import org.jetbrains.compose.resources.stringResource
 import spacelaunchnow_kmp.composeapp.generated.resources.Res
+import spacelaunchnow_kmp.composeapp.generated.resources.common_launch_placeholder
 import spacelaunchnow_kmp.composeapp.generated.resources.common_retry
 import spacelaunchnow_kmp.composeapp.generated.resources.home_launch_image_description
-import spacelaunchnow_kmp.composeapp.generated.resources.home_launch_placeholder_description
 import spacelaunchnow_kmp.composeapp.generated.resources.home_launches_error
 
 // Constants for layout dimensions
@@ -258,7 +258,7 @@ fun LaunchItemView(
                         ) {
                             Icon(
                                 imageVector = CustomIcons.RocketLaunch,
-                                contentDescription = stringResource(Res.string.home_launch_placeholder_description),
+                                contentDescription = stringResource(Res.string.common_launch_placeholder),
                                 modifier = Modifier.size(72.dp),
                                 tint = MaterialTheme.colorScheme.primary.copy(alpha = 0.6f)
                             )
@@ -282,7 +282,7 @@ fun LaunchItemView(
                 ) {
                     Icon(
                         imageVector = CustomIcons.RocketLaunch,
-                        contentDescription = stringResource(Res.string.home_launch_placeholder_description),
+                        contentDescription = stringResource(Res.string.common_launch_placeholder),
                         modifier = Modifier.size(72.dp),
                         tint = MaterialTheme.colorScheme.primary.copy(alpha = 0.6f)
                     )

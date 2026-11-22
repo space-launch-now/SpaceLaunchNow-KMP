@@ -60,6 +60,10 @@ import kotlin.time.Duration.Companion.hours
 import kotlin.time.Duration.Companion.minutes
 import kotlin.time.Duration.Companion.seconds
 import kotlin.time.Instant
+import spacelaunchnow_kmp.composeapp.generated.resources.launch_countdown_status_dialog_title
+import spacelaunchnow_kmp.composeapp.generated.resources.launch_countdown_status_info_description
+import spacelaunchnow_kmp.composeapp.generated.resources.common_description
+import spacelaunchnow_kmp.composeapp.generated.resources.common_ok
 
 @Preview
 @Composable
@@ -74,7 +78,7 @@ fun BuildLaunchCountdown() {
                     1,
                     "Go for Launch",
                     abbrev = "Go",
-                    description = "The launch is a go!"
+                    description = "The launch is a go!" // i18n-ignore: preview sample
                 ),
                 precision = NetPrecision(id = 0, name = "Second", abbrev = null, description = null)
             )
@@ -157,7 +161,7 @@ fun LaunchStatusDialog(
                 verticalAlignment = Alignment.CenterVertically,
                 horizontalArrangement = Arrangement.spacedBy(8.dp)
             ) {
-                Text(text = "Launch Status", style = MaterialTheme.typography.titleLarge)
+                Text(text = stringResource(Res.string.launch_countdown_status_dialog_title), style = MaterialTheme.typography.titleLarge)
             }
         },
         text = {
@@ -170,10 +174,10 @@ fun LaunchStatusDialog(
                 ) {
                     Icon(
                         imageVector = Icons.Filled.Info,
-                        contentDescription = "Status information"
+                        contentDescription = stringResource(Res.string.launch_countdown_status_info_description)
                     )
                     Text(
-                        text = "Description",
+                        text = stringResource(Res.string.common_description),
                         style = MaterialTheme.typography.bodyLarge,
                         fontWeight = FontWeight.Bold
                     )
@@ -189,7 +193,7 @@ fun LaunchStatusDialog(
         },
         confirmButton = {
             TextButton(onClick = onDismiss) {
-                Text(text = "OK")
+                Text(text = stringResource(Res.string.common_ok))
             }
         }
     )
@@ -460,7 +464,7 @@ private fun CompactCountdownPreviewContent() {
                 launchTime = System.now().plus(2.days).plus(6.hours).plus(34.minutes),
                 precision = precise,
                 status = null,
-                fallback = { Text("fallback") }
+                fallback = { Text("fallback") } // i18n-ignore: preview sample
             )
             // Fallback: 120 days out is past the 30-day countdown window
             CompactLaunchCountdown(
@@ -469,7 +473,7 @@ private fun CompactCountdownPreviewContent() {
                 status = null,
                 fallback = {
                     Text(
-                        text = "NET Feb 15, 2026",
+                        text = "NET Feb 15, 2026", // i18n-ignore: preview sample
                         style = MaterialTheme.typography.bodySmall
                     )
                 }

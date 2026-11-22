@@ -41,10 +41,10 @@ import me.calebjones.spacelaunchnow.ui.theme.SpaceLaunchNowTheme
 import org.jetbrains.compose.ui.tooling.preview.Preview
 import org.jetbrains.compose.resources.stringResource
 import spacelaunchnow_kmp.composeapp.generated.resources.Res
-import spacelaunchnow_kmp.composeapp.generated.resources.astronaut_profile_agency_logo_description
 import spacelaunchnow_kmp.composeapp.generated.resources.astronaut_profile_click_label
 import spacelaunchnow_kmp.composeapp.generated.resources.astronaut_profile_description
 import spacelaunchnow_kmp.composeapp.generated.resources.astronaut_profile_photo_description
+import spacelaunchnow_kmp.composeapp.generated.resources.common_agency_logo
 
 /**
  * A compact horizontal card displaying astronaut profile information.
@@ -188,7 +188,7 @@ fun AstronautProfileCard(
                 ) {
                     SubcomposeAsyncImage(
                         model = agencyImageUrl,
-                        contentDescription = stringResource(Res.string.astronaut_profile_agency_logo_description),
+                        contentDescription = stringResource(Res.string.common_agency_logo),
                         modifier = Modifier
                             .fillMaxSize()
                             .padding(4.dp),

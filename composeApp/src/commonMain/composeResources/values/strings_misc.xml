@@ -1,7 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <!-- Content description of the app icon in the round badge. Read by screen readers. Short name, one line. -->
-    <string name="app_components_app_icon_description">Space Launch Now</string>
     <!-- Small badge on a card showing cached data. One word, max 10 chars. -->
     <string name="app_components_cache_indicator_label">Cached</string>
     <!-- Content description of the flag image in a country chip. %1$s is the country name. Read by screen readers. -->
@@ -12,8 +10,6 @@
     <string name="app_components_feedback_button_email">Send Email</string>
     <!-- Outlined button in the feedback dialog, opens a GitHub issue. One line, max 16 chars. Half the dialog width. -->
     <string name="app_components_feedback_button_github">GitHub Issue</string>
-    <!-- Text button that closes the feedback dialog, full width, one line. -->
-    <string name="app_components_feedback_button_later">Maybe Later</string>
     <!-- Body of the feedback dialog above the buttons. Two to four lines. -->
     <string name="app_components_feedback_message">Your feedback helps me improve! How would you like to share your thoughts?</string>
     <!-- Title of the feedback dialog. One or two lines, headline size. -->
@@ -36,46 +32,26 @@
     <string name="app_components_search_bar_clear_description">Clear search</string>
     <!-- Content description of the magnifier icon in the search field. Read by screen readers. -->
     <string name="app_components_search_bar_icon_description">Search icon</string>
-    <!-- Default placeholder in the search field when the caller gives none. One line. -->
-    <string name="app_components_search_bar_placeholder">Search</string>
     <!-- Title of the sort bottom sheet or dialog. One line, large bold. -->
     <string name="app_components_sort_menu_title">Sort by</string>
-    <!-- Button with an open icon that opens the article in the system browser again. One line. -->
-    <string name="app_components_web_fallback_button">Open in browser</string>
     <!-- Centered message while the article opens in the system browser. One or two lines. -->
     <string name="app_components_web_fallback_opening">Opening article in your browser…</string>
-    <!-- Content description of the round agency logo badge. Read by screen readers. -->
-    <string name="app_compose_agency_logo_badge_description">Agency logo</string>
     <!-- Default label of the empty state button, next to a settings icon. One line, max 20 chars. -->
     <string name="app_compose_empty_state_action">Adjust Filters</string>
-    <!-- Content description of the settings icon in the empty state button. Read by screen readers. -->
-    <string name="app_compose_empty_state_action_icon_description">Settings</string>
     <!-- Default message under the empty state title. Two or three lines. -->
     <string name="app_compose_empty_state_message">Try adjusting your agency or location filters to see more launches</string>
     <!-- Default title of the empty state card when filters hide all launches. One or two lines, bold. -->
     <string name="app_compose_empty_state_title">No Launches Match Your Filters</string>
-    <!-- Content description of the hero image placeholder at the top of a detail screen. Read by screen readers. -->
-    <string name="app_compose_hero_detail_image_placeholder_description">Image placeholder</string>
     <!-- Content description of the agency logo on a launch card header. Read by screen readers. -->
     <string name="app_compose_launch_card_header_agency_logo_description">Agency Logo</string>
     <!-- Content description of the agency logo placeholder on a launch card header. Read by screen readers. -->
     <string name="app_compose_launch_card_header_agency_placeholder_description">Agency placeholder</string>
-    <!-- Content description of the location icon on a launch card header. Read by screen readers. -->
-    <string name="app_compose_launch_card_header_location_description">Launch Location</string>
-    <!-- Small label above the launch window length. One word. -->
-    <string name="app_compose_launch_window_duration_label">Duration</string>
     <!-- Value under the duration label when the launch window has zero length. One word. -->
     <string name="app_compose_launch_window_instantaneous">Instantaneous</string>
     <!-- Small bold title above the launch window timeline. One line. -->
     <string name="app_compose_launch_window_title">Launch Window</string>
     <!-- Content description of the pulsing live badge. Read by screen readers. -->
     <string name="app_compose_live_indicator_description">Live broadcast indicator</string>
-    <!-- Content description of the image placeholder in the shared detail header. Read by screen readers. -->
-    <string name="app_compose_shared_detail_image_placeholder_description">Image placeholder</string>
-    <!-- Text button under an expanded video description. One line. -->
-    <string name="app_compose_video_player_description_less">Show less</string>
-    <!-- Text button under a clipped video description. One line. -->
-    <string name="app_compose_video_player_description_more">Show more</string>
     <!-- Default message in the video error box. One or two lines, bold. -->
     <string name="app_compose_video_player_error_message">Unable to load video</string>
     <!-- Content description of the fullscreen button on the video player. Read by screen readers. -->
@@ -90,14 +66,10 @@
     <string name="app_explore_card_agencies_content_description">Navigate to Agencies list to explore space organizations</string>
     <!-- Description under the Agencies card title on the Explore screen. Centered, small text, max 2 lines. -->
     <string name="app_explore_card_agencies_description">Space agencies and missions</string>
-    <!-- Title of the Agencies card on the Explore screen. Bold, centered, one line. -->
-    <string name="app_explore_card_agencies_title">Agencies</string>
     <!-- Accessibility description of the whole Astronauts card on the Explore screen. Read by screen readers. -->
     <string name="app_explore_card_astronauts_content_description">Navigate to Astronauts list to view career stats and missions</string>
     <!-- Description under the Astronauts card title on the Explore screen. Centered, small text, max 2 lines. -->
     <string name="app_explore_card_astronauts_description">Browse astronaut profiles</string>
-    <!-- Title of the Astronauts card on the Explore screen. Bold, centered, one line. -->
-    <string name="app_explore_card_astronauts_title">Astronauts</string>
     <!-- Accessibility description of the whole ISS Tracking card on the Explore screen. Read by screen readers. -->
     <string name="app_explore_card_iss_content_description">Navigate to ISS Tracking with live position and crew information</string>
     <!-- Description under the ISS Tracking card title on the Explore screen. Centered, small text, max 2 lines. -->
@@ -108,48 +80,30 @@
     <string name="app_explore_card_news_events_content_description">Navigate to News and Events to browse articles and upcoming space events</string>
     <!-- Description under the News & Events card title on the Explore screen. Centered, small text, max 2 lines. -->
     <string name="app_explore_card_news_events_description">Space news and upcoming events</string>
-    <!-- Title of the News & Events card on the Explore screen. Bold, centered, one line. -->
-    <string name="app_explore_card_news_events_title">News &amp; Events</string>
     <!-- Accessibility description of the whole Rockets card on the Explore screen. Read by screen readers. -->
     <string name="app_explore_card_rockets_content_description">Navigate to Rockets list to explore launch vehicles</string>
     <!-- Description under the Rockets card title on the Explore screen. Centered, small text, max 2 lines. -->
     <string name="app_explore_card_rockets_description">Launcher configurations</string>
-    <!-- Title of the Rockets card on the Explore screen. Bold, centered, one line. -->
-    <string name="app_explore_card_rockets_title">Rockets</string>
     <!-- Accessibility description of the whole Starship card on the Explore screen. Read by screen readers. -->
     <string name="app_explore_card_starship_content_description">Navigate to Starship dashboard for updates and launches</string>
     <!-- Description under the Starship card title on the Explore screen. Centered, small text, max 2 lines. -->
     <string name="app_explore_card_starship_description">SpaceX Starship development</string>
-    <!-- Title of the Starship card on the Explore screen. Bold, centered, one line. -->
-    <string name="app_explore_card_starship_title">Starship</string>
-    <!-- Top bar title of the Explore screen. One line, large bold. -->
-    <string name="app_explore_title">Explore</string>
     <!-- Content description of the app icon in the desktop navigation drawer header. Read by screen readers. -->
     <string name="app_layout_desktop_app_icon_description">App Icon</string>
     <!-- Accessibility description of the Explore tab icon in the bottom bar or side rail. Read by screen readers. -->
     <string name="app_layout_nav_explore_content_description">Explore tab</string>
-    <!-- Label of the Explore tab in the bottom bar or side rail. One word, max 12 chars. -->
-    <string name="app_layout_nav_explore_label">Explore</string>
     <!-- Accessibility description of the Home tab icon in the bottom bar or side rail. Read by screen readers. -->
     <string name="app_layout_nav_home_content_description">Home tab</string>
     <!-- Label of the Home tab in the bottom bar or side rail. One word, max 12 chars. -->
     <string name="app_layout_nav_home_label">Home</string>
     <!-- Accessibility description of the News tab icon in the bottom bar or side rail. Read by screen readers. -->
     <string name="app_layout_nav_news_content_description">News and Events tab</string>
-    <!-- Label of the News tab in the bottom bar or side rail. One word, max 12 chars. -->
-    <string name="app_layout_nav_news_label">News</string>
     <!-- Accessibility description of the Schedule tab icon in the bottom bar or side rail. Read by screen readers. -->
     <string name="app_layout_nav_schedule_content_description">Schedule tab</string>
     <!-- Label of the Schedule tab in the bottom bar or side rail. One word, max 12 chars. -->
     <string name="app_layout_nav_schedule_label">Schedule</string>
     <!-- Accessibility description of the Settings tab icon in the bottom bar or side rail. Read by screen readers. -->
     <string name="app_layout_nav_settings_content_description">Settings tab</string>
-    <!-- Label of the Settings tab in the bottom bar or side rail. One word, max 12 chars. -->
-    <string name="app_layout_nav_settings_label">Settings</string>
-    <!-- Content description of the app logo at the top of the navigation rail. Read by screen readers. -->
-    <string name="app_layout_scaffold_logo_description">Space Launch Now</string>
-    <!-- Content description of the open icon in the news detail top bar. Read by screen readers. -->
-    <string name="app_newsevents_detail_open_in_browser_description">Open in browser</string>
     <!-- Top bar title of the news detail screen when the article has no title. One line. -->
     <string name="app_newsevents_detail_title_fallback">Article</string>
     <!-- Empty list message on the Events tab. Centered, one or two lines. -->
@@ -166,18 +120,12 @@
     <string name="app_newsevents_event_item_description">Event: %1$s, Type: %2$s</string>
     <!-- Content description of the event image in an event card. %1$s is the event name. Read by screen readers. -->
     <string name="app_newsevents_event_item_image_description">Event image for %1$s</string>
-    <!-- Content description of the filter icon button next to the title. Read by screen readers. -->
-    <string name="app_newsevents_filter_description">Filter</string>
     <!-- Full-width text button that clears every filter. One line. -->
     <string name="app_newsevents_filter_sheet_clear_all">Clear All Filters</string>
-    <!-- Text button that closes the filter bottom sheet. One word, max 12 chars. -->
-    <string name="app_newsevents_filter_sheet_close">Close</string>
     <!-- Small heading above the event type chips. One line. -->
     <string name="app_newsevents_filter_sheet_event_types_heading">Select event types</string>
     <!-- Message in the filter sheet while event types load. One line. -->
     <string name="app_newsevents_filter_sheet_event_types_loading">Loading event types...</string>
-    <!-- Content description of the close icon on a selected filter chip. Read by screen readers. -->
-    <string name="app_newsevents_filter_sheet_remove_description">Remove filter</string>
     <!-- Small heading above the news source chips. One line. -->
     <string name="app_newsevents_filter_sheet_sources_heading">Select sources</string>
     <!-- Title of the filter bottom sheet on the Events tab. One line, bold. -->
@@ -192,8 +140,6 @@
     <string name="app_newsevents_search_placeholder_events">Search events...</string>
     <!-- Placeholder in the search field on the News tab. One line. -->
     <string name="app_newsevents_search_placeholder_news">Search news articles...</string>
-    <!-- Top bar title of the News & Events screen. One line, large bold. -->
-    <string name="app_newsevents_title">News &amp; Events</string>
     <!-- Bold title of the Roadmap error block, above the error message. One line. -->
     <string name="app_roadmap_error_title">Oops!</string>
     <!-- Small line above the roadmap items. %1$s is the update date text such as February 2026. One line. -->
@@ -240,10 +186,30 @@
     <string name="app_roadmap_placeholder_quarter_feb_2026">February 2026</string>
     <!-- Quarter or date label (Q1 2026) in the footer of a fallback roadmap card. Small text, one line. -->
     <string name="app_roadmap_placeholder_quarter_q1_2026">Q1 2026</string>
-    <!-- Top bar title of the Roadmap screen. One line, very large bold. -->
-    <string name="app_roadmap_title">Roadmap</string>
     <!-- Content description of the open icon in the fullscreen video header, opens the video in another app. Read by screen readers. -->
     <string name="app_video_fullscreen_external_description">Open in external app</string>
     <!-- Label in the fullscreen video controls. %1$d is the position of the selected video, %2$d the number of videos. One line. -->
     <string name="app_video_fullscreen_position">Video %1$d of %2$d</string>
+    <!-- Status badge on a roadmap item, and the description of its status icon. One or two words. -->
+    <string name="app_roadmap_status_completed">Completed</string>
+    <!-- Status badge on a roadmap item, and the description of its status icon. One or two words. -->
+    <string name="app_roadmap_status_in_testing">In Testing</string>
+    <!-- Status badge on a roadmap item, and the description of its status icon. One or two words. -->
+    <string name="app_roadmap_status_in_progress">In Progress</string>
+    <!-- Status badge on a roadmap item, and the description of its status icon. One or two words. -->
+    <string name="app_roadmap_status_planned">Planned</string>
+    <!-- Status badge on a roadmap item, and the description of its status icon. One or two words. -->
+    <string name="app_roadmap_status_backlog">Backlog</string>
+    <!-- Category label on a roadmap item. One or two words. -->
+    <string name="app_roadmap_category_feature">Feature</string>
+    <!-- Category label on a roadmap item. One or two words. -->
+    <string name="app_roadmap_category_enhancement">Enhancement</string>
+    <!-- Category label on a roadmap item. One or two words. -->
+    <string name="app_roadmap_category_bug_fix">Bug Fix</string>
+    <!-- Category label on a roadmap item. One or two words. -->
+    <string name="app_roadmap_category_infrastructure">Infrastructure</string>
+    <!-- Category label on a roadmap item. One or two words. -->
+    <string name="app_roadmap_category_design">Design</string>
+    <!-- Description of the loading text on the start-up screen. Read by screen readers. -->
+    <string name="preload_loading_description">Loading launch data</string>
 </resources>

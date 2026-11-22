@@ -1,7 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <!-- Launch status, full name. Shown on a launch card or detail page. -->
-    <string name="enum_status_go">Go for Launch</string>
     <!-- Launch status, short form. Shown on a small badge, often in capitals. -->
     <string name="enum_status_go_abbrev">Go</string>
     <!-- Launch status, full name. Shown on a launch card or detail page. -->

@@ -14,6 +14,8 @@ import me.calebjones.spacelaunchnow.data.repository.AstronautRepository
 import me.calebjones.spacelaunchnow.domain.model.AstronautListItem
 import me.calebjones.spacelaunchnow.util.logging.isCoroutineCancellation
 import me.calebjones.spacelaunchnow.util.logging.logger
+import org.jetbrains.compose.resources.StringResource
+import spacelaunchnow_kmp.composeapp.generated.resources.*
 
 /**
  * ViewModel for displaying a paginated list of astronauts.
@@ -375,11 +377,11 @@ data class AstronautListUiState(
 /**
  * Sort order options for astronaut list.
  */
-enum class AstronautSortOrder(val apiValue: String, val displayName: String) {
-    NAME_ASC("name", "Name (A-Z)"),
-    NAME_DESC("-name", "Name (Z-A)"),
-    FLIGHTS_ASC("flights_count", "Flights (Low to High)"),
-    FLIGHTS_DESC("-flights_count", "Flights (High to Low)"),
-    FIRST_FLIGHT_ASC("first_flight", "First Flight (Oldest)"),
-    FIRST_FLIGHT_DESC("-first_flight", "First Flight (Newest)")
+enum class AstronautSortOrder(val apiValue: String, val label: StringResource) {
+    NAME_ASC("name", Res.string.common_sort_name_asc),
+    NAME_DESC("-name", Res.string.common_sort_name_desc),
+    FLIGHTS_ASC("flights_count", Res.string.astronauts_sort_flights_asc),
+    FLIGHTS_DESC("-flights_count", Res.string.astronauts_sort_flights_desc),
+    FIRST_FLIGHT_ASC("first_flight", Res.string.astronauts_sort_first_flight_asc),
+    FIRST_FLIGHT_DESC("-first_flight", Res.string.astronauts_sort_first_flight_desc)
 }

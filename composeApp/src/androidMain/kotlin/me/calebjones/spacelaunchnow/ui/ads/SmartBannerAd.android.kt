@@ -56,6 +56,9 @@ import me.calebjones.spacelaunchnow.getPlatform
 import me.calebjones.spacelaunchnow.ui.subscription.rememberHasFeature
 import me.calebjones.spacelaunchnow.util.logging.SpaceLogger
 import kotlin.time.Clock
+import org.jetbrains.compose.resources.stringResource
+import spacelaunchnow_kmp.composeapp.generated.resources.Res
+import spacelaunchnow_kmp.composeapp.generated.resources.ads_remove_ads_button
 
 private val log by lazy { SpaceLogger.getLogger("SmartBannerAd") }
 
@@ -192,11 +195,21 @@ actual fun SmartBannerAd(
     val reservedSize = if (availableAd.state == AdState.NONE) actualAdSize else availableAd.adSize
     val bannerHeight = if (reservedSize.height > 0) reservedSize.height.dp else 50.dp
 
-    // Inline slot handlers are not preloaded, so they reload here on a display change
-    // (preloaded handlers reload in WithPreloadedAds)
-    ReloadOnDisplayChange {
-        if (slotHandler != null && isBannerLoaded(slotHandler.state)) {
-            slotHandler.reloadBannerView(placementType.name, actualAdSize)
+    // Inline slot handlers are not preloaded, so they reload here when their loaded display
+    // config differs from the current one (preloaded handlers reload in WithPreloadedAds). The
+    // record covers a display change while this host was out of composition (scrolled away).
+    val displayKey = rememberDisplayConfigKey()
+    // Every reload goes through here so a slot handler's loaded config is always recorded.
+    val reload: (BannerAdHandler, AdSize?) -> Unit = { handler, size ->
+        if (handler === slotHandler) LoadedDisplayKeys.shared.markLoaded(handler, displayKey)
+        if (size != null) handler.reloadBannerView(placementType.name, size)
+        else handler.reloadBannerView(placementType.name)
+    }
+    LaunchedEffect(slotHandler, displayKey) {
+        if (slotHandler != null && isBannerLoaded(slotHandler.state) &&
+            LoadedDisplayKeys.shared.isStale(slotHandler, displayKey)
+        ) {
+            reload(slotHandler, actualAdSize)
         }
     }
 
@@ -216,7 +229,7 @@ actual fun SmartBannerAd(
             )
         ) {
             log.d { "New screen for placement $placementType - loading a fresh banner" }
-            availableAd.reloadBannerView(placementType.name)
+            reload(availableAd, null)
         }
         refreshChecked = true
     }
@@ -241,7 +254,7 @@ actual fun SmartBannerAd(
             // Preloaded handlers load themselves; a slot handler starts empty (at the library's
             // FULL_BANNER default size), so load it now at the slot's size
             AdState.NONE -> if (slotHandler != null) {
-                availableAd.reloadBannerView(placementType.name, actualAdSize)
+                reload(availableAd, actualAdSize)
             }
 
             AdState.FAILING -> {
@@ -249,7 +262,7 @@ actual fun SmartBannerAd(
                 log.d { "Ad failed, retrying in ${delayMs}ms for placement $placementType" }
                 delay(delayMs)
                 retryPolicy.recordAttempt(availableAd)
-                availableAd.reloadBannerView(placementType.name)
+                reload(availableAd, null)
                 retryRound++
             }
 
@@ -369,7 +382,7 @@ actual fun SmartBannerAd(
                                     .padding(horizontal = 16.dp)
                             ) {
                                 Text(
-                                    text = "Remove Ads",
+                                    text = stringResource(Res.string.ads_remove_ads_button),
                                     style = MaterialTheme.typography.bodyMedium,
                                     color = MaterialTheme.colorScheme.primary
                                 )

@@ -7,6 +7,7 @@ import me.calebjones.spacelaunchnow.domain.model.Orbit
 import org.jetbrains.compose.resources.StringResource
 import org.jetbrains.compose.resources.stringResource
 import spacelaunchnow_kmp.composeapp.generated.resources.Res
+import spacelaunchnow_kmp.composeapp.generated.resources.common_go_for_launch
 import spacelaunchnow_kmp.composeapp.generated.resources.enum_country_au
 import spacelaunchnow_kmp.composeapp.generated.resources.enum_country_br
 import spacelaunchnow_kmp.composeapp.generated.resources.enum_country_ca
@@ -82,7 +83,6 @@ import spacelaunchnow_kmp.composeapp.generated.resources.enum_status_deployed
 import spacelaunchnow_kmp.composeapp.generated.resources.enum_status_deployed_abbrev
 import spacelaunchnow_kmp.composeapp.generated.resources.enum_status_failure
 import spacelaunchnow_kmp.composeapp.generated.resources.enum_status_failure_abbrev
-import spacelaunchnow_kmp.composeapp.generated.resources.enum_status_go
 import spacelaunchnow_kmp.composeapp.generated.resources.enum_status_go_abbrev
 import spacelaunchnow_kmp.composeapp.generated.resources.enum_status_hold
 import spacelaunchnow_kmp.composeapp.generated.resources.enum_status_hold_abbrev
@@ -105,7 +105,7 @@ import spacelaunchnow_kmp.composeapp.generated.resources.enum_status_tbd_abbrev
 object ApiEnumLabels {
     /** Launch status name by status id (1 to 9). */
     fun launchStatusName(id: Int?): StringResource? = when (id) {
-        1 -> Res.string.enum_status_go
+        1 -> Res.string.common_go_for_launch
         2 -> Res.string.enum_status_tbd
         3 -> Res.string.enum_status_success
         4 -> Res.string.enum_status_failure

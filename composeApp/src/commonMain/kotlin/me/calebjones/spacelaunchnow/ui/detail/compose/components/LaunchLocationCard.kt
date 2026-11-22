@@ -42,10 +42,10 @@ import me.calebjones.spacelaunchnow.ui.components.StatCard
 import me.calebjones.spacelaunchnow.util.parseIsoDurationToHumanReadable
 import org.jetbrains.compose.resources.stringResource
 import spacelaunchnow_kmp.composeapp.generated.resources.Res
-import spacelaunchnow_kmp.composeapp.generated.resources.launch_detail_info_description
-import spacelaunchnow_kmp.composeapp.generated.resources.launch_detail_link_website
-import spacelaunchnow_kmp.composeapp.generated.resources.launch_detail_link_wikipedia
-import spacelaunchnow_kmp.composeapp.generated.resources.launch_detail_link_wikipedia_description
+import spacelaunchnow_kmp.composeapp.generated.resources.common_information
+import spacelaunchnow_kmp.composeapp.generated.resources.common_launches
+import spacelaunchnow_kmp.composeapp.generated.resources.common_website
+import spacelaunchnow_kmp.composeapp.generated.resources.common_wikipedia
 import spacelaunchnow_kmp.composeapp.generated.resources.launch_detail_location_flag_description
 import spacelaunchnow_kmp.composeapp.generated.resources.launch_detail_location_image_description
 import spacelaunchnow_kmp.composeapp.generated.resources.launch_detail_location_map_description
@@ -55,7 +55,6 @@ import spacelaunchnow_kmp.composeapp.generated.resources.launch_detail_pad_image
 import spacelaunchnow_kmp.composeapp.generated.resources.launch_detail_pad_map_description
 import spacelaunchnow_kmp.composeapp.generated.resources.launch_detail_pad_map_icon_description
 import spacelaunchnow_kmp.composeapp.generated.resources.launch_detail_pad_open_map
-import spacelaunchnow_kmp.composeapp.generated.resources.launch_detail_pad_stat_launches
 import spacelaunchnow_kmp.composeapp.generated.resources.launch_detail_pad_stat_orbital_attempts
 
 @Composable
@@ -287,11 +286,11 @@ fun LaunchLocationCard(
                                 ) {
                                     Icon(
                                         imageVector = FontAwesomeIcons.Solid.InfoCircle,
-                                        contentDescription = stringResource(Res.string.launch_detail_info_description),
+                                        contentDescription = stringResource(Res.string.common_information),
                                         modifier = Modifier.size(18.dp)
                                     )
                                     Spacer(modifier = Modifier.width(8.dp))
-                                    Text(stringResource(Res.string.launch_detail_link_website))
+                                    Text(stringResource(Res.string.common_website))
                                 }
                             }
                             it.wikiUrl?.let { url ->
@@ -302,11 +301,11 @@ fun LaunchLocationCard(
                                 ) {
                                     Icon(
                                         imageVector = FontAwesomeIcons.Brands.WikipediaW,
-                                        contentDescription = stringResource(Res.string.launch_detail_link_wikipedia_description),
+                                        contentDescription = stringResource(Res.string.common_wikipedia),
                                         modifier = Modifier.size(18.dp)
                                     )
                                     Spacer(modifier = Modifier.width(8.dp))
-                                    Text(stringResource(Res.string.launch_detail_link_wikipedia), color = MaterialTheme.colorScheme.onSecondary)
+                                    Text(stringResource(Res.string.common_wikipedia), color = MaterialTheme.colorScheme.onSecondary)
                                 }
                             }
                         }
@@ -329,7 +328,7 @@ fun PadQuickStatsRow(pad: Pad?) {
                 modifier = Modifier.weight(1f),
                 icon = Icons.Filled.Public,
                 value = pad.totalLaunchCount.toString(),
-                label = stringResource(Res.string.launch_detail_pad_stat_launches)
+                label = stringResource(Res.string.common_launches)
             )
         }
         if (pad.orbitalLaunchAttemptCount != null) {

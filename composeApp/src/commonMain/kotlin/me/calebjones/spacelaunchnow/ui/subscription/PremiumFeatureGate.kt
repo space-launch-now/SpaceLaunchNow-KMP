@@ -47,7 +47,12 @@ import me.calebjones.spacelaunchnow.data.repository.SubscriptionRepository
 import org.koin.compose.koinInject
 import org.jetbrains.compose.resources.stringResource
 import spacelaunchnow_kmp.composeapp.generated.resources.Res
-import spacelaunchnow_kmp.composeapp.generated.resources.premium_badge_label
+import spacelaunchnow_kmp.composeapp.generated.resources.common_ad_free_experience
+import spacelaunchnow_kmp.composeapp.generated.resources.common_calendar_sync
+import spacelaunchnow_kmp.composeapp.generated.resources.common_premium
+import spacelaunchnow_kmp.composeapp.generated.resources.common_premium_feature
+import spacelaunchnow_kmp.composeapp.generated.resources.common_upgrade_to_premium
+import spacelaunchnow_kmp.composeapp.generated.resources.common_wear_os
 import spacelaunchnow_kmp.composeapp.generated.resources.premium_feature_description_ad_free
 import spacelaunchnow_kmp.composeapp.generated.resources.premium_feature_description_advanced_widgets
 import spacelaunchnow_kmp.composeapp.generated.resources.premium_feature_description_cal_sync
@@ -55,15 +60,10 @@ import spacelaunchnow_kmp.composeapp.generated.resources.premium_feature_descrip
 import spacelaunchnow_kmp.composeapp.generated.resources.premium_feature_description_notification_customization
 import spacelaunchnow_kmp.composeapp.generated.resources.premium_feature_description_wear_os
 import spacelaunchnow_kmp.composeapp.generated.resources.premium_feature_description_widgets_customization
-import spacelaunchnow_kmp.composeapp.generated.resources.premium_feature_title_ad_free
 import spacelaunchnow_kmp.composeapp.generated.resources.premium_feature_title_advanced_widgets
-import spacelaunchnow_kmp.composeapp.generated.resources.premium_feature_title_cal_sync
 import spacelaunchnow_kmp.composeapp.generated.resources.premium_feature_title_custom_themes
 import spacelaunchnow_kmp.composeapp.generated.resources.premium_feature_title_notification_customization
-import spacelaunchnow_kmp.composeapp.generated.resources.premium_feature_title_wear_os
 import spacelaunchnow_kmp.composeapp.generated.resources.premium_feature_title_widgets_customization
-import spacelaunchnow_kmp.composeapp.generated.resources.premium_gate_title
-import spacelaunchnow_kmp.composeapp.generated.resources.premium_gate_upgrade_button
 
 /**
  * Wrapper composable that gates content behind a premium feature
@@ -187,7 +187,7 @@ private fun DefaultPaywallCard(
             )
 
             Text(
-                text = stringResource(Res.string.premium_gate_title),
+                text = stringResource(Res.string.common_premium_feature),
                 style = MaterialTheme.typography.headlineSmall,
                 fontWeight = FontWeight.Bold
             )
@@ -204,7 +204,7 @@ private fun DefaultPaywallCard(
             ) {
                 Icon(Icons.Default.Star, contentDescription = null)
                 Spacer(Modifier.width(8.dp))
-                Text(stringResource(Res.string.premium_gate_upgrade_button))
+                Text(stringResource(Res.string.common_upgrade_to_premium))
             }
         }
     }
@@ -269,7 +269,7 @@ fun PremiumPromptCard(
                 .padding(horizontal = 16.dp)
                 .padding(bottom = 16.dp)
         ) {
-            Text(stringResource(Res.string.premium_gate_upgrade_button))
+            Text(stringResource(Res.string.common_upgrade_to_premium))
         }
     }
 }
@@ -339,7 +339,7 @@ fun PremiumFeatureButton(
         if (!hasFeature) {
             Icon(
                 Icons.Default.Lock,
-                contentDescription = stringResource(Res.string.premium_badge_label),
+                contentDescription = stringResource(Res.string.common_premium),
                 modifier = Modifier.size(20.dp)
             )
             Spacer(Modifier.width(4.dp))
@@ -373,7 +373,7 @@ fun PremiumBadge(
                 tint = MaterialTheme.colorScheme.onPrimaryContainer
             )
             Text(
-                text = stringResource(Res.string.premium_badge_label),
+                text = stringResource(Res.string.common_premium),
                 style = MaterialTheme.typography.labelSmall,
                 fontWeight = FontWeight.Bold,
                 color = MaterialTheme.colorScheme.onPrimaryContainer,
@@ -450,12 +450,12 @@ fun PremiumFeature.getDescription(): String {
 @Composable
 fun PremiumFeature.getTitle(): String {
     return when (this) {
-        PremiumFeature.AD_FREE -> stringResource(Res.string.premium_feature_title_ad_free)
+        PremiumFeature.AD_FREE -> stringResource(Res.string.common_ad_free_experience)
         PremiumFeature.CUSTOM_THEMES -> stringResource(Res.string.premium_feature_title_custom_themes)
         PremiumFeature.ADVANCED_WIDGETS -> stringResource(Res.string.premium_feature_title_advanced_widgets)
         PremiumFeature.WIDGETS_CUSTOMIZATION -> stringResource(Res.string.premium_feature_title_widgets_customization)
-        PremiumFeature.CAL_SYNC -> stringResource(Res.string.premium_feature_title_cal_sync)
+        PremiumFeature.CAL_SYNC -> stringResource(Res.string.common_calendar_sync)
         PremiumFeature.NOTIFICATION_CUSTOMIZATION -> stringResource(Res.string.premium_feature_title_notification_customization)
-        PremiumFeature.WEAR_OS -> stringResource(Res.string.premium_feature_title_wear_os)
+        PremiumFeature.WEAR_OS -> stringResource(Res.string.common_wear_os)
     }
 }

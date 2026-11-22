@@ -9,6 +9,8 @@ import androidx.compose.material.icons.filled.RocketLaunch
 import androidx.compose.material.icons.filled.Settings
 import androidx.compose.ui.graphics.vector.ImageVector
 import kotlinx.serialization.Serializable
+import org.jetbrains.compose.resources.StringResource
+import spacelaunchnow_kmp.composeapp.generated.resources.*
 
 // Serializable routes for type-safe navigation (modern multiplatform approach)
 @Serializable
@@ -107,10 +109,10 @@ data class FullscreenVideo(
 )
 
 // Legacy sealed class for UI metadata only
-sealed class Screen(val label: String, val icon: ImageVector) {
-    data object Home : Screen("Home", Icons.Filled.Home)
-    data object Schedule : Screen("Schedule", Icons.AutoMirrored.Filled.List)
-    data object Explore : Screen("Explore", Icons.Filled.Explore)
-    data object NewsEvents : Screen("News", Icons.Filled.Newspaper)
-    data object Settings : Screen("Settings", Icons.Filled.Settings)
+sealed class Screen(val label: StringResource, val icon: ImageVector) {
+    data object Home : Screen(Res.string.app_layout_nav_home_label, Icons.Filled.Home)
+    data object Schedule : Screen(Res.string.app_layout_nav_schedule_label, Icons.AutoMirrored.Filled.List)
+    data object Explore : Screen(Res.string.common_explore, Icons.Filled.Explore)
+    data object NewsEvents : Screen(Res.string.common_news, Icons.Filled.Newspaper)
+    data object Settings : Screen(Res.string.common_settings, Icons.Filled.Settings)
 }
