@@ -44,6 +44,21 @@ class MainApplication : Application(), Configuration.Provider {
     override val workManagerConfiguration: Configuration
         get() = Configuration.Builder().build()
 
+    /**
+     * The per-app language (Android 13+ system setting) changes the locale without
+     * recreating the activity (`locale` is in its configChanges), so refresh the
+     * `app_language` user property here.
+     */
+    override fun onConfigurationChanged(newConfig: android.content.res.Configuration) {
+        super.onConfigurationChanged(newConfig)
+        try {
+            getKoin().get<me.calebjones.spacelaunchnow.analytics.FunnelUserPropertySyncer>()
+                .syncAppLanguage()
+        } catch (e: Exception) {
+            log.w(e) { "app_language refresh skipped" }
+        }
+    }
+
     override fun onCreate() {
         super.onCreate()
         // The shared module is an Android library with no BuildConfig; hand it the variant values.
