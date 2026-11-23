@@ -356,4 +356,14 @@
     <string name="about_tsd_link">Visit The Space Devs</string>
     <!-- Heading above the list of open source libraries. One line. -->
     <string name="about_libraries_heading">Open Source Libraries</string>
+    <!-- Message on any screen when the device is offline or cannot reach the server. Body text, may wrap, one or two sentences. -->
+    <string name="common_error_no_connection">No internet connection. Check your network and try again.</string>
+    <!-- Message on any screen when a request took too long. Body text, may wrap, one or two sentences. -->
+    <string name="common_error_timeout">The request took too long. Please try again.</string>
+    <!-- Message on any screen when the server refuses too many requests. Body text, may wrap, one or two sentences. -->
+    <string name="common_error_rate_limit">Too many requests. Wait a moment and try again.</string>
+    <!-- Message on any screen when the server fails. Body text, may wrap, one or two sentences. -->
+    <string name="common_error_server">The server had a problem. Please try again later.</string>
+    <!-- Message on any screen when the requested item does not exist. Body text, may wrap, one short sentence. -->
+    <string name="common_error_not_found">We could not find that.</string>
 </resources>

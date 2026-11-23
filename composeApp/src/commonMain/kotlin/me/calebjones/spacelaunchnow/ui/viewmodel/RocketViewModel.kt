@@ -19,6 +19,7 @@ import me.calebjones.spacelaunchnow.util.logging.isCoroutineCancellation
 import me.calebjones.spacelaunchnow.util.logging.logger
 import org.jetbrains.compose.resources.StringResource
 import spacelaunchnow_kmp.composeapp.generated.resources.*
+import me.calebjones.spacelaunchnow.util.toUserMessage
 
 /**
  * ViewModel for displaying a paginated list of rockets.
@@ -114,7 +115,7 @@ class RocketViewModel(
                         _uiState.update {
                             it.copy(
                                 isLoading = false,
-                                error = "Failed to load rockets: ${exception.message}"
+                                error = exception.toUserMessage()
                             )
                         }
                     }
@@ -124,7 +125,7 @@ class RocketViewModel(
                 _uiState.update {
                     it.copy(
                         isLoading = false,
-                        error = "Unexpected error: ${e.message}"
+                        error = e.toUserMessage()
                     )
                 }
             }
@@ -191,7 +192,7 @@ class RocketViewModel(
                         _uiState.update {
                             it.copy(
                                 isLoadingMore = false,
-                                error = "Failed to load more: ${exception.message}"
+                                error = exception.toUserMessage()
                             )
                         }
                     }
@@ -205,7 +206,7 @@ class RocketViewModel(
                 _uiState.update {
                     it.copy(
                         isLoadingMore = false,
-                        error = "Unexpected error: ${e.message}"
+                        error = e.toUserMessage()
                     )
                 }
             }
@@ -391,7 +392,7 @@ class RocketViewModel(
                 log.e(exception) { "Failed to fetch rocket details for id: $id" }
                 _uiState.update { 
                     it.copy(
-                        error = exception.message,
+                        error = exception.toUserMessage(),
                         isLoading = false
                     )
                 }

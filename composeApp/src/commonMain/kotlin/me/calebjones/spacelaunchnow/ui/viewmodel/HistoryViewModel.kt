@@ -10,6 +10,7 @@ import kotlinx.coroutines.launch
 import me.calebjones.spacelaunchnow.data.repository.LaunchRepository
 import me.calebjones.spacelaunchnow.domain.model.Launch
 import me.calebjones.spacelaunchnow.util.logging.logger
+import me.calebjones.spacelaunchnow.util.toUserMessage
 
 /**
  * Manages "This Day in History" launch data for the home screen.
@@ -80,7 +81,7 @@ class HistoryViewModel(
                     // Keep existing data, just show error
                     _historyState.update {
                         it.copy(
-                            error = formatErrorMessage(exception),
+                            error = exception.toUserMessage(),
                             isLoading = false
                         )
                     }
@@ -88,7 +89,7 @@ class HistoryViewModel(
             } catch (exception: Exception) {
                 _historyState.update {
                     it.copy(
-                        error = exception.message ?: "Unknown error",
+                        error = exception.toUserMessage(),
                         isLoading = false
                     )
                 }
@@ -102,20 +103,4 @@ class HistoryViewModel(
      */
     fun refresh(day: Int, month: Int) = loadHistoryLaunches(day, month, forceRefresh = true)
 
-    // ========== Private Helper Methods ==========
-
-    /**
-     * Formats error messages consistently
-     */
-    private fun formatErrorMessage(exception: Throwable): String {
-        return when {
-            exception.message?.contains("throttled") == true ->
-                "API rate limit exceeded. Please try again later."
-
-            exception.message?.contains("API Error") == true ->
-                exception.message!!.substringAfter("API Error: ")
-
-            else -> exception.message ?: "Unknown error occurred"
-        }
-    }
 }

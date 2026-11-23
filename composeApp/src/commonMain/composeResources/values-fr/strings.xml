@@ -178,4 +178,9 @@
     <string name="about_tsd_description">The Space Devs est une alliance de développeurs et de documentalistes passionnés d'astronautique, unis par un même objectif : offrir un accès libre aux données spatiales. Nos API REST couvrent tout l'univers du spatial, des lancements de fusées aux évènements et aux actualités.\n\nEn tant que développeur de Space Launch Now, je suis membre du conseil d'administration et fier soutien de The Space Devs !</string>
     <string name="about_tsd_link">Visiter The Space Devs</string>
     <string name="about_libraries_heading">Bibliothèques open source</string>
+    <string name="common_error_no_connection">Pas de connexion internet. Vérifiez votre réseau et réessayez.</string>
+    <string name="common_error_timeout">La requête a pris trop de temps. Veuillez réessayer.</string>
+    <string name="common_error_rate_limit">Trop de requêtes. Patientez un instant et réessayez.</string>
+    <string name="common_error_server">Le serveur a rencontré un problème. Veuillez réessayer plus tard.</string>
+    <string name="common_error_not_found">Nous n'avons pas pu le trouver.</string>
 </resources>

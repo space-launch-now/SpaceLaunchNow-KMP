@@ -178,4 +178,9 @@
     <string name="about_tsd_description">The Space Devs 是一个由航天爱好者开发者和资料管理员组成的联盟，共同目标是免费提供航天数据。我们的 REST API 涵盖航天领域的方方面面，从火箭发射到活动和新闻。\n\n作为 Space Launch Now 的开发者，我是 The Space Devs 的董事会成员，也是它的骄傲支持者！</string>
     <string name="about_tsd_link">访问 The Space Devs</string>
     <string name="about_libraries_heading">开源库</string>
+    <string name="common_error_no_connection">没有网络连接。请检查网络后重试。</string>
+    <string name="common_error_timeout">请求耗时过长，请重试。</string>
+    <string name="common_error_rate_limit">请求过多，请稍等片刻后重试。</string>
+    <string name="common_error_server">服务器出现问题，请稍后重试。</string>
+    <string name="common_error_not_found">我们找不到相关内容。</string>
 </resources>

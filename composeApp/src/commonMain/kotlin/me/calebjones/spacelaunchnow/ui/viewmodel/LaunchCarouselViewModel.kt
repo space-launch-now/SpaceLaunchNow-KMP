@@ -17,6 +17,7 @@ import me.calebjones.spacelaunchnow.data.services.LaunchFilterService
 import me.calebjones.spacelaunchnow.data.storage.NotificationStateStorage
 import me.calebjones.spacelaunchnow.domain.model.Launch
 import me.calebjones.spacelaunchnow.util.logging.logger
+import me.calebjones.spacelaunchnow.util.toUserMessage
 
 /**
  * Manages the bidirectional launch carousel (LaunchListView).
@@ -141,7 +142,7 @@ class LaunchCarouselViewModel(
                     log.e(exception) { "Upcoming launches failed" }
                     _upcomingLaunchesState.update {
                         it.copy(
-                            error = formatErrorMessage(exception),
+                            error = exception.toUserMessage(),
                             isLoading = false
                         )
                     }
@@ -162,7 +163,7 @@ class LaunchCarouselViewModel(
                     log.e(exception) { "Previous launches failed" }
                     _previousLaunchesState.update {
                         it.copy(
-                            error = formatErrorMessage(exception),
+                            error = exception.toUserMessage(),
                             isLoading = false
                         )
                     }
@@ -173,18 +174,15 @@ class LaunchCarouselViewModel(
                 log.e(exception) { "Exception in loadLaunches" }
 
                 _upcomingLaunchesState.update {
-                    it.copy(error = exception.message ?: "Unknown error", isLoading = false)
+                    it.copy(error = exception.toUserMessage(), isLoading = false)
                 }
                 _previousLaunchesState.update {
-                    it.copy(error = exception.message ?: "Unknown error", isLoading = false)
+                    it.copy(error = exception.toUserMessage(), isLoading = false)
                 }
             }
         }
     }
 
-    private fun formatErrorMessage(exception: Throwable): String {
-        return exception.message ?: "An unknown error occurred"
-    }
 
     fun refresh() = loadLaunches(forceRefresh = true)
 }

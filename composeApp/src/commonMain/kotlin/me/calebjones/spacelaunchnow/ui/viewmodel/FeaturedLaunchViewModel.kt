@@ -23,6 +23,7 @@ import me.calebjones.spacelaunchnow.data.storage.PinnedContentPreferences
 import me.calebjones.spacelaunchnow.domain.model.Event
 import me.calebjones.spacelaunchnow.domain.model.Launch
 import me.calebjones.spacelaunchnow.util.logging.logger
+import me.calebjones.spacelaunchnow.util.toUserMessage
 
 /**
  * Sealed class for pinned content - can be either a launch or an event.
@@ -209,7 +210,7 @@ class FeaturedLaunchViewModel(
                     }
                 }.onFailure { exception ->
                     log.e(exception) { "Repository failure: ${exception.message}" }
-                    val errorMsg = formatErrorMessage(exception)
+                    val errorMsg = exception.toUserMessage()
 
                     _featuredLaunchState.update {
                         it.copy(
@@ -228,7 +229,7 @@ class FeaturedLaunchViewModel(
             } catch (exception: Exception) {
                 log.e(exception) { "Exception in loadFeaturedLaunch: ${exception.message}" }
 
-                val errorMsg = exception.message ?: "Unknown error"
+                val errorMsg = exception.toUserMessage()
                 _featuredLaunchState.update {
                     it.copy(
                         error = errorMsg,
@@ -255,9 +256,6 @@ class FeaturedLaunchViewModel(
         }
     }
 
-    private fun formatErrorMessage(exception: Throwable): String {
-        return exception.message ?: "An unknown error occurred"
-    }
 
     fun refresh() {
         loadFeaturedLaunch(forceRefresh = true)
@@ -313,7 +311,7 @@ class FeaturedLaunchViewModel(
                     log.e(exception) { "Failed to load in-flight launches: ${exception.message}" }
                     _inFlightLaunchState.update {
                         it.copy(
-                            error = formatErrorMessage(exception),
+                            error = exception.toUserMessage(),
                             isLoading = false
                         )
                     }
@@ -322,7 +320,7 @@ class FeaturedLaunchViewModel(
                 log.e(exception) { "Exception in loadInFlightLaunch: ${exception.message}" }
                 _inFlightLaunchState.update {
                     it.copy(
-                        error = exception.message ?: "Unknown error",
+                        error = exception.toUserMessage(),
                         isLoading = false
                     )
                 }
@@ -404,7 +402,7 @@ class FeaturedLaunchViewModel(
                             }.onFailure { e ->
                                 log.e(e) { "Failed to load pinned launch: ${e.message}" }
                                 _pinnedContentState.update {
-                                    it.copy(error = e.message, isLoading = false)
+                                    it.copy(error = e.toUserMessage(), isLoading = false)
                                 }
                             }
                         }
@@ -435,7 +433,7 @@ class FeaturedLaunchViewModel(
                             }.onFailure { e ->
                                 log.e(e) { "Failed to load pinned event: ${e.message}" }
                                 _pinnedContentState.update {
-                                    it.copy(error = e.message, isLoading = false)
+                                    it.copy(error = e.toUserMessage(), isLoading = false)
                                 }
                             }
                         }
@@ -452,13 +450,13 @@ class FeaturedLaunchViewModel(
                 }.onFailure { e ->
                     log.e(e) { "Failed to get pinned content config: ${e.message}" }
                     _pinnedContentState.update {
-                        it.copy(error = e.message, isLoading = false)
+                        it.copy(error = e.toUserMessage(), isLoading = false)
                     }
                 }
             } catch (e: Exception) {
                 log.e(e) { "Exception in loadPinnedContent: ${e.message}" }
                 _pinnedContentState.update {
-                    it.copy(error = e.message, isLoading = false)
+                    it.copy(error = e.toUserMessage(), isLoading = false)
                 }
             }
         }

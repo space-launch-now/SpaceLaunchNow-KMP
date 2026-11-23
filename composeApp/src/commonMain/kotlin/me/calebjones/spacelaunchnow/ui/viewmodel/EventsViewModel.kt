@@ -10,6 +10,7 @@ import kotlinx.coroutines.launch
 import me.calebjones.spacelaunchnow.data.repository.EventsRepository
 import me.calebjones.spacelaunchnow.domain.model.Event
 import me.calebjones.spacelaunchnow.util.logging.logger
+import me.calebjones.spacelaunchnow.util.toUserMessage
 
 /**
  * Manages upcoming space events for the home screen.
@@ -59,7 +60,7 @@ class EventsViewModel(
                 }.onFailure { exception ->
                     _eventsState.update {
                         it.copy(
-                            error = formatErrorMessage(exception),
+                            error = exception.toUserMessage(),
                             isLoading = false
                         )
                     }
@@ -67,7 +68,7 @@ class EventsViewModel(
             } catch (exception: Exception) {
                 _eventsState.update {
                     it.copy(
-                        error = exception.message ?: "Unknown error",
+                        error = exception.toUserMessage(),
                         isLoading = false
                     )
                 }
@@ -80,20 +81,4 @@ class EventsViewModel(
      */
     fun refresh() = loadEvents(forceRefresh = true)
 
-    // ========== Private Helper Methods ==========
-
-    /**
-     * Formats error messages consistently
-     */
-    private fun formatErrorMessage(exception: Throwable): String {
-        return when {
-            exception.message?.contains("throttled") == true ->
-                "API rate limit exceeded. Please try again later."
-
-            exception.message?.contains("API Error") == true ->
-                exception.message!!.substringAfter("API Error: ")
-
-            else -> exception.message ?: "Unknown error occurred"
-        }
-    }
 }

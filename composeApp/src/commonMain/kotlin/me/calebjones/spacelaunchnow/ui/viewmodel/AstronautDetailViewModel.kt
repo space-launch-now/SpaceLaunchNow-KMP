@@ -12,6 +12,7 @@ import me.calebjones.spacelaunchnow.analytics.events.AnalyticsEvent
 import me.calebjones.spacelaunchnow.data.repository.AstronautRepository
 import me.calebjones.spacelaunchnow.domain.model.AstronautDetail
 import me.calebjones.spacelaunchnow.util.logging.logger
+import me.calebjones.spacelaunchnow.util.toUserMessage
 
 /**
  * ViewModel for displaying detailed astronaut information.
@@ -59,7 +60,7 @@ class AstronautDetailViewModel(
                         _uiState.update {
                             it.copy(
                                 isLoading = false,
-                                error = "Failed to load astronaut: ${exception.message}"
+                                error = exception.toUserMessage()
                             )
                         }
                     }
@@ -69,7 +70,7 @@ class AstronautDetailViewModel(
                 _uiState.update {
                     it.copy(
                         isLoading = false,
-                        error = "Unexpected error: ${e.message}"
+                        error = e.toUserMessage()
                     )
                 }
             }
