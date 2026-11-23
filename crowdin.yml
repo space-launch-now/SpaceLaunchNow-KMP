@@ -23,6 +23,7 @@ files:
     type: android
     # Do not overwrite a translation that a person approved with the model's first fill.
     update_option: update_as_unapproved
+    # The app_roadmap_* keys are translatable="false" (Tasks#1329), so Crowdin skips them.
 
   # Android widgets and notifications (androidMain res). app_name and app_name_debug are translatable="false".
   - source: /composeApp/src/androidMain/res/values/strings.xml
