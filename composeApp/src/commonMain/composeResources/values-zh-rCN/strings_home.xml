@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="home_articles_error">文章加载失败</string>
+    <string name="home_cached_data_notice">显示的是缓存数据</string>
+    <string name="home_events_error">活动加载失败</string>
+    <string name="home_events_title">即将举行的活动</string>
+    <string name="home_featured_view_more">查看更多</string>
+    <string name="home_history_empty">历史上的今天没有发射</string>
+    <string name="home_history_error">历史发射加载失败</string>
+    <string name="home_history_title">历史上的今天</string>
+    <string name="home_last_launch_title">上次发射</string>
+    <string name="home_launch_image_description">发射图片</string>
+    <string name="home_launch_image_for_title_description">%1$s 的发射图片</string>
+    <string name="home_launches_error">发射加载失败</string>
+    <string name="home_live_launch_description">飞行中的发射：%1$s。状态：%2$s。点按查看详情。</string>
+    <string name="home_next_up_error_title">API 请求错误</string>
+    <string name="home_pinned_badge">精选</string>
+    <string name="home_pinned_dismiss_featured">关闭精选发射</string>
+    <string name="home_pinned_dismiss_message">关闭消息</string>
+    <string name="home_pinned_featured_description">精选：%1$s。%2$s。点按查看详情。</string>
+    <string name="home_pinned_featured_launch_description">精选发射：%1$s。%2$s。点按查看详情。</string>
+    <string name="home_pinned_motd_description">每日消息：%1$s</string>
+    <string name="home_placeholder_content">内容</string>
+    <string name="home_section_info_description">关于%1$s的信息</string>
+    <string name="home_section_see_all">查看全部</string>
+    <string name="home_stats_next_24_hours">未来 24 小时</string>
+    <string name="home_stats_next_30_days">未来 30 天</string>
+    <string name="home_stats_next_7_days">未来 7 天</string>
+    <string name="home_stats_title">快速统计</string>
+    <string name="home_top_bar_support_description">支持我</string>
+    <string name="home_updates_author_profile_description">作者头像</string>
+    <string name="home_updates_error">动态加载失败</string>
+    <string name="home_updates_info_body">动态来自 The Space Devs 的志愿资料管理员，他们使用开源情报（OSINT）技术追踪全球发射。他们会关注机构公告、监管文件和社交媒体，让数据库保持准确和最新。
+
+作为 Space Launch Now 的开发者，我是 The Space Devs 的创始董事会成员，也是它的骄傲支持者！</string>
+    <string name="home_updates_info_confirm">知道了</string>
+    <string name="home_updates_info_title">关于最新动态</string>
+    <string name="home_updates_profile_placeholder_description">头像占位图</string>
+    <string name="home_updates_source_description">来源</string>
+    <string name="home_updates_title">最新动态</string>
+</resources>

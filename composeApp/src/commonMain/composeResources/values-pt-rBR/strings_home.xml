@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="home_articles_error">Falha ao carregar as matérias</string>
+    <string name="home_cached_data_notice">Exibindo dados em cache</string>
+    <string name="home_events_error">Falha ao carregar os eventos</string>
+    <string name="home_events_title">Próximos eventos</string>
+    <string name="home_featured_view_more">Ver mais</string>
+    <string name="home_history_empty">Nenhum lançamento neste dia</string>
+    <string name="home_history_error">Falha ao carregar os lançamentos históricos</string>
+    <string name="home_history_title">Este dia na história</string>
+    <string name="home_last_launch_title">Último lançamento</string>
+    <string name="home_launch_image_description">Imagem do lançamento</string>
+    <string name="home_launch_image_for_title_description">Imagem do lançamento %1$s</string>
+    <string name="home_launches_error">Falha ao carregar os lançamentos</string>
+    <string name="home_live_launch_description">Lançamento em voo: %1$s. Status: %2$s. Toque para ver os detalhes.</string>
+    <string name="home_next_up_error_title">Erro na requisição da API</string>
+    <string name="home_pinned_badge">EM DESTAQUE</string>
+    <string name="home_pinned_dismiss_featured">Dispensar lançamento em destaque</string>
+    <string name="home_pinned_dismiss_message">Dispensar mensagem</string>
+    <string name="home_pinned_featured_description">Em destaque: %1$s. %2$s. Toque para ver os detalhes.</string>
+    <string name="home_pinned_featured_launch_description">Lançamento em destaque: %1$s. %2$s. Toque para ver os detalhes.</string>
+    <string name="home_pinned_motd_description">Mensagem do dia: %1$s</string>
+    <string name="home_placeholder_content">Conteúdo</string>
+    <string name="home_section_info_description">Informações sobre %1$s</string>
+    <string name="home_section_see_all">Ver tudo</string>
+    <string name="home_stats_next_24_hours">Próximas 24 horas</string>
+    <string name="home_stats_next_30_days">Próximos 30 dias</string>
+    <string name="home_stats_next_7_days">Próximos 7 dias</string>
+    <string name="home_stats_title">Estatísticas rápidas</string>
+    <string name="home_top_bar_support_description">Apoie o app</string>
+    <string name="home_updates_author_profile_description">Perfil do autor</string>
+    <string name="home_updates_error">Falha ao carregar as atualizações</string>
+    <string name="home_updates_info_body">As atualizações vêm dos bibliotecários voluntários do The Space Devs, que usam técnicas de inteligência de fontes abertas (OSINT) para acompanhar lançamentos no mundo todo. Eles monitoram anúncios de agências, registros regulatórios e redes sociais para manter o banco de dados preciso e atualizado.
+
+Como desenvolvedor do Space Launch Now, sou Membro Fundador do Conselho e Orgulhoso Apoiador do The Space Devs!</string>
+    <string name="home_updates_info_confirm">Entendi</string>
+    <string name="home_updates_info_title">Sobre as últimas atualizações</string>
+    <string name="home_updates_profile_placeholder_description">Imagem de perfil provisória</string>
+    <string name="home_updates_source_description">Fonte</string>
+    <string name="home_updates_title">Últimas atualizações</string>
+</resources>

@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="home_articles_error">Články se nepodařilo načíst</string>
+    <string name="home_cached_data_notice">Zobrazena data z mezipaměti</string>
+    <string name="home_events_error">Události se nepodařilo načíst</string>
+    <string name="home_events_title">Nadcházející události</string>
+    <string name="home_featured_view_more">Zobrazit více</string>
+    <string name="home_history_empty">V tento den žádné starty</string>
+    <string name="home_history_error">Historické starty se nepodařilo načíst</string>
+    <string name="home_history_title">Tento den v historii</string>
+    <string name="home_last_launch_title">Poslední start</string>
+    <string name="home_launch_image_description">Obrázek startu</string>
+    <string name="home_launch_image_for_title_description">Obrázek startu: %1$s</string>
+    <string name="home_launches_error">Starty se nepodařilo načíst</string>
+    <string name="home_live_launch_description">Probíhající start: %1$s. Stav: %2$s. Klepnutím zobrazíš detaily.</string>
+    <string name="home_next_up_error_title">Chyba požadavku API</string>
+    <string name="home_pinned_badge">VYBRANÉ</string>
+    <string name="home_pinned_dismiss_featured">Skrýt vybraný start</string>
+    <string name="home_pinned_dismiss_message">Skrýt zprávu</string>
+    <string name="home_pinned_featured_description">Vybráno: %1$s. %2$s. Klepnutím zobrazíš detaily.</string>
+    <string name="home_pinned_featured_launch_description">Vybraný start: %1$s. %2$s. Klepnutím zobrazíš detaily.</string>
+    <string name="home_pinned_motd_description">Zpráva dne: %1$s</string>
+    <string name="home_placeholder_content">Obsah</string>
+    <string name="home_section_info_description">Informace o sekci %1$s</string>
+    <string name="home_section_see_all">Zobrazit vše</string>
+    <string name="home_stats_next_24_hours">Příštích 24 hodin</string>
+    <string name="home_stats_next_30_days">Příštích 30 dní</string>
+    <string name="home_stats_next_7_days">Příštích 7 dní</string>
+    <string name="home_stats_title">Rychlé statistiky</string>
+    <string name="home_top_bar_support_description">Podpoř mě</string>
+    <string name="home_updates_author_profile_description">Profil autora</string>
+    <string name="home_updates_error">Aktuality se nepodařilo načíst</string>
+    <string name="home_updates_info_body">Aktuality pocházejí od dobrovolných knihovníků The Space Devs, kteří pomocí metod open-source intelligence (OSINT) sledují starty po celém světě. Sledují oznámení agentur, regulační podání a sociální sítě, aby databáze zůstala přesná a aktuální.
+
+Jako vývojář Space Launch Now jsem zakládajícím členem správní rady a hrdým podporovatelem The Space Devs!</string>
+    <string name="home_updates_info_confirm">Rozumím</string>
+    <string name="home_updates_info_title">O nejnovějších aktualitách</string>
+    <string name="home_updates_profile_placeholder_description">Zástupný obrázek profilu</string>
+    <string name="home_updates_source_description">Zdroj</string>
+    <string name="home_updates_title">Nejnovější aktuality</string>
+</resources>

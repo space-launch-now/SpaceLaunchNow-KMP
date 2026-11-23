@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="time_today_at">Dnes v %1$s</string>
+    <string name="time_tomorrow_at">Zítra v %1$s</string>
+    <string name="time_yesterday_at">Včera v %1$s</string>
+    <string name="time_weekday_at">%1$s v %2$s</string>
+    <string name="time_weekday_monday">Pondělí</string>
+    <string name="time_weekday_tuesday">Úterý</string>
+    <string name="time_weekday_wednesday">Středa</string>
+    <string name="time_weekday_thursday">Čtvrtek</string>
+    <string name="time_weekday_friday">Pátek</string>
+    <string name="time_weekday_saturday">Sobota</string>
+    <string name="time_weekday_sunday">Neděle</string>
+    <string name="time_half_1_year">H1 %1$s</string>
+    <string name="time_half_2_year">H2 %1$s</string>
+    <string name="time_net_year">NET %1$s</string>
+    <string name="time_fiscal_year">FY %1$s</string>
+    <string name="time_decade_year">Dekáda %1$s</string>
+    <string name="time_quarter_year">Q%1$d %2$s</string>
+    <string name="time_compact_before">T- %1$s</string>
+    <string name="time_compact_after">T+ %1$s</string>
+    <string name="time_timeline_before">T - %1$s</string>
+    <string name="time_timeline_after">T + %1$s</string>
+    <string name="time_unit_days">%1$sd</string>
+    <string name="time_unit_hours">%1$sh</string>
+    <string name="time_unit_minutes">%1$sm</string>
+    <string name="time_unit_seconds">%1$ss</string>
+    <string name="countdown_label_days">DNY</string>
+    <string name="countdown_label_hours">HODINY</string>
+    <string name="countdown_label_minutes">MINUTY</string>
+    <string name="countdown_label_seconds">SEKUNDY</string>
+</resources>

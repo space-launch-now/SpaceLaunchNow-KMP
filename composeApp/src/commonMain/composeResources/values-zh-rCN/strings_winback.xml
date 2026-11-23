@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="winback_title">还在考虑 Premium 吗？</string>
+    <string name="winback_body">告别广告，解锁 Space Launch Now 的全部高级功能。</string>
+    <string name="winback_price_trial">免费试用 %1$s，之后每年 %2$s。可随时取消。</string>
+    <string name="winback_price_no_trial">每年 %1$s。可随时取消。</string>
+    <string name="winback_cta_trial">开始免费试用</string>
+    <string name="winback_cta">订阅</string>
+    <string name="winback_not_now">暂不</string>
+</resources>

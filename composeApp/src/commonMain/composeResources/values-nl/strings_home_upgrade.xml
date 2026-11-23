@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="home_upgrade_row_title">Geen advertenties en meer functies</string>
+    <string name="home_upgrade_row_action">Bekijk abonnementen</string>
+    <string name="home_upgrade_row_close">Upgradeaanbieding sluiten</string>
+</resources>

@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="winback_title">Stále tě zajímá Premium?</string>
+    <string name="winback_body">Užívej si aplikaci bez reklam a odemkni všechny prémiové funkce v Space Launch Now.</string>
+    <string name="winback_price_trial">%1$s zkušební doba zdarma, poté %2$s ročně. Zrušit můžeš kdykoli.</string>
+    <string name="winback_price_no_trial">%1$s ročně. Zrušit můžeš kdykoli.</string>
+    <string name="winback_cta_trial">Začít zkušební dobu zdarma</string>
+    <string name="winback_cta">Předplatit</string>
+    <string name="winback_not_now">Teď ne</string>
+</resources>

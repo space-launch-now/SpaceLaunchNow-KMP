@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="time_today_at">Сьогодні о %1$s</string>
+    <string name="time_tomorrow_at">Завтра о %1$s</string>
+    <string name="time_yesterday_at">Вчора о %1$s</string>
+    <string name="time_weekday_at">%1$s о %2$s</string>
+    <string name="time_weekday_monday">Понеділок</string>
+    <string name="time_weekday_tuesday">Вівторок</string>
+    <string name="time_weekday_wednesday">Середа</string>
+    <string name="time_weekday_thursday">Четвер</string>
+    <string name="time_weekday_friday">П'ятниця</string>
+    <string name="time_weekday_saturday">Субота</string>
+    <string name="time_weekday_sunday">Неділя</string>
+    <string name="time_half_1_year">1-ше півр. %1$s</string>
+    <string name="time_half_2_year">2-ге півр. %1$s</string>
+    <string name="time_net_year">NET %1$s</string>
+    <string name="time_fiscal_year">ФР %1$s</string>
+    <string name="time_decade_year">Десятиліття %1$s</string>
+    <string name="time_quarter_year">%1$d кв. %2$s</string>
+    <string name="time_compact_before">T- %1$s</string>
+    <string name="time_compact_after">T+ %1$s</string>
+    <string name="time_timeline_before">T - %1$s</string>
+    <string name="time_timeline_after">T + %1$s</string>
+    <string name="time_unit_days">%1$sд</string>
+    <string name="time_unit_hours">%1$sг</string>
+    <string name="time_unit_minutes">%1$sхв</string>
+    <string name="time_unit_seconds">%1$sс</string>
+    <string name="countdown_label_days">ДНІ</string>
+    <string name="countdown_label_hours">ГОДИНИ</string>
+    <string name="countdown_label_minutes">ХВИЛИНИ</string>
+    <string name="countdown_label_seconds">СЕКУНДИ</string>
+</resources>

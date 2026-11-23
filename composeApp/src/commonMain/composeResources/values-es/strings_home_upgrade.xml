@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="home_upgrade_row_title">Sin anuncios y con más extras</string>
+    <string name="home_upgrade_row_action">Ver planes</string>
+    <string name="home_upgrade_row_close">Cerrar oferta de mejora</string>
+</resources>

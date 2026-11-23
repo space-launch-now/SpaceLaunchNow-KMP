@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="winback_title">Ainda curioso sobre o Premium?</string>
+    <string name="winback_body">Fique sem anúncios e desbloqueie todos os recursos premium do Space Launch Now.</string>
+    <string name="winback_price_trial">Experimente grátis por %1$s, depois %2$s por ano. Cancele quando quiser.</string>
+    <string name="winback_price_no_trial">%1$s por ano. Cancele quando quiser.</string>
+    <string name="winback_cta_trial">Começar teste grátis</string>
+    <string name="winback_cta">Assinar</string>
+    <string name="winback_not_now">Agora não</string>
+</resources>

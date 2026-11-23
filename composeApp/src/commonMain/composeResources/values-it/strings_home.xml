@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="home_articles_error">Impossibile caricare gli articoli</string>
+    <string name="home_cached_data_notice">Dati dalla cache</string>
+    <string name="home_events_error">Impossibile caricare gli eventi</string>
+    <string name="home_events_title">Prossimi eventi</string>
+    <string name="home_featured_view_more">Vedi altro</string>
+    <string name="home_history_empty">Nessun lancio in questo giorno</string>
+    <string name="home_history_error">Impossibile caricare i lanci storici</string>
+    <string name="home_history_title">Accadde oggi</string>
+    <string name="home_last_launch_title">Ultimo lancio</string>
+    <string name="home_launch_image_description">Immagine del lancio</string>
+    <string name="home_launch_image_for_title_description">Immagine del lancio per %1$s</string>
+    <string name="home_launches_error">Impossibile caricare i lanci</string>
+    <string name="home_live_launch_description">Lancio in volo: %1$s. Stato: %2$s. Tocca per vedere i dettagli.</string>
+    <string name="home_next_up_error_title">Errore nella richiesta API</string>
+    <string name="home_pinned_badge">IN EVIDENZA</string>
+    <string name="home_pinned_dismiss_featured">Nascondi il lancio in evidenza</string>
+    <string name="home_pinned_dismiss_message">Nascondi il messaggio</string>
+    <string name="home_pinned_featured_description">In evidenza: %1$s. %2$s. Tocca per vedere i dettagli.</string>
+    <string name="home_pinned_featured_launch_description">Lancio in evidenza: %1$s. %2$s. Tocca per vedere i dettagli.</string>
+    <string name="home_pinned_motd_description">Messaggio del giorno: %1$s</string>
+    <string name="home_placeholder_content">Contenuto</string>
+    <string name="home_section_info_description">Info su %1$s</string>
+    <string name="home_section_see_all">Vedi tutti</string>
+    <string name="home_stats_next_24_hours">Prossime 24 ore</string>
+    <string name="home_stats_next_30_days">Prossimi 30 giorni</string>
+    <string name="home_stats_next_7_days">Prossimi 7 giorni</string>
+    <string name="home_stats_title">Statistiche rapide</string>
+    <string name="home_top_bar_support_description">Supportami</string>
+    <string name="home_updates_author_profile_description">Profilo dell'autore</string>
+    <string name="home_updates_error">Impossibile caricare gli aggiornamenti</string>
+    <string name="home_updates_info_body">Gli aggiornamenti arrivano dai bibliotecari volontari di The Space Devs, che usano tecniche di intelligence open source (OSINT) per seguire i lanci in tutto il mondo. Controllano annunci delle agenzie, documenti normativi e social media per tenere il database accurato e aggiornato.
+
+Come sviluppatore di Space Launch Now, sono membro fondatore del consiglio e orgoglioso sostenitore di The Space Devs!</string>
+    <string name="home_updates_info_confirm">Ho capito</string>
+    <string name="home_updates_info_title">Sugli ultimi aggiornamenti</string>
+    <string name="home_updates_profile_placeholder_description">Segnaposto del profilo</string>
+    <string name="home_updates_source_description">Fonte</string>
+    <string name="home_updates_title">Ultimi aggiornamenti</string>
+</resources>

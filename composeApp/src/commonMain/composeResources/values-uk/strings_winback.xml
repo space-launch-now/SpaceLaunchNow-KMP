@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="winback_title">Ще цікавить Premium?</string>
+    <string name="winback_body">Позбудься реклами й розблокуй усі преміум-функції Space Launch Now.</string>
+    <string name="winback_price_trial">Спробуй безкоштовно (%1$s), потім %2$s на рік. Скасувати можна будь-коли.</string>
+    <string name="winback_price_no_trial">%1$s на рік. Скасувати можна будь-коли.</string>
+    <string name="winback_cta_trial">Почати пробний період</string>
+    <string name="winback_cta">Підписатися</string>
+    <string name="winback_not_now">Не зараз</string>
+</resources>

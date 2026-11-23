@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="home_upgrade_row_title">Sans pub, avec plus d'options</string>
+    <string name="home_upgrade_row_action">Voir les offres</string>
+    <string name="home_upgrade_row_close">Fermer l'offre Premium</string>
+</resources>

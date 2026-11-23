@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="home_articles_error">Artikelen laden mislukt</string>
+    <string name="home_cached_data_notice">Gecachete gegevens worden getoond</string>
+    <string name="home_events_error">Evenementen laden mislukt</string>
+    <string name="home_events_title">Aankomende evenementen</string>
+    <string name="home_featured_view_more">Meer tonen</string>
+    <string name="home_history_empty">Geen lanceringen op deze dag</string>
+    <string name="home_history_error">Eerdere lanceringen laden mislukt</string>
+    <string name="home_history_title">Deze dag in de geschiedenis</string>
+    <string name="home_last_launch_title">Laatste lancering</string>
+    <string name="home_launch_image_description">Afbeelding van lancering</string>
+    <string name="home_launch_image_for_title_description">Afbeelding van lancering voor %1$s</string>
+    <string name="home_launches_error">Lanceringen laden mislukt</string>
+    <string name="home_live_launch_description">Lancering onderweg: %1$s. Status: %2$s. Tik voor details.</string>
+    <string name="home_next_up_error_title">Fout bij API-verzoek</string>
+    <string name="home_pinned_badge">UITGELICHT</string>
+    <string name="home_pinned_dismiss_featured">Uitgelichte lancering sluiten</string>
+    <string name="home_pinned_dismiss_message">Bericht sluiten</string>
+    <string name="home_pinned_featured_description">Uitgelicht: %1$s. %2$s. Tik voor details.</string>
+    <string name="home_pinned_featured_launch_description">Uitgelichte lancering: %1$s. %2$s. Tik voor details.</string>
+    <string name="home_pinned_motd_description">Bericht van de dag: %1$s</string>
+    <string name="home_placeholder_content">Inhoud</string>
+    <string name="home_section_info_description">Info over %1$s</string>
+    <string name="home_section_see_all">Alles bekijken</string>
+    <string name="home_stats_next_24_hours">Komende 24 uur</string>
+    <string name="home_stats_next_30_days">Komende 30 dagen</string>
+    <string name="home_stats_next_7_days">Komende 7 dagen</string>
+    <string name="home_stats_title">Snelle statistieken</string>
+    <string name="home_top_bar_support_description">Steun mij</string>
+    <string name="home_updates_author_profile_description">Profiel van auteur</string>
+    <string name="home_updates_error">Updates laden mislukt</string>
+    <string name="home_updates_info_body">Updates komen van de vrijwillige bibliothecarissen van The Space Devs, die met open-sourceinlichtingentechnieken (OSINT) lanceringen wereldwijd volgen. Ze houden aankondigingen van agentschappen, officiële aanvragen en sociale media in de gaten, zodat de database juist en actueel blijft.
+
+Als ontwikkelaar van Space Launch Now ben ik oprichtend bestuurslid en trotse supporter van The Space Devs!</string>
+    <string name="home_updates_info_confirm">Begrepen</string>
+    <string name="home_updates_info_title">Over de laatste updates</string>
+    <string name="home_updates_profile_placeholder_description">Plaatshouder voor profiel</string>
+    <string name="home_updates_source_description">Bron</string>
+    <string name="home_updates_title">Laatste updates</string>
+</resources>
