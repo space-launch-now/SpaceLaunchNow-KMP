@@ -13,12 +13,12 @@ import Foundation
 enum NotificationBodyText {
 
     /// Body for a launch push. A known `notification_type` uses a catalog string; an unknown
-    /// type shows `serverBody`, and only when that is empty the "Launch from" text.
+    /// type shows the "Launch from" text. (`AppDelegate` shows the server's body when the push
+    /// carries one, so this text is the fallback.)
     static func body(
         notificationType: String,
         launchNet: String,
-        launchLocation: String,
-        serverBody: String? = nil
+        launchLocation: String
     ) -> String {
         switch notificationType.lowercased() {
         case "netstampchanged":
@@ -40,9 +40,6 @@ enum NotificationBodyText {
         case "twentyfourhour":
             return text("notification_twenty_four_hours", "Launch attempt in less than 24 hours at %@", formatLaunchDate(launchNet))
         default:
-            if let serverBody = serverBody, !serverBody.isEmpty {
-                return serverBody
-            }
             return text("notification_fallback_launch_from", "Launch from %@", launchLocation)
         }
     }
@@ -81,12 +78,11 @@ enum NotificationBodyText {
 
 extension NotificationData {
     /// Body text for this launch push; see `NotificationBodyText.body`.
-    func displayBody(serverBody: String? = nil) -> String {
+    func displayBody() -> String {
         NotificationBodyText.body(
             notificationType: notificationType,
             launchNet: launchNet,
-            launchLocation: launchLocation,
-            serverBody: serverBody
+            launchLocation: launchLocation
         )
     }
 }
