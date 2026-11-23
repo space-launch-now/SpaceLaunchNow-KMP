@@ -57,6 +57,8 @@
 		F99496BC2F2A9B75009EACA3 /* V5NotificationData.swift in Sources */ = {isa = PBXBuildFile; fileRef = F99496B82F2A9B75009EACA3 /* V5NotificationData.swift */; };
 		F99496C02F2A9B75009EACA3 /* V5NotificationData.swift in Sources */ = {isa = PBXBuildFile; fileRef = F99496B82F2A9B75009EACA3 /* V5NotificationData.swift */; };
 		AA00CAFE00000000000000B1 /* NotificationAlertPolicy.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA00CAFE00000000000000A1 /* NotificationAlertPolicy.swift */; };
+		AA00CAFE00000000000000C2 /* NotificationBodyText.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA00CAFE00000000000000C1 /* NotificationBodyText.swift */; };
+		AA00CAFE00000000000000C4 /* NotificationText.xcstrings in Resources */ = {isa = PBXBuildFile; fileRef = AA00CAFE00000000000000C3 /* NotificationText.xcstrings */; };
 		AA00CAFE00000000000000B2 /* NotificationAlertPolicy.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA00CAFE00000000000000A1 /* NotificationAlertPolicy.swift */; };
 		F9AF025D2F29DD7B00E31B3C /* NotificationServiceExtension.appex in Embed Foundation Extensions */ = {isa = PBXBuildFile; fileRef = F9AF02562F29DD7B00E31B3C /* NotificationServiceExtension.appex */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
 		F9B127162F0C36A5005426E1 /* GoogleMaps in Frameworks */ = {isa = PBXBuildFile; productRef = F9B127152F0C36A5005426E1 /* GoogleMaps */; };
@@ -120,6 +122,8 @@
 		F90569C52F0889DC009D885A /* ShareHelper.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ShareHelper.swift; sourceTree = "<group>"; };
 		F99496B82F2A9B75009EACA3 /* V5NotificationData.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = V5NotificationData.swift; sourceTree = "<group>"; };
 		AA00CAFE00000000000000A1 /* NotificationAlertPolicy.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NotificationAlertPolicy.swift; sourceTree = "<group>"; };
+		AA00CAFE00000000000000C1 /* NotificationBodyText.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NotificationBodyText.swift; sourceTree = "<group>"; };
+		AA00CAFE00000000000000C3 /* NotificationText.xcstrings */ = {isa = PBXFileReference; lastKnownFileType = text.json.xcstrings; path = NotificationText.xcstrings; sourceTree = "<group>"; };
 		F9AF02562F29DD7B00E31B3C /* NotificationServiceExtension.appex */ = {isa = PBXFileReference; explicitFileType = "wrapper.app-extension"; includeInIndex = 0; path = NotificationServiceExtension.appex; sourceTree = BUILT_PRODUCTS_DIR; };
 /* End PBXFileReference section */
 
@@ -268,6 +272,8 @@
 			children = (
 				F99496B82F2A9B75009EACA3 /* V5NotificationData.swift */,
 				AA00CAFE00000000000000A1 /* NotificationAlertPolicy.swift */,
+				AA00CAFE00000000000000C1 /* NotificationBodyText.swift */,
+				AA00CAFE00000000000000C3 /* NotificationText.xcstrings */,
 				F90569C52F0889DC009D885A /* ShareHelper.swift */,
 				3C7AFD372EADC588002FEDEE /* GoogleService-Info.plist */,
 				3CC6E4CE2EAD9BBF002F6FE9 /* AppDelegate.swift */,
@@ -499,6 +505,7 @@
 				3C9137E52E9008320095D5AB /* Secrets.plist in Resources */,
 				058557BB273AAA24004C7B11 /* Assets.xcassets in Resources */,
 				A11800000000000000000002 /* InfoPlist.xcstrings in Resources */,
+				AA00CAFE00000000000000C4 /* NotificationText.xcstrings in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -599,6 +606,7 @@
 				3CC6E4D02EAD9BBF002F6FE9 /* AppDelegate.swift in Sources */,
 				F99496BC2F2A9B75009EACA3 /* V5NotificationData.swift in Sources */,
 				AA00CAFE00000000000000B1 /* NotificationAlertPolicy.swift in Sources */,
+				AA00CAFE00000000000000C2 /* NotificationBodyText.swift in Sources */,
 				F90569C72F0889DC009D885A /* ShareHelper.swift in Sources */,
 				3CC6E4D12EAD9BBF002F6FE9 /* FCMBridge.swift in Sources */,
 			);
