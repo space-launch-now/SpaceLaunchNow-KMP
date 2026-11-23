@@ -1,10 +1,12 @@
 package me.calebjones.spacelaunchnow
 
 import android.app.Application
+import android.content.res.Configuration as AndroidConfiguration
 import androidx.work.Configuration
 import androidx.work.ExistingPeriodicWorkPolicy
 import androidx.work.PeriodicWorkRequestBuilder
 import androidx.work.WorkManager
+import me.calebjones.spacelaunchnow.analytics.FunnelUserPropertySyncer
 import kotlinx.coroutines.launch
 import me.calebjones.spacelaunchnow.analytics.initializeDatadog
 import me.calebjones.spacelaunchnow.data.billing.BillingManager
@@ -49,12 +51,12 @@ class MainApplication : Application(), Configuration.Provider {
      * recreating the activity (`locale` is in its configChanges), so refresh the
      * `app_language` user property here.
      */
-    override fun onConfigurationChanged(newConfig: android.content.res.Configuration) {
+    override fun onConfigurationChanged(newConfig: AndroidConfiguration) {
         super.onConfigurationChanged(newConfig)
         try {
-            getKoin().get<me.calebjones.spacelaunchnow.analytics.FunnelUserPropertySyncer>()
-                .syncAppLanguage()
+            getKoin().get<FunnelUserPropertySyncer>().syncAppLanguage()
         } catch (e: Exception) {
+            // Koin may not be started yet if a config change arrives during launch.
             log.w(e) { "app_language refresh skipped" }
         }
     }
