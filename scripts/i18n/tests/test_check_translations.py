@@ -255,5 +255,16 @@ class CatalogTest(unittest.TestCase):
         self.assertIn("2 of 10 languages started", out)
 
 
+class RepoCatalogsTest(unittest.TestCase):
+    def test_notification_text_catalog_is_checked_and_clean(self):
+        catalog = "iosApp/iosApp/NotificationText.xcstrings"
+        self.assertIn(catalog, ct.CATALOGS)
+        root = Path(__file__).resolve().parents[3]
+        rows, errors, _ = ct.check_catalog(root / catalog, catalog)
+        self.assertEqual(errors, [])
+        self.assertEqual(len(rows), len(ct.LANGUAGES))
+        self.assertTrue(all(done == total > 0 for _, _, done, total in rows))
+
+
 if __name__ == "__main__":
     unittest.main()
