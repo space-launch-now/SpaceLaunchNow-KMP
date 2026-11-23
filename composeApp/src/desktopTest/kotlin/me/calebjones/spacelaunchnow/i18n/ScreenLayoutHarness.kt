@@ -14,6 +14,7 @@ import coil3.compose.LocalAsyncImagePreviewHandler
 import me.calebjones.spacelaunchnow.ui.layout.phone.LocalNavAnimatedVisibilityScope
 import me.calebjones.spacelaunchnow.ui.layout.phone.LocalSharedTransitionScope
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Typography
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.ui.geometry.Rect
@@ -87,7 +88,8 @@ object ScreenLayoutHarness {
         )
     }
 
-    /** Runs [content] in every [ScreenLanguage]; [prepare] runs inside the test before `setContent`. */
+    /** Runs [content] in every [ScreenLanguage]. [koinModules] builds fresh fakes for each render; [settle]
+     * runs after the first idle (wait for async data here) and before the capture. */
     fun assertLayout(
         screen: String,
         languages: List<ScreenLanguage> = ScreenLanguage.entries,
@@ -124,23 +126,16 @@ object ScreenLayoutHarness {
 
     @Composable
     private fun FixedFont(content: @Composable () -> Unit) {
-        val typography = MaterialTheme.typography
-        val withFont = typography.copy(
-            displayLarge = typography.displayLarge.withFont(),
-            displayMedium = typography.displayMedium.withFont(),
-            displaySmall = typography.displaySmall.withFont(),
-            headlineLarge = typography.headlineLarge.withFont(),
-            headlineMedium = typography.headlineMedium.withFont(),
-            headlineSmall = typography.headlineSmall.withFont(),
-            titleLarge = typography.titleLarge.withFont(),
-            titleMedium = typography.titleMedium.withFont(),
-            titleSmall = typography.titleSmall.withFont(),
-            bodyLarge = typography.bodyLarge.withFont(),
-            bodyMedium = typography.bodyMedium.withFont(),
-            bodySmall = typography.bodySmall.withFont(),
-            labelLarge = typography.labelLarge.withFont(),
-            labelMedium = typography.labelMedium.withFont(),
-            labelSmall = typography.labelSmall.withFont(),
+        val t = MaterialTheme.typography
+        val withFont = Typography(
+            displayLarge = t.displayLarge.withFont(), displayMedium = t.displayMedium.withFont(),
+            displaySmall = t.displaySmall.withFont(), headlineLarge = t.headlineLarge.withFont(),
+            headlineMedium = t.headlineMedium.withFont(), headlineSmall = t.headlineSmall.withFont(),
+            titleLarge = t.titleLarge.withFont(), titleMedium = t.titleMedium.withFont(),
+            titleSmall = t.titleSmall.withFont(), bodyLarge = t.bodyLarge.withFont(),
+            bodyMedium = t.bodyMedium.withFont(), bodySmall = t.bodySmall.withFont(),
+            labelLarge = t.labelLarge.withFont(), labelMedium = t.labelMedium.withFont(),
+            labelSmall = t.labelSmall.withFont(),
         )
         MaterialTheme(
             colorScheme = MaterialTheme.colorScheme,
