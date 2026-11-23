@@ -1,0 +1,2 @@
+texts=4
+findings=0

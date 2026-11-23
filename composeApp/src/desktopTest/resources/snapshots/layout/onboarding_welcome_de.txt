@@ -1,0 +1,2 @@
+texts=14
+findings=0

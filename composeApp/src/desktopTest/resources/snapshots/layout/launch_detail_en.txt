@@ -1,0 +1,7 @@
+texts=27
+findings=5
+clipped-height "#%"
+clipped-height "Weather"
+hidden-lines "Mission"
+hidden-lines "Overview"
+hidden-lines "The launch window opens at the time shown, and the team is watching the weather."

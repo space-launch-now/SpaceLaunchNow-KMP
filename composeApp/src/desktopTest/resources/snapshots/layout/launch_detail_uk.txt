@@ -1,0 +1,6 @@
+texts=27
+findings=4
+clipped-height "#%"
+clipped-height "Погода"
+hidden-lines "The launch window opens at the time shown, and the team is watching the weather."
+hidden-lines "Агенція"

@@ -1,0 +1,7 @@
+texts=27
+findings=5
+clipped-height "#%"
+clipped-height "Clima"
+hidden-lines "Agencia"
+hidden-lines "Resumen"
+hidden-lines "The launch window opens at the time shown, and the team is watching the weather."

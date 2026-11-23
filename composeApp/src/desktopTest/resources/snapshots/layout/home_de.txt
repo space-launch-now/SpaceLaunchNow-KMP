@@ -1,0 +1,6 @@
+texts=39
+findings=4
+hidden-lines "Cape Canaveral SFS, FL, USA"
+hidden-lines "Dieser Tag in der Geschichte"
+hidden-lines "Falcon # Block # | Starlink Group #-#"
+hidden-lines "Nächste # Stunden"

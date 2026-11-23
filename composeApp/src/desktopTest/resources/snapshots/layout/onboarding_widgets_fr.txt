@@ -1,0 +1,5 @@
+texts=24
+findings=3
+hidden-lines "Falcon # Block # | Starlink Group #-#"
+hidden-lines "Jiuquan Satellite Launch Center, People's Republic of China"
+hidden-lines "National Aeronautics and Space Administration"

@@ -1,0 +1,2 @@
+texts=3
+findings=0
