@@ -7,6 +7,12 @@ import androidx.work.ExistingPeriodicWorkPolicy
 import androidx.work.PeriodicWorkRequestBuilder
 import androidx.work.WorkManager
 import co.touchlab.kermit.Logger
+import coil3.ImageLoader
+import coil3.PlatformContext
+import coil3.SingletonImageLoader
+import io.ktor.client.engine.android.Android
+import me.calebjones.spacelaunchnow.wear.data.createWatchImageHttpClient
+import me.calebjones.spacelaunchnow.wear.data.createWatchImageLoader
 import me.calebjones.spacelaunchnow.wear.di.wearModule
 import me.calebjones.spacelaunchnow.wear.worker.WatchDataRefreshWorker
 import org.koin.android.ext.koin.androidContext
@@ -15,7 +21,7 @@ import org.koin.core.context.startKoin
 import org.koin.core.logger.Level
 import java.util.concurrent.TimeUnit
 
-class WearApplication : Application(), Configuration.Provider {
+class WearApplication : Application(), Configuration.Provider, SingletonImageLoader.Factory {
 
     /**
      * WorkManager's androidx.startup auto-initializer is removed in AndroidManifest.xml
@@ -26,6 +32,10 @@ class WearApplication : Application(), Configuration.Provider {
      */
     override val workManagerConfiguration: Configuration
         get() = Configuration.Builder().build()
+
+    /** Coil loads launch artwork through a client that sends the SpaceLaunchNow User-Agent. */
+    override fun newImageLoader(context: PlatformContext): ImageLoader =
+        createWatchImageLoader(context, createWatchImageHttpClient(Android.create()))
 
     override fun onCreate() {
         super.onCreate()
