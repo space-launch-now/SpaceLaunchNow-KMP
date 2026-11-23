@@ -1,6 +1,9 @@
 package me.calebjones.spacelaunchnow.ui.viewmodel
 
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.withTimeout
+import kotlinx.coroutines.withContext
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.StandardTestDispatcher
 import kotlinx.coroutines.test.advanceUntilIdle
@@ -11,6 +14,9 @@ import me.calebjones.spacelaunchnow.data.model.DataResult
 import me.calebjones.spacelaunchnow.data.model.DataSource
 import me.calebjones.spacelaunchnow.data.repository.FakeEventsRepository
 import me.calebjones.spacelaunchnow.domain.model.PaginatedResult
+import org.jetbrains.compose.resources.getString
+import spacelaunchnow_kmp.composeapp.generated.resources.Res
+import spacelaunchnow_kmp.composeapp.generated.resources.common_unknown_error
 import kotlin.test.AfterTest
 import kotlin.test.BeforeTest
 import kotlin.test.Test
@@ -67,6 +73,11 @@ class EventsViewModelTest {
         advanceUntilIdle()
 
         assertEquals(true, viewModel.eventsState.value.isUserInitiated)
-        assertEquals("events failed", viewModel.eventsState.value.error)
+        // The text loads from a resource off the test dispatcher, so wait for it.
+        // The raw exception text must not reach the screen; the fixed "unknown" text does.
+        val error = withContext(Dispatchers.Default) {
+            withTimeout(5_000) { viewModel.eventsState.first { it.error != null }.error }
+        }
+        assertEquals(getString(Res.string.common_unknown_error), error)
     }
 }
