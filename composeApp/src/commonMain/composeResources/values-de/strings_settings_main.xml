@@ -14,6 +14,8 @@
     <string name="settings_main_notification_filters_subtitle">Starts filtern, die in der App und in Benachrichtigungen erscheinen</string>
     <string name="settings_main_system_settings_title">Systemeinstellungen</string>
     <string name="settings_main_system_settings_subtitle">Benachrichtigungskanäle, Töne und Nicht stören verwalten</string>
+    <string name="settings_main_language_title">Sprache</string>
+    <string name="settings_main_language_subtitle">Wähle die Sprache für diese App</string>
     <string name="settings_main_go_premium_title">Premium holen ✨</string>
     <string name="settings_main_go_premium_subtitle">Werbefrei, Widgets, Designs und mehr</string>
     <string name="settings_main_wear_available_title">Wear-OS-App verfügbar</string>

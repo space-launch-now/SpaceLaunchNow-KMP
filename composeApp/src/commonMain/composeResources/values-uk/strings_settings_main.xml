@@ -14,6 +14,8 @@
     <string name="settings_main_notification_filters_subtitle">Фільтруй запуски в застосунку та сповіщеннях</string>
     <string name="settings_main_system_settings_title">Налаштування системи</string>
     <string name="settings_main_system_settings_subtitle">Керуй каналами сповіщень, звуками та режимом «Не турбувати»</string>
+    <string name="settings_main_language_title">Мова</string>
+    <string name="settings_main_language_subtitle">Обери мову цього застосунку</string>
     <string name="settings_main_go_premium_title">Перейти на Premium ✨</string>
     <string name="settings_main_go_premium_subtitle">Без реклами, віджети, теми та більше</string>
     <string name="settings_main_wear_available_title">Доступний застосунок для Wear OS</string>

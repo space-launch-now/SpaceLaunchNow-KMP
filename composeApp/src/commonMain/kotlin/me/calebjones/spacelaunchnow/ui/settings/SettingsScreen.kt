@@ -75,6 +75,7 @@ import me.calebjones.spacelaunchnow.ui.viewmodel.SettingsViewModel
 import me.calebjones.spacelaunchnow.ui.viewmodel.ThemeOption
 import me.calebjones.spacelaunchnow.util.BuildConfig
 import me.calebjones.spacelaunchnow.util.DebugUnlock
+import me.calebjones.spacelaunchnow.util.AppLanguageSettings
 import me.calebjones.spacelaunchnow.util.NotificationSettingsHelper
 import me.calebjones.spacelaunchnow.util.isWearOsConnected
 import me.calebjones.spacelaunchnow.util.ShopLink
@@ -120,6 +121,8 @@ import spacelaunchnow_kmp.composeapp.generated.resources.settings_main_go_premiu
 import spacelaunchnow_kmp.composeapp.generated.resources.settings_main_go_premium_title
 import spacelaunchnow_kmp.composeapp.generated.resources.settings_main_hide_tbd_subtitle
 import spacelaunchnow_kmp.composeapp.generated.resources.settings_main_hide_tbd_title
+import spacelaunchnow_kmp.composeapp.generated.resources.settings_main_language_subtitle
+import spacelaunchnow_kmp.composeapp.generated.resources.settings_main_language_title
 import spacelaunchnow_kmp.composeapp.generated.resources.settings_main_notification_filters_subtitle
 import spacelaunchnow_kmp.composeapp.generated.resources.settings_main_notifications_disabled_subtitle
 import spacelaunchnow_kmp.composeapp.generated.resources.settings_main_notifications_enabled_subtitle
@@ -276,6 +279,14 @@ fun SettingsScreen(
                             subtitle = stringResource(Res.string.settings_main_calendar_subtitle),
                             onClick = { navController.navigate(CalendarSync) },
                         )
+                        if (AppLanguageSettings.isSupported) {
+                            Spacer(modifier = Modifier.height(12.dp))
+                            SettingsNavigationRow(
+                                title = stringResource(Res.string.settings_main_language_title),
+                                subtitle = stringResource(Res.string.settings_main_language_subtitle),
+                                onClick = { AppLanguageSettings.open() },
+                            )
+                        }
                     }
                 }
             }

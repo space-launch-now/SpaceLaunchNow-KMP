@@ -28,6 +28,10 @@
     <string name="settings_main_system_settings_title">System Settings</string>
     <!-- Row description under "System Settings". One or two lines. -->
     <string name="settings_main_system_settings_subtitle">Manage notification channels, sounds, and do-not-disturb</string>
+    <!-- Row title in Settings. Opens the system language screen for this app. One line. -->
+    <string name="settings_main_language_title">Language</string>
+    <!-- Row description under "Language". One or two lines. -->
+    <string name="settings_main_language_subtitle">Choose the language for this app</string>
     <!-- Row title with a sparkles symbol at the end. Keep the symbol. One line. -->
     <string name="settings_main_go_premium_title">Go Premium ✨</string>
     <!-- Row description under "Go Premium". One or two lines. -->

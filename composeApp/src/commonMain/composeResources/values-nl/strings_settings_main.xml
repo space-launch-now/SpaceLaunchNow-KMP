@@ -14,6 +14,8 @@
     <string name="settings_main_notification_filters_subtitle">Filter lanceringen in de app en in meldingen</string>
     <string name="settings_main_system_settings_title">Systeeminstellingen</string>
     <string name="settings_main_system_settings_subtitle">Beheer meldingskanalen, geluiden en niet storen</string>
+    <string name="settings_main_language_title">Taal</string>
+    <string name="settings_main_language_subtitle">Kies de taal van deze app</string>
     <string name="settings_main_go_premium_title">Ga Premium ✨</string>
     <string name="settings_main_go_premium_subtitle">Advertentievrij, widgets, thema's en meer</string>
     <string name="settings_main_wear_available_title">Wear OS-app beschikbaar</string>

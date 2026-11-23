@@ -14,6 +14,8 @@
     <string name="settings_main_notification_filters_subtitle">Filtra los lanzamientos que se muestran en la app y en las notificaciones</string>
     <string name="settings_main_system_settings_title">Ajustes del sistema</string>
     <string name="settings_main_system_settings_subtitle">Gestiona canales de notificación, sonidos y no molestar</string>
+    <string name="settings_main_language_title">Idioma</string>
+    <string name="settings_main_language_subtitle">Elige el idioma de esta aplicación</string>
     <string name="settings_main_go_premium_title">Hazte Premium ✨</string>
     <string name="settings_main_go_premium_subtitle">Sin anuncios, widgets, temas y más</string>
     <string name="settings_main_wear_available_title">App para Wear OS disponible</string>

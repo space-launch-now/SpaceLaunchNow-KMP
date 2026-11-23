@@ -14,6 +14,8 @@
     <string name="settings_main_notification_filters_subtitle">Filtruj starty zobrazené v aplikaci a v oznámeních</string>
     <string name="settings_main_system_settings_title">Nastavení systému</string>
     <string name="settings_main_system_settings_subtitle">Spravuj kanály oznámení, zvuky a režim Nerušit</string>
+    <string name="settings_main_language_title">Jazyk</string>
+    <string name="settings_main_language_subtitle">Vyber jazyk této aplikace</string>
     <string name="settings_main_go_premium_title">Přejít na Premium ✨</string>
     <string name="settings_main_go_premium_subtitle">Bez reklam, widgety, motivy a další</string>
     <string name="settings_main_wear_available_title">K dispozici aplikace pro Wear OS</string>
