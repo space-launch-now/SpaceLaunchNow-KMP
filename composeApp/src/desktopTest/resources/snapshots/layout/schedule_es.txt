@@ -1,0 +1,4 @@
+texts=15
+findings=2
+hidden-lines "Cape Canaveral SFS, FL, USA"
+hidden-lines "Kennedy Space Center, FL, USA"
