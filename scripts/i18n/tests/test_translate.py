@@ -12,7 +12,10 @@ sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
 import check_translations as ct  # noqa: E402
 import translate as tr  # noqa: E402
 
-COMPOSE, ANDROID, WEAR = ct.MASTERS
+COMPOSE = "composeApp/src/commonMain/composeResources/values/strings.xml"
+FEATURE = "composeApp/src/commonMain/composeResources/values/strings_home.xml"
+ANDROID, WEAR = ct.FIXED_MASTERS
+FEATURE_XML = "<resources><string name=\"home_title\">Home</string></resources>"
 ALL_PLURAL_ITEMS = {"one": "%d x", "few": "%d y", "many": "%d z", "other": "%d w"}
 
 COMPOSE_XML = """<?xml version="1.0" encoding="utf-8"?>
@@ -87,6 +90,21 @@ class TranslateTest(unittest.TestCase):
         self.assertEqual(compose["launch_count"].items["one"], "%d Start")
         android = ct.parse_resources(self.read(ANDROID))
         self.assertEqual(set(android), {"shared_no_launches", "notification_ok"})  # app_name skipped
+
+    def test_missing_key_goes_to_the_file_of_the_same_name(self):
+        put(self.root, FEATURE, FEATURE_XML)
+        model = StubModel({**self.good, f"{FEATURE}::home_title": "Startseite"})
+        report = tr.run(self.root, ["de"], model, "glossary text", masters=ct.find_masters(self.root))
+        self.assertEqual(report.failed, [])
+        feature = ct.target_path(self.root / FEATURE, "de")
+        self.assertEqual(feature.name, "strings_home.xml")
+        self.assertEqual(ct.parse_resources(feature)["home_title"].text, "Startseite")
+        self.assertNotIn("home_title", ct.parse_resources(self.read(COMPOSE)))
+
+    def test_default_masters_include_feature_files(self):
+        put(self.root, FEATURE, FEATURE_XML)
+        report = tr.run(self.root, ["de"], None, "g", dry_run=True)
+        self.assertIn(f"{FEATURE}::home_title", report.written["de"])
 
     def test_shared_key_is_translated_once_and_written_twice(self):
         model = StubModel(self.good)

@@ -35,6 +35,10 @@ jobs:
           python3 scripts/i18n/sync_shared_keys.py --check
           python3 -m unittest discover -s scripts/i18n/tests -p 'test_sync_shared_keys.py'
 
+      # Fails only on a placeholder mismatch (it crashes at runtime). Coverage is a warning.
+      - name: Check translations (placeholders)
+        run: python3 scripts/i18n/check_translations.py
+
       - name: Set up JDK 26
         uses: actions/setup-java@v5
         with:

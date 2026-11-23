@@ -1,5 +1,6 @@
 """Tests for check_translations.py. Run: python3 -m unittest discover -s scripts/i18n/tests"""
 import io
+import json
 import sys
 import tempfile
 import unittest
@@ -9,7 +10,9 @@ from pathlib import Path
 sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
 import check_translations as ct  # noqa: E402
 
-MASTER = ct.MASTERS[0]
+MASTER = "composeApp/src/commonMain/composeResources/values/strings.xml"
+FEATURE = "composeApp/src/commonMain/composeResources/values/strings_home.xml"
+CATALOG = ct.CATALOGS[1]
 ENGLISH = """<?xml version="1.0" encoding="utf-8"?>
 <resources>
     <!-- Button, one line, max 6 chars. -->
@@ -165,6 +168,91 @@ class CheckRunTest(unittest.TestCase):
             lenient = self.run_main(root)[0]
             strict = self.run_main(root, "--strict-plurals")[0]
         self.assertEqual((lenient, strict), (0, 1))
+
+
+class FeatureFileTest(unittest.TestCase):
+    """Every values/*.xml is a master, not only strings.xml."""
+
+    def run_main(self, root):
+        out = io.StringIO()
+        with redirect_stdout(out):
+            code = ct.main(["--root", root])
+        return code, out.getvalue()
+
+    def build(self, german):
+        root = tempfile.TemporaryDirectory()
+        self.addCleanup(root.cleanup)
+        write(root.name, MASTER, ENGLISH)
+        write(root.name, FEATURE, resources('<string name="home_title">Hello %1$s</string>'))
+        if german is not None:
+            write(root.name, ct.target_path(FEATURE, "de"), resources(german))
+        return root.name
+
+    def test_glob_finds_feature_files_and_keeps_fixed_masters(self):
+        root = self.build(None)
+        self.assertEqual(ct.find_masters(root), (MASTER, FEATURE, *ct.FIXED_MASTERS))
+
+    def test_placeholder_error_in_feature_file_fails(self):
+        code, out = self.run_main(self.build('<string name="home_title">Hallo %2$s</string>'))
+        self.assertEqual(code, 1)
+        self.assertIn("strings_home.xml", out)
+        self.assertIn("error:", out)
+
+    def test_good_feature_file_passes_and_missing_key_only_warns(self):
+        code, out = self.run_main(self.build('<string name="home_title">Hallo %1$s</string>'))
+        self.assertEqual(code, 0)
+        self.assertIn("strings_home.xml (1 keys)", out)
+
+    def test_language_not_started_is_not_a_failure(self):
+        code, out = self.run_main(self.build(None))
+        self.assertEqual(code, 0)
+        self.assertIn("0 of 10 languages started", out)
+
+
+class CatalogTest(unittest.TestCase):
+    def catalog(self, **languages):
+        """English `Last tried: %@` plus one translation per language code given."""
+
+        def unit(value):
+            return {"stringUnit": {"state": "translated", "value": value}}
+
+        strings = {
+            "last_tried": {"localizations": {"en": unit("Last tried: %@"), **{c: unit(v) for c, v in languages.items()}}},
+            "title": {"localizations": {"en": unit("Widget Error"), **{c: unit("T") for c in languages}}},
+        }
+        return json.dumps({"sourceLanguage": "en", "strings": strings, "version": "1.0"})
+
+    def run_main(self, text):
+        with tempfile.TemporaryDirectory() as root:
+            write(root, CATALOG, text)
+            out = io.StringIO()
+            with redirect_stdout(out):
+                code = ct.main(["--root", root])
+        return code, out.getvalue()
+
+    def test_placeholder_mismatch_fails(self):
+        code, out = self.run_main(self.catalog(de="Zuletzt: %d"))
+        self.assertEqual(code, 1)
+        self.assertIn("error:", out)
+        self.assertIn("last_tried", out)
+
+    def test_matching_placeholder_passes_with_a_position_number(self):
+        code, _ = self.run_main(self.catalog(de="Zuletzt: %1$@"))
+        self.assertEqual(code, 0)
+
+    def test_key_with_no_value_warns_and_does_not_fail(self):
+        text = json.loads(self.catalog(de="Zuletzt: %@"))
+        text["strings"]["title"]["localizations"]["de"]["stringUnit"]["value"] = ""
+        code, out = self.run_main(json.dumps(text))
+        self.assertEqual(code, 0)
+        self.assertIn("no value for 1 keys, first title", out)
+
+    def test_catalog_codes_are_pt_br_and_zh_hans(self):
+        code, out = self.run_main(self.catalog(**{"pt-BR": "Última: %@", "zh-Hans": "最后：%d", "zh-CN": "ignored %d"}))
+        self.assertEqual(code, 1)  # zh-Hans is read; zh-CN is not a catalog code
+        self.assertEqual(out.count("error:"), 1)
+        self.assertIn("[zh-Hans]", out)
+        self.assertIn("2 of 10 languages started", out)
 
 
 if __name__ == "__main__":
