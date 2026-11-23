@@ -1,17 +1,20 @@
 #!/usr/bin/env python3
 """Fill the missing translations of the app text with a language model.
 
-Reads the English masters (check_translations.MASTERS), the glossary and the key
-comments. For each target language it finds the keys that have no translation yet,
-asks the model for them, checks the answer and appends only the good ones to
-values-<lang>/strings.xml. A key that exists in a target file is never touched, so
-text a person approved or edited in Crowdin stays as it is. The new text is
+Reads the English masters (check_translations.find_masters: every Compose values/*.xml, the
+Android res and the Wear strings.xml), the glossary and the key comments. For each target
+language it finds the keys that have no translation yet, asks the model for them, checks the
+answer and appends only the good ones to the file of the same name in values-<lang>
+(values/strings_home.xml fills values-de/strings_home.xml). A key that exists in a target file
+is never touched, so text a person approved or edited in Crowdin stays as it is. The new text is
 unapproved: upload it with `crowdin upload translations --auto-approve-imported=false`
 so people can review it (spec 017, section 7.4).
 
 A text that fails the checks (placeholders, plural categories, length limit from the
 key comment) is sent back once with the reasons. If it fails again it is not written
 and the report lists it.
+
+It does not write the iOS String Catalogs; check_translations.py only reads them.
 
 Keys named `shared_*` are translated once and written to every master that has them.
 
@@ -243,8 +246,9 @@ def translate_language(root, language, jobs, call_model, glossary, batch_size):
     return good, {k: v for k, v in failed.items() if k not in good}
 
 
-def run(root, languages, call_model, glossary, masters=ct.MASTERS, batch_size=40, dry_run=False):
+def run(root, languages, call_model, glossary, masters=None, batch_size=40, dry_run=False):
     root = Path(root)
+    masters = masters or ct.find_masters(root)
     report = Report()
     for language in languages:
         jobs = missing_jobs(root, language, masters)

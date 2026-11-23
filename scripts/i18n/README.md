@@ -2,6 +2,25 @@
 
 Helpers for app text translation (spec 017).
 
+## Check and fill translations
+
+`check_translations.py` compares every translation with its English master and runs in CI
+("Check translations (placeholders)" in `pr-validation.yml`):
+
+- Masters: every `composeApp/src/commonMain/composeResources/values/*.xml` (found by glob, so a new
+  `strings_<feature>.xml` is covered), the Android res `values/strings.xml` and the Wear
+  `values/strings.xml`. Each is compared with the file of the same name in `values-<lang>`.
+- Catalogs: `iosApp/iosApp/InfoPlist.xcstrings` and `iosApp/LaunchWidget/Localizable.xcstrings`.
+  Language codes there are `es`, `pt-BR` and `zh-Hans` (the others match the Crowdin code).
+- It exits 1 only on a placeholder mismatch. A language with no file yet is "not started", and low
+  coverage, a catalog key with no value, a plural category or a length limit are warnings.
+  `--strict-plurals` also fails on a missing plural category.
+
+`translate.py` fills missing keys in `values-<lang>` with a language model, into the file of the same
+name as the master. It never touches a key that exists, and it does not write the catalogs.
+
+Run the tests: `python3 -m unittest discover -s scripts/i18n/tests`.
+
 ## Load translation memory 406219 into Crowdin project 948217 (T29)
 
 The old Android project is deleted, but its translation memory (`406219`, 606 segments) lives on
