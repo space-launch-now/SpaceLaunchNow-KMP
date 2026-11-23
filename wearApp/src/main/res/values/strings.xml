@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="app_name">Space Launch Now</string>
+    <string name="app_name" translatable="false">Space Launch Now</string>
     <string name="next_launch_complication_label">Next Launch</string>
     <string name="next_launch_tile_label">Next Launch</string>
     <string name="subscribe_prompt">Subscribe on phone</string>

@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="home_upgrade_row_title">Bez reklam a s více funkcemi</string>
+    <string name="home_upgrade_row_action">Zobrazit plány</string>
+    <string name="home_upgrade_row_close">Zavřít nabídku upgradu</string>
+</resources>

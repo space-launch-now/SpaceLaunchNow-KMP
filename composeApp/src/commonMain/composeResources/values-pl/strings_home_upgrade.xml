@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="home_upgrade_row_title">Wyłącz reklamy i odblokuj więcej</string>
+    <string name="home_upgrade_row_action">Zobacz plany</string>
+    <string name="home_upgrade_row_close">Zamknij ofertę</string>
+</resources>

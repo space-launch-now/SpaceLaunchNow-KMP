@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="time_today_at">今天 %1$s</string>
+    <string name="time_tomorrow_at">明天 %1$s</string>
+    <string name="time_yesterday_at">昨天 %1$s</string>
+    <string name="time_weekday_at">%1$s %2$s</string>
+    <string name="time_weekday_monday">星期一</string>
+    <string name="time_weekday_tuesday">星期二</string>
+    <string name="time_weekday_wednesday">星期三</string>
+    <string name="time_weekday_thursday">星期四</string>
+    <string name="time_weekday_friday">星期五</string>
+    <string name="time_weekday_saturday">星期六</string>
+    <string name="time_weekday_sunday">星期日</string>
+    <string name="time_half_1_year">%1$s年上半年</string>
+    <string name="time_half_2_year">%1$s年下半年</string>
+    <string name="time_net_year">NET %1$s</string>
+    <string name="time_fiscal_year">%1$s财年</string>
+    <string name="time_decade_year">%1$s年代</string>
+    <string name="time_quarter_year">%2$s年第%1$d季度</string>
+    <string name="time_compact_before">T- %1$s</string>
+    <string name="time_compact_after">T+ %1$s</string>
+    <string name="time_timeline_before">T - %1$s</string>
+    <string name="time_timeline_after">T + %1$s</string>
+    <string name="time_unit_days">%1$s天</string>
+    <string name="time_unit_hours">%1$s时</string>
+    <string name="time_unit_minutes">%1$s分</string>
+    <string name="time_unit_seconds">%1$s秒</string>
+    <string name="countdown_label_days">天</string>
+    <string name="countdown_label_hours">小时</string>
+    <string name="countdown_label_minutes">分钟</string>
+    <string name="countdown_label_seconds">秒</string>
+</resources>

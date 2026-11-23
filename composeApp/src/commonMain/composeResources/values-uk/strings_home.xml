@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="home_articles_error">Не вдалося завантажити статті</string>
+    <string name="home_cached_data_notice">Показано дані з кешу</string>
+    <string name="home_events_error">Не вдалося завантажити події</string>
+    <string name="home_events_title">Майбутні події</string>
+    <string name="home_featured_view_more">Докладніше</string>
+    <string name="home_history_empty">У цей день пусків не було</string>
+    <string name="home_history_error">Не вдалося завантажити історичні пуски</string>
+    <string name="home_history_title">Цього дня в історії</string>
+    <string name="home_last_launch_title">Останній пуск</string>
+    <string name="home_launch_image_description">Зображення пуску</string>
+    <string name="home_launch_image_for_title_description">Зображення пуску: %1$s</string>
+    <string name="home_launches_error">Не вдалося завантажити пуски</string>
+    <string name="home_live_launch_description">Пуск у польоті: %1$s. Статус: %2$s. Торкнися, щоб побачити деталі.</string>
+    <string name="home_next_up_error_title">Помилка запиту до API</string>
+    <string name="home_pinned_badge">ВИБРАНЕ</string>
+    <string name="home_pinned_dismiss_featured">Сховати вибраний пуск</string>
+    <string name="home_pinned_dismiss_message">Сховати повідомлення</string>
+    <string name="home_pinned_featured_description">Вибране: %1$s. %2$s. Торкнися, щоб побачити деталі.</string>
+    <string name="home_pinned_featured_launch_description">Вибраний пуск: %1$s. %2$s. Торкнися, щоб побачити деталі.</string>
+    <string name="home_pinned_motd_description">Повідомлення дня: %1$s</string>
+    <string name="home_placeholder_content">Вміст</string>
+    <string name="home_section_info_description">Інформація: %1$s</string>
+    <string name="home_section_see_all">Усі</string>
+    <string name="home_stats_next_24_hours">Наступні 24 години</string>
+    <string name="home_stats_next_30_days">Наступні 30 днів</string>
+    <string name="home_stats_next_7_days">Наступні 7 днів</string>
+    <string name="home_stats_title">Коротка статистика</string>
+    <string name="home_top_bar_support_description">Підтримати мене</string>
+    <string name="home_updates_author_profile_description">Профіль автора</string>
+    <string name="home_updates_error">Не вдалося завантажити оновлення</string>
+    <string name="home_updates_info_body">Оновлення надходять від волонтерів-бібліотекарів The Space Devs, які за допомогою методів відкритої розвідки (OSINT) відстежують пуски в усьому світі. Вони стежать за оголошеннями агенцій, регуляторними документами та соцмережами, щоб база даних була точною й актуальною.
+
+Як розробник Space Launch Now, я є одним із засновників правління та гордим прибічником The Space Devs!</string>
+    <string name="home_updates_info_confirm">Зрозуміло</string>
+    <string name="home_updates_info_title">Про останні оновлення</string>
+    <string name="home_updates_profile_placeholder_description">Заглушка профілю</string>
+    <string name="home_updates_source_description">Джерело</string>
+    <string name="home_updates_title">Останні оновлення</string>
+</resources>

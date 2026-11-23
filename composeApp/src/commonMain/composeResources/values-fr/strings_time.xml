@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="time_today_at">Aujourd'hui à %1$s</string>
+    <string name="time_tomorrow_at">Demain à %1$s</string>
+    <string name="time_yesterday_at">Hier à %1$s</string>
+    <string name="time_weekday_at">%1$s à %2$s</string>
+    <string name="time_weekday_monday">Lundi</string>
+    <string name="time_weekday_tuesday">Mardi</string>
+    <string name="time_weekday_wednesday">Mercredi</string>
+    <string name="time_weekday_thursday">Jeudi</string>
+    <string name="time_weekday_friday">Vendredi</string>
+    <string name="time_weekday_saturday">Samedi</string>
+    <string name="time_weekday_sunday">Dimanche</string>
+    <string name="time_half_1_year">S1 %1$s</string>
+    <string name="time_half_2_year">S2 %1$s</string>
+    <string name="time_net_year">NET %1$s</string>
+    <string name="time_fiscal_year">EF %1$s</string>
+    <string name="time_decade_year">Décennie %1$s</string>
+    <string name="time_quarter_year">T%1$d %2$s</string>
+    <string name="time_compact_before">T- %1$s</string>
+    <string name="time_compact_after">T+ %1$s</string>
+    <string name="time_timeline_before">T - %1$s</string>
+    <string name="time_timeline_after">T + %1$s</string>
+    <string name="time_unit_days">%1$sj</string>
+    <string name="time_unit_hours">%1$sh</string>
+    <string name="time_unit_minutes">%1$smin</string>
+    <string name="time_unit_seconds">%1$ss</string>
+    <string name="countdown_label_days">JOURS</string>
+    <string name="countdown_label_hours">HEURES</string>
+    <string name="countdown_label_minutes">MINUTES</string>
+    <string name="countdown_label_seconds">SECONDES</string>
+</resources>

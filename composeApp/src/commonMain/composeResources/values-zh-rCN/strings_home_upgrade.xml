@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="home_upgrade_row_title">去除广告，解锁更多</string>
+    <string name="home_upgrade_row_action">查看方案</string>
+    <string name="home_upgrade_row_close">关闭升级提示</string>
+</resources>

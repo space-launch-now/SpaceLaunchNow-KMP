@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="home_upgrade_row_title">Werbefrei und mehr freischalten</string>
+    <string name="home_upgrade_row_action">Pläne ansehen</string>
+    <string name="home_upgrade_row_close">Upgrade-Angebot schließen</string>
+</resources>

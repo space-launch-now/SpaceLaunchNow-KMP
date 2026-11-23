@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="winback_title">Nog nieuwsgierig naar Premium?</string>
+    <string name="winback_body">Ga advertentievrij en ontgrendel elke Premium-functie in Space Launch Now.</string>
+    <string name="winback_price_trial">Probeer %1$s gratis, daarna %2$s per jaar. Op elk moment opzegbaar.</string>
+    <string name="winback_price_no_trial">%1$s per jaar. Op elk moment opzegbaar.</string>
+    <string name="winback_cta_trial">Start gratis proefperiode</string>
+    <string name="winback_cta">Abonneren</string>
+    <string name="winback_not_now">Niet nu</string>
+</resources>
