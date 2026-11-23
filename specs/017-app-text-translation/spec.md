@@ -107,6 +107,8 @@ Merging them gives about 900 to 1,100 unique keys (estimate; the move tasks will
 | `ui/astronaut` | 68 | `ui/newsevents` | 25 |
 | `ui/agencies` | 62 | `ui/roadmap` 21, `ui/about` 20, `ui/layout` 16, `ui/video` 7, `ui/preview` 7, other 6 | 77 |
 
+Change after the moves (Tasks#1329): the `ui/roadmap` keys (`app_roadmap_*`) are `translatable="false"`. The roadmap items come from the server in English, so the screen body stays English. The top bar title, Back and Retry use shared `common_*` keys and stay translated.
+
 ### 4.3 Surfaces outside Compose
 
 | Surface | What | Count | Note |

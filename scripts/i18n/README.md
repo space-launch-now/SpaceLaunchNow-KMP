@@ -30,7 +30,10 @@ Run the tests: `python3 -m unittest discover -s scripts/i18n/tests`.
 - Android widgets and notifications: `composeApp/src/androidMain/res/values/strings.xml`.
 - Wear OS: `wearApp/src/main/res/values/strings.xml`.
 
-`app_name` and `app_name_debug` carry `translatable="false"`, so Crowdin skips them. A
+`app_name` and `app_name_debug` carry `translatable="false"`, so Crowdin skips them. The
+33 `app_roadmap_*` keys in `composeResources/values/strings_misc.xml` carry it too: the roadmap
+items come from the server in English and change often, so the Roadmap screen body stays English
+in every locale (Tasks#1329). Do not add them back to a `values-<code>` file.
 A top-level `languages_mapping` pins the folder names `es`, `pt-rBR` and `zh-rCN`, because `%android_code%` may
 give `es-rES`. The iOS catalogs are not in Crowdin. Crowdin Sync uploads sources on a push to main that
 changes `crowdin.yml` or a Compose source file. A change to the Android res or Wear source alone does
