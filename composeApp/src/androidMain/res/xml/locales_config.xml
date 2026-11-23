@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Languages of the app. Android 13+ lists these in the per-app language setting.
+     Spec 017, section 10.2. Keep in step with the values-<lang> folders and crowdin.yml. -->
+<locale-config xmlns:android="http://schemas.android.com/apk/res/android">
+    <locale android:name="en" />
+    <locale android:name="de" />
+    <locale android:name="es" />
+    <locale android:name="fr" />
+    <locale android:name="zh-CN" />
+    <locale android:name="nl" />
+    <locale android:name="uk" />
+    <locale android:name="it" />
+    <locale android:name="pl" />
+    <locale android:name="pt-BR" />
+    <locale android:name="cs" />
+</locale-config>

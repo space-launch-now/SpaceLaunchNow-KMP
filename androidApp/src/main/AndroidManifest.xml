@@ -18,6 +18,7 @@
         android:label="${appName}"
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
+        android:localeConfig="@xml/locales_config"
         android:theme="@style/Theme.SpaceLaunchNow">
         <activity
             android:name=".MainActivity"
