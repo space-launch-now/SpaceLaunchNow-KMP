@@ -88,6 +88,11 @@ class SubscriptionViewModel(
         )
     }
 
+    /** Fires paywall_dismissed only when the user leaves without a subscription (a purchase is not a dismiss). */
+    fun trackPaywallDismissedIfNotSubscribed(source: String, secondsOnScreen: Long) {
+        if (!repository.state.value.isSubscribed) trackPaywallDismissed(source, secondsOnScreen)
+    }
+
     // Subscription state from repository
     val subscriptionState: StateFlow<SubscriptionState> = repository.state
 
