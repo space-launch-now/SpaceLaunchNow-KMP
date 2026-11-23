@@ -23,10 +23,12 @@ import me.calebjones.spacelaunchnow.getPlatform
 class FunnelUserPropertySyncer(
     private val analyticsManager: AnalyticsManager,
     private val billingManager: BillingManager,
+    private val appLanguageTag: () -> String = ::getPlatformAppLanguageTag,
 ) {
 
     fun start(scope: CoroutineScope, subscriptionStateFlow: Flow<SubscriptionState>) {
         analyticsManager.setUserProperty("platform", platformName())
+        syncAppLanguage()
         subscriptionStateFlow
             .onEach { state ->
                 analyticsManager.setUserProperty(
@@ -40,6 +42,14 @@ class FunnelUserPropertySyncer(
                 )
             }
             .launchIn(scope)
+    }
+
+    /**
+     * Sets `app_language` to the UI language the app shows (not the raw device
+     * locale). Call at start and whenever the app language changes.
+     */
+    fun syncAppLanguage() {
+        analyticsManager.setUserProperty("app_language", AppLanguage.resolve(appLanguageTag()))
     }
 
     private fun platformName(): String = when (getPlatform().type) {
