@@ -50,7 +50,7 @@ import UserNotifications
         let displayTitle = notificationData.isWebcastLive() ? "🔴 \(baseTitle)" : baseTitle
         
         // Format body using same logic as AppDelegate
-        let displayBody = getNotificationBody(data: notificationData)
+        let displayBody = notificationData.displayBody()
         
         content.title = "Test: \(displayTitle)"
         content.body = displayBody
@@ -86,57 +86,6 @@ import UserNotifications
             print("📱 [TestNotification] No image URL, showing text-only notification")
             scheduleNotification(content: content, identifier: "test-\(launchUuid)")
         }
-    }
-    
-    /// Get notification body message based on notification type (matches Android strings)
-    private func getNotificationBody(data: NotificationData) -> String {
-        let formattedDate = formatLaunchDate(data.launchNet)
-        
-        switch data.notificationType.lowercased() {
-        case "netstampchanged":
-            return "SCHEDULE UPDATE: Next attempt no earlier than \(formattedDate)"
-        case "success":
-            return "The launch was successful!"
-        case "failure":
-            return "A launch failure has occurred."
-        case "partialfailure":
-            return "The launch was a partial failure."
-        case "inflight":
-            return "Liftoff! Launch vehicle is now in flight!"
-        case "oneminute":
-            return "Launch attempt in less than one minute at \(formattedDate)"
-        case "tenminutes":
-            return "Launch attempt in less than ten minutes at \(formattedDate)"
-        case "onehour":
-            return "Launch attempt in less than one hour at \(formattedDate)"
-        case "twentyfourhour":
-            return "Launch attempt in less than 24 hours at \(formattedDate)"
-        default:
-            // Fallback to location
-            return "Launch from \(data.launchLocation)"
-        }
-    }
-    
-    /// Format launch date to readable time (matches Android)
-    /// Input: "2025-10-15T12:00:00Z" -> Output: "12:00 PM"
-    private func formatLaunchDate(_ launchNet: String) -> String {
-        let inputFormatter = ISO8601DateFormatter()
-        inputFormatter.formatOptions = [.withInternetDateTime, .withFractionalSeconds]
-        
-        // Try with fractional seconds first, then without
-        guard let date = inputFormatter.date(from: launchNet) ?? {
-            inputFormatter.formatOptions = [.withInternetDateTime]
-            return inputFormatter.date(from: launchNet)
-        }() else {
-            print("⚠️ Failed to parse launch date: \(launchNet)")
-            return launchNet // Return original if parsing fails
-        }
-        
-        // Format to user's local time
-        let outputFormatter = DateFormatter()
-        outputFormatter.dateFormat = "h:mm a"
-        outputFormatter.timeZone = TimeZone.current
-        return outputFormatter.string(from: date)
     }
     
     /// Schedule local notification

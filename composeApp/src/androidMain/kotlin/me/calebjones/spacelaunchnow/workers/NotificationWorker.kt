@@ -445,8 +445,8 @@ class NotificationWorker(
 
         // Prepare display strings
         val title = inputData.getString("fcm_title") ?: notificationData.launchName
-        val body = inputData.getString("fcm_body") 
-            ?: "${notificationData.notificationType} for ${notificationData.launchName}"
+        val serverBody = inputData.getString("fcm_body")
+        val body = NotificationDisplayHelper.launchBody(applicationContext, notificationData, serverBody)
 
         if (!shouldShow) {
             log.i { "🔇 V4 Notification filtered out - ${notificationData.launchName}" }
@@ -482,7 +482,8 @@ class NotificationWorker(
         NotificationDisplayHelper.showNotification(
             context = applicationContext,
             notificationData = notificationData,
-            title = title
+            title = title,
+            serverBody = serverBody
         )
 
         // Save to history

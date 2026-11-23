@@ -486,37 +486,36 @@ object NotificationDisplayHelper {
     }
 
     /**
-     * Get notification body message based on notification type
+     * Get notification body message based on notification type.
+     * Known types come from string resources (the device language); an unknown type falls
+     * back to the server text. See [buildLaunchBody].
      */
     private fun getNotificationBody(
         context: Context,
         notificationType: String,
         launchNet: String,
-        launchLocation: String
-    ): String {
-        val formattedDate = formatLaunchDate(context, launchNet)
+        launchLocation: String,
+        serverBody: String?
+    ): String = buildLaunchBody(
+        notificationType = notificationType,
+        launchLocation = launchLocation,
+        serverBody = serverBody,
+        formattedTime = { formatLaunchDate(context, launchNet) },
+        getString = { resId, args -> context.getString(resId, *args.toTypedArray()) },
+    )
 
-        return when (notificationType.lowercase()) {
-            "netstampchanged" -> context.getString(
-                R.string.notification_schedule_changed,
-                formattedDate
-            )
-
-            "success" -> context.getString(R.string.notification_launch_successful)
-            "failure" -> context.getString(R.string.notification_launch_failure)
-            "partialfailure" -> context.getString(R.string.notification_launch_partial_failure)
-            "inflight" -> context.getString(R.string.notification_launch_liftoff)
-            "oneminute" -> context.getString(R.string.notification_one_minute, formattedDate)
-            "tenminutes" -> context.getString(R.string.notification_ten_minutes, formattedDate)
-            "onehour" -> context.getString(R.string.notification_one_hour, formattedDate)
-            "twentyfourhour" -> context.getString(
-                R.string.notification_twenty_four_hours,
-                formattedDate
-            )
-
-            else -> context.getString(R.string.notification_fallback_launch_from, launchLocation) // Fallback
-        }
-    }
+    /**
+     * The body text shown for a launch push, for callers that must store the same text
+     * (the notification history).
+     */
+    fun launchBody(context: Context, notificationData: NotificationData, serverBody: String?): String =
+        getNotificationBody(
+            context,
+            notificationData.notificationType,
+            notificationData.launchNet,
+            notificationData.launchLocation,
+            serverBody
+        )
 
     /**
      * Display a notification using NotificationData
@@ -524,11 +523,15 @@ object NotificationDisplayHelper {
      *
      * Note: This method loads images synchronously on the calling thread.
      * Consider calling from a background thread for better performance.
+     *
+     * @param serverBody the server's body text, shown only for a notification type the app
+     *   has no text for
      */
     fun showNotification(
         context: Context,
         notificationData: NotificationData,
-        title: String? = null
+        title: String? = null,
+        serverBody: String? = null
     ) {
         // Ensure channels exist
         createNotificationChannels(context)
@@ -545,13 +548,8 @@ object NotificationDisplayHelper {
             baseTitle
         }
 
-        // Always generate body with proper date formatting from NotificationData
-        val displayBody = getNotificationBody(
-            context,
-            notificationData.notificationType,
-            notificationData.launchNet,
-            notificationData.launchLocation
-        )
+        // Known types: body from string resources with proper date formatting
+        val displayBody = launchBody(context, notificationData, serverBody)
 
         // Create intent with launch data
         // Use launchUuid for navigation since API 2.4.0 requires UUID for launch details
@@ -647,7 +645,7 @@ object NotificationDisplayHelper {
     /**
      * Display a notification from raw data map (used by Firebase)
      * This converts the map to NotificationData and calls showNotification
-     * Note: body parameter is only used for fallback when parsing fails
+     * Note: body is the server text; it shows when parsing fails or the type is unknown
      */
     fun showNotificationFromMap(
         context: Context,
@@ -657,8 +655,7 @@ object NotificationDisplayHelper {
     ) {
         val notificationData = NotificationData.Companion.fromMap(data)
         if (notificationData != null) {
-            // Don't pass body - always use formatted body from NotificationData
-            showNotification(context, notificationData, title)
+            showNotification(context, notificationData, title, serverBody = body)
         } else {
             // Fallback: show basic notification if parsing fails
             showBasicNotification(
