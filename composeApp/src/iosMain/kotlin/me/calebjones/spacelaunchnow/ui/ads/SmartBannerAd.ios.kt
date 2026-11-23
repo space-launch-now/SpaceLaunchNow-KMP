@@ -366,6 +366,10 @@ internal actual fun destroyBannerHandler(handler: Any) = Unit
 /**
  * Reloads with this app's ad unit and [loadSize], by default the handler's own size. A bare
  * load() falls back to the library defaults: Google's test ad unit at FULL_BANNER size.
+ *
+ * The new GADBannerView's delegate is wrapped so a failure reports the AdMob error code (the
+ * library drops it). That wrapper is the single sender of ad_failed: the library's onFailure
+ * here does nothing.
  */
 @OptIn(DependsOnGoogleMobileAds::class)
 private fun BannerAdHandler.reloadBanner(placement: String, loadSize: AdSize = adSize) {
@@ -374,12 +378,13 @@ private fun BannerAdHandler.reloadBanner(placement: String, loadSize: AdSize = a
         adUnitId = GlobalAdManager.getPlatformAdUnitId(AdType.BANNER),
         adSize = loadSize,
         onLoad = { AdTelemetry.loaded("banner", size, placement) },
-        onFailure = { AdTelemetry.failed("banner", it, size, placement) },
+        onFailure = { /* reported with its code by CodeReportingBannerDelegate */ },
         onDismissed = {},
         onShown = {},
         onImpression = { AdTelemetry.impression("banner", size, placement) },
         onClick = { AdTelemetry.clicked("banner", size, placement) }
     )
+    installCodeReporting(size, placement)
 }
 
 /** Shimmer placeholder shown while ads are loading or waiting for a retry. */

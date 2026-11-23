@@ -4,6 +4,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
 import me.calebjones.spacelaunchnow.util.logging.SpaceLogger
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.SideEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -12,6 +13,7 @@ import androidx.compose.runtime.rememberUpdatedState
 import kotlinx.coroutines.launch
 import androidx.compose.runtime.setValue
 import app.lexilabs.basic.ads.AdSize
+import app.lexilabs.basic.ads.BannerAdHandler
 import app.lexilabs.basic.ads.Consent
 import kotlinx.coroutines.delay
 import app.lexilabs.basic.ads.DependsOnGoogleMobileAds
@@ -157,7 +159,7 @@ actual fun WithPreloadedAds(
         adUnitId = GlobalAdManager.getPlatformAdUnitId(AdType.BANNER),
         adSize = AdSize.BANNER,
         onLoad = { AdTelemetry.loaded("banner", AdSize.BANNER.label(), "BANNER") },
-        onFailure = { AdTelemetry.failed("banner", it, AdSize.BANNER.label(), "BANNER") },
+        onFailure = { /* reported with its code by CodeReportingBannerDelegate */ },
         onDismissed = {},
         onShown = {},
         onImpression = { AdTelemetry.impression("banner", AdSize.BANNER.label(), "BANNER") },
@@ -170,7 +172,7 @@ actual fun WithPreloadedAds(
         adUnitId = GlobalAdManager.getPlatformAdUnitId(AdType.BANNER),
         adSize = AdSize.LARGE_BANNER,
         onLoad = { AdTelemetry.loaded("banner", AdSize.LARGE_BANNER.label(), "LARGE_BANNER") },
-        onFailure = { AdTelemetry.failed("banner", it, AdSize.LARGE_BANNER.label(), "LARGE_BANNER") },
+        onFailure = { /* reported with its code by CodeReportingBannerDelegate */ },
         onDismissed = {},
         onShown = {},
         onImpression = { AdTelemetry.impression("banner", AdSize.LARGE_BANNER.label(), "LARGE_BANNER") },
@@ -183,7 +185,7 @@ actual fun WithPreloadedAds(
         adUnitId = GlobalAdManager.getPlatformAdUnitId(AdType.BANNER),
         adSize = AdSize.MEDIUM_RECTANGLE,
         onLoad = { AdTelemetry.loaded("banner", AdSize.MEDIUM_RECTANGLE.label(), "MEDIUM_RECTANGLE") },
-        onFailure = { AdTelemetry.failed("banner", it, AdSize.MEDIUM_RECTANGLE.label(), "MEDIUM_RECTANGLE") },
+        onFailure = { /* reported with its code by CodeReportingBannerDelegate */ },
         onDismissed = {},
         onShown = {},
         onImpression = { AdTelemetry.impression("banner", AdSize.MEDIUM_RECTANGLE.label(), "MEDIUM_RECTANGLE") },
@@ -197,12 +199,19 @@ actual fun WithPreloadedAds(
         adUnitId = GlobalAdManager.getPlatformAdUnitId(AdType.BANNER),
         adSize = AdSize.BANNER,
         onLoad = { AdTelemetry.loaded("banner", AdSize.BANNER.label(), "NAVIGATION") },
-        onFailure = { AdTelemetry.failed("banner", it, AdSize.BANNER.label(), "NAVIGATION") },
+        onFailure = { /* reported with its code by CodeReportingBannerDelegate */ },
         onDismissed = {},
         onShown = {},
         onImpression = { AdTelemetry.impression("banner", AdSize.BANNER.label(), "NAVIGATION") },
         onClick = { AdTelemetry.clicked("banner", AdSize.BANNER.label(), "NAVIGATION") }
     )
+
+    // The library's rememberBannerAd loads inside composition and makes a new GADBannerView per
+    // load. Wrap each one's delegate so a failed load reports its AdMob error code.
+    PreloadedBannerSetup(preloadedBannerAd, AdSize.BANNER, "BANNER")
+    PreloadedBannerSetup(preloadedLargeBannerAd, AdSize.LARGE_BANNER, "LARGE_BANNER")
+    PreloadedBannerSetup(preloadedMediumRectangleAd, AdSize.MEDIUM_RECTANGLE, "MEDIUM_RECTANGLE")
+    PreloadedBannerSetup(preloadedNavigationBannerAd, AdSize.BANNER, "NAVIGATION")
 
     // Aliased fallbacks for sizes/placements that produced ~$0 in production.
     val preloadedNavigationLargeBannerAd = preloadedLargeBannerAd
@@ -257,6 +266,12 @@ actual fun rememberPrivacyOptionsRequired(): Boolean {
     val vc = contextFactory?.getActivity()
     val consent = remember(vc) { Consent(vc) }
     return consent.isPrivacyOptionsRequired()
+}
+
+@OptIn(DependsOnGoogleMobileAds::class)
+@Composable
+private fun PreloadedBannerSetup(handler: BannerAdHandler, size: AdSize, placement: String) {
+    SideEffect { handler.installCodeReporting(size.label(), placement) }
 }
 
 private fun AdSize.label(): String = AdTelemetry.sizeLabel(width, height)
