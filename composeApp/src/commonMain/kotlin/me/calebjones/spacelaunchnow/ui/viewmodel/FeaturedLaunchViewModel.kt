@@ -308,7 +308,7 @@ class FeaturedLaunchViewModel(
                         )
                     }
                 }.onFailure { exception ->
-                    log.e(exception) { exception.toUserMessage() }
+                    log.e(exception) { "Failed to load in-flight launches: ${exception.message}" }
                     _inFlightLaunchState.update {
                         it.copy(
                             error = exception.toUserMessage(),
@@ -400,7 +400,7 @@ class FeaturedLaunchViewModel(
                                     }
                                 }
                             }.onFailure { e ->
-                                log.e(e) { e.toUserMessage() }
+                                log.e(e) { "Failed to load pinned launch: ${e.message}" }
                                 _pinnedContentState.update {
                                     it.copy(error = e.toUserMessage(), isLoading = false)
                                 }
@@ -431,7 +431,7 @@ class FeaturedLaunchViewModel(
                                     )
                                 }
                             }.onFailure { e ->
-                                log.e(e) { e.toUserMessage() }
+                                log.e(e) { "Failed to load pinned event: ${e.message}" }
                                 _pinnedContentState.update {
                                     it.copy(error = e.toUserMessage(), isLoading = false)
                                 }

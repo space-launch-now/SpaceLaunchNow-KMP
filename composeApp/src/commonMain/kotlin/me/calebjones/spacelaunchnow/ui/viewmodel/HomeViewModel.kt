@@ -314,7 +314,7 @@ class HomeViewModel(
                         )
                     }
                 }.onFailure { exception ->
-                    log.e(exception) { exception.toUserMessage() }
+                    log.e(exception) { "Failed to load in-flight launches: ${exception.message}" }
                     _inFlightLaunchState.update {
                         it.copy(
                             error = exception.toUserMessage(),
