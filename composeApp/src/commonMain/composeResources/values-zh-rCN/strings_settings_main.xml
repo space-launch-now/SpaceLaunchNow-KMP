@@ -14,6 +14,8 @@
     <string name="settings_main_notification_filters_subtitle">筛选应用和通知中显示的发射</string>
     <string name="settings_main_system_settings_title">系统设置</string>
     <string name="settings_main_system_settings_subtitle">管理通知渠道、提示音和勿扰模式</string>
+    <string name="settings_main_language_title">语言</string>
+    <string name="settings_main_language_subtitle">选择此应用的语言</string>
     <string name="settings_main_go_premium_title">升级 Premium ✨</string>
     <string name="settings_main_go_premium_subtitle">无广告、小组件、主题等</string>
     <string name="settings_main_wear_available_title">提供 Wear OS 应用</string>
