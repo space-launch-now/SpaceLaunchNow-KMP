@@ -21,6 +21,21 @@ name as the master. It never touches a key that exists, and it does not write th
 
 Run the tests: `python3 -m unittest discover -s scripts/i18n/tests`.
 
+## What Crowdin holds (crowdin.yml)
+
+`crowdin.yml` maps three Android XML source sets to project 948217. Each writes back to
+`values-<code>/<same file name>` and uses `update_as_unapproved`:
+
+- Compose resources: `composeApp/src/commonMain/composeResources/values/*.xml`.
+- Android widgets and notifications: `composeApp/src/androidMain/res/values/strings.xml`.
+- Wear OS: `wearApp/src/main/res/values/strings.xml`.
+
+`app_name` and `app_name_debug` carry `translatable="false"`, so Crowdin skips them. A
+`languages_mapping` pins the folder names `es`, `pt-rBR` and `zh-rCN`, because `%android_code%` may
+give `es-rES`. The iOS catalogs are not in Crowdin. Crowdin Sync uploads sources on a push to main that
+changes `crowdin.yml` or a Compose source file. A change to the Android res or Wear source alone does
+not start it: run the workflow by hand. Never add Russian.
+
 ## Load translation memory 406219 into Crowdin project 948217 (T29)
 
 The old Android project is deleted, but its translation memory (`406219`, 606 segments) lives on

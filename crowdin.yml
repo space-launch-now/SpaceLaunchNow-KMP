@@ -17,3 +17,33 @@ files:
     type: android
     # Do not overwrite a translation that a person approved with the model's first fill.
     update_option: update_as_unapproved
+    # %android_code% can give es-rES; the repo folders are values-es, values-pt-rBR, values-zh-rCN.
+    languages_mapping:
+      android_code:
+        es: es
+        pt-BR: pt-rBR
+        zh-CN: zh-rCN
+
+  # Android widgets and notifications (androidMain res). app_name and app_name_debug are translatable="false".
+  - source: /composeApp/src/androidMain/res/values/strings.xml
+    translation: /composeApp/src/androidMain/res/values-%android_code%/%original_file_name%
+    type: android
+    update_option: update_as_unapproved
+    # %android_code% can give es-rES; the repo folders are values-es, values-pt-rBR, values-zh-rCN.
+    languages_mapping:
+      android_code:
+        es: es
+        pt-BR: pt-rBR
+        zh-CN: zh-rCN
+
+  # Wear OS app. Same folder names as the phone app.
+  - source: /wearApp/src/main/res/values/strings.xml
+    translation: /wearApp/src/main/res/values-%android_code%/%original_file_name%
+    type: android
+    update_option: update_as_unapproved
+    # %android_code% can give es-rES; the repo folders are values-es, values-pt-rBR, values-zh-rCN.
+    languages_mapping:
+      android_code:
+        es: es
+        pt-BR: pt-rBR
+        zh-CN: zh-rCN
