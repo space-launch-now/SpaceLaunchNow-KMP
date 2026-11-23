@@ -2,7 +2,7 @@
 """Check the translated string files against the English masters.
 
 Covers every Compose resource file (values/*.xml), the Android res and Wear
-strings.xml, and the two iOS String Catalogs. Reports coverage per file and
+strings.xml, and the three iOS String Catalogs. Reports coverage per file and
 language and fails (exit 1) on a placeholder mismatch, because a wrong
 placeholder crashes at runtime (spec 017, section 7.3).
 A language under 95 percent coverage, a catalog key with no value, a missing
@@ -50,6 +50,7 @@ FIXED_MASTERS = (
 CATALOGS = (
     "iosApp/iosApp/InfoPlist.xcstrings",
     "iosApp/LaunchWidget/Localizable.xcstrings",
+    "iosApp/iosApp/NotificationText.xcstrings",
 )
 
 # Never translated, whatever the file says.
