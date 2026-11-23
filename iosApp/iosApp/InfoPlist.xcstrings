@@ -5,10 +5,70 @@
       "comment" : "Location permission prompt text shown by iOS",
       "extractionState" : "manual",
       "localizations" : {
+        "cs" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Space Launch Now používá tvou polohu k zobrazení startů v tvém okolí a informací o relevantních startovacích místech."
+          }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Space Launch Now nutzt deinen Standort, um Starts in deiner Nähe und passende Informationen zu Startplätzen anzuzeigen."
+          }
+        },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "Space Launch Now uses your location to show launches near you and relevant launch site information."
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Space Launch Now usa tu ubicación para mostrarte lanzamientos cercanos e información relevante de los lugares de lanzamiento."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Space Launch Now utilise ta position pour afficher les lancements près de chez toi et les informations utiles sur les sites de lancement."
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Space Launch Now usa la tua posizione per mostrarti i lanci vicini a te e le informazioni rilevanti sulle basi di lancio."
+          }
+        },
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Space Launch Now gebruikt je locatie om lanceringen bij jou in de buurt en relevante informatie over lanceerlocaties te tonen."
+          }
+        },
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Space Launch Now używa Twojej lokalizacji, aby pokazywać starty w pobliżu i informacje o odpowiednich miejscach startu."
+          }
+        },
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "O Space Launch Now usa sua localização para mostrar lançamentos perto de você e informações relevantes sobre o local de lançamento."
+          }
+        },
+        "uk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Space Launch Now використовує твоє місцеперебування, щоб показувати запуски поблизу та інформацію про відповідні місця запуску."
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Space Launch Now 使用你的位置来显示你附近的发射和相关发射场信息。"
           }
         }
       }
@@ -17,10 +77,70 @@
       "comment" : "App Tracking Transparency prompt text shown by iOS",
       "extractionState" : "manual",
       "localizations" : {
+        "cs" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Díky tomu může Space Launch Now zobrazovat reklamy, které jsou pro tebe relevantnější, což pomáhá udržet aplikaci zdarma."
+          }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "So kann Space Launch Now Werbung zeigen, die besser zu dir passt. Das hilft, die App kostenlos zu halten."
+          }
+        },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "This lets Space Launch Now show ads that are more relevant to you, which helps keep the app free."
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Esto permite que Space Launch Now muestre anuncios más relevantes para ti, lo que ayuda a mantener la app gratuita."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Cela permet à Space Launch Now d'afficher des pubs plus pertinentes pour toi, ce qui aide à garder l'application gratuite."
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Questo permette a Space Launch Now di mostrarti annunci più pertinenti, il che aiuta a mantenere gratuita l'app."
+          }
+        },
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Hiermee kan Space Launch Now advertenties tonen die beter bij je passen, zodat de app gratis blijft."
+          }
+        },
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Dzięki temu Space Launch Now może pokazywać reklamy lepiej dopasowane do Ciebie, co pomaga utrzymać aplikację za darmo."
+          }
+        },
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Isso permite que o Space Launch Now mostre anúncios mais relevantes para você, o que ajuda a manter o app gratuito."
+          }
+        },
+        "uk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Це дає змогу Space Launch Now показувати рекламу, яка більше стосується тебе, і допомагає залишати застосунок безкоштовним."
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "这能让 Space Launch Now 向你展示更相关的广告，帮助应用保持免费。"
           }
         }
       }
