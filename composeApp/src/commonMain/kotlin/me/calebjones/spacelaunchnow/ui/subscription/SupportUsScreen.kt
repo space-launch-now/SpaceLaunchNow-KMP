@@ -51,6 +51,7 @@ import androidx.compose.material3.TextButton
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import me.calebjones.spacelaunchnow.ui.components.PlatformBackHandler
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
@@ -184,6 +185,14 @@ fun SupportUsScreen(
         viewModel.trackPaywallViewed(source)
     }
 
+    // Dismiss: any exit (top-bar arrow or system back) without a subscription, once per presentation.
+    val dismissTracker = remember(source) { PaywallDismissTracker(viewModel, source) }
+    val leave = {
+        dismissTracker.dismiss()
+        onNavigateBack()
+    }
+    PlatformBackHandler { leave() }
+
     // Determine user status for different upgrade flows
     val subscriptionRepo = koinInject<SubscriptionRepository>()
     val fullSubscriptionState by subscriptionRepo.state.collectAsState()
@@ -211,7 +220,7 @@ fun SupportUsScreen(
 //                    )
                 },
                 navigationIcon = {
-                    IconButton(onClick = onNavigateBack) {
+                    IconButton(onClick = leave) {
                         Icon(
                             imageVector = Icons.AutoMirrored.Filled.ArrowBack,
                             contentDescription = stringResource(Res.string.common_back)
