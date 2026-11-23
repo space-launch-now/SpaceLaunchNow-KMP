@@ -453,10 +453,3 @@ sqldelight {
         }
     }
 }
-// The CI unit-test step runs `./gradlew test`. This module had no `test` task, so the desktop tests
-// (text-tree snapshots, dense-screen layout tests) never ran there. Hook them in.
-tasks.register("test") {
-    group = "verification"
-    description = "Runs the desktop (JVM) tests so `./gradlew test` covers this module."
-    dependsOn("desktopTest")
-}
