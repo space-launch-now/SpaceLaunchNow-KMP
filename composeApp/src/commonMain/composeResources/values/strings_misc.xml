@@ -141,75 +141,75 @@
     <!-- Placeholder in the search field on the News tab. One line. -->
     <string name="app_newsevents_search_placeholder_news">Search news articles...</string>
     <!-- Bold title of the Roadmap error block, above the error message. One line. -->
-    <string name="app_roadmap_error_title">Oops!</string>
+    <string name="app_roadmap_error_title" translatable="false">Oops!</string>
     <!-- Small line above the roadmap items. %1$s is the update date text such as February 2026. One line. -->
-    <string name="app_roadmap_last_updated">Last updated: %1$s</string>
+    <string name="app_roadmap_last_updated" translatable="false">Last updated: %1$s</string>
     <!-- Message under the loading spinner on the Roadmap screen. One line. -->
-    <string name="app_roadmap_loading">Loading roadmap...</string>
+    <string name="app_roadmap_loading" translatable="false">Loading roadmap...</string>
     <!-- Description of fallback roadmap card 1. One to three lines. -->
-    <string name="app_roadmap_placeholder_item1_description">Customizable schedule page with advanced sorting options</string>
+    <string name="app_roadmap_placeholder_item1_description" translatable="false">Customizable schedule page with advanced sorting options</string>
     <!-- Bold title of fallback roadmap card 1, shown when the remote roadmap is empty or fails. One or two lines. -->
-    <string name="app_roadmap_placeholder_item1_title">Schedule page Sorting</string>
+    <string name="app_roadmap_placeholder_item1_title" translatable="false">Schedule page Sorting</string>
     <!-- Description of fallback roadmap card 2. One to three lines. -->
-    <string name="app_roadmap_placeholder_item2_description">New pages with additional content</string>
+    <string name="app_roadmap_placeholder_item2_description" translatable="false">New pages with additional content</string>
     <!-- Bold title of fallback roadmap card 2, shown when the remote roadmap is empty or fails. One or two lines. -->
-    <string name="app_roadmap_placeholder_item2_title">Starship | Rockets | Agencies | ISS Tracking</string>
+    <string name="app_roadmap_placeholder_item2_title" translatable="false">Starship | Rockets | Agencies | ISS Tracking</string>
     <!-- Description of fallback roadmap card 3. One to three lines. -->
-    <string name="app_roadmap_placeholder_item3_description">Users receiving notifications for locations they did not select</string>
+    <string name="app_roadmap_placeholder_item3_description" translatable="false">Users receiving notifications for locations they did not select</string>
     <!-- Bold title of fallback roadmap card 3, shown when the remote roadmap is empty or fails. One or two lines. -->
-    <string name="app_roadmap_placeholder_item3_title">Notification Filter Issues</string>
+    <string name="app_roadmap_placeholder_item3_title" translatable="false">Notification Filter Issues</string>
     <!-- Description of fallback roadmap card 4. One to three lines. -->
-    <string name="app_roadmap_placeholder_item4_description">MVP release of the all new Space Launch Now app for iOS devices</string>
+    <string name="app_roadmap_placeholder_item4_description" translatable="false">MVP release of the all new Space Launch Now app for iOS devices</string>
     <!-- Bold title of fallback roadmap card 4, shown when the remote roadmap is empty or fails. One or two lines. -->
-    <string name="app_roadmap_placeholder_item4_title">Initial iOS Launch</string>
+    <string name="app_roadmap_placeholder_item4_title" translatable="false">Initial iOS Launch</string>
     <!-- Description of fallback roadmap card 5. One to three lines. -->
-    <string name="app_roadmap_placeholder_item5_description">Profiles for astronauts with mission history and biographies</string>
+    <string name="app_roadmap_placeholder_item5_description" translatable="false">Profiles for astronauts with mission history and biographies</string>
     <!-- Bold title of fallback roadmap card 5, shown when the remote roadmap is empty or fails. One or two lines. -->
-    <string name="app_roadmap_placeholder_item5_title">Astronauts Profiles</string>
+    <string name="app_roadmap_placeholder_item5_title" translatable="false">Astronauts Profiles</string>
     <!-- Description of fallback roadmap card 6. One to three lines. -->
-    <string name="app_roadmap_placeholder_item6_description">Detailed pages for launch vehicles with specifications and images</string>
+    <string name="app_roadmap_placeholder_item6_description" translatable="false">Detailed pages for launch vehicles with specifications and images</string>
     <!-- Bold title of fallback roadmap card 6, shown when the remote roadmap is empty or fails. One or two lines. -->
-    <string name="app_roadmap_placeholder_item6_title">Launch Vehicles Page</string>
+    <string name="app_roadmap_placeholder_item6_title" translatable="false">Launch Vehicles Page</string>
     <!-- Description of fallback roadmap card 7. One to three lines. -->
-    <string name="app_roadmap_placeholder_item7_description">More home screen widgets with customizable themes</string>
+    <string name="app_roadmap_placeholder_item7_description" translatable="false">More home screen widgets with customizable themes</string>
     <!-- Bold title of fallback roadmap card 7, shown when the remote roadmap is empty or fails. One or two lines. -->
-    <string name="app_roadmap_placeholder_item7_title">Additional Widgets</string>
+    <string name="app_roadmap_placeholder_item7_title" translatable="false">Additional Widgets</string>
     <!-- Update date of the fallback roadmap, used in the Last updated line. Small text, one line. -->
-    <string name="app_roadmap_placeholder_last_updated">February 2026</string>
+    <string name="app_roadmap_placeholder_last_updated" translatable="false">February 2026</string>
     <!-- Header message of the fallback roadmap in a highlighted card. Two to four lines. -->
-    <string name="app_roadmap_placeholder_message">This roadmap represents planned features and is subject to change based on user feedback and priorities.</string>
+    <string name="app_roadmap_placeholder_message" translatable="false">This roadmap represents planned features and is subject to change based on user feedback and priorities.</string>
     <!-- Quarter or date label (Early 2026) in the footer of a fallback roadmap card. Small text, one line. -->
-    <string name="app_roadmap_placeholder_quarter_early_2026">Early 2026</string>
+    <string name="app_roadmap_placeholder_quarter_early_2026" translatable="false">Early 2026</string>
     <!-- Quarter or date label (Early December 2025) in the footer of a fallback roadmap card. Small text, one line. -->
-    <string name="app_roadmap_placeholder_quarter_early_dec_2025">Early December 2025</string>
+    <string name="app_roadmap_placeholder_quarter_early_dec_2025" translatable="false">Early December 2025</string>
     <!-- Quarter or date label (February 2026) in the footer of a fallback roadmap card. Small text, one line. -->
-    <string name="app_roadmap_placeholder_quarter_feb_2026">February 2026</string>
+    <string name="app_roadmap_placeholder_quarter_feb_2026" translatable="false">February 2026</string>
     <!-- Quarter or date label (Q1 2026) in the footer of a fallback roadmap card. Small text, one line. -->
-    <string name="app_roadmap_placeholder_quarter_q1_2026">Q1 2026</string>
+    <string name="app_roadmap_placeholder_quarter_q1_2026" translatable="false">Q1 2026</string>
     <!-- Content description of the open icon in the fullscreen video header, opens the video in another app. Read by screen readers. -->
     <string name="app_video_fullscreen_external_description">Open in external app</string>
     <!-- Label in the fullscreen video controls. %1$d is the position of the selected video, %2$d the number of videos. One line. -->
     <string name="app_video_fullscreen_position">Video %1$d of %2$d</string>
     <!-- Status badge on a roadmap item, and the description of its status icon. One or two words. -->
-    <string name="app_roadmap_status_completed">Completed</string>
+    <string name="app_roadmap_status_completed" translatable="false">Completed</string>
     <!-- Status badge on a roadmap item, and the description of its status icon. One or two words. -->
-    <string name="app_roadmap_status_in_testing">In Testing</string>
+    <string name="app_roadmap_status_in_testing" translatable="false">In Testing</string>
     <!-- Status badge on a roadmap item, and the description of its status icon. One or two words. -->
-    <string name="app_roadmap_status_in_progress">In Progress</string>
+    <string name="app_roadmap_status_in_progress" translatable="false">In Progress</string>
     <!-- Status badge on a roadmap item, and the description of its status icon. One or two words. -->
-    <string name="app_roadmap_status_planned">Planned</string>
+    <string name="app_roadmap_status_planned" translatable="false">Planned</string>
     <!-- Status badge on a roadmap item, and the description of its status icon. One or two words. -->
-    <string name="app_roadmap_status_backlog">Backlog</string>
+    <string name="app_roadmap_status_backlog" translatable="false">Backlog</string>
     <!-- Category label on a roadmap item. One or two words. -->
-    <string name="app_roadmap_category_feature">Feature</string>
+    <string name="app_roadmap_category_feature" translatable="false">Feature</string>
     <!-- Category label on a roadmap item. One or two words. -->
-    <string name="app_roadmap_category_enhancement">Enhancement</string>
+    <string name="app_roadmap_category_enhancement" translatable="false">Enhancement</string>
     <!-- Category label on a roadmap item. One or two words. -->
-    <string name="app_roadmap_category_bug_fix">Bug Fix</string>
+    <string name="app_roadmap_category_bug_fix" translatable="false">Bug Fix</string>
     <!-- Category label on a roadmap item. One or two words. -->
-    <string name="app_roadmap_category_infrastructure">Infrastructure</string>
+    <string name="app_roadmap_category_infrastructure" translatable="false">Infrastructure</string>
     <!-- Category label on a roadmap item. One or two words. -->
-    <string name="app_roadmap_category_design">Design</string>
+    <string name="app_roadmap_category_design" translatable="false">Design</string>
     <!-- Description of the loading text on the start-up screen. Read by screen readers. -->
     <string name="preload_loading_description">Loading launch data</string>
 </resources>
