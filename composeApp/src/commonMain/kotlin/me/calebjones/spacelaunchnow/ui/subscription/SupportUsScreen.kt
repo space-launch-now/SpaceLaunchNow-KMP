@@ -185,13 +185,15 @@ fun SupportUsScreen(
         viewModel.trackPaywallViewed(source)
     }
 
-    // Dismiss: any exit (top-bar arrow or system back) without a subscription, once per presentation.
+    // Dismiss: any exit (top-bar arrow, system back, iOS swipe-back, desktop window close)
+    // without a subscription, once per presentation.
     val dismissTracker = remember(source) { PaywallDismissTracker(viewModel, source) }
     val leave = {
         dismissTracker.dismiss()
         onNavigateBack()
     }
     PlatformBackHandler { leave() }
+    DismissOnLeaveComposition(dismissTracker)
 
     // Determine user status for different upgrade flows
     val subscriptionRepo = koinInject<SubscriptionRepository>()
