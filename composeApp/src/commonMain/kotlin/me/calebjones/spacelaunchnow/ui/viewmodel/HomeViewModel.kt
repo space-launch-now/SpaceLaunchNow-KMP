@@ -32,6 +32,7 @@ import kotlin.time.Clock.System
 import kotlin.time.Duration.Companion.days
 import kotlin.time.Duration.Companion.hours
 import kotlin.time.ExperimentalTime
+import me.calebjones.spacelaunchnow.util.toUserMessage
 
 // ViewState is now in ViewState.kt - imported from same package
 
@@ -245,7 +246,7 @@ class HomeViewModel(
                     }
                 }.onFailure { exception ->
                     log.e(exception) { "Repository failure: ${exception.message}" }
-                    val errorMsg = formatErrorMessage(exception)
+                    val errorMsg = exception.toUserMessage()
 
                     _featuredLaunchState.update {
                         it.copy(
@@ -260,7 +261,7 @@ class HomeViewModel(
 
                 _featuredLaunchState.update {
                     it.copy(
-                        error = exception.message ?: "Unknown error",
+                        error = exception.toUserMessage(),
                         isLoading = false
                     )
                 }
@@ -313,10 +314,10 @@ class HomeViewModel(
                         )
                     }
                 }.onFailure { exception ->
-                    log.e(exception) { "Failed to load in-flight launches: ${exception.message}" }
+                    log.e(exception) { exception.toUserMessage() }
                     _inFlightLaunchState.update {
                         it.copy(
-                            error = formatErrorMessage(exception),
+                            error = exception.toUserMessage(),
                             isLoading = false
                         )
                     }
@@ -325,7 +326,7 @@ class HomeViewModel(
                 log.e(exception) { "Exception in loadInFlightLaunch: ${exception.message}" }
                 _inFlightLaunchState.update {
                     it.copy(
-                        error = exception.message ?: "Unknown error",
+                        error = exception.toUserMessage(),
                         isLoading = false
                     )
                 }
@@ -388,7 +389,7 @@ class HomeViewModel(
                 }.onFailure { exception ->
                     _upcomingLaunchesState.update {
                         it.copy(
-                            error = formatErrorMessage(exception),
+                            error = exception.toUserMessage(),
                             isLoading = false
                         )
                     }
@@ -407,7 +408,7 @@ class HomeViewModel(
                 }.onFailure { exception ->
                     _previousLaunchesState.update {
                         it.copy(
-                            error = formatErrorMessage(exception),
+                            error = exception.toUserMessage(),
                             isLoading = false
                         )
                     }
@@ -415,13 +416,13 @@ class HomeViewModel(
             } catch (exception: Exception) {
                 _upcomingLaunchesState.update {
                     it.copy(
-                        error = exception.message ?: "Unknown error",
+                        error = exception.toUserMessage(),
                         isLoading = false
                     )
                 }
                 _previousLaunchesState.update {
                     it.copy(
-                        error = exception.message ?: "Unknown error",
+                        error = exception.toUserMessage(),
                         isLoading = false
                     )
                 }
@@ -458,7 +459,7 @@ class HomeViewModel(
                 }.onFailure { exception ->
                     _updatesState.update {
                         it.copy(
-                            error = formatErrorMessage(exception),
+                            error = exception.toUserMessage(),
                             isLoading = false
                         )
                     }
@@ -466,7 +467,7 @@ class HomeViewModel(
             } catch (exception: Exception) {
                 _updatesState.update {
                     it.copy(
-                        error = exception.message ?: "Unknown error",
+                        error = exception.toUserMessage(),
                         isLoading = false
                     )
                 }
@@ -503,7 +504,7 @@ class HomeViewModel(
                 }.onFailure { exception ->
                     _articlesState.update {
                         it.copy(
-                            error = formatErrorMessage(exception),
+                            error = exception.toUserMessage(),
                             isLoading = false
                         )
                     }
@@ -511,7 +512,7 @@ class HomeViewModel(
             } catch (exception: Exception) {
                 _articlesState.update {
                     it.copy(
-                        error = exception.message ?: "Unknown error",
+                        error = exception.toUserMessage(),
                         isLoading = false
                     )
                 }
@@ -548,7 +549,7 @@ class HomeViewModel(
                 }.onFailure { exception ->
                     _eventsState.update {
                         it.copy(
-                            error = formatErrorMessage(exception),
+                            error = exception.toUserMessage(),
                             isLoading = false
                         )
                     }
@@ -556,7 +557,7 @@ class HomeViewModel(
             } catch (exception: Exception) {
                 _eventsState.update {
                     it.copy(
-                        error = exception.message ?: "Unknown error",
+                        error = exception.toUserMessage(),
                         isLoading = false
                     )
                 }
@@ -646,7 +647,7 @@ class HomeViewModel(
                     // Keep existing data, just show error
                     _historyState.update {
                         it.copy(
-                            error = formatErrorMessage(exception),
+                            error = exception.toUserMessage(),
                             isLoading = false
                         )
                     }
@@ -654,7 +655,7 @@ class HomeViewModel(
             } catch (exception: Exception) {
                 _historyState.update {
                     it.copy(
-                        error = exception.message ?: "Unknown error",
+                        error = exception.toUserMessage(),
                         isLoading = false
                     )
                 }
@@ -775,18 +776,4 @@ class HomeViewModel(
         }
     }
 
-    /**
-     * Formats error messages consistently
-     */
-    private fun formatErrorMessage(exception: Throwable): String {
-        return when {
-            exception.message?.contains("throttled") == true ->
-                "API rate limit exceeded. Please try again later."
-
-            exception.message?.contains("API Error") == true ->
-                exception.message!!.substringAfter("API Error: ")
-
-            else -> exception.message ?: "Unknown error occurred"
-        }
-    }
 }

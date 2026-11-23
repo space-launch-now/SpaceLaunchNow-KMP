@@ -14,6 +14,7 @@ import me.calebjones.spacelaunchnow.data.repository.ArticlesRepository
 import me.calebjones.spacelaunchnow.data.repository.UpdatesRepository
 import me.calebjones.spacelaunchnow.domain.model.Update
 import me.calebjones.spacelaunchnow.util.logging.logger
+import me.calebjones.spacelaunchnow.util.toUserMessage
 
 /**
  * Manages news and updates feed data for the home screen:
@@ -80,7 +81,7 @@ class FeedViewModel(
                 }.onFailure { exception ->
                     _updatesState.update {
                         it.copy(
-                            error = formatErrorMessage(exception),
+                            error = exception.toUserMessage(),
                             isLoading = false
                         )
                     }
@@ -88,7 +89,7 @@ class FeedViewModel(
             } catch (exception: Exception) {
                 _updatesState.update {
                     it.copy(
-                        error = exception.message ?: "Unknown error",
+                        error = exception.toUserMessage(),
                         isLoading = false
                     )
                 }
@@ -125,7 +126,7 @@ class FeedViewModel(
                 }.onFailure { exception ->
                     _articlesState.update {
                         it.copy(
-                            error = formatErrorMessage(exception),
+                            error = exception.toUserMessage(),
                             isLoading = false
                         )
                     }
@@ -133,7 +134,7 @@ class FeedViewModel(
             } catch (exception: Exception) {
                 _articlesState.update {
                     it.copy(
-                        error = exception.message ?: "Unknown error",
+                        error = exception.toUserMessage(),
                         isLoading = false
                     )
                 }
@@ -151,20 +152,4 @@ class FeedViewModel(
         }
     }
 
-    // ========== Private Helper Methods ==========
-
-    /**
-     * Formats error messages consistently
-     */
-    private fun formatErrorMessage(exception: Throwable): String {
-        return when {
-            exception.message?.contains("throttled") == true ->
-                "API rate limit exceeded. Please try again later."
-
-            exception.message?.contains("API Error") == true ->
-                exception.message!!.substringAfter("API Error: ")
-
-            else -> exception.message ?: "Unknown error occurred"
-        }
-    }
 }

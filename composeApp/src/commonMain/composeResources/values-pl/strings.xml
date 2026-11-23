@@ -178,4 +178,9 @@
     <string name="about_tsd_description">The Space Devs to sojusz programistów i bibliotekarzy pasjonujących się lotami kosmicznymi, połączonych wspólnym celem: zapewnić bezpłatny dostęp do danych o lotach kosmicznych. Nasze API REST obejmują cały świat lotów kosmicznych — od startów rakiet po wydarzenia i wiadomości.\n\nJako twórca Space Launch Now jestem członkiem zarządu i dumnym zwolennikiem The Space Devs!</string>
     <string name="about_tsd_link">Odwiedź The Space Devs</string>
     <string name="about_libraries_heading">Biblioteki open source</string>
+    <string name="common_error_no_connection">Brak połączenia z internetem. Sprawdź sieć i spróbuj ponownie.</string>
+    <string name="common_error_timeout">Żądanie trwało zbyt długo. Spróbuj ponownie.</string>
+    <string name="common_error_rate_limit">Zbyt wiele żądań. Poczekaj chwilę i spróbuj ponownie.</string>
+    <string name="common_error_server">Serwer napotkał problem. Spróbuj ponownie później.</string>
+    <string name="common_error_not_found">Nie udało się tego znaleźć.</string>
 </resources>

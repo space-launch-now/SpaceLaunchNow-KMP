@@ -34,6 +34,7 @@ import me.calebjones.spacelaunchnow.domain.model.VehicleConfig
 import me.calebjones.spacelaunchnow.domain.model.VideoLink
 import me.calebjones.spacelaunchnow.ui.state.VideoPlayerState
 import me.calebjones.spacelaunchnow.util.StarshipConstants
+import me.calebjones.spacelaunchnow.util.toUserMessage
 
 /**
  * Vehicle type selector for the Vehicles tab
@@ -335,7 +336,7 @@ class StarshipViewModel(
             }
             .onFailure { exception ->
                 _programState.update {
-                    it.copy(error = formatErrorMessage(exception), isLoading = false)
+                    it.copy(error = exception.toUserMessage(), isLoading = false)
                 }
             }
     }
@@ -365,7 +366,7 @@ class StarshipViewModel(
             }
             .onFailure { exception ->
                 _nextLaunchState.update {
-                    it.copy(error = formatErrorMessage(exception), isLoading = false)
+                    it.copy(error = exception.toUserMessage(), isLoading = false)
                 }
             }
     }
@@ -395,7 +396,7 @@ class StarshipViewModel(
             }
             .onFailure { exception ->
                 _historyLaunchesState.update {
-                    it.copy(error = formatErrorMessage(exception), isLoading = false)
+                    it.copy(error = exception.toUserMessage(), isLoading = false)
                 }
             }
     }
@@ -426,7 +427,7 @@ class StarshipViewModel(
             }
             .onFailure { exception ->
                 _updatesState.update {
-                    it.copy(error = formatErrorMessage(exception), isLoading = false)
+                    it.copy(error = exception.toUserMessage(), isLoading = false)
                 }
             }
     }
@@ -460,7 +461,7 @@ class StarshipViewModel(
             .onFailure { exception ->
                 println("[STARSHIP] Events load failed: ${exception.message}")
                 _eventsState.update {
-                    it.copy(error = formatErrorMessage(exception), isLoading = false)
+                    it.copy(error = exception.toUserMessage(), isLoading = false)
                 }
             }
     }
@@ -487,7 +488,7 @@ class StarshipViewModel(
             .onFailure { exception ->
                 println("[STARSHIP] News load failed: ${exception.message}")
                 _newsState.update {
-                    it.copy(error = formatErrorMessage(exception), isLoading = false)
+                    it.copy(error = exception.toUserMessage(), isLoading = false)
                 }
             }
     }
@@ -519,7 +520,7 @@ class StarshipViewModel(
             .onFailure { exception ->
                 println("[STARSHIP] Launcher configs load failed: ${exception.message}")
                 _launcherConfigsState.update {
-                    it.copy(error = formatErrorMessage(exception), isLoading = false)
+                    it.copy(error = exception.toUserMessage(), isLoading = false)
                 }
             }
     }
@@ -555,7 +556,7 @@ class StarshipViewModel(
             .onFailure { exception ->
                 println("[STARSHIP] Spacecraft configs load failed: ${exception.message}")
                 _spacecraftConfigsState.update {
-                    it.copy(error = formatErrorMessage(exception), isLoading = false)
+                    it.copy(error = exception.toUserMessage(), isLoading = false)
                 }
             }
     }
@@ -613,7 +614,7 @@ class StarshipViewModel(
             .onFailure { exception ->
                 println("[STARSHIP] Spacecraft load failed: ${exception.message}")
                 _spacecraftState.update {
-                    it.copy(error = formatErrorMessage(exception), isLoading = false)
+                    it.copy(error = exception.toUserMessage(), isLoading = false)
                 }
             }
     }
@@ -671,7 +672,7 @@ class StarshipViewModel(
             .onFailure { exception ->
                 println("[STARSHIP] Launchers load failed: ${exception.message}")
                 _launchersState.update {
-                    it.copy(error = formatErrorMessage(exception), isLoading = false)
+                    it.copy(error = exception.toUserMessage(), isLoading = false)
                 }
             }
     }
@@ -793,9 +794,6 @@ class StarshipViewModel(
 
     // ========== Utilities ==========
 
-    private fun formatErrorMessage(exception: Throwable): String {
-        return exception.message ?: "An unknown error occurred"
-    }
 }
 
 /**
