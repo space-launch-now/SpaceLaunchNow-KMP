@@ -1,41 +1,39 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="home_articles_error">文章加载失败</string>
-    <string name="home_cached_data_notice">显示的是缓存数据</string>
-    <string name="home_events_error">活动加载失败</string>
-    <string name="home_events_title">即将举行的活动</string>
-    <string name="home_featured_view_more">查看更多</string>
-    <string name="home_history_empty">历史上的今天没有发射</string>
-    <string name="home_history_error">历史发射加载失败</string>
-    <string name="home_history_title">历史上的今天</string>
-    <string name="home_last_launch_title">上次发射</string>
-    <string name="home_launch_image_description">发射图片</string>
-    <string name="home_launch_image_for_title_description">%1$s 的发射图片</string>
-    <string name="home_launches_error">发射加载失败</string>
-    <string name="home_live_launch_description">飞行中的发射：%1$s。状态：%2$s。点按查看详情。</string>
-    <string name="home_next_up_error_title">API 请求错误</string>
-    <string name="home_pinned_badge">精选</string>
-    <string name="home_pinned_dismiss_featured">关闭精选发射</string>
-    <string name="home_pinned_dismiss_message">关闭消息</string>
-    <string name="home_pinned_featured_description">精选：%1$s。%2$s。点按查看详情。</string>
-    <string name="home_pinned_featured_launch_description">精选发射：%1$s。%2$s。点按查看详情。</string>
-    <string name="home_pinned_motd_description">每日消息：%1$s</string>
-    <string name="home_placeholder_content">内容</string>
-    <string name="home_section_info_description">关于%1$s的信息</string>
-    <string name="home_section_see_all">查看全部</string>
-    <string name="home_stats_next_24_hours">未来 24 小时</string>
-    <string name="home_stats_next_30_days">未来 30 天</string>
-    <string name="home_stats_next_7_days">未来 7 天</string>
-    <string name="home_stats_title">快速统计</string>
-    <string name="home_top_bar_support_description">支持我</string>
-    <string name="home_updates_author_profile_description">作者头像</string>
-    <string name="home_updates_error">动态加载失败</string>
-    <string name="home_updates_info_body">动态来自 The Space Devs 的志愿资料管理员，他们使用开源情报（OSINT）技术追踪全球发射。他们会关注机构公告、监管文件和社交媒体，让数据库保持准确和最新。
-
-作为 Space Launch Now 的开发者，我是 The Space Devs 的创始董事会成员，也是它的骄傲支持者！</string>
-    <string name="home_updates_info_confirm">知道了</string>
-    <string name="home_updates_info_title">关于最新动态</string>
-    <string name="home_updates_profile_placeholder_description">头像占位图</string>
-    <string name="home_updates_source_description">来源</string>
-    <string name="home_updates_title">最新动态</string>
+    <!-- Error message in the Latest News section when the articles fail to load. One or two lines. -->
+    <!-- Banner above a home list when the data shown comes from the cache. One line, small text. -->
+    <!-- Error message in the Upcoming Events section when events fail to load. One or two lines. -->
+    <!-- Section heading on the home screen. One line, bold. -->
+    <!-- Button under the featured launches row. Opens the full launch list. One line, max 14 chars. -->
+    <!-- Message in the This Day in History section when no launch happened on this date. One line. -->
+    <!-- Error message in the This Day in History section when launches fail to load. One or two lines. -->
+    <!-- Heading of the This Day in History section, label of its quick stats tile and icon description. One line. -->
+    <!-- Heading of the last launch card, and content description of its check icon. One line. -->
+    <!-- Content description of a launch image on the home screen. Read by screen readers. -->
+    <!-- Content description of a launch image on a card. %1$s is the launch title. Read by screen readers. -->
+    <!-- Error message in the home launch list when launches fail to load. One or two lines. -->
+    <!-- Content description of the live launch card. %1$s is the launch title, %2$s the status name. Read by screen readers. -->
+    <!-- Heading of the error card shown when the next launch fails to load. One line. -->
+    <!-- Badge on the featured launch card. Upper case, one word, small label. -->
+    <!-- Content description of the close icon on the featured launch card. Read by screen readers. -->
+    <!-- Content description of the close icon on the message of the day banner. Read by screen readers. -->
+    <!-- Content description of the featured card. %1$s is the title, %2$s the custom message (may be empty). Read by screen readers. -->
+    <!-- Content description of the featured launch card in previews. %1$s is the launch title, %2$s the custom message (may be empty). Read by screen readers. -->
+    <!-- Content description of the message of the day banner. %1$s is the message. Read by screen readers. -->
+    <!-- Grey placeholder text in an empty content box. One word. -->
+    <!-- Content description of the info button in a section heading. %1$s is the section title. Read by screen readers. -->
+    <!-- Text button at the end of a home section heading. Opens the full list. One line, max 14 chars. -->
+    <!-- Label of a quick stats tile. Number of launches in the next 24 hours. One line. -->
+    <!-- Label of a quick stats tile. Number of launches in the next 30 days. One line. -->
+    <!-- Label of a quick stats tile. Number of launches in the next 7 days. One line. -->
+    <!-- Heading above the quick stats tiles. One line, bold. -->
+    <!-- Content description of the heart icon button in the home top bar. Opens the support screen. Read by screen readers. -->
+    <!-- Content description of the profile picture of a launch update author. Read by screen readers. -->
+    <!-- Error message in the Latest Updates section when updates fail to load. One or two lines. -->
+    <!-- Body of the Latest Updates info dialog. Two paragraphs with a blank line between them. -->
+    <!-- Confirm button of the Latest Updates info dialog. One line, max 14 chars. -->
+    <!-- Title of the dialog that explains where launch updates come from. One line. -->
+    <!-- Content description of the person icon shown when an update author has no picture. Read by screen readers. -->
+    <!-- Content description of the info icon that marks the source of an update. Read by screen readers. -->
+    <!-- Section heading on the home screen. One line, bold. -->
 </resources>

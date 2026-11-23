@@ -1,0 +1,100 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- Premium feature description. One sentence under the locked-feature heading. -->
+    <!-- Premium feature description. One sentence under the locked-feature heading. -->
+    <!-- Premium feature description. One sentence under the locked-feature heading. -->
+    <!-- Premium feature description. One sentence under the locked-feature heading. -->
+    <!-- Premium feature description. One sentence under the locked-feature heading. -->
+    <!-- Premium feature description. One sentence under the locked-feature heading. -->
+    <!-- Premium feature description. One sentence under the locked-feature heading. -->
+    <!-- Premium feature name in a list of benefits. Short, one line. -->
+    <!-- Premium feature name in a list of benefits. Short, one line. -->
+    <!-- Premium feature name in a list of benefits. Short, one line. -->
+    <!-- Premium feature name in a list of benefits. Short, one line. -->
+    <!-- Text under the card title when the caller gives none. One or two lines. -->
+    <!-- Status line with a clock icon. %1$s is the time left, such as 23h 45m. -->
+    <!-- Button label while a rewarded ad loads. One line, max 20 chars. -->
+    <!-- Button. Watching an ad adds 24 hours to the premium access that is active. One line. -->
+    <!-- Button. Watching an ad gives 24 hours of premium access. One line. -->
+    <!-- Time left. %1$d is hours, %2$d is minutes. Example: 2h 15m. Keep it short. -->
+    <!-- Time left. %1$d is hours. Example: 2h. Keep it short. -->
+    <!-- Time left. %1$d is minutes. Example: 45m. Keep it short. -->
+    <!-- Time left when under one minute. Short. -->
+    <!-- Time left when there is no expiry date. Short. -->
+    <!-- Small note under the plan cards while the store prices load. Starts with an emoji. One line. -->
+    <!-- Heading above the perk cards for a legacy supporter, and heading of the legacy banner. One line, large. -->
+    <!-- Heading above the perk cards for a monthly or yearly member. One line, large. -->
+    <!-- Perk card title and active perk title. Widget is the home screen widget. One line. -->
+    <!-- Perk card text on iOS. One or two lines. -->
+    <!-- Perk card text on Android. One or two lines. -->
+    <!-- Perk card title and active perk title. One line. -->
+    <!-- Perk card text. One or two lines. -->
+    <!-- Perk card title and active perk title. One line. -->
+    <!-- Perk card text. Two lines. -->
+    <!-- Perk card title. One line. -->
+    <!-- Perk card text. Two lines. -->
+    <!-- Heading above the plan cards for a member who can still upgrade. One line. -->
+    <!-- Heading above the plan cards for a new user. One line. -->
+    <!-- Plan card title for the yearly plan. One word. -->
+    <!-- Plan card title for the monthly plan. One word. -->
+    <!-- Shown right after the price, for a yearly plan. Short, keeps the slash. -->
+    <!-- Shown right after the price, for a monthly plan. Short, keeps the slash. -->
+    <!-- Divider text between the plan cards and the lifetime card. Two spaces on each side (written as \u0020) keep it away from the lines. Keep the spaces. -->
+    <!-- Text button under the plans. For a person who is not a member yet. One line. -->
+    <!-- Text button under the plans. For a person who is a member. One line. -->
+    <!-- Header of the Support Us screen for a member. One line, large. -->
+    <!-- Line under the header for a member. %1$s is the plan type in lower case, such as premium or lifetime. -->
+    <!-- Header of the Support Us screen for a person who is not a member. One line, large. -->
+    <!-- Line under the header for a person who is not a member. One or two lines. -->
+    <!-- Button on a plan card with no free trial. One line. -->
+    <!-- Badge on the recommended plan. Capital letters. Short. -->
+    <!-- Badge on a plan with a free trial. %1$s is the length, such as 3-day. -->
+    <!-- Line under the trial badge. %1$s is the price, %2$s is the period such as /year. -->
+    <!-- Heading of the thank-you card for a member. One line. -->
+    <!-- Text on the thank-you card for a legacy supporter. Two or three lines. -->
+    <!-- Text on the thank-you card for a member. %1$s is the plan type in lower case, such as premium. -->
+    <!-- Heading above the list of benefits of a legacy supporter. One line, ends with a colon. -->
+    <!-- Heading above the list of benefits of a member. One line, ends with a colon. -->
+    <!-- Active perk text on iOS. One line. -->
+    <!-- Active perk text on Android. One line. -->
+    <!-- Active perk text. One line. -->
+    <!-- Active perk text. ICS is the calendar file format. One line. -->
+    <!-- Active perk title. One line. -->
+    <!-- Active perk text. One short line. -->
+    <!-- Active perk text. One line. -->
+    <!-- Small label above the user id. One line. -->
+    <!-- Shown in place of the user id when the store gives none. One line. -->
+    <!-- Content description of the copy icon next to the user id. Read by screen readers. -->
+    <!-- Title of the help card. A question. One line. -->
+    <!-- Text of the help card. Opens a feedback form. One line. -->
+    <!-- Content description of the open-in-browser icon on the help card. Read by screen readers. -->
+    <!-- Title of the lifetime plan card. Pro is the name of the tier. One line. -->
+    <!-- Line under the lifetime plan title. One line. -->
+    <!-- Shown right after the lifetime price. Short. -->
+    <!-- Badge on the lifetime card. Emoji on both sides. Capital letters. -->
+    <!-- Check-list line on the lifetime card. -->
+    <!-- Check-list line on the lifetime card. -->
+    <!-- Check-list line on the lifetime card. -->
+    <!-- Button on the lifetime card. One line. -->
+    <!-- Heading of the current plan card. One line. -->
+    <!-- Plan status during a free trial. Shown when the days left are not known. -->
+    <!-- Plan status during a free trial with days left. %1$d is the count of days. -->
+    <!-- Plan status for a person who is not a member. -->
+    <!-- Plan status for a subscriber. %1$s is the plan name, such as Pro or Lifetime. -->
+    <!-- Line on the current plan card. %1$s is the store product name. -->
+    <!-- Line on the current plan card for a person who is not a member. One or two lines. -->
+    <!-- Heading of the legacy banner. One line. -->
+    <!-- Text of the legacy banner. First person, from the developer. Three or four lines. -->
+    <!-- Text of the legacy banner, under the continue button. One or two lines. -->
+    <!-- Heading of the fine print on subscription screens. One line. -->
+    <!-- Billing note. %1$s is a store name, filled in from one of the next three strings (fine_print_store_*). Translate the sentence around it; the store name arrives as the form that sentence needs. -->
+    <!-- Store name on Android. Used only in fine_print_billing_note, as %1$s. Write the store name in the form that sentence needs, with its article where the language has one. -->
+    <!-- Store name on iOS. Used only in fine_print_billing_note, as %1$s, where it reads after "through". Write the store name in the form that sentence needs, with its article where the language has one (English: "the App Store"). -->
+    <!-- Store name on other platforms, such as desktop. Used only in fine_print_billing_note, as %1$s. Write the store name in the form that sentence needs, with its article where the language has one. -->
+    <!-- Free trial disclosure required by store policy. %1$s is the price after the trial, such as $9.99/year. %2$s is the trial length, such as 3-day. -->
+    <!-- Auto-renew notice under the plans. Three sentences. -->
+    <!-- Button that opens the Google Play subscriptions page. One line. -->
+    <!-- Button that opens the App Store subscriptions page. One line. -->
+    <!-- Generic button for managing subscriptions. One line. -->
+    <!-- Button under a banner ad card. Opens the screen where the user can pay to remove ads. One or two words. -->
+</resources>

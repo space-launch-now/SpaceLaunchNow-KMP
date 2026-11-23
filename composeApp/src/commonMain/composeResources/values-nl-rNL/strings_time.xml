@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- Launch time, one line. %1$s is a clock time such as 2:30 PM. Today's launches. -->
+    <!-- Launch time, one line. %1$s is a clock time such as 2:30 PM. Tomorrow's launches. -->
+    <!-- Launch time, one line. %1$s is a clock time such as 2:30 PM. Yesterday's launches. -->
+    <!-- Launch time, one line. %1$s is a weekday name (Monday to Sunday), %2$s a clock time such as 2:30 PM. -->
+    <!-- Weekday name, full form. Capitalised as at the start of a line. -->
+    <!-- Weekday name, full form. Capitalised as at the start of a line. -->
+    <!-- Weekday name, full form. Capitalised as at the start of a line. -->
+    <!-- Weekday name, full form. Capitalised as at the start of a line. -->
+    <!-- Weekday name, full form. Capitalised as at the start of a line. -->
+    <!-- Weekday name, full form. Capitalised as at the start of a line. -->
+    <!-- Weekday name, full form. Capitalised as at the start of a line. -->
+    <!-- Launch date with first-half-of-year precision. %1$s is the four-digit year. H1 = first half. Keep short. -->
+    <!-- Launch date with second-half-of-year precision. %1$s is the four-digit year. H2 = second half. Keep short. -->
+    <!-- Launch date with no earlier date than the year. %1$s is the four-digit year. NET = "no earlier than" (a term of the data field). Keep short. -->
+    <!-- Launch date with fiscal-year precision. %1$s is the four-digit year. FY = fiscal year. Keep short. -->
+    <!-- Launch date with decade precision. %1$s is the year that starts the decade. -->
+    <!-- Launch date with quarter precision. %1$d is the quarter number 1 to 4, %2$s the four-digit year. Q = quarter. Keep short. -->
+    <!-- Countdown to launch, one line. Starts the compact timer before the launch. %1$s is the time parts, e.g. 1d 06h 59m 59s. T = time of launch. -->
+    <!-- Countdown after launch, one line. Starts the compact timer after the launch. %1$s is the time parts, e.g. 1d 06h 59m 59s. T = time of launch. -->
+    <!-- Timeline event time before launch. %1$s is the time parts, e.g. 1d 14h. T = time of launch. -->
+    <!-- Timeline event time after launch. %1$s is the time parts, e.g. 2h 30m. T = time of launch. -->
+    <!-- Unit suffix for days after a number. %1$s is the number. One letter or short; keep the number first or last as the language needs. -->
+    <!-- Unit suffix for hours after a number. %1$s is the number, may start with a zero. One letter or short. -->
+    <!-- Unit suffix for minutes after a number. %1$s is the number, may start with a zero. One letter or short. -->
+    <!-- Unit suffix for seconds after a number. %1$s is the number, may start with a zero. One letter or short. -->
+    <!-- Label under the days digits of the countdown. One word, capitals, max 10 chars; the digit row is narrow. -->
+    <!-- Label under the hours digits of the countdown. One word, capitals, max 10 chars; the digit row is narrow. -->
+    <!-- Label under the minutes digits of the countdown. One word, capitals, max 10 chars; the digit row is narrow. -->
+    <!-- Label under the seconds digits of the countdown. One word, capitals, max 10 chars; the digit row is narrow. -->
+</resources>

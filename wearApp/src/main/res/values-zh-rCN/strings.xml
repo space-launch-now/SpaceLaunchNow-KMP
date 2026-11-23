@@ -1,59 +1,45 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="next_launch_complication_label">下次发射</string>
-    <string name="next_launch_tile_label">下次发射</string>
-    <string name="subscribe_prompt">在手机上订阅</string>
-    <string name="no_upcoming_launches">暂无即将进行的发射</string>
-    <string name="loading">加载中…</string>
-    <string name="open_on_phone">在手机上打开</string>
-    <string name="settings">设置</string>
-    <string name="utc_toggle">使用 UTC 时间</string>
-    <string name="premium_required">需要 Premium</string>
-    <string name="premium_gate_message">在手机上升级即可解锁 Wear OS 功能</string>
-    <string name="last_updated">上次更新 %1$s</string>
-    <string name="data_source_direct">直连 API</string>
-    <string name="data_source_phone">手机同步</string>
-    <string name="data_source_cache">已缓存</string>
-    <string name="wear_tile_details">详情</string>
-    <string name="wear_tile_open">打开</string>
-    <string name="wear_tile_upgrade_prompt">在手机上升级\n查看发射</string>
-    <string name="wear_tile_error_title">无法加载</string>
-    <string name="wear_tile_error_retry">点击重试</string>
-    <string name="wear_countdown_label_days">天</string>
-    <string name="wear_countdown_label_hours">小时</string>
-    <string name="wear_countdown_label_minutes">分</string>
-    <string name="wear_countdown_launched">已发射</string>
-    <string name="wear_countdown_days_hours">T-%1$d天 %2$d时</string>
-    <string name="wear_countdown_hours_minutes">T-%1$d时 %2$d分</string>
-    <string name="wear_countdown_minutes">T-%1$d分</string>
-    <string name="wear_countdown_zero">T-0</string>
-    <string name="wear_launches_loading">正在加载发射...</string>
-    <string name="wear_launches_title">即将进行的发射</string>
-    <string name="wear_launches_refresh_failed">刷新失败</string>
-    <string name="wear_launch_not_found">未找到该发射</string>
-    <string name="wear_premium_title">Premium 功能</string>
-    <string name="wear_premium_message">在手机上订阅即可解锁 Wear OS 功能</string>
-    <string name="wear_premium_open_app">打开应用</string>
-    <string name="wear_settings_app_name">Space Launch Now Wear</string>
-    <string name="wear_settings_version">v%1$s</string>
-    <string name="wear_settings_about">关于</string>
-    <string name="wear_settings_about_body">距离发射不到 1 小时时，发射数据每 5 分钟刷新一次，其他情况每 30 分钟刷新一次。\n\n磁贴和表盘组件都遵循你在手机上设置的筛选偏好。</string>
-    <string name="wear_complication_next_launch_description">下次发射：%1$s，%2$s后</string>
-    <string name="wear_complication_long_text">%1$s — %2$s</string>
-    <string name="wear_complication_subscribe">订阅</string>
-    <string name="wear_complication_subscribe_description">订阅即可查看发射倒计时</string>
-    <string name="wear_complication_no_launches">无发射</string>
-    <string name="wear_complication_no_launches_description">暂无即将进行的发射</string>
-    <string name="wear_complication_countdown_done">已完成</string>
-    <string name="wear_complication_countdown_now">现在</string>
-    <string name="wear_complication_countdown_short_days_hours">%1$dD %2$dH</string>
-    <string name="wear_complication_countdown_short_hours_minutes">%1$dH %2$dM</string>
-    <string name="wear_complication_countdown_short_minutes">%1$dM</string>
-    <string name="wear_complication_countdown_long_days_hours">T-%1$dD %2$dH</string>
-    <string name="wear_complication_countdown_long_hours_minutes">T-%1$dH %2$dM</string>
-    <string name="wear_complication_countdown_long_minutes">T-%1$dM</string>
-    <string name="wear_complication_countdown_long_zero">T-0</string>
-    <string name="wear_complication_agency_fallback">T-</string>
-    <string name="wear_complication_preview_vehicle">Falcon 9</string>
-    <string name="wear_complication_preview_agency">SpX</string>
+    <!-- Tile edge button under the next launch, one line -->
+    <!-- Tile edge button when the tile has no launch to open, one line -->
+    <!-- Tile body for a free user, two lines, \n splits them -->
+    <!-- Tile title when the tile failed to load, one line -->
+    <!-- Tile body under the error title -->
+    <!-- Countdown label under the days digits, tile and launch detail, one line, caps -->
+    <!-- Countdown label under the hours digits, tile and launch detail, one line, caps -->
+    <!-- Countdown label under the minutes digits, tile and launch detail, one line, caps -->
+    <!-- Launch list and detail countdown once the launch time has passed -->
+    <!-- Launch list and detail countdown: T-minus, %1$d days, %2$d hours -->
+    <!-- Launch list and detail countdown: T-minus, %1$d hours, %2$d minutes -->
+    <!-- Launch list and detail countdown: T-minus, %1$d minutes -->
+    <!-- Launch list and detail countdown under one minute -->
+    <!-- Launch list, text next to the spinner while loading -->
+    <!-- Launch list, heading above the cards -->
+    <!-- Launch list, shown when a refresh fails and the error has no message -->
+    <!-- Launch detail, shown when the launch id is not in the cache -->
+    <!-- Premium gate screen, heading -->
+    <!-- Premium gate screen, body under the heading -->
+    <!-- Premium gate screen, button that opens the paywall on the phone, one line -->
+    <!-- Settings screen, app name line -->
+    <!-- Settings screen, version line, %1$s is the version number -->
+    <!-- Settings screen, heading above the about text -->
+    <!-- Settings screen, about text, two paragraphs, \n\n splits them -->
+    <!-- Complication, accessibility text: %1$s vehicle name, %2$s countdown such as T-1D 13H -->
+    <!-- Complication, long text: %1$s vehicle name, %2$s countdown such as T-1D 13H -->
+    <!-- Complication, short text for a free user, about 9 chars -->
+    <!-- Complication, accessibility text for a free user -->
+    <!-- Complication, short text when no launch is cached, about 11 chars -->
+    <!-- Complication, accessibility text when no launch is cached -->
+    <!-- Complication, short text once the launch time has passed, max 7 chars -->
+    <!-- Complication, short text under one minute, max 7 chars -->
+    <!-- Complication, short text: %1$d days, %2$d hours, max 7 chars, letters stay caps -->
+    <!-- Complication, short text: %1$d hours, %2$d minutes, max 7 chars, letters stay caps -->
+    <!-- Complication, short text: %1$d minutes, max 7 chars, letters stay caps -->
+    <!-- Complication, long text: T-minus, %1$d days, %2$d hours, letters stay caps -->
+    <!-- Complication, long text: T-minus, %1$d hours, %2$d minutes, letters stay caps -->
+    <!-- Complication, long text: T-minus, %1$d minutes, letters stay caps -->
+    <!-- Complication, long text under one minute -->
+    <!-- Complication title when the launch has no agency name, max 7 chars -->
+    <!-- Complication picker preview, vehicle name -->
+    <!-- Complication picker preview, agency abbreviation, max 7 chars -->
 </resources>

@@ -1,0 +1,109 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- Small badge on a card showing cached data. One word, max 10 chars. -->
+    <!-- Content description of the flag image in a country chip. %1$s is the country name. Read by screen readers. -->
+    <!-- Outlined button with the Discord icon, full width, one line. -->
+    <!-- Filled button in the feedback dialog, opens an email. One line, max 16 chars. Half the dialog width. -->
+    <!-- Outlined button in the feedback dialog, opens a GitHub issue. One line, max 16 chars. Half the dialog width. -->
+    <!-- Body of the feedback dialog above the buttons. Two to four lines. -->
+    <!-- Title of the feedback dialog. One or two lines, headline size. -->
+    <!-- Content description of the close icon on a filter chip. %1$s is the filter label. Read by screen readers. -->
+    <!-- Banner text next to the cloud-off icon when data comes from the cache. One line, may truncate. -->
+    <!-- Text button in the rating dialog, full width, one line. -->
+    <!-- Outlined button in the rating dialog, one line, max 16 chars. Half the dialog width. -->
+    <!-- Filled button in the rating dialog, one line, max 16 chars. Half the dialog width. -->
+    <!-- Dialog body under the rating title. Two or three lines. -->
+    <!-- Dialog title asking if the user likes the app. One or two lines, headline size. -->
+    <!-- Content description of the clear button in the search field. Read by screen readers. -->
+    <!-- Content description of the magnifier icon in the search field. Read by screen readers. -->
+    <!-- Title of the sort bottom sheet or dialog. One line, large bold. -->
+    <!-- Centered message while the article opens in the system browser. One or two lines. -->
+    <!-- Default label of the empty state button, next to a settings icon. One line, max 20 chars. -->
+    <!-- Default message under the empty state title. Two or three lines. -->
+    <!-- Default title of the empty state card when filters hide all launches. One or two lines, bold. -->
+    <!-- Content description of the agency logo on a launch card header. Read by screen readers. -->
+    <!-- Content description of the agency logo placeholder on a launch card header. Read by screen readers. -->
+    <!-- Value under the duration label when the launch window has zero length. One word. -->
+    <!-- Small bold title above the launch window timeline. One line. -->
+    <!-- Content description of the pulsing live badge. Read by screen readers. -->
+    <!-- Default message in the video error box. One or two lines, bold. -->
+    <!-- Content description of the fullscreen button on the video player. Read by screen readers. -->
+    <!-- Button label with an open icon below the video, opens the video in its own app. One line, max 16 chars. -->
+    <!-- Content description of the play icon over the video thumbnail. Read by screen readers. -->
+    <!-- Content description of the video thumbnail before playing. Read by screen readers. -->
+    <!-- Accessibility description of the whole Agencies card on the Explore screen. Read by screen readers. -->
+    <!-- Description under the Agencies card title on the Explore screen. Centered, small text, max 2 lines. -->
+    <!-- Accessibility description of the whole Astronauts card on the Explore screen. Read by screen readers. -->
+    <!-- Description under the Astronauts card title on the Explore screen. Centered, small text, max 2 lines. -->
+    <!-- Accessibility description of the whole ISS Tracking card on the Explore screen. Read by screen readers. -->
+    <!-- Description under the ISS Tracking card title on the Explore screen. Centered, small text, max 2 lines. -->
+    <!-- Title of the ISS Tracking card on the Explore screen. Bold, centered, one line. -->
+    <!-- Accessibility description of the whole News & Events card on the Explore screen. Read by screen readers. -->
+    <!-- Description under the News & Events card title on the Explore screen. Centered, small text, max 2 lines. -->
+    <!-- Accessibility description of the whole Rockets card on the Explore screen. Read by screen readers. -->
+    <!-- Description under the Rockets card title on the Explore screen. Centered, small text, max 2 lines. -->
+    <!-- Accessibility description of the whole Starship card on the Explore screen. Read by screen readers. -->
+    <!-- Description under the Starship card title on the Explore screen. Centered, small text, max 2 lines. -->
+    <!-- Content description of the app icon in the desktop navigation drawer header. Read by screen readers. -->
+    <!-- Accessibility description of the Explore tab icon in the bottom bar or side rail. Read by screen readers. -->
+    <!-- Accessibility description of the Home tab icon in the bottom bar or side rail. Read by screen readers. -->
+    <!-- Label of the Home tab in the bottom bar or side rail. One word, max 12 chars. -->
+    <!-- Accessibility description of the News tab icon in the bottom bar or side rail. Read by screen readers. -->
+    <!-- Accessibility description of the Schedule tab icon in the bottom bar or side rail. Read by screen readers. -->
+    <!-- Label of the Schedule tab in the bottom bar or side rail. One word, max 12 chars. -->
+    <!-- Accessibility description of the Settings tab icon in the bottom bar or side rail. Read by screen readers. -->
+    <!-- Top bar title of the news detail screen when the article has no title. One line. -->
+    <!-- Empty list message on the Events tab. Centered, one or two lines. -->
+    <!-- Empty list message on the Events tab after a search. %1$s is the search text. Centered, one or two lines. -->
+    <!-- Empty list message on the News tab. Centered, one or two lines. -->
+    <!-- Empty list message on the News tab after a search. %1$s is the search text. Centered, one or two lines. -->
+    <!-- Title of the error block in the News & Events lists, above the error message. Centered, one or two lines. -->
+    <!-- Accessibility description of a whole event card. %1$s is the event name, %2$s the event type. Read by screen readers. -->
+    <!-- Content description of the event image in an event card. %1$s is the event name. Read by screen readers. -->
+    <!-- Full-width text button that clears every filter. One line. -->
+    <!-- Small heading above the event type chips. One line. -->
+    <!-- Message in the filter sheet while event types load. One line. -->
+    <!-- Small heading above the news source chips. One line. -->
+    <!-- Title of the filter bottom sheet on the Events tab. One line, bold. -->
+    <!-- Title of the filter bottom sheet on the News tab. One line, bold. -->
+    <!-- Accessibility description of a whole news card. %1$s is the article title, %2$s the news site. Read by screen readers. -->
+    <!-- Content description of the image in a news card. %1$s is the article title. Read by screen readers. -->
+    <!-- Placeholder in the search field on the Events tab. One line. -->
+    <!-- Placeholder in the search field on the News tab. One line. -->
+    <!-- Bold title of the Roadmap error block, above the error message. One line. -->
+    <!-- Small line above the roadmap items. %1$s is the update date text such as February 2026. One line. -->
+    <!-- Message under the loading spinner on the Roadmap screen. One line. -->
+    <!-- Description of fallback roadmap card 1. One to three lines. -->
+    <!-- Bold title of fallback roadmap card 1, shown when the remote roadmap is empty or fails. One or two lines. -->
+    <!-- Description of fallback roadmap card 2. One to three lines. -->
+    <!-- Bold title of fallback roadmap card 2, shown when the remote roadmap is empty or fails. One or two lines. -->
+    <!-- Description of fallback roadmap card 3. One to three lines. -->
+    <!-- Bold title of fallback roadmap card 3, shown when the remote roadmap is empty or fails. One or two lines. -->
+    <!-- Description of fallback roadmap card 4. One to three lines. -->
+    <!-- Bold title of fallback roadmap card 4, shown when the remote roadmap is empty or fails. One or two lines. -->
+    <!-- Description of fallback roadmap card 5. One to three lines. -->
+    <!-- Bold title of fallback roadmap card 5, shown when the remote roadmap is empty or fails. One or two lines. -->
+    <!-- Description of fallback roadmap card 6. One to three lines. -->
+    <!-- Bold title of fallback roadmap card 6, shown when the remote roadmap is empty or fails. One or two lines. -->
+    <!-- Description of fallback roadmap card 7. One to three lines. -->
+    <!-- Bold title of fallback roadmap card 7, shown when the remote roadmap is empty or fails. One or two lines. -->
+    <!-- Update date of the fallback roadmap, used in the Last updated line. Small text, one line. -->
+    <!-- Header message of the fallback roadmap in a highlighted card. Two to four lines. -->
+    <!-- Quarter or date label (Early 2026) in the footer of a fallback roadmap card. Small text, one line. -->
+    <!-- Quarter or date label (Early December 2025) in the footer of a fallback roadmap card. Small text, one line. -->
+    <!-- Quarter or date label (February 2026) in the footer of a fallback roadmap card. Small text, one line. -->
+    <!-- Quarter or date label (Q1 2026) in the footer of a fallback roadmap card. Small text, one line. -->
+    <!-- Content description of the open icon in the fullscreen video header, opens the video in another app. Read by screen readers. -->
+    <!-- Label in the fullscreen video controls. %1$d is the position of the selected video, %2$d the number of videos. One line. -->
+    <!-- Status badge on a roadmap item, and the description of its status icon. One or two words. -->
+    <!-- Status badge on a roadmap item, and the description of its status icon. One or two words. -->
+    <!-- Status badge on a roadmap item, and the description of its status icon. One or two words. -->
+    <!-- Status badge on a roadmap item, and the description of its status icon. One or two words. -->
+    <!-- Status badge on a roadmap item, and the description of its status icon. One or two words. -->
+    <!-- Category label on a roadmap item. One or two words. -->
+    <!-- Category label on a roadmap item. One or two words. -->
+    <!-- Category label on a roadmap item. One or two words. -->
+    <!-- Category label on a roadmap item. One or two words. -->
+    <!-- Category label on a roadmap item. One or two words. -->
+    <!-- Description of the loading text on the start-up screen. Read by screen readers. -->
+</resources>

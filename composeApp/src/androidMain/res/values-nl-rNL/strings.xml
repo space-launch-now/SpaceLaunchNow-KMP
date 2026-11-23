@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- Notification messages -->
+    <!-- Notification channels (names and descriptions shown in system settings) -->
+    <!-- Notification fallbacks -->
+    <!-- Sharing and feedback -->
+    <!-- Home screen widgets -->
+    <!-- Countdown unit label under the number of days, in the Next Up widget. -->
+    <!-- Countdown unit label under the number of hours, in the Next Up widget. -->
+    <!-- Countdown unit label under the number of minutes, in the Next Up widget. -->
+    <!-- Heading of the Launch List widget. -->
+    <!-- Title of the Launch List widget for users without Premium. The lock emoji stays. -->
+    <!-- Hint on the locked Launch List widget. Tapping it opens the subscription screen. -->
+    <!-- Badge drawn on the picture of a notification when the webcast is live. Keep it short; the red circle emoji stays. -->
+</resources>

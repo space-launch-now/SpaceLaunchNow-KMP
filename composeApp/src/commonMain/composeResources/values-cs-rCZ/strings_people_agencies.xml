@@ -1,0 +1,60 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- Agency filter sheet, label of the agency name text field. Field label, one line, max 20 characters. -->
+    <!-- Agency filter sheet, placeholder inside the agency name text field. Placeholder text, one line, max 28 characters. -->
+    <!-- Agency filter sheet, filters card, heading above the featured choice buttons. Heading text, one line, max 28 characters. -->
+    <!-- Agency filter sheet, featured choice, segmented button that shows all agencies. Segment label, one line, max 10 characters. -->
+    <!-- Agency filter sheet, featured choice, segmented button that shows only featured agencies. Segment label, one line, max 16 characters. -->
+    <!-- Agency filter sheet, featured choice, segmented button that shows only agencies that are not featured. Segment label, one line, max 16 characters. -->
+    <!-- Agency list screen, top bar title when filters are active. %1$d is the number of agencies found. Title text, one line, max 24 characters. -->
+    <!-- Agency list screen, top bar, accessibility description of the filter icon button. Screen reader text, not shown, max 24 characters. -->
+    <!-- Agency list screen, centre of screen, under the spinner during first load. Body text, one line, max 28 characters. -->
+    <!-- Agency list screen, centre of screen, bold heading above the error message. Heading text, may wrap, max 32 characters. -->
+    <!-- Agency list screen and agency list view, centre of screen, heading when the list is empty. Heading text, may wrap, max 32 characters. -->
+    <!-- Agency list view, centre of screen, heading above the error message. Heading text, may wrap, max 32 characters. -->
+    <!-- Agency list view, accessibility description of the icon above the empty heading. Screen reader text, not shown, max 20 characters. -->
+    <!-- Agency detail screen, full width button under the overview card. %1$d is the number of launches of the agency. Button label, one line, max 36 characters. -->
+    <!-- Agency detail screen, section heading above the spacecraft landing statistic cards. Heading text, may wrap, max 32 characters. -->
+    <!-- Agency detail screen, section heading above the vehicles card. Heading text, one line, max 28 characters. -->
+    <!-- Agency detail screen, overview card, small tile label above the agency abbreviation. Tile label, one line, max 16 characters. -->
+    <!-- Agency detail screen, vehicles card, heading above the launch vehicles text. Heading text, one line, max 20 characters. -->
+    <!-- Astronaut list item, accessibility description, used for a missing name, status or agency; astronaut detail screen, top bar title when the astronaut has no name. Text, one line, max 16 characters. -->
+    <!-- Astronaut detail screen, error screen, bold heading above the error message. Heading text, may wrap, max 32 characters. -->
+    <!-- Astronaut filter sheet, reload dialog, body message. Body text, may wrap, max 100 characters. -->
+    <!-- Astronaut filter sheet, label of the astronaut name text field. Field label, one line, max 20 characters. -->
+    <!-- Astronaut filter sheet, placeholder inside the astronaut name text field. Placeholder text, one line, max 28 characters. -->
+    <!-- Astronaut filter sheet, filters card, heading above the has flown choice buttons. Heading text, one line, max 28 characters. -->
+    <!-- Astronaut filter sheet, filters card, heading above the currently in space choice buttons. Heading text, one line, max 28 characters. -->
+    <!-- Astronaut filter sheet, filters card, segmented button that applies no filter. Segment label, one line, max 10 characters. -->
+    <!-- Astronaut filter sheet, filters card, type choice, segmented button that shows human astronauts. Segment label, one line, max 12 characters. -->
+    <!-- Astronaut filter sheet, filters card, type choice, segmented button that shows non-human astronauts. Segment label, one line, max 16 characters. -->
+    <!-- Astronaut filter sheet, filters card, status section, hint under the heading. Hint text, may wrap, max 48 characters. -->
+    <!-- Astronaut filter sheet, filters card, status section, label above the status chips when none is chosen. Label text, one line, max 20 characters. -->
+    <!-- Astronaut filter sheet, filters card, status section, label above the status chips when some are chosen. Label text, one line, max 20 characters. -->
+    <!-- Astronaut list screen, top bar title when filters are active. %1$d is the number of astronauts found. Title text, one line, max 24 characters. -->
+    <!-- Astronaut list screen, loading state, text under the progress indicator. Status text, one line, max 28 characters. -->
+    <!-- Astronaut list screen, error state, bold heading above the error message. Heading text, may wrap, max 32 characters. -->
+    <!-- Astronaut list screen, empty state, bold heading. Heading text, may wrap, max 32 characters. -->
+    <!-- Astronaut list screen, empty state, hint under the heading. Hint text, may wrap, max 40 characters. -->
+    <!-- Astronaut list item, accessibility description of the whole card. %1$s is the astronaut name, %2$s the status, %3$s the agency. Screen reader text, not shown, max 120 characters. -->
+    <!-- Astronaut detail screen, flight history card, heading. Heading text, one line, max 20 characters. -->
+    <!-- Astronaut detail screen, flight history card, count of flights. %1$d is the number of flights. Label text, one line, max 16 characters. -->
+    <!-- Astronaut detail screen, biography card, heading. Heading text, one line, max 20 characters. -->
+    <!-- Astronaut detail screen, biography card, button that expands a long biography. Button label, one line, max 16 characters. -->
+    <!-- Astronaut detail screen, links card, row label used when a social media link has no platform name. Row label, one line, max 20 characters. -->
+    <!-- Astronaut detail screen, links card, link row, accessibility description of the open icon. Screen reader text, not shown, max 20 characters. -->
+    <!-- Astronaut detail screen, personal info and overview cards, tile label above the date of death. Label text, one line, max 16 characters. -->
+    <!-- Astronaut detail screen, personal info and overview cards, tile label above the age. Label text, one line, max 16 characters. -->
+    <!-- Astronaut detail screen, personal info and overview cards, age tile, value. %1$s is the age in years. Value text, one line, max 16 characters. -->
+    <!-- Astronaut detail screen, personal info and overview cards, tile label above the nationality chips. Label text, one line, max 20 characters. -->
+    <!-- Mission screen, crew member card, accessibility action label of the card. %1$s is the astronaut name. Screen reader text, not shown, max 48 characters. -->
+    <!-- Mission screen, crew member card, accessibility description of the card. %1$s is the astronaut name, %2$s the role. Screen reader text, not shown, max 80 characters. -->
+    <!-- Mission screen, crew member card, accessibility description of the astronaut photo. %1$s is the astronaut name. Screen reader text, not shown, max 48 characters. -->
+    <!-- Astronaut detail screen, overview card, tile label above the number of flights. Label text, one line, max 16 characters. -->
+    <!-- Astronaut detail screen, overview card, tile label above the number of spacewalks. Label text, one line, max 16 characters. -->
+    <!-- Astronaut detail screen, overview card, tile label above the total spacewalk time. Label text, one line, max 16 characters. -->
+    <!-- Sort option in the astronaut filter sheet menu. The text in brackets says the direction. One line. -->
+    <!-- Sort option in the astronaut filter sheet menu. The text in brackets says the direction. One line. -->
+    <!-- Sort option in the astronaut filter sheet menu. The text in brackets says the direction. One line. -->
+    <!-- Sort option in the astronaut filter sheet menu. The text in brackets says the direction. One line. -->
+</resources>

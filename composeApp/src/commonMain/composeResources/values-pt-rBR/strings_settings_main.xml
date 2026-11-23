@@ -1,132 +1,132 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="settings_main_section_general">Geral</string>
-    <string name="settings_main_utc_title">Usar horário UTC</string>
-    <string name="settings_main_utc_subtitle">Mostrar datas e horários em UTC em vez do fuso horário local</string>
-    <string name="settings_main_hide_tbd_title">Ocultar lançamentos TBD</string>
-    <string name="settings_main_hide_tbd_subtitle">Ocultar lançamentos sem data confirmada</string>
-    <string name="settings_theme_title">Configurações de tema</string>
-    <string name="settings_main_theme_subtitle">Aparência, cores e personalização da paleta</string>
-    <string name="settings_main_calendar_subtitle">Sincronize lançamentos e eventos com seu calendário</string>
-    <string name="settings_main_notifications_disabled_subtitle">É necessária permissão para enviar notificações</string>
-    <string name="settings_main_notifications_enabled_title">Notificações ativadas</string>
-    <string name="settings_main_notifications_enabled_subtitle">Permitir notificações de notícias, lançamentos e eventos</string>
-    <string name="settings_main_notification_filters_subtitle">Filtre os lançamentos exibidos no app e nas notificações</string>
-    <string name="settings_main_system_settings_title">Configurações do sistema</string>
-    <string name="settings_main_system_settings_subtitle">Gerencie canais de notificação, sons e não perturbe</string>
-    <string name="settings_main_language_title">Idioma</string>
-    <string name="settings_main_language_subtitle">Escolha o idioma deste app</string>
-    <string name="settings_main_go_premium_title">Seja Premium ✨</string>
-    <string name="settings_main_go_premium_subtitle">Sem anúncios, widgets, temas e mais</string>
-    <string name="settings_main_wear_available_title">App para Wear OS disponível</string>
-    <string name="settings_main_wear_available_body">O Space Launch Now também está disponível no Wear OS.</string>
-    <string name="settings_main_wear_early_release">Lançamento antecipado</string>
-    <string name="settings_main_wear_connected">● Relógio conectado</string>
-    <string name="settings_main_wear_early_release_body">O suporte ao Wear OS está em lançamento antecipado. Mais recursos, acabamento e melhorias estão a caminho.</string>
-    <string name="settings_main_wear_data_updates_title">Atualizações de dados</string>
-    <string name="settings_main_wear_data_updates_body">Os dados de lançamento no seu relógio são atualizados a cada 5 minutos quando falta menos de 1 hora para um lançamento, e a cada 30 minutos nos demais casos. O tile e a complicação seguem os mesmos filtros que você define aqui no app.</string>
-    <string name="settings_main_section_diagnostic">Diagnóstico</string>
-    <string name="settings_main_section_developer">Desenvolvedor</string>
-    <string name="settings_main_debug_title">Configurações de depuração</string>
-    <string name="settings_main_debug_subtitle">Troca de URL da API, teste de tópicos e opções de desenvolvedor</string>
-    <string name="settings_main_roadmap_subtitle">Veja os recursos planejados e o cronograma de desenvolvimento</string>
-    <string name="settings_main_feedback_title">Enviar feedback</string>
-    <string name="settings_main_feedback_subtitle">Relate problemas ou sugira melhorias</string>
-    <string name="settings_main_about_details">Detalhes do app</string>
-    <string name="settings_main_shop_title">Loja</string>
-    <string name="settings_main_shop_subtitle">Produtos do Space Launch Now</string>
-    <string name="settings_main_ad_privacy">Configurações de privacidade de anúncios</string>
-    <string name="settings_main_privacy_policy">Política de privacidade</string>
-    <string name="settings_main_terms_of_service">Termos de serviço</string>
-    <string name="settings_main_version">Versão %1$s</string>
-    <string name="settings_main_debug_dialog_title_totp">Digite o código TOTP</string>
-    <string name="settings_main_debug_dialog_title_password">Digite a senha de depuração</string>
-    <string name="settings_main_debug_dialog_message_totp">Digite o código de 6 dígitos do seu app autenticador:</string>
-    <string name="settings_main_debug_dialog_message_password">Digite a senha para desbloquear as configurações de desenvolvedor:</string>
-    <string name="settings_main_debug_dialog_field_totp">Código TOTP</string>
-    <string name="settings_main_debug_dialog_field_password">Senha</string>
-    <string name="settings_main_debug_dialog_hide_password">Ocultar senha</string>
-    <string name="settings_main_debug_dialog_show_password">Mostrar senha</string>
-    <string name="settings_main_debug_dialog_error_totp">Código TOTP inválido</string>
-    <string name="settings_main_debug_dialog_error_password">Senha incorreta</string>
-    <string name="settings_main_debug_dialog_use_password">Usar senha</string>
-    <string name="settings_main_debug_dialog_use_totp">Usar TOTP</string>
-    <string name="settings_main_debug_dialog_unlock">Desbloquear</string>
-    <string name="settings_calendar_unlock_title">Desbloqueie a sincronização de calendário</string>
-    <string name="settings_calendar_unlock_body">Assine o Premium para sincronizar lançamentos e eventos com seu calendário.</string>
-    <string name="settings_calendar_url_copied">URL copiada para a área de transferência!</string>
-    <string name="settings_calendar_how_title">Como funciona</string>
-    <string name="settings_calendar_how_body">Use as URLs ICS do calendário abaixo para assinar os eventos e lançamentos do Space Launch Now no seu app de calendário. Seu calendário será atualizado automaticamente com as informações mais recentes.</string>
-    <string name="settings_calendar_how_note">Esses links funcionam em qualquer calendário que aceite feeds de URL ICS.</string>
-    <string name="settings_calendar_feeds_title">URLs dos feeds de calendário</string>
-    <string name="settings_calendar_feed_launches_description">Assine os próximos lançamentos espaciais</string>
-    <string name="settings_calendar_feed_events_description">Assine eventos relacionados ao espaço</string>
-    <string name="settings_calendar_copy_url">Copiar URL</string>
-    <string name="settings_calendar_setup_title">Configuração do Google Agenda</string>
-    <string name="settings_calendar_setup_intro">Para adicionar estes feeds ao Google Agenda:</string>
-    <string name="settings_calendar_setup_step_copy">Copie o URL do feed da agenda acima</string>
-    <string name="settings_calendar_setup_step_open">Abra o Google Agenda no seu computador</string>
-    <string name="settings_calendar_setup_step_add">Clique em "+" ao lado de "Outras agendas"</string>
-    <string name="settings_calendar_setup_step_from_url">Selecione "Do URL"</string>
-    <string name="settings_calendar_setup_step_paste">Cole o URL copiado e clique em "Adicionar agenda"</string>
-    <string name="settings_calendar_setup_step_repeat">Repita para os feeds de Lançamentos e de Eventos</string>
-    <string name="settings_calendar_setup_done">Sua agenda será atualizada automaticamente com novos lançamentos e eventos!</string>
-    <string name="settings_theme_unlock_title">Desbloqueie os temas personalizados</string>
-    <string name="settings_theme_unlock_body">Personalize o tema do app com cores e estilos de paleta próprios</string>
-    <string name="settings_theme_trial_body">Assista a um anúncio para desbloquear os recursos de tema premium por 24 horas</string>
-    <string name="settings_theme_section_appearance">Aparência</string>
-    <string name="settings_theme_appearance_subtitle">Escolha entre o tema claro, escuro ou do sistema</string>
-    <string name="settings_theme_section_preview">Pré-visualização ao vivo</string>
-    <string name="settings_theme_preview_subtitle">Veja como a cor e o estilo de paleta escolhidos ficam juntos.</string>
-    <string name="settings_theme_section_seed">Cor base</string>
-    <string name="settings_theme_seed_subtitle">Escolha a cor base do seu tema.</string>
-    <string name="settings_theme_section_palette">Estilo da paleta</string>
-    <string name="settings_theme_palette_subtitle">Escolha como as cores são geradas a partir da sua cor primária</string>
-    <string name="settings_theme_section_widget">Aparência do widget</string>
-    <string name="settings_theme_widget_subtitle">Personalize o visual dos widgets da sua tela inicial</string>
-    <string name="settings_theme_widget_transparency_title">Transparência do fundo</string>
-    <string name="settings_theme_widget_transparency_hint">0% = totalmente transparente, 100% = totalmente opaco</string>
-    <string name="settings_theme_widget_radius_title">Raio dos cantos</string>
-    <string name="settings_theme_widget_radius_hint">Cantos arredondados no fundo do widget (0-40dp, em passos de 4dp)</string>
-    <string name="settings_theme_widget_changes_title">Alterações na aparência do widget</string>
-    <string name="settings_theme_widget_changes_pending">Você tem alterações não aplicadas. Toque abaixo para atualizar seus widgets.</string>
-    <string name="settings_theme_widget_changes_applied">Seus widgets estão atualizados.</string>
-    <string name="settings_theme_widget_locked_body">Assine o Premium para personalizar a aparência do widget e aplicar as alterações.</string>
-    <string name="settings_theme_widget_apply">Aplicar aos widgets</string>
-    <string name="settings_theme_widget_applied">Já aplicado</string>
-    <string name="settings_theme_reset">Restaurar padrões</string>
-    <string name="settings_theme_reset_premium">Restaurar padrões (Premium)</string>
-    <string name="settings_theme_tab_label">Tema</string>
-    <string name="settings_theme_role_primary">Primária</string>
-    <string name="settings_theme_role_secondary">Secundária</string>
-    <string name="settings_theme_role_tertiary">Terciária</string>
-    <string name="settings_theme_hue">Matiz</string>
-    <string name="settings_theme_hex">Hex</string>
-    <string name="settings_theme_selected">Selecionado</string>
-    <string name="settings_theme_palette_tonal_spot">Equilibrado e harmonioso, estilo padrão</string>
-    <string name="settings_theme_palette_neutral">Tons sutis e suaves</string>
-    <string name="settings_theme_palette_vibrant">Cores fortes e saturadas</string>
-    <string name="settings_theme_palette_expressive">Paleta criativa e dinâmica</string>
-    <string name="settings_theme_palette_rainbow">Divertido e colorido</string>
-    <string name="settings_theme_palette_fruit_salad">Matizes frescos e variados</string>
-    <string name="settings_theme_palette_monochrome">Variações de um único matiz</string>
-    <string name="settings_theme_palette_fidelity">Fiel à cor que você escolheu</string>
-    <string name="settings_theme_palette_content">Adapta-se ao conteúdo</string>
-    <string name="settings_theme_palette_scheme_content">Esquema de cores baseado no conteúdo</string>
-    <string name="settings_theme_palette_custom">Estilo de paleta personalizado</string>
-    <string name="settings_theme_widget_follow_app_title">Seguir o tema do app</string>
-    <string name="settings_theme_widget_follow_app_subtitle">Use as cores do tema personalizado do app nos widgets</string>
-    <string name="settings_theme_widget_follow_system_title">Seguir o tema do sistema</string>
-    <string name="settings_theme_widget_follow_system_subtitle">Claro/escuro automático conforme as configurações do sistema</string>
-    <string name="settings_theme_widget_dynamic_title">Cores dinâmicas</string>
-    <string name="settings_theme_widget_dynamic_subtitle">Combine com as cores do papel de parede (Android 12+)</string>
-    <string name="settings_diagnostics_title">Diagnóstico</string>
-    <string name="settings_diagnostics_reset_button">Redefinir inscrições push (reinscrever do zero)</string>
-    <string name="settings_diagnostics_reset_hint">Cancela todos os tópicos push que esta instalação tem registrados e depois reinscreve conforme suas configurações. As notificações podem pausar por pouco tempo enquanto isso roda.</string>
-    <string name="settings_logging_title">Registro de diagnóstico</string>
-    <string name="settings_logging_description">Ajude-nos a depurar problemas compartilhando registros de diagnóstico. Standard envia avisos e decisões de entrega de notificações; Verbose envia registros detalhados. Off mantém os registros só neste dispositivo. O Verbose volta ao normal automaticamente após 72 horas.</string>
-    <string name="settings_logging_open_diagnostics">Abrir diagnóstico</string>
-    <string name="settings_theme_option_system">Sistema</string>
-    <string name="settings_theme_option_light">Claro</string>
-    <string name="settings_theme_option_dark">Escuro</string>
+    <!-- Section heading in Settings. One line. -->
+    <!-- Switch title in Settings. One line. -->
+    <!-- Switch description under "Use UTC time". One or two lines. -->
+    <!-- Switch title in Settings. One line. -->
+    <!-- Switch description under "Hide TBD Launches". One or two lines. -->
+    <!-- Row title in Settings and top bar title of the theme screen. One line. -->
+    <!-- Row description under "Theme Settings". One or two lines. -->
+    <!-- Row description under "Calendar Sync". One or two lines. -->
+    <!-- Description under "Notifications Disabled". One or two lines. -->
+    <!-- Switch title for notifications. One line. -->
+    <!-- Switch description under "Notifications Enabled". One or two lines. -->
+    <!-- Row description under "Notification Filters". One or two lines. -->
+    <!-- Row title. Opens the system notification settings. One line. -->
+    <!-- Row description under "System Settings". One or two lines. -->
+    <!-- Row title in Settings. Opens the system language screen for this app. One line. -->
+    <!-- Row description under "Language". One or two lines. -->
+    <!-- Row title with a sparkles symbol at the end. Keep the symbol. One line. -->
+    <!-- Row description under "Go Premium". One or two lines. -->
+    <!-- Card title when the watch app is not installed. One line. -->
+    <!-- Card text under "Wear OS App Available". One or two lines. -->
+    <!-- Badge title for the watch app. One line. -->
+    <!-- Small status line. Starts with a bullet symbol; keep it. One line. -->
+    <!-- Card text. Two or three lines. -->
+    <!-- Card heading about how often watch data refreshes. One line. -->
+    <!-- Card text. Several lines. Tile and complication are Wear OS terms. -->
+    <!-- Section heading in Settings above the logging card. One line. -->
+    <!-- Section heading in Settings above the debug row. One line. -->
+    <!-- Row title. Opens developer options. One line. -->
+    <!-- Row description under "Debug Settings". One or two lines. -->
+    <!-- Row description under "Roadmap". One or two lines. -->
+    <!-- Row title. Opens a feedback form or email. One line. -->
+    <!-- Row description under "Send Feedback". One or two lines. -->
+    <!-- Row title. Opens the About screen. One line. -->
+    <!-- Row title. Opens the merchandise shop. One line. -->
+    <!-- Row description under "Shop". One line. -->
+    <!-- Row title. Opens the ad consent form. One line. -->
+    <!-- Row title. Opens the privacy policy web page. One line. -->
+    <!-- Row title. Opens the terms web page. One line. -->
+    <!-- Footer line. %1$s is the app version name such as 5.31.2. One line. -->
+    <!-- Developer unlock dialog title. Used only by developers. One line. -->
+    <!-- Developer unlock dialog title. Used only by developers. One line. -->
+    <!-- Developer unlock dialog text. Used only by developers. One or two lines. -->
+    <!-- Developer unlock dialog text. Used only by developers. One or two lines. -->
+    <!-- Text field label in the developer unlock dialog. One line. -->
+    <!-- Text field label in the developer unlock dialog. One line. -->
+    <!-- Content description of the eye icon button. Read by screen readers. -->
+    <!-- Content description of the eye icon button. Read by screen readers. -->
+    <!-- Error under the text field in the developer unlock dialog. One line. -->
+    <!-- Error under the text field in the developer unlock dialog. One line. -->
+    <!-- Text button in the developer unlock dialog. One line. -->
+    <!-- Text button in the developer unlock dialog. One line. -->
+    <!-- Button in the developer unlock dialog. One word. -->
+    <!-- Locked-state card title on the calendar screen. One line. -->
+    <!-- Locked-state card text. One or two lines. -->
+    <!-- Snackbar after the user copies a feed URL. One line. -->
+    <!-- Heading of the info card. One line. -->
+    <!-- Info card text. Several lines. ICS is a calendar file format. -->
+    <!-- Info card note. One or two lines. -->
+    <!-- Section heading above the two feed URLs. One line. -->
+    <!-- Feed description under "Launches". One line. -->
+    <!-- Feed description under "Events". One line. -->
+    <!-- Content description of the copy icon button. Read by screen readers. -->
+    <!-- Heading of the setup card. One line. -->
+    <!-- Text above the numbered steps. One line. -->
+    <!-- Setup step 1. One or two lines. -->
+    <!-- Setup step 2. One or two lines. -->
+    <!-- Setup step 3. The quoted words are labels in Google Calendar: translate them as Google shows them. One or two lines. -->
+    <!-- Setup step 4. The quoted words are a label in Google Calendar. One or two lines. -->
+    <!-- Setup step 5. The quoted words are a label in Google Calendar. One or two lines. -->
+    <!-- Setup step 6. One or two lines. -->
+    <!-- Closing note of the setup card. One or two lines. -->
+    <!-- Locked-state card title. One line. -->
+    <!-- Locked-state card text. One or two lines. -->
+    <!-- Card text for the rewarded-ad offer. One or two lines. -->
+    <!-- Section heading. One line. -->
+    <!-- Text under "Appearance". One line. -->
+    <!-- Section heading. One line. -->
+    <!-- Text under "Live preview". One or two lines. -->
+    <!-- Section heading for the base colour picker. One line. -->
+    <!-- Text under "Seed Color". One line. -->
+    <!-- Section heading. One line. -->
+    <!-- Text under "Palette Style". One or two lines. -->
+    <!-- Section heading for home screen widget options. One line. -->
+    <!-- Text under "Widget Appearance". One line. -->
+    <!-- Slider title. One line. -->
+    <!-- Hint under the slider. One line. -->
+    <!-- Slider title. One line. -->
+    <!-- Hint under the slider. One or two lines. dp is a unit. -->
+    <!-- Card title for premium users. One line. -->
+    <!-- Card text. One or two lines. -->
+    <!-- Card text. One line. -->
+    <!-- Card text for non-premium users. One or two lines. -->
+    <!-- Button. One line, max 24 chars. -->
+    <!-- Disabled button. One line, max 24 chars. -->
+    <!-- Button. Resets all theme choices. One line. -->
+    <!-- Disabled button for non-premium users. One line. -->
+    <!-- Navigation bar label. One word. -->
+    <!-- Label under a colour swatch. One word. -->
+    <!-- Label under a colour swatch. One word. -->
+    <!-- Label under a colour swatch. One word. -->
+    <!-- Label of the hue slider. One word. -->
+    <!-- Label of the hex colour text field. One word. -->
+    <!-- Content description of a check mark on the chosen option. Read by screen readers. -->
+    <!-- Description of a palette style. One line. -->
+    <!-- Description of a palette style. One line. -->
+    <!-- Description of a palette style. One line. -->
+    <!-- Description of a palette style. One line. -->
+    <!-- Description of a palette style. One line. -->
+    <!-- Description of a palette style. One line. -->
+    <!-- Description of a palette style. One line. -->
+    <!-- Description of a palette style. One line. -->
+    <!-- Description of a palette style. One line. -->
+    <!-- Description of a palette style. One line. -->
+    <!-- Description of an unknown palette style. One line. -->
+    <!-- Switch title. One line. -->
+    <!-- Switch description. One or two lines. -->
+    <!-- Switch title. One line. -->
+    <!-- Switch description. One or two lines. -->
+    <!-- Switch title. One line. -->
+    <!-- Switch description. One or two lines. -->
+    <!-- Top bar title of the diagnostics screen. One line. -->
+    <!-- Button. One or two lines. -->
+    <!-- Text under the reset button. Two or three lines. -->
+    <!-- Card title. One line. -->
+    <!-- Card text under the title. Several lines. Standard and Verbose are the names of two log levels on the chips below; Off is the third. -->
+    <!-- Text button. Opens the diagnostics screen. One line. -->
+    <!-- Theme choice in the theme dropdown. One word. -->
+    <!-- Theme choice in the theme dropdown. One word. -->
+    <!-- Theme choice in the theme dropdown. One word. -->
 </resources>

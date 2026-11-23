@@ -1,0 +1,132 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- Section heading in Settings. One line. -->
+    <!-- Switch title in Settings. One line. -->
+    <!-- Switch description under "Use UTC time". One or two lines. -->
+    <!-- Switch title in Settings. One line. -->
+    <!-- Switch description under "Hide TBD Launches". One or two lines. -->
+    <!-- Row title in Settings and top bar title of the theme screen. One line. -->
+    <!-- Row description under "Theme Settings". One or two lines. -->
+    <!-- Row description under "Calendar Sync". One or two lines. -->
+    <!-- Description under "Notifications Disabled". One or two lines. -->
+    <!-- Switch title for notifications. One line. -->
+    <!-- Switch description under "Notifications Enabled". One or two lines. -->
+    <!-- Row description under "Notification Filters". One or two lines. -->
+    <!-- Row title. Opens the system notification settings. One line. -->
+    <!-- Row description under "System Settings". One or two lines. -->
+    <!-- Row title in Settings. Opens the system language screen for this app. One line. -->
+    <!-- Row description under "Language". One or two lines. -->
+    <!-- Row title with a sparkles symbol at the end. Keep the symbol. One line. -->
+    <!-- Row description under "Go Premium". One or two lines. -->
+    <!-- Card title when the watch app is not installed. One line. -->
+    <!-- Card text under "Wear OS App Available". One or two lines. -->
+    <!-- Badge title for the watch app. One line. -->
+    <!-- Small status line. Starts with a bullet symbol; keep it. One line. -->
+    <!-- Card text. Two or three lines. -->
+    <!-- Card heading about how often watch data refreshes. One line. -->
+    <!-- Card text. Several lines. Tile and complication are Wear OS terms. -->
+    <!-- Section heading in Settings above the logging card. One line. -->
+    <!-- Section heading in Settings above the debug row. One line. -->
+    <!-- Row title. Opens developer options. One line. -->
+    <!-- Row description under "Debug Settings". One or two lines. -->
+    <!-- Row description under "Roadmap". One or two lines. -->
+    <!-- Row title. Opens a feedback form or email. One line. -->
+    <!-- Row description under "Send Feedback". One or two lines. -->
+    <!-- Row title. Opens the About screen. One line. -->
+    <!-- Row title. Opens the merchandise shop. One line. -->
+    <!-- Row description under "Shop". One line. -->
+    <!-- Row title. Opens the ad consent form. One line. -->
+    <!-- Row title. Opens the privacy policy web page. One line. -->
+    <!-- Row title. Opens the terms web page. One line. -->
+    <!-- Footer line. %1$s is the app version name such as 5.31.2. One line. -->
+    <!-- Developer unlock dialog title. Used only by developers. One line. -->
+    <!-- Developer unlock dialog title. Used only by developers. One line. -->
+    <!-- Developer unlock dialog text. Used only by developers. One or two lines. -->
+    <!-- Developer unlock dialog text. Used only by developers. One or two lines. -->
+    <!-- Text field label in the developer unlock dialog. One line. -->
+    <!-- Text field label in the developer unlock dialog. One line. -->
+    <!-- Content description of the eye icon button. Read by screen readers. -->
+    <!-- Content description of the eye icon button. Read by screen readers. -->
+    <!-- Error under the text field in the developer unlock dialog. One line. -->
+    <!-- Error under the text field in the developer unlock dialog. One line. -->
+    <!-- Text button in the developer unlock dialog. One line. -->
+    <!-- Text button in the developer unlock dialog. One line. -->
+    <!-- Button in the developer unlock dialog. One word. -->
+    <!-- Locked-state card title on the calendar screen. One line. -->
+    <!-- Locked-state card text. One or two lines. -->
+    <!-- Snackbar after the user copies a feed URL. One line. -->
+    <!-- Heading of the info card. One line. -->
+    <!-- Info card text. Several lines. ICS is a calendar file format. -->
+    <!-- Info card note. One or two lines. -->
+    <!-- Section heading above the two feed URLs. One line. -->
+    <!-- Feed description under "Launches". One line. -->
+    <!-- Feed description under "Events". One line. -->
+    <!-- Content description of the copy icon button. Read by screen readers. -->
+    <!-- Heading of the setup card. One line. -->
+    <!-- Text above the numbered steps. One line. -->
+    <!-- Setup step 1. One or two lines. -->
+    <!-- Setup step 2. One or two lines. -->
+    <!-- Setup step 3. The quoted words are labels in Google Calendar: translate them as Google shows them. One or two lines. -->
+    <!-- Setup step 4. The quoted words are a label in Google Calendar. One or two lines. -->
+    <!-- Setup step 5. The quoted words are a label in Google Calendar. One or two lines. -->
+    <!-- Setup step 6. One or two lines. -->
+    <!-- Closing note of the setup card. One or two lines. -->
+    <!-- Locked-state card title. One line. -->
+    <!-- Locked-state card text. One or two lines. -->
+    <!-- Card text for the rewarded-ad offer. One or two lines. -->
+    <!-- Section heading. One line. -->
+    <!-- Text under "Appearance". One line. -->
+    <!-- Section heading. One line. -->
+    <!-- Text under "Live preview". One or two lines. -->
+    <!-- Section heading for the base colour picker. One line. -->
+    <!-- Text under "Seed Color". One line. -->
+    <!-- Section heading. One line. -->
+    <!-- Text under "Palette Style". One or two lines. -->
+    <!-- Section heading for home screen widget options. One line. -->
+    <!-- Text under "Widget Appearance". One line. -->
+    <!-- Slider title. One line. -->
+    <!-- Hint under the slider. One line. -->
+    <!-- Slider title. One line. -->
+    <!-- Hint under the slider. One or two lines. dp is a unit. -->
+    <!-- Card title for premium users. One line. -->
+    <!-- Card text. One or two lines. -->
+    <!-- Card text. One line. -->
+    <!-- Card text for non-premium users. One or two lines. -->
+    <!-- Button. One line, max 24 chars. -->
+    <!-- Disabled button. One line, max 24 chars. -->
+    <!-- Button. Resets all theme choices. One line. -->
+    <!-- Disabled button for non-premium users. One line. -->
+    <!-- Navigation bar label. One word. -->
+    <!-- Label under a colour swatch. One word. -->
+    <!-- Label under a colour swatch. One word. -->
+    <!-- Label under a colour swatch. One word. -->
+    <!-- Label of the hue slider. One word. -->
+    <!-- Label of the hex colour text field. One word. -->
+    <!-- Content description of a check mark on the chosen option. Read by screen readers. -->
+    <!-- Description of a palette style. One line. -->
+    <!-- Description of a palette style. One line. -->
+    <!-- Description of a palette style. One line. -->
+    <!-- Description of a palette style. One line. -->
+    <!-- Description of a palette style. One line. -->
+    <!-- Description of a palette style. One line. -->
+    <!-- Description of a palette style. One line. -->
+    <!-- Description of a palette style. One line. -->
+    <!-- Description of a palette style. One line. -->
+    <!-- Description of a palette style. One line. -->
+    <!-- Description of an unknown palette style. One line. -->
+    <!-- Switch title. One line. -->
+    <!-- Switch description. One or two lines. -->
+    <!-- Switch title. One line. -->
+    <!-- Switch description. One or two lines. -->
+    <!-- Switch title. One line. -->
+    <!-- Switch description. One or two lines. -->
+    <!-- Top bar title of the diagnostics screen. One line. -->
+    <!-- Button. One or two lines. -->
+    <!-- Text under the reset button. Two or three lines. -->
+    <!-- Card title. One line. -->
+    <!-- Card text under the title. Several lines. Standard and Verbose are the names of two log levels on the chips below; Off is the third. -->
+    <!-- Text button. Opens the diagnostics screen. One line. -->
+    <!-- Theme choice in the theme dropdown. One word. -->
+    <!-- Theme choice in the theme dropdown. One word. -->
+    <!-- Theme choice in the theme dropdown. One word. -->
+</resources>

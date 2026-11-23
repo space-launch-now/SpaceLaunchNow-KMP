@@ -1,0 +1,87 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- Section heading in the event detail card, above the list of date, location, duration rows. One line, bold. -->
+    <!-- Row label in the event details list. Value (an event date and time) shows beside it. One word. -->
+    <!-- Row value in the event details list when the event webcast is live. The red circle is an emoji; keep it. Short. -->
+    <!-- Row label in the event details list. Value is the date and time of the last data update. Short. -->
+    <!-- Button text for an event link that has no title. One word. -->
+    <!-- Card heading above the list of space stations at the event. One line, bold. -->
+    <!-- Card heading above the list of space station expeditions at the event. One line, bold. -->
+    <!-- Row title for an expedition that has no name. One word. -->
+    <!-- Card heading above the list of launches linked to the event. One line, bold. -->
+    <!-- Line under the updates list when more than 10 updates exist. %1$d is the number of updates not shown. Keep the leading plus sign. -->
+    <!-- Hint in the empty detail pane of the two-pane Schedule screen on tablets. Tells the user to pick a launch from the list. One or two lines. -->
+    <!-- Content description of the X button in the search field. Closes the search field. Read by screen readers. -->
+    <!-- Placeholder text inside the empty launch search field. One line. -->
+    <!-- Screen title at the top of the Schedule screen. One line, large heading. -->
+    <!-- Heading on the launch list error block, above the error message. One line. -->
+    <!-- Message in the launch list when no launch matches the filters or search. One line. -->
+    <!-- Title of the filter sheet. One line, large heading. -->
+    <!-- Body of the reload confirm dialog. Several lines. -->
+    <!-- Info note at the top of the filter sheet, shown next to an info icon. Two or three lines. Home page and Schedule are screen names. -->
+    <!-- Banner text on the filter sheet. Starts with a construction emoji; keep it. One line. -->
+    <!-- Section heading on the filter sheet, above the crewed-only switch. One line. -->
+    <!-- Label of a switch on the filter sheet. When on, only crewed launches show. One line. -->
+    <!-- Warning under the Rockets filter when more than one rocket is selected. API is a technical term. One or two lines. -->
+    <!-- Filter section heading on the filter sheet. Launch statuses such as Go or Hold. One line. -->
+    <!-- Filter section heading on the filter sheet. Target orbits. One line. -->
+    <!-- Filter section heading on the filter sheet. Types of mission such as Communications. One line. -->
+    <!-- Filter section heading on the filter sheet. Rocket families such as Falcon. One line. -->
+    <!-- Launch name in a list card when the launch has no name. Short. -->
+    <!-- Launch site in a list card when the launch has no location. Short. -->
+    <!-- Content description of the rocket icon shown when a launch image is missing. Read by screen readers. -->
+    <!-- Button on the filter sheet when filters are selected. %1$d is the number of selected filters. One line. -->
+    <!-- Button on the filter side sheet when filters are selected. %1$d is the number of selected filters, shown in brackets. Max 14 chars. -->
+    <!-- Line at the top of the filter sheet. %1$d is the number of selected filters. (s) marks an optional plural. -->
+    <!-- Text in the warning card shown when the system notification permission is off. One or two lines. -->
+    <!-- Intro sentence under the top bar of the notification settings screen. Two lines. -->
+    <!-- Title of a switch. When on, the user gets a notification for every launch. One line. -->
+    <!-- Description under the Follow All Launches switch. One or two lines. -->
+    <!-- Note shown when Follow All Launches is on. Tells the user the agency and location choices below are ignored. Two lines. -->
+    <!-- Section heading above the strict matching switch. One line. -->
+    <!-- Description under the Notification Matching heading. One or two lines. -->
+    <!-- Title of a switch. When on, a launch must match both an agency and a location. One line. -->
+    <!-- Note under the Strict Matching switch when Follow All Launches is on. One or two lines. -->
+    <!-- Explains the strict matching mode. STRICT, BOTH and AND are in capitals for emphasis; keep the emphasis. Two lines. -->
+    <!-- Example for strict matching. SpaceX and Kennedy Space Center are proper names. KSC is the short form of Kennedy Space Center. ONLY is in capitals for emphasis. Two or three lines. -->
+    <!-- Three bullet lines under the strict matching example. Each line starts with a bullet, a check or cross emoji. Keep the emoji and the line breaks. KSC is the short form of Kennedy Space Center. -->
+    <!-- Explains the flexible matching mode. FLEXIBLE, ANY and OR are in capitals for emphasis; keep the emphasis. Two lines. -->
+    <!-- Example for flexible matching. SpaceX and Kennedy Space Center are proper names. KSC is the short form of Kennedy Space Center. ALL and AND are in capitals for emphasis. Two or three lines. -->
+    <!-- Three bullet lines under the flexible matching example. Each line starts with a bullet and a check emoji. Keep the emoji and the line breaks. KSC is the short form of Kennedy Space Center. -->
+    <!-- Section heading above the list of agency checkboxes. One line. -->
+    <!-- Description under the Launch Service Providers heading. One line. -->
+    <!-- Title of a switch. When on, Starlink launches send no notification. Starlink is a product name. One line. -->
+    <!-- Description under the Mute Starlink launches switch. Starlink is a product name. One or two lines. -->
+    <!-- Section heading above the list of location checkboxes. One line. -->
+    <!-- Description under the Launch Locations heading. One line. -->
+    <!-- Title of the premium upsell card. One or two lines. -->
+    <!-- Body of the premium upsell card. Premium is the name of the paid plan. Two lines. -->
+    <!-- Section heading above the list of topic switches. One line. -->
+    <!-- Sub-heading above the event, news and announcement switches. One line. -->
+    <!-- Title of a switch for space event notifications. One line. -->
+    <!-- Description under the Event Notifications switch. One or two lines. -->
+    <!-- Title of a switch for featured news notifications. One line. -->
+    <!-- Description under the Featured News switch. One line. -->
+    <!-- Title of a switch for app announcement notifications. One line. -->
+    <!-- Description under the Announcements switch. Space Launch Now is the app name; do not translate. One or two lines. -->
+    <!-- Sub-heading above the timed countdown switches. One line. -->
+    <!-- Description under the Countdown Notifications sub-heading. One or two lines. -->
+    <!-- Title of a switch for notifications sent when the launch time changes. NET means No Earlier Than. One line. -->
+    <!-- Description under the Net Timestamp Changes switch. One line. -->
+    <!-- Title of a switch for a notification sent 24 hours before launch. One line. -->
+    <!-- Description under the 24 Hour Notice switch. One line. -->
+    <!-- Title of a switch for a notification sent 1 hour before launch. One line. -->
+    <!-- Description under the 1 Hour Notice switch. One line. -->
+    <!-- Title of a switch for a notification sent 10 minutes before launch. One line. -->
+    <!-- Description under the 10 Minutes Notice switch. One line. -->
+    <!-- Title of a switch for a notification sent 1 minute before launch. One line. -->
+    <!-- Description under the 1 Minute Notice switch. Light, friendly tone. One line. -->
+    <!-- Sub-heading above the launch status switches. One line. -->
+    <!-- Description under the Status Notifications sub-heading. One or two lines. -->
+    <!-- Title of a switch. When on, only launches that have a live video stream send notifications. One line. -->
+    <!-- Description under the Webcast Only Launches switch. One line. -->
+    <!-- Title of a switch for notifications sent while a rocket is flying. One line. -->
+    <!-- Description under the In-Flight Updates switch. One line. -->
+    <!-- Title of a switch for notifications sent when a mission succeeds. One line. -->
+    <!-- Description under the Mission Success switch. Light, friendly tone. One line. -->
+</resources>

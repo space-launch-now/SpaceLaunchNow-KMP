@@ -1,0 +1,62 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- Onboarding button, one line. Moves to the next page. -->
+    <!-- Onboarding text button, one line. Jumps to the last page. -->
+    <!-- Welcome page. Small line above the app name. One line. -->
+    <!-- Welcome page. Tagline under the app name. Two lines; the line break after the comma is on purpose. -->
+    <!-- Welcome page. Small caps label above the next launch card. -->
+    <!-- Welcome page. Short label between two divider lines, above a row of feature icons. Two spaces on each side keep it clear of the lines (written as &amp;#32; in the file). -->
+    <!-- Welcome page. Caption under a feature icon. One word. -->
+    <!-- Welcome page. Caption under a feature icon. One or two words. -->
+    <!-- Welcome page. Caption under a feature icon. One word. -->
+    <!-- Welcome page. Caption under a feature icon. One word. -->
+    <!-- Launch card page. Page title. One line. -->
+    <!-- Launch card page. Text under the title. One or two lines. -->
+    <!-- Schedule page. Page title. One line. -->
+    <!-- Schedule page. Text under the title. One or two lines. -->
+    <!-- News and events page. Text under the title. One or two lines. -->
+    <!-- Explore page. Page title. One line. -->
+    <!-- Explore page. Text under the title. One or two lines. -->
+    <!-- Widgets page. Page title. One line. -->
+    <!-- Widgets page, iOS. Text under the title. One or two lines. -->
+    <!-- Widgets page, Android. Text under the title. One or two lines. -->
+    <!-- Widget picture on the widgets page. Small caps label at the top of the sample widget. -->
+    <!-- Widget picture on the widgets page. Status badge on the sample widget, small caps. -->
+    <!-- Widget picture on the widgets page. Very short status next to a rocket icon. -->
+    <!-- Widget picture on the widgets page. Heading of the sample Android widget. -->
+    <!-- Notification filters page. Page title. One line. -->
+    <!-- Notification filters page. Text under the title. One or two lines. -->
+    <!-- Notification filters page. Section heading above sample timing switches. One or two words. -->
+    <!-- Notification filters page. Sample location checkbox label. US state name. -->
+    <!-- Notification filters page. Sample location checkbox label. US state name. -->
+    <!-- Notification filters page. Sample location checkbox label. US state name. -->
+    <!-- Notification filters page. Sample switch label. Alert one day before a launch. -->
+    <!-- Notification filters page. Sample switch label. Alert ten minutes before a launch. -->
+    <!-- Notification permission page. Title when notifications are already on. One line. -->
+    <!-- Notification permission page. Title when the app asks for permission. One line. -->
+    <!-- Notification permission page. Text under the title when notifications are already on. Two or three lines. -->
+    <!-- Notification permission page. Text under the title when the app asks for permission. Two or three lines. -->
+    <!-- Notification permission page. Button that shows the system permission dialog. -->
+    <!-- Premium offer page. Heading when the user already has Premium. One line. -->
+    <!-- Premium offer page. Heading for a user without Premium. One line. -->
+    <!-- Premium offer page. Text under the heading when the user already has Premium. One or two lines. -->
+    <!-- Premium offer page. Text under the heading for a user without Premium. The three dots are part of the text. -->
+    <!-- Premium offer page. Small caps heading above the list of Premium perks. -->
+    <!-- Premium offer page. Small caps line under the list of Premium perks. -->
+    <!-- Premium offer page. Perk text under its title. One or two lines. -->
+    <!-- Premium offer page. Perk title. One line. -->
+    <!-- Premium offer page, iOS. Perk text under its title. One or two lines. -->
+    <!-- Premium offer page, Android. Perk text under its title. One or two lines. -->
+    <!-- Premium offer page. Perk title. One line. -->
+    <!-- Premium offer page. Perk text under its title. One or two lines. -->
+    <!-- Premium offer page. Perk text under its title. One or two lines. -->
+    <!-- Premium offer page. Main button when the store gives a free trial length. %1$s is the length, such as 2-week. -->
+    <!-- Premium offer page. Small line under the main button text. %1$s is the yearly price with currency, such as $29.99. -->
+    <!-- Premium offer page. Small badge on the main button. %1$s is a percentage, such as 50%. -->
+    <!-- Premium offer page. Monthly plan button, without a price. -->
+    <!-- Premium offer page. Added after the monthly plan button text when a price is known. %1$s is the monthly price with currency. The text starts with a space, a middle dot and a space. -->
+    <!-- Premium offer page. Button that leaves the page without buying. -->
+    <!-- Premium offer page. Message shown when the device cannot make purchases. -->
+    <!-- Premium offer page. Button that leaves the page when the user already has Premium. -->
+    <!-- Premium offer page. Content description of the next launch image. Read by screen readers. -->
+</resources>

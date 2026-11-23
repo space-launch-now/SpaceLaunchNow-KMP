@@ -1,102 +1,100 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="premium_feature_description_ad_free">在整个应用中享受无广告体验</string>
-    <string name="premium_feature_description_custom_themes">用自定义颜色主题个性化你的应用</string>
-    <string name="premium_feature_description_advanced_widgets">使用发射列表小组件</string>
-    <string name="premium_feature_description_widgets_customization">自定义小组件的外观和风格</string>
-    <string name="premium_feature_description_cal_sync">使用日历同步链接，同步发射和活动</string>
-    <string name="premium_feature_description_notification_customization">自定义你的通知偏好</string>
-    <string name="premium_feature_description_wear_os">在你的 Wear OS 手表上使用 Space Launch Now</string>
-    <string name="premium_feature_title_custom_themes">自定义主题</string>
-    <string name="premium_feature_title_advanced_widgets">高级小组件</string>
-    <string name="premium_feature_title_widgets_customization">小组件自定义</string>
-    <string name="premium_feature_title_notification_customization">通知自定义</string>
-    <string name="temp_premium_default_description">观看一则广告，即可解锁所有高级功能 24 小时</string>
-    <string name="temp_premium_time_remaining">剩余时间：%1$s</string>
-    <string name="temp_premium_loading_ad">正在加载广告…</string>
-    <string name="temp_premium_extend_button">延长全部权限（+24 小时）</string>
-    <string name="temp_premium_watch_ad_button">观看广告获取 24 小时 Premium 权限</string>
-    <string name="temp_premium_time_hours_minutes">%1$d小时%2$d分钟</string>
-    <string name="temp_premium_time_hours">%1$d小时</string>
-    <string name="temp_premium_time_minutes">%1$d分钟</string>
-    <string name="temp_premium_time_under_minute">不足 1 分钟</string>
-    <string name="temp_premium_time_none">0 分钟</string>
-    <string name="support_us_loading_pricing">💰 正在从商店加载价格...</string>
-    <string name="support_us_continue_support">继续支持我们</string>
-    <string name="support_us_upgrade_to_lifetime">升级到终身版</string>
-    <string name="support_us_perk_widget_title">Premium 小组件</string>
-    <string name="support_us_perk_widget_description_ios">锁定屏幕和主屏幕小组件，一眼掌握发射动态</string>
-    <string name="support_us_perk_widget_description_android">为主屏幕解锁额外的发射列表小组件</string>
-    <string name="support_us_perk_themes_title">Premium 主题</string>
-    <string name="support_us_perk_themes_description">使用高级主题，打造专属的应用体验</string>
-    <string name="support_us_perk_no_ads_title">无广告</string>
-    <string name="support_us_perk_no_ads_description">在整个应用中享受不受打扰的无广告体验</string>
-    <string name="support_us_perk_support_title">支持开发</string>
-    <string name="support_us_perk_support_description">帮助我们持续改进应用并添加新功能</string>
-    <string name="support_us_choose_upgrade">选择升级方案！</string>
-    <string name="support_us_choose_plan">选择你的方案</string>
-    <string name="support_us_plan_yearly">年付</string>
-    <string name="support_us_plan_monthly">月付</string>
-    <string name="support_us_period_year">/年</string>
-    <string name="support_us_period_month">/月</string>
-    <string name="support_us_or_go_lifetime">\u0020\u0020或选择终身版\u0020\u0020</string>
-    <string name="support_us_restore_purchases_member">已是会员？恢复购买</string>
-    <string name="support_us_restore_purchases">恢复购买</string>
-    <string name="support_us_header_thank_you">谢谢你！🎉</string>
-    <string name="support_us_header_member_type">你是 %1$s 会员！</string>
-    <string name="support_us_header_love_title">喜欢 Space Launch Now？</string>
-    <string name="support_us_header_join_subtitle">成为会员，解锁高级功能</string>
-    <string name="support_us_subscribe_now">立即订阅</string>
-    <string name="support_us_best_value">超值之选</string>
-    <string name="support_us_free_trial_badge">%1$s免费试用</string>
-    <string name="support_us_then_price_after_trial">试用后 %1$s%2$s</string>
-    <string name="support_us_making_difference">你正在带来改变！</string>
-    <string name="support_us_thanks_legacy">感谢你一直以来对 Space Launch Now 的支持。你可以享受无广告体验。</string>
-    <string name="support_us_thanks_member">感谢你支持 Space Launch Now。你的 %1$s 会员资格帮助我们继续开发功能并维持应用运行。</string>
-    <string name="support_us_legacy_benefits_heading">你的早期支持者权益：</string>
-    <string name="support_us_premium_features_heading">你的 Premium 功能：</string>
-    <string name="support_us_active_widget_ios">锁定屏幕和主屏幕小组件</string>
-    <string name="support_us_active_widget_android">额外的发射列表小组件</string>
-    <string name="support_us_active_no_ads">无广告体验</string>
-    <string name="support_us_active_calendar_sync">使用 ICS 同步</string>
-    <string name="support_us_active_supporting_title">支持开发</string>
-    <string name="support_us_active_supporting_description">谢谢你！</string>
-    <string name="support_us_active_themes">自定义你的应用</string>
-    <string name="support_us_user_id_label">用户 ID</string>
-    <string name="support_us_user_id_unavailable">不可用</string>
-    <string name="support_us_copy_user_id_description">复制用户 ID</string>
-    <string name="support_us_restore_help_title">无法恢复购买？</string>
-    <string name="support_us_restore_help_body">告诉我，我来帮你解决</string>
-    <string name="support_us_open_form_description">打开表单</string>
-    <string name="support_us_lifetime_title">Pro 终身版</string>
-    <string name="support_us_lifetime_tagline">一次购买，永久拥有</string>
-    <string name="support_us_lifetime_one_time">一次性</string>
-    <string name="support_us_lifetime_max_support">✨ 最大支持 ✨</string>
-    <string name="support_us_lifetime_perk_subscriptions">包含订阅的全部权益</string>
-    <string name="support_us_lifetime_perk_access">终身使用权</string>
-    <string name="support_us_lifetime_perk_support">支持独立开发者</string>
-    <string name="support_us_unlock_pro_forever">永久解锁 Pro</string>
-    <string name="support_us_current_plan">当前方案</string>
-    <string name="support_us_free_trial">免费试用</string>
-    <plurals name="support_us_free_trial_days_remaining">
-        <item quantity="other">免费试用 – 剩余 %1$d 天</item>
-    </plurals>
-    <string name="support_us_free_user">免费用户</string>
-    <string name="support_us_member_plan">%1$s 会员</string>
-    <string name="support_us_product_line">产品：%1$s</string>
-    <string name="support_us_upgrade_prompt">升级即可解锁高级功能并支持开发</string>
-    <string name="support_us_legacy_banner_title">感谢你，早期支持者！</string>
-    <string name="support_us_legacy_banner_body">你早期的购买帮助 Space Launch Now 成长为今天的样子。我由衷感谢你的早期支持！</string>
-    <string name="support_us_legacy_banner_prompt">请在下方选择方案，继续支持开发！</string>
-    <string name="fine_print_secure_billing_title">安全计费</string>
-    <string name="fine_print_billing_note">购买通过%1$s安全处理。</string>
-    <string name="fine_print_store_google_play">Google Play</string>
-    <string name="fine_print_store_app_store">App Store</string>
-    <string name="fine_print_store_other">你所用平台的商店</string>
-    <string name="fine_print_trial_disclosure">除非在试用期结束前取消，免费试用将自动转为付费订阅，价格为 %1$s。如果在 %2$s试用期内取消，你不会被扣费。</string>
-    <string name="fine_print_auto_renew_notice">任何一项购买都会解锁所有高级功能。订阅会自动续订，除非取消。你可以随时通过下方链接管理或取消订阅。</string>
-    <string name="fine_print_manage_google_play">在 Google Play 管理订阅</string>
-    <string name="fine_print_manage_app_store">在 App Store 管理订阅</string>
-    <string name="fine_print_manage_generic">管理订阅</string>
-    <string name="ads_remove_ads_button">移除广告</string>
+    <!-- Premium feature description. One sentence under the locked-feature heading. -->
+    <!-- Premium feature description. One sentence under the locked-feature heading. -->
+    <!-- Premium feature description. One sentence under the locked-feature heading. -->
+    <!-- Premium feature description. One sentence under the locked-feature heading. -->
+    <!-- Premium feature description. One sentence under the locked-feature heading. -->
+    <!-- Premium feature description. One sentence under the locked-feature heading. -->
+    <!-- Premium feature description. One sentence under the locked-feature heading. -->
+    <!-- Premium feature name in a list of benefits. Short, one line. -->
+    <!-- Premium feature name in a list of benefits. Short, one line. -->
+    <!-- Premium feature name in a list of benefits. Short, one line. -->
+    <!-- Premium feature name in a list of benefits. Short, one line. -->
+    <!-- Text under the card title when the caller gives none. One or two lines. -->
+    <!-- Status line with a clock icon. %1$s is the time left, such as 23h 45m. -->
+    <!-- Button label while a rewarded ad loads. One line, max 20 chars. -->
+    <!-- Button. Watching an ad adds 24 hours to the premium access that is active. One line. -->
+    <!-- Button. Watching an ad gives 24 hours of premium access. One line. -->
+    <!-- Time left. %1$d is hours, %2$d is minutes. Example: 2h 15m. Keep it short. -->
+    <!-- Time left. %1$d is hours. Example: 2h. Keep it short. -->
+    <!-- Time left. %1$d is minutes. Example: 45m. Keep it short. -->
+    <!-- Time left when under one minute. Short. -->
+    <!-- Time left when there is no expiry date. Short. -->
+    <!-- Small note under the plan cards while the store prices load. Starts with an emoji. One line. -->
+    <!-- Heading above the perk cards for a legacy supporter, and heading of the legacy banner. One line, large. -->
+    <!-- Heading above the perk cards for a monthly or yearly member. One line, large. -->
+    <!-- Perk card title and active perk title. Widget is the home screen widget. One line. -->
+    <!-- Perk card text on iOS. One or two lines. -->
+    <!-- Perk card text on Android. One or two lines. -->
+    <!-- Perk card title and active perk title. One line. -->
+    <!-- Perk card text. One or two lines. -->
+    <!-- Perk card title and active perk title. One line. -->
+    <!-- Perk card text. Two lines. -->
+    <!-- Perk card title. One line. -->
+    <!-- Perk card text. Two lines. -->
+    <!-- Heading above the plan cards for a member who can still upgrade. One line. -->
+    <!-- Heading above the plan cards for a new user. One line. -->
+    <!-- Plan card title for the yearly plan. One word. -->
+    <!-- Plan card title for the monthly plan. One word. -->
+    <!-- Shown right after the price, for a yearly plan. Short, keeps the slash. -->
+    <!-- Shown right after the price, for a monthly plan. Short, keeps the slash. -->
+    <!-- Divider text between the plan cards and the lifetime card. Two spaces on each side (written as \u0020) keep it away from the lines. Keep the spaces. -->
+    <!-- Text button under the plans. For a person who is not a member yet. One line. -->
+    <!-- Text button under the plans. For a person who is a member. One line. -->
+    <!-- Header of the Support Us screen for a member. One line, large. -->
+    <!-- Line under the header for a member. %1$s is the plan type in lower case, such as premium or lifetime. -->
+    <!-- Header of the Support Us screen for a person who is not a member. One line, large. -->
+    <!-- Line under the header for a person who is not a member. One or two lines. -->
+    <!-- Button on a plan card with no free trial. One line. -->
+    <!-- Badge on the recommended plan. Capital letters. Short. -->
+    <!-- Badge on a plan with a free trial. %1$s is the length, such as 3-day. -->
+    <!-- Line under the trial badge. %1$s is the price, %2$s is the period such as /year. -->
+    <!-- Heading of the thank-you card for a member. One line. -->
+    <!-- Text on the thank-you card for a legacy supporter. Two or three lines. -->
+    <!-- Text on the thank-you card for a member. %1$s is the plan type in lower case, such as premium. -->
+    <!-- Heading above the list of benefits of a legacy supporter. One line, ends with a colon. -->
+    <!-- Heading above the list of benefits of a member. One line, ends with a colon. -->
+    <!-- Active perk text on iOS. One line. -->
+    <!-- Active perk text on Android. One line. -->
+    <!-- Active perk text. One line. -->
+    <!-- Active perk text. ICS is the calendar file format. One line. -->
+    <!-- Active perk title. One line. -->
+    <!-- Active perk text. One short line. -->
+    <!-- Active perk text. One line. -->
+    <!-- Small label above the user id. One line. -->
+    <!-- Shown in place of the user id when the store gives none. One line. -->
+    <!-- Content description of the copy icon next to the user id. Read by screen readers. -->
+    <!-- Title of the help card. A question. One line. -->
+    <!-- Text of the help card. Opens a feedback form. One line. -->
+    <!-- Content description of the open-in-browser icon on the help card. Read by screen readers. -->
+    <!-- Title of the lifetime plan card. Pro is the name of the tier. One line. -->
+    <!-- Line under the lifetime plan title. One line. -->
+    <!-- Shown right after the lifetime price. Short. -->
+    <!-- Badge on the lifetime card. Emoji on both sides. Capital letters. -->
+    <!-- Check-list line on the lifetime card. -->
+    <!-- Check-list line on the lifetime card. -->
+    <!-- Check-list line on the lifetime card. -->
+    <!-- Button on the lifetime card. One line. -->
+    <!-- Heading of the current plan card. One line. -->
+    <!-- Plan status during a free trial. Shown when the days left are not known. -->
+    <!-- Plan status during a free trial with days left. %1$d is the count of days. -->
+    <!-- Plan status for a person who is not a member. -->
+    <!-- Plan status for a subscriber. %1$s is the plan name, such as Pro or Lifetime. -->
+    <!-- Line on the current plan card. %1$s is the store product name. -->
+    <!-- Line on the current plan card for a person who is not a member. One or two lines. -->
+    <!-- Heading of the legacy banner. One line. -->
+    <!-- Text of the legacy banner. First person, from the developer. Three or four lines. -->
+    <!-- Text of the legacy banner, under the continue button. One or two lines. -->
+    <!-- Heading of the fine print on subscription screens. One line. -->
+    <!-- Billing note. %1$s is a store name, filled in from one of the next three strings (fine_print_store_*). Translate the sentence around it; the store name arrives as the form that sentence needs. -->
+    <!-- Store name on Android. Used only in fine_print_billing_note, as %1$s. Write the store name in the form that sentence needs, with its article where the language has one. -->
+    <!-- Store name on iOS. Used only in fine_print_billing_note, as %1$s, where it reads after "through". Write the store name in the form that sentence needs, with its article where the language has one (English: "the App Store"). -->
+    <!-- Store name on other platforms, such as desktop. Used only in fine_print_billing_note, as %1$s. Write the store name in the form that sentence needs, with its article where the language has one. -->
+    <!-- Free trial disclosure required by store policy. %1$s is the price after the trial, such as $9.99/year. %2$s is the trial length, such as 3-day. -->
+    <!-- Auto-renew notice under the plans. Three sentences. -->
+    <!-- Button that opens the Google Play subscriptions page. One line. -->
+    <!-- Button that opens the App Store subscriptions page. One line. -->
+    <!-- Generic button for managing subscriptions. One line. -->
+    <!-- Button under a banner ad card. Opens the screen where the user can pay to remove ads. One or two words. -->
 </resources>

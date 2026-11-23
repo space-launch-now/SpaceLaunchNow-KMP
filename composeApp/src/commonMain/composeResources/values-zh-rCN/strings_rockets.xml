@@ -1,48 +1,48 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="rockets_list_title_filtered">火箭 (%1$d)</string>
-    <string name="rockets_list_filter_description">筛选火箭</string>
-    <string name="rockets_list_loading">正在加载火箭...</string>
-    <string name="rockets_list_error_title">火箭加载失败</string>
-    <string name="rockets_list_empty_title">未找到火箭</string>
-    <string name="rockets_list_item_image_description">%1$s 图片</string>
-    <string name="rockets_detail_info_title">火箭信息</string>
-    <string name="rockets_detail_performance_title">性能</string>
-    <string name="rockets_detail_capacity_title">有效载荷能力</string>
-    <string name="rockets_detail_label_format">%1$s：</string>
-    <string name="rockets_detail_label_full_name">全名</string>
-    <string name="rockets_detail_stages_range">%1$d-%2$d</string>
-    <string name="rockets_detail_label_liftoff_thrust">起飞推力</string>
-    <string name="rockets_detail_value_kilonewtons">%1$s kN</string>
-    <string name="rockets_detail_value_cost_millions">$%1$sM</string>
-    <string name="rockets_detail_label_total_launches">发射总数</string>
-    <string name="rockets_detail_label_pending">待发射</string>
-    <string name="rockets_detail_label_consecutive_successes">连续成功</string>
-    <string name="rockets_filter_search_label">火箭名称</string>
-    <string name="rockets_filter_search_placeholder">例如 Falcon、Atlas、Starship</string>
-    <string name="rockets_filter_active_title">现役状态</string>
-    <string name="rockets_filter_option_all">全部</string>
-    <string name="rockets_filter_active_only">仅现役</string>
-    <string name="rockets_filter_retired">已退役</string>
-    <string name="rockets_filter_reusable_title">可复用性</string>
-    <string name="rockets_filter_loading">正在加载筛选选项...</string>
-    <string name="rockets_filter_none_loaded">未加载筛选选项</string>
-    <string name="rockets_filter_reload">重新加载选项</string>
-    <string name="rockets_filter_refresh">刷新筛选选项</string>
-    <string name="rockets_sort_family_asc">系列 (A-Z)</string>
-    <string name="rockets_sort_family_desc">系列 (Z-A)</string>
-    <string name="rockets_sort_leo_capacity_asc">LEO 运载能力（从低到高）</string>
-    <string name="rockets_sort_leo_capacity_desc">LEO 运载能力（从高到低）</string>
-    <string name="rockets_sort_gto_capacity_asc">GTO 运载能力（从低到高）</string>
-    <string name="rockets_sort_gto_capacity_desc">GTO 运载能力（从高到低）</string>
-    <string name="rockets_sort_launch_mass_asc">起飞质量（从低到高）</string>
-    <string name="rockets_sort_launch_mass_desc">起飞质量（从高到低）</string>
-    <string name="rockets_sort_launch_cost_asc">发射成本（从低到高）</string>
-    <string name="rockets_sort_launch_cost_desc">发射成本（从高到低）</string>
-    <string name="rockets_sort_maiden_flight_asc">首飞（最早）</string>
-    <string name="rockets_sort_maiden_flight_desc">首飞（最新）</string>
-    <string name="rockets_sort_field_total_launches_desc">发射最多</string>
-    <string name="rockets_sort_field_total_launches_asc">发射最少</string>
-    <string name="rockets_sort_field_first_flight_desc">最新优先</string>
-    <string name="rockets_sort_field_first_flight_asc">最早优先</string>
+    <!-- Rocket list top bar title when filters are active. %1$d is the number of matching rockets. One line. -->
+    <!-- Content description of the filter icon button in the rocket list top bar. Read by screen readers. -->
+    <!-- Text under the spinner while the rocket list loads the first time. One line. -->
+    <!-- Heading of the rocket list error state, above the error message. One or two lines, bold. -->
+    <!-- Heading of the empty rocket list, above the hint. One or two lines, bold. -->
+    <!-- Content description of a rocket picture in the list. %1$s is the rocket name. Read by screen readers. -->
+    <!-- Card heading on the rocket detail screen, above the basic facts. One line, bold. -->
+    <!-- Card heading on the rocket detail screen, above size and thrust rows. One line, bold. -->
+    <!-- Card heading on the rocket detail screen, above the orbit payload rows. One line, bold. -->
+    <!-- Row label format on the rocket detail screen. %1$s is the row label, such as Length. Keep the colon style of the language. -->
+    <!-- Row label, left column. The rocket full name is the value. -->
+    <!-- Row value, range of stages. %1$d is the fewest stages, %2$d the most stages. Example: 1-2. -->
+    <!-- Row label, left column. The thrust at liftoff is the value. -->
+    <!-- Row value, thrust in kilonewtons. %1$s is a formatted number such as 7607. -->
+    <!-- Row value, cost in millions of US dollars. %1$s is a formatted number such as 67. Keep the dollar sign and the M. -->
+    <!-- Row label, left column. The number of launches is the value. -->
+    <!-- Row label, left column. The count of launches not flown yet is the value. -->
+    <!-- Row label, left column, on the launch and the landing cards. The count of successes in a row is the value. -->
+    <!-- Floating label of the search field in the filter sheet. One line. -->
+    <!-- Placeholder of the search field in the filter sheet. Example rocket names. One line. -->
+    <!-- Label above the active status segmented buttons. One line. -->
+    <!-- Segmented button. No filter on this setting. One word, max 12 chars. -->
+    <!-- Segmented button. Shows rockets in service only. Max 12 chars. -->
+    <!-- Segmented button. Shows rockets out of service only. One word, max 12 chars. -->
+    <!-- Label above the reusable segmented buttons. One line. -->
+    <!-- Small text in the filter sheet while the program and family lists load. One line. -->
+    <!-- Small text in the filter sheet when the program and family lists are empty. One line. -->
+    <!-- Text button under the empty-options message. Loads the lists again. One line. -->
+    <!-- Text button at the end of the filter section. Loads the lists again. One line. -->
+    <!-- Sort option in the rocket filter sheet menu. The text in brackets says the direction. One line. -->
+    <!-- Sort option in the rocket filter sheet menu. The text in brackets says the direction. One line. -->
+    <!-- Sort option in the rocket filter sheet menu. The text in brackets says the direction. One line. -->
+    <!-- Sort option in the rocket filter sheet menu. The text in brackets says the direction. One line. -->
+    <!-- Sort option in the rocket filter sheet menu. The text in brackets says the direction. One line. -->
+    <!-- Sort option in the rocket filter sheet menu. The text in brackets says the direction. One line. -->
+    <!-- Sort option in the rocket filter sheet menu. The text in brackets says the direction. One line. -->
+    <!-- Sort option in the rocket filter sheet menu. The text in brackets says the direction. One line. -->
+    <!-- Sort option in the rocket filter sheet menu. The text in brackets says the direction. One line. -->
+    <!-- Sort option in the rocket filter sheet menu. The text in brackets says the direction. One line. -->
+    <!-- Sort option in the rocket filter sheet menu. The text in brackets says the direction. One line. -->
+    <!-- Sort option in the rocket filter sheet menu. The text in brackets says the direction. One line. -->
+    <!-- Sort option in the rocket sort menu. Short phrase, one line. -->
+    <!-- Sort option in the rocket sort menu. Short phrase, one line. -->
+    <!-- Sort option in the rocket sort menu. Short phrase, one line. -->
+    <!-- Sort option in the rocket sort menu. Short phrase, one line. -->
 </resources>

@@ -1,0 +1,66 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- Space station detail. Screen reader description of the back arrow on the error screen. -->
+    <!-- Space station detail. Heading on the error screen, above the error message. One or two lines. -->
+    <!-- Space station detail. Screen reader description of the button that opens the map full screen. -->
+    <!-- Space station detail. Screen reader description of the button that closes the full screen map. -->
+    <!-- Station map marker, Android only. Title of the marker that shows where the station is. Keep short. -->
+    <!-- Station position card. Heading of the card, one line. -->
+    <!-- Station position card. Small label above the latitude value. One word. -->
+    <!-- Station position card. Small label above the longitude value. One word. -->
+    <!-- Station position card. %1$s is a number with 4 decimals, such as 51.6400. Keep the degree sign. -->
+    <!-- Station position card. Small label above the altitude value, and its icon description. One word. -->
+    <!-- Station position card. Small label above the speed value, and its icon description. One word. -->
+    <!-- Station position card. Speed value. %1$s is a number, such as 27580. Keep the unit short. -->
+    <!-- Station position card. Small label above the day or night state of the station. One word. -->
+    <!-- Station position card. Small label above the orbit name. One word. -->
+    <!-- Station position card. Text shown while the position loads. One line. -->
+    <!-- Station crew card. Heading. %1$d is the number of crew members. -->
+    <!-- Station crew lists. Shown in place of a crew member name that is missing. One word. -->
+    <!-- Station docking card and station statistics. Heading of the docking card and label of the docked vehicles count. -->
+    <!-- Station docking card. Screen reader description of the vehicle icon. -->
+    <!-- Station docking card. Shown in place of a vehicle name that is missing. -->
+    <!-- Station docking card. Small line under a vehicle. %1$s is a date such as Nov 3, 2026. -->
+    <!-- Expedition card. Screen reader description of the expedition icon. -->
+    <!-- Expedition card. Small label above the start date. One word. -->
+    <!-- Expedition card. Small label above the end date. One word. -->
+    <!-- Expedition card. Shown in place of the end date while the expedition runs. One word. -->
+    <!-- Expedition card. Heading of the crew list. %1$d is the number of crew members. -->
+    <!-- Expedition card. Screen reader description of the picture shown when a crew member has no photo. -->
+    <!-- Station owners card. Heading of the card. -->
+    <!-- Station news card. Heading of the card. -->
+    <!-- Station statistics card. Heading of the card. -->
+    <!-- Station statistics card. Label above the station height. One word. -->
+    <!-- Station statistics card. Label above the station width. One word. -->
+    <!-- Station statistics card. Label above the station mass. One word. -->
+    <!-- Station statistics card. Label above the station volume. One word. -->
+    <!-- Station statistics card. Volume in cubic metres. %1$s is a number. -->
+    <!-- Starship screen. Tab label. One word. -->
+    <!-- Starship events tab. Section heading above the news list. -->
+    <!-- Starship events tab. Empty state when no event exists. -->
+    <!-- Starship events tab. Shown in place of an event type that is missing. -->
+    <!-- Starship timeline. Heading of the program timeline. -->
+    <!-- Starship timeline. Error line. %1$s is the error message from the server. -->
+    <!-- Starship timeline. Badge on the next launch card. Capital letters, one word, max 10 chars. -->
+    <!-- Starship timeline. Screen reader description of a launch picture. -->
+    <!-- Starship timeline. Line on a failed launch. %1$s is the failure reason. Keep the warning sign. -->
+    <!-- Starship overview tab. Shown in place of an error message that is missing. -->
+    <!-- Starship overview tab. Hint under the error message. Tapping retries the load. -->
+    <!-- Starship overview tab. Empty state when the program has no data. -->
+    <!-- Starship overview tab. Banner shown when the data comes from the cache. -->
+    <!-- Starship vehicles tab. Line under the spacecraft heading. -->
+    <!-- Starship vehicles tab. Section heading and name used when a booster configuration has no name. -->
+    <!-- Starship vehicles tab. Line under the boosters heading. -->
+    <!-- Starship vehicles tab. Empty state when no configuration exists. -->
+    <!-- Starship vehicles tab. Screen reader description of the arrow that goes back to the configuration list. -->
+    <!-- Starship vehicles tab. Section heading above the list of single vehicles. -->
+    <!-- Starship vehicles tab. Error line when the spacecraft list fails to load. -->
+    <!-- Starship vehicles tab. Empty state when no spacecraft exists. -->
+    <!-- Starship vehicles tab. Error line when the booster list fails to load. -->
+    <!-- Starship vehicles tab. Empty state when no booster exists. -->
+    <!-- Starship vehicle configuration card. Launch count. %1$d is the number of launches. -->
+    <!-- Starship vehicle card. Shown in place of a serial number that is missing. One word. -->
+    <!-- Starship vehicle card. Shown for a booster that has not flown. One word. -->
+    <!-- Starship vehicle card. Flight count of a booster that has flown. %1$d is the number of flights. -->
+    <!-- Description of the NASA live video stream of Earth from the International Space Station. One sentence. -->
+</resources>

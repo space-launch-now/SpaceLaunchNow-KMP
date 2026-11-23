@@ -1,76 +1,109 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="app_components_cache_indicator_label">缓存</string>
-    <string name="app_components_country_chip_flag_description">%1$s旗帜</string>
-    <string name="app_components_feedback_button_discord">加入 Discord 社区</string>
-    <string name="app_components_feedback_button_email">发送邮件</string>
-    <string name="app_components_feedback_button_github">GitHub 议题</string>
-    <string name="app_components_feedback_message">你的反馈能帮我改进！你想用什么方式分享你的想法？</string>
-    <string name="app_components_feedback_title">期待你的反馈</string>
-    <string name="app_components_filter_chip_remove_description">移除筛选条件 %1$s</string>
-    <string name="app_components_offline_banner_message">离线 - 显示缓存数据</string>
-    <string name="app_components_rating_button_later">稍后再问我</string>
-    <string name="app_components_rating_button_no">不太喜欢</string>
-    <string name="app_components_rating_button_yes">是的，我很喜欢！</string>
-    <string name="app_components_rating_message">我们很想听听你的反馈！你喜欢使用这款应用吗？</string>
-    <string name="app_components_rating_title">喜欢 Space Launch Now 吗？</string>
-    <string name="app_components_search_bar_clear_description">清除搜索</string>
-    <string name="app_components_search_bar_icon_description">搜索图标</string>
-    <string name="app_components_sort_menu_title">排序方式</string>
-    <string name="app_components_web_fallback_opening">正在浏览器中打开文章…</string>
-    <string name="app_compose_empty_state_action">调整筛选条件</string>
-    <string name="app_compose_empty_state_message">试试调整机构或地点筛选条件，查看更多发射</string>
-    <string name="app_compose_empty_state_title">没有符合筛选条件的发射</string>
-    <string name="app_compose_launch_card_header_agency_logo_description">机构徽标</string>
-    <string name="app_compose_launch_card_header_agency_placeholder_description">机构占位图</string>
-    <string name="app_compose_launch_window_instantaneous">瞬时</string>
-    <string name="app_compose_launch_window_title">发射窗口</string>
-    <string name="app_compose_live_indicator_description">直播指示标志</string>
-    <string name="app_compose_video_player_error_message">无法加载视频</string>
-    <string name="app_compose_video_player_fullscreen_description">进入全屏</string>
-    <string name="app_compose_video_player_open_in_app">在应用中打开</string>
-    <string name="app_compose_video_player_play_description">播放视频</string>
-    <string name="app_compose_video_player_thumbnail_description">视频缩略图</string>
-    <string name="app_explore_card_agencies_content_description">前往机构列表，探索航天组织</string>
-    <string name="app_explore_card_agencies_description">航天机构与任务</string>
-    <string name="app_explore_card_astronauts_content_description">前往航天员列表，查看职业数据与任务</string>
-    <string name="app_explore_card_astronauts_description">浏览航天员档案</string>
-    <string name="app_explore_card_iss_content_description">前往 ISS 追踪，查看实时位置与乘员信息</string>
-    <string name="app_explore_card_iss_description">实时追踪与乘员信息</string>
-    <string name="app_explore_card_iss_title">ISS 追踪</string>
-    <string name="app_explore_card_news_events_content_description">前往新闻与活动，浏览文章和即将举行的航天活动</string>
-    <string name="app_explore_card_news_events_description">航天新闻与即将举行的活动</string>
-    <string name="app_explore_card_rockets_content_description">前往火箭列表，探索运载火箭</string>
-    <string name="app_explore_card_rockets_description">运载火箭型号</string>
-    <string name="app_explore_card_starship_content_description">前往 Starship 看板，查看动态与发射</string>
-    <string name="app_explore_card_starship_description">SpaceX Starship 研发进展</string>
-    <string name="app_layout_desktop_app_icon_description">应用图标</string>
-    <string name="app_layout_nav_explore_content_description">探索标签页</string>
-    <string name="app_layout_nav_home_content_description">主页标签页</string>
-    <string name="app_layout_nav_home_label">主页</string>
-    <string name="app_layout_nav_news_content_description">新闻与活动标签页</string>
-    <string name="app_layout_nav_schedule_content_description">日程标签页</string>
-    <string name="app_layout_nav_schedule_label">日程</string>
-    <string name="app_layout_nav_settings_content_description">设置标签页</string>
-    <string name="app_newsevents_detail_title_fallback">文章</string>
-    <string name="app_newsevents_empty_events">未找到活动</string>
-    <string name="app_newsevents_empty_events_search">未找到与 \"%1$s\" 相关的活动</string>
-    <string name="app_newsevents_empty_news">未找到新闻文章</string>
-    <string name="app_newsevents_empty_news_search">未找到与 \"%1$s\" 相关的文章</string>
-    <string name="app_newsevents_error_title">内容加载出错</string>
-    <string name="app_newsevents_event_item_description">活动：%1$s，类型：%2$s</string>
-    <string name="app_newsevents_event_item_image_description">%1$s 的活动图片</string>
-    <string name="app_newsevents_filter_sheet_clear_all">清除所有筛选条件</string>
-    <string name="app_newsevents_filter_sheet_event_types_heading">选择活动类型</string>
-    <string name="app_newsevents_filter_sheet_event_types_loading">正在加载活动类型...</string>
-    <string name="app_newsevents_filter_sheet_sources_heading">选择来源</string>
-    <string name="app_newsevents_filter_sheet_title_events">按活动类型筛选</string>
-    <string name="app_newsevents_filter_sheet_title_news">按来源筛选</string>
-    <string name="app_newsevents_news_item_description">新闻文章：%1$s，来自 %2$s</string>
-    <string name="app_newsevents_news_item_image_description">%1$s 的文章图片</string>
-    <string name="app_newsevents_search_placeholder_events">搜索活动...</string>
-    <string name="app_newsevents_search_placeholder_news">搜索新闻文章...</string>
-    <string name="app_video_fullscreen_external_description">在外部应用中打开</string>
-    <string name="app_video_fullscreen_position">视频 %1$d/%2$d</string>
-    <string name="preload_loading_description">正在加载发射数据</string>
+    <!-- Small badge on a card showing cached data. One word, max 10 chars. -->
+    <!-- Content description of the flag image in a country chip. %1$s is the country name. Read by screen readers. -->
+    <!-- Outlined button with the Discord icon, full width, one line. -->
+    <!-- Filled button in the feedback dialog, opens an email. One line, max 16 chars. Half the dialog width. -->
+    <!-- Outlined button in the feedback dialog, opens a GitHub issue. One line, max 16 chars. Half the dialog width. -->
+    <!-- Body of the feedback dialog above the buttons. Two to four lines. -->
+    <!-- Title of the feedback dialog. One or two lines, headline size. -->
+    <!-- Content description of the close icon on a filter chip. %1$s is the filter label. Read by screen readers. -->
+    <!-- Banner text next to the cloud-off icon when data comes from the cache. One line, may truncate. -->
+    <!-- Text button in the rating dialog, full width, one line. -->
+    <!-- Outlined button in the rating dialog, one line, max 16 chars. Half the dialog width. -->
+    <!-- Filled button in the rating dialog, one line, max 16 chars. Half the dialog width. -->
+    <!-- Dialog body under the rating title. Two or three lines. -->
+    <!-- Dialog title asking if the user likes the app. One or two lines, headline size. -->
+    <!-- Content description of the clear button in the search field. Read by screen readers. -->
+    <!-- Content description of the magnifier icon in the search field. Read by screen readers. -->
+    <!-- Title of the sort bottom sheet or dialog. One line, large bold. -->
+    <!-- Centered message while the article opens in the system browser. One or two lines. -->
+    <!-- Default label of the empty state button, next to a settings icon. One line, max 20 chars. -->
+    <!-- Default message under the empty state title. Two or three lines. -->
+    <!-- Default title of the empty state card when filters hide all launches. One or two lines, bold. -->
+    <!-- Content description of the agency logo on a launch card header. Read by screen readers. -->
+    <!-- Content description of the agency logo placeholder on a launch card header. Read by screen readers. -->
+    <!-- Value under the duration label when the launch window has zero length. One word. -->
+    <!-- Small bold title above the launch window timeline. One line. -->
+    <!-- Content description of the pulsing live badge. Read by screen readers. -->
+    <!-- Default message in the video error box. One or two lines, bold. -->
+    <!-- Content description of the fullscreen button on the video player. Read by screen readers. -->
+    <!-- Button label with an open icon below the video, opens the video in its own app. One line, max 16 chars. -->
+    <!-- Content description of the play icon over the video thumbnail. Read by screen readers. -->
+    <!-- Content description of the video thumbnail before playing. Read by screen readers. -->
+    <!-- Accessibility description of the whole Agencies card on the Explore screen. Read by screen readers. -->
+    <!-- Description under the Agencies card title on the Explore screen. Centered, small text, max 2 lines. -->
+    <!-- Accessibility description of the whole Astronauts card on the Explore screen. Read by screen readers. -->
+    <!-- Description under the Astronauts card title on the Explore screen. Centered, small text, max 2 lines. -->
+    <!-- Accessibility description of the whole ISS Tracking card on the Explore screen. Read by screen readers. -->
+    <!-- Description under the ISS Tracking card title on the Explore screen. Centered, small text, max 2 lines. -->
+    <!-- Title of the ISS Tracking card on the Explore screen. Bold, centered, one line. -->
+    <!-- Accessibility description of the whole News & Events card on the Explore screen. Read by screen readers. -->
+    <!-- Description under the News & Events card title on the Explore screen. Centered, small text, max 2 lines. -->
+    <!-- Accessibility description of the whole Rockets card on the Explore screen. Read by screen readers. -->
+    <!-- Description under the Rockets card title on the Explore screen. Centered, small text, max 2 lines. -->
+    <!-- Accessibility description of the whole Starship card on the Explore screen. Read by screen readers. -->
+    <!-- Description under the Starship card title on the Explore screen. Centered, small text, max 2 lines. -->
+    <!-- Content description of the app icon in the desktop navigation drawer header. Read by screen readers. -->
+    <!-- Accessibility description of the Explore tab icon in the bottom bar or side rail. Read by screen readers. -->
+    <!-- Accessibility description of the Home tab icon in the bottom bar or side rail. Read by screen readers. -->
+    <!-- Label of the Home tab in the bottom bar or side rail. One word, max 12 chars. -->
+    <!-- Accessibility description of the News tab icon in the bottom bar or side rail. Read by screen readers. -->
+    <!-- Accessibility description of the Schedule tab icon in the bottom bar or side rail. Read by screen readers. -->
+    <!-- Label of the Schedule tab in the bottom bar or side rail. One word, max 12 chars. -->
+    <!-- Accessibility description of the Settings tab icon in the bottom bar or side rail. Read by screen readers. -->
+    <!-- Top bar title of the news detail screen when the article has no title. One line. -->
+    <!-- Empty list message on the Events tab. Centered, one or two lines. -->
+    <!-- Empty list message on the Events tab after a search. %1$s is the search text. Centered, one or two lines. -->
+    <!-- Empty list message on the News tab. Centered, one or two lines. -->
+    <!-- Empty list message on the News tab after a search. %1$s is the search text. Centered, one or two lines. -->
+    <!-- Title of the error block in the News & Events lists, above the error message. Centered, one or two lines. -->
+    <!-- Accessibility description of a whole event card. %1$s is the event name, %2$s the event type. Read by screen readers. -->
+    <!-- Content description of the event image in an event card. %1$s is the event name. Read by screen readers. -->
+    <!-- Full-width text button that clears every filter. One line. -->
+    <!-- Small heading above the event type chips. One line. -->
+    <!-- Message in the filter sheet while event types load. One line. -->
+    <!-- Small heading above the news source chips. One line. -->
+    <!-- Title of the filter bottom sheet on the Events tab. One line, bold. -->
+    <!-- Title of the filter bottom sheet on the News tab. One line, bold. -->
+    <!-- Accessibility description of a whole news card. %1$s is the article title, %2$s the news site. Read by screen readers. -->
+    <!-- Content description of the image in a news card. %1$s is the article title. Read by screen readers. -->
+    <!-- Placeholder in the search field on the Events tab. One line. -->
+    <!-- Placeholder in the search field on the News tab. One line. -->
+    <!-- Bold title of the Roadmap error block, above the error message. One line. -->
+    <!-- Small line above the roadmap items. %1$s is the update date text such as February 2026. One line. -->
+    <!-- Message under the loading spinner on the Roadmap screen. One line. -->
+    <!-- Description of fallback roadmap card 1. One to three lines. -->
+    <!-- Bold title of fallback roadmap card 1, shown when the remote roadmap is empty or fails. One or two lines. -->
+    <!-- Description of fallback roadmap card 2. One to three lines. -->
+    <!-- Bold title of fallback roadmap card 2, shown when the remote roadmap is empty or fails. One or two lines. -->
+    <!-- Description of fallback roadmap card 3. One to three lines. -->
+    <!-- Bold title of fallback roadmap card 3, shown when the remote roadmap is empty or fails. One or two lines. -->
+    <!-- Description of fallback roadmap card 4. One to three lines. -->
+    <!-- Bold title of fallback roadmap card 4, shown when the remote roadmap is empty or fails. One or two lines. -->
+    <!-- Description of fallback roadmap card 5. One to three lines. -->
+    <!-- Bold title of fallback roadmap card 5, shown when the remote roadmap is empty or fails. One or two lines. -->
+    <!-- Description of fallback roadmap card 6. One to three lines. -->
+    <!-- Bold title of fallback roadmap card 6, shown when the remote roadmap is empty or fails. One or two lines. -->
+    <!-- Description of fallback roadmap card 7. One to three lines. -->
+    <!-- Bold title of fallback roadmap card 7, shown when the remote roadmap is empty or fails. One or two lines. -->
+    <!-- Update date of the fallback roadmap, used in the Last updated line. Small text, one line. -->
+    <!-- Header message of the fallback roadmap in a highlighted card. Two to four lines. -->
+    <!-- Quarter or date label (Early 2026) in the footer of a fallback roadmap card. Small text, one line. -->
+    <!-- Quarter or date label (Early December 2025) in the footer of a fallback roadmap card. Small text, one line. -->
+    <!-- Quarter or date label (February 2026) in the footer of a fallback roadmap card. Small text, one line. -->
+    <!-- Quarter or date label (Q1 2026) in the footer of a fallback roadmap card. Small text, one line. -->
+    <!-- Content description of the open icon in the fullscreen video header, opens the video in another app. Read by screen readers. -->
+    <!-- Label in the fullscreen video controls. %1$d is the position of the selected video, %2$d the number of videos. One line. -->
+    <!-- Status badge on a roadmap item, and the description of its status icon. One or two words. -->
+    <!-- Status badge on a roadmap item, and the description of its status icon. One or two words. -->
+    <!-- Status badge on a roadmap item, and the description of its status icon. One or two words. -->
+    <!-- Status badge on a roadmap item, and the description of its status icon. One or two words. -->
+    <!-- Status badge on a roadmap item, and the description of its status icon. One or two words. -->
+    <!-- Category label on a roadmap item. One or two words. -->
+    <!-- Category label on a roadmap item. One or two words. -->
+    <!-- Category label on a roadmap item. One or two words. -->
+    <!-- Category label on a roadmap item. One or two words. -->
+    <!-- Category label on a roadmap item. One or two words. -->
+    <!-- Description of the loading text on the start-up screen. Read by screen readers. -->
 </resources>

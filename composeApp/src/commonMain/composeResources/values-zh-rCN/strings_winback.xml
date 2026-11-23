@@ -1,10 +1,10 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="winback_title">还在考虑 Premium 吗？</string>
-    <string name="winback_body">告别广告，解锁 Space Launch Now 的全部高级功能。</string>
-    <string name="winback_price_trial">免费试用 %1$s，之后每年 %2$s。可随时取消。</string>
-    <string name="winback_price_no_trial">每年 %1$s。可随时取消。</string>
-    <string name="winback_cta_trial">开始免费试用</string>
-    <string name="winback_cta">订阅</string>
-    <string name="winback_not_now">暂不</string>
+    <!-- Win-back sheet headline, shown once a week after the user skipped the first premium offer. Short. -->
+    <!-- Win-back sheet body, one sentence. Premium removes ads and unlocks extra features. -->
+    <!-- Price and trial terms. %1$s is a trial length such as "2-week", %2$s is a price with currency such as $9.99. -->
+    <!-- Price terms with no trial. %1$s is a price with currency such as $9.99. -->
+    <!-- Button that starts the subscription, when the plan has a free trial. -->
+    <!-- Button that starts the subscription, when the plan has no trial. -->
+    <!-- Button that closes the sheet without buying. Short. -->
 </resources>

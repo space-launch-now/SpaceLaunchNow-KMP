@@ -1,91 +1,91 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="enum_status_go_abbrev">Go</string>
-    <string name="enum_status_tbd">待定</string>
-    <string name="enum_status_tbd_abbrev">待定</string>
-    <string name="enum_status_success">发射成功</string>
-    <string name="enum_status_success_abbrev">成功</string>
-    <string name="enum_status_failure">发射失败</string>
-    <string name="enum_status_failure_abbrev">失败</string>
-    <string name="enum_status_hold">暂停中</string>
-    <string name="enum_status_hold_abbrev">暂停</string>
-    <string name="enum_status_in_flight">发射飞行中</string>
-    <string name="enum_status_in_flight_abbrev">飞行中</string>
-    <string name="enum_status_partial_failure">发射部分失败</string>
-    <string name="enum_status_partial_failure_abbrev">部分失败</string>
-    <string name="enum_status_tbc">待确认</string>
-    <string name="enum_status_tbc_abbrev">待确认</string>
-    <string name="enum_status_deployed">载荷已部署</string>
-    <string name="enum_status_deployed_abbrev">已部署</string>
-    <string name="enum_orbit_elliptical_orbit">椭圆轨道</string>
-    <string name="enum_orbit_geostationary_orbit">地球静止轨道</string>
-    <string name="enum_orbit_geostationary_transfer_orbit">地球静止转移轨道</string>
-    <string name="enum_orbit_geosynchronous_orbit">地球同步轨道</string>
-    <string name="enum_orbit_geosynchronous_transfer_orbit">地球同步转移轨道</string>
-    <string name="enum_orbit_heliocentric_l1">日心轨道 L1</string>
-    <string name="enum_orbit_heliocentric_n_a">日心轨道 N/A</string>
-    <string name="enum_orbit_high_earth_orbit">高地球轨道</string>
-    <string name="enum_orbit_low_earth_orbit">近地轨道</string>
-    <string name="enum_orbit_lunar_flyby">月球飞越</string>
-    <string name="enum_orbit_lunar_impactor">月球撞击器</string>
-    <string name="enum_orbit_lunar_orbit">月球轨道</string>
-    <string name="enum_orbit_medium_earth_orbit">中地球轨道</string>
-    <string name="enum_orbit_polar_orbit">极地轨道</string>
-    <string name="enum_orbit_solar_escape_trajectory">太阳逃逸轨迹</string>
-    <string name="enum_orbit_suborbital">亚轨道</string>
-    <string name="enum_orbit_sun_earth_l2">日地 L2</string>
-    <string name="enum_orbit_sun_synchronous_orbit">太阳同步轨道</string>
-    <string name="enum_orbit_supersynchronous_transfer_orbit">超同步转移轨道</string>
-    <string name="enum_orbit_mars_orbit">火星轨道</string>
-    <string name="enum_orbit_venus_orbit">金星轨道</string>
-    <string name="enum_orbit_asteroid">小行星</string>
-    <string name="enum_orbit_venus_flyby">金星飞越</string>
-    <string name="enum_orbit_mars_flyby">火星飞越</string>
-    <string name="enum_orbit_mercury_flyby">水星飞越</string>
-    <string name="enum_orbit_unknown">未知</string>
-    <string name="enum_orbit_enhanced_geostationary_transfer_orbit">增强型地球静止转移轨道</string>
-    <string name="enum_orbit_jupiter_orbit">木星轨道</string>
-    <string name="enum_orbit_earth_entry_trajectory">地球再入轨迹</string>
-    <string name="enum_mission_type_earth_science">地球科学</string>
-    <string name="enum_mission_type_planetary_science">行星科学</string>
-    <string name="enum_mission_type_astrophysics">天体物理</string>
-    <string name="enum_mission_type_heliophysics">太阳物理</string>
-    <string name="enum_mission_type_human_exploration">载人探索</string>
-    <string name="enum_mission_type_robotic_exploration">机器人探索</string>
-    <string name="enum_mission_type_government_top_secret">政府/绝密</string>
-    <string name="enum_mission_type_tourism">太空旅游</string>
-    <string name="enum_mission_type_unknown">未知</string>
-    <string name="enum_mission_type_communications">通信</string>
-    <string name="enum_mission_type_resupply">补给</string>
-    <string name="enum_mission_type_suborbital">亚轨道</string>
-    <string name="enum_mission_type_test_flight">试飞</string>
-    <string name="enum_mission_type_dedicated_rideshare">专用拼车发射</string>
-    <string name="enum_mission_type_navigation">导航</string>
-    <string name="enum_mission_type_test_target">测试目标</string>
-    <string name="enum_mission_type_lunar_exploration">月球探索</string>
-    <string name="enum_mission_type_materials_science">材料科学</string>
-    <string name="enum_mission_type_biology">生物学</string>
-    <string name="enum_mission_type_technology">技术</string>
-    <string name="enum_mission_type_mission_extension">任务延寿</string>
-    <string name="enum_mission_type_space_situational_awareness">空间态势感知</string>
-    <string name="enum_country_us">美国</string>
-    <string name="enum_country_cn">中国</string>
-    <string name="enum_country_ru">俄罗斯</string>
-    <string name="enum_country_fr">法国</string>
-    <string name="enum_country_jp">日本</string>
-    <string name="enum_country_in">印度</string>
-    <string name="enum_country_nz">新西兰</string>
-    <string name="enum_country_gb">英国</string>
-    <string name="enum_country_il">以色列</string>
-    <string name="enum_country_ir">伊朗</string>
-    <string name="enum_country_kr">韩国</string>
-    <string name="enum_country_kp">朝鲜</string>
-    <string name="enum_country_it">意大利</string>
-    <string name="enum_country_de">德国</string>
-    <string name="enum_country_au">澳大利亚</string>
-    <string name="enum_country_br">巴西</string>
-    <string name="enum_country_ca">加拿大</string>
-    <string name="enum_country_kz">哈萨克斯坦</string>
-    <string name="enum_country_es">西班牙</string>
-    <string name="enum_country_ua">乌克兰</string>
+    <!-- Launch status, short form. Shown on a small badge, often in capitals. -->
+    <!-- Launch status, full name. Shown on a launch card or detail page. -->
+    <!-- Launch status, short form. Shown on a small badge, often in capitals. -->
+    <!-- Launch status, full name. Shown on a launch card or detail page. -->
+    <!-- Launch status, short form. Shown on a small badge, often in capitals. -->
+    <!-- Launch status, full name. Shown on a launch card or detail page. -->
+    <!-- Launch status, short form. Shown on a small badge, often in capitals. -->
+    <!-- Launch status, full name. Shown on a launch card or detail page. -->
+    <!-- Launch status, short form. Shown on a small badge, often in capitals. -->
+    <!-- Launch status, full name. Shown on a launch card or detail page. -->
+    <!-- Launch status, short form. Shown on a small badge, often in capitals. -->
+    <!-- Launch status, full name. Shown on a launch card or detail page. -->
+    <!-- Launch status, short form. Shown on a small badge, often in capitals. -->
+    <!-- Launch status, full name. Shown on a launch card or detail page. -->
+    <!-- Launch status, short form. Shown on a small badge, often in capitals. -->
+    <!-- Launch status, full name. Shown on a launch card or detail page. -->
+    <!-- Launch status, short form. Shown on a small badge, often in capitals. -->
+    <!-- Orbit name. Shown as a tag on a mission. -->
+    <!-- Orbit name. Shown as a tag on a mission. -->
+    <!-- Orbit name. Shown as a tag on a mission. -->
+    <!-- Orbit name. Shown as a tag on a mission. -->
+    <!-- Orbit name. Shown as a tag on a mission. -->
+    <!-- Orbit name. Shown as a tag on a mission. -->
+    <!-- Orbit name. Shown as a tag on a mission. -->
+    <!-- Orbit name. Shown as a tag on a mission. -->
+    <!-- Orbit name. Shown as a tag on a mission. -->
+    <!-- Orbit name. Shown as a tag on a mission. -->
+    <!-- Orbit name. Shown as a tag on a mission. -->
+    <!-- Orbit name. Shown as a tag on a mission. -->
+    <!-- Orbit name. Shown as a tag on a mission. -->
+    <!-- Orbit name. Shown as a tag on a mission. -->
+    <!-- Orbit name. Shown as a tag on a mission. -->
+    <!-- Orbit name. Shown as a tag on a mission. -->
+    <!-- Orbit name. Shown as a tag on a mission. -->
+    <!-- Orbit name. Shown as a tag on a mission. -->
+    <!-- Orbit name. Shown as a tag on a mission. -->
+    <!-- Orbit name. Shown as a tag on a mission. -->
+    <!-- Orbit name. Shown as a tag on a mission. -->
+    <!-- Orbit name. Shown as a tag on a mission. -->
+    <!-- Orbit name. Shown as a tag on a mission. -->
+    <!-- Orbit name. Shown as a tag on a mission. -->
+    <!-- Orbit name. Shown as a tag on a mission. -->
+    <!-- Orbit name. Shown as a tag on a mission. -->
+    <!-- Orbit name. Shown as a tag on a mission. -->
+    <!-- Orbit name. Shown as a tag on a mission. -->
+    <!-- Orbit name. Shown as a tag on a mission. -->
+    <!-- Mission type, shown as a tag on a mission. -->
+    <!-- Mission type, shown as a tag on a mission. -->
+    <!-- Mission type, shown as a tag on a mission. -->
+    <!-- Mission type, shown as a tag on a mission. -->
+    <!-- Mission type, shown as a tag on a mission. -->
+    <!-- Mission type, shown as a tag on a mission. -->
+    <!-- Mission type, shown as a tag on a mission. -->
+    <!-- Mission type, shown as a tag on a mission. -->
+    <!-- Mission type, shown as a tag on a mission. -->
+    <!-- Mission type, shown as a tag on a mission. -->
+    <!-- Mission type, shown as a tag on a mission. -->
+    <!-- Mission type, shown as a tag on a mission. -->
+    <!-- Mission type, shown as a tag on a mission. -->
+    <!-- Mission type, shown as a tag on a mission. -->
+    <!-- Mission type, shown as a tag on a mission. -->
+    <!-- Mission type, shown as a tag on a mission. -->
+    <!-- Mission type, shown as a tag on a mission. -->
+    <!-- Mission type, shown as a tag on a mission. -->
+    <!-- Mission type, shown as a tag on a mission. -->
+    <!-- Mission type, shown as a tag on a mission. -->
+    <!-- Mission type, shown as a tag on a mission. -->
+    <!-- Mission type, shown as a tag on a mission. -->
+    <!-- Country name, as the launch provider or location country. -->
+    <!-- Country name, as the launch provider or location country. -->
+    <!-- Country name, as the launch provider or location country. -->
+    <!-- Country name, as the launch provider or location country. -->
+    <!-- Country name, as the launch provider or location country. -->
+    <!-- Country name, as the launch provider or location country. -->
+    <!-- Country name, as the launch provider or location country. -->
+    <!-- Country name, as the launch provider or location country. -->
+    <!-- Country name, as the launch provider or location country. -->
+    <!-- Country name, as the launch provider or location country. -->
+    <!-- Country name, as the launch provider or location country. -->
+    <!-- Country name, as the launch provider or location country. -->
+    <!-- Country name, as the launch provider or location country. -->
+    <!-- Country name, as the launch provider or location country. -->
+    <!-- Country name, as the launch provider or location country. -->
+    <!-- Country name, as the launch provider or location country. -->
+    <!-- Country name, as the launch provider or location country. -->
+    <!-- Country name, as the launch provider or location country. -->
+    <!-- Country name, as the launch provider or location country. -->
+    <!-- Country name, as the launch provider or location country. -->
 </resources>

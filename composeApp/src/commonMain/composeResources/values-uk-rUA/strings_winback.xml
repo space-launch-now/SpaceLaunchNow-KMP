@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- Win-back sheet headline, shown once a week after the user skipped the first premium offer. Short. -->
+    <!-- Win-back sheet body, one sentence. Premium removes ads and unlocks extra features. -->
+    <!-- Price and trial terms. %1$s is a trial length such as "2-week", %2$s is a price with currency such as $9.99. -->
+    <!-- Price terms with no trial. %1$s is a price with currency such as $9.99. -->
+    <!-- Button that starts the subscription, when the plan has a free trial. -->
+    <!-- Button that starts the subscription, when the plan has no trial. -->
+    <!-- Button that closes the sheet without buying. Short. -->
+</resources>

@@ -1,186 +1,186 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="common_back">返回</string>
-    <string name="common_error">错误</string>
-    <string name="common_loading">加载中...</string>
-    <string name="common_retry">重试</string>
-    <string name="common_live">直播</string>
-    <string name="common_unknown">未知</string>
-    <string name="common_about">关于</string>
-    <string name="common_app_name">Space Launch Now</string>
-    <string name="common_information">信息</string>
-    <string name="common_website">网站</string>
-    <string name="common_wikipedia">维基百科</string>
-    <string name="common_success_rate">成功\n比率</string>
-    <string name="common_total_launches">发射\n总数</string>
-    <string name="common_successful_launches">成功\n发射</string>
-    <string name="common_failed_launches">失败\n发射</string>
-    <string name="common_agency_logo">机构标志</string>
-    <string name="common_agency">机构</string>
-    <string name="common_type">类型</string>
-    <string name="common_founded">成立时间</string>
-    <string name="common_administrator">负责人</string>
-    <string name="common_country">国家</string>
-    <string name="common_tbd">待定</string>
-    <string name="common_mission">任务</string>
-    <string name="common_attempt">尝试</string>
-    <string name="common_onboard_crew">在轨乘组</string>
-    <string name="common_unknown_astronaut">未知航天员</string>
-    <string name="common_yes">是</string>
-    <string name="common_no">否</string>
-    <string name="common_landing_details">着陆详情</string>
-    <string name="common_location">地点</string>
-    <string name="common_value_kilometers">%1$s 公里</string>
-    <string name="common_not_available">无</string>
-    <string name="common_show_less_lower">收起</string>
-    <string name="common_show_more_lower">展开</string>
-    <string name="common_launches">发射</string>
-    <string name="common_show_less">收起</string>
-    <string name="common_active">现役</string>
-    <string name="common_inactive">停用</string>
-    <string name="common_reusable">可复用</string>
-    <string name="common_expendable">一次性</string>
-    <string name="common_manufacturer">制造商</string>
-    <string name="common_variant">型号</string>
-    <string name="common_families">系列</string>
-    <string name="common_stages">级数</string>
-    <string name="common_maiden_flight">首飞</string>
-    <string name="common_collapse">收起</string>
-    <string name="common_expand">展开</string>
-    <string name="common_length">长度</string>
-    <string name="common_diameter">直径</string>
-    <string name="common_launch_mass">起飞质量</string>
-    <string name="common_launch_cost">发射成本</string>
-    <string name="common_leo">LEO</string>
-    <string name="common_gto">GTO</string>
-    <string name="common_geo">GEO</string>
-    <string name="common_sso">SSO</string>
-    <string name="common_pending_launches">待发射\n数量</string>
-    <string name="common_consecutive_success">连续\n成功</string>
-    <string name="common_landing_statistics">着陆统计</string>
-    <string name="common_attempted_landings">尝试\n着陆</string>
-    <string name="common_successful_landings">成功\n着陆</string>
-    <string name="common_failed_landings">失败\n着陆</string>
-    <string name="common_mission_patch">任务徽章</string>
-    <string name="common_ok">好</string>
-    <string name="common_load_more_count">加载更多（还有 %1$d 条）</string>
-    <string name="common_event_image">活动图片</string>
-    <string name="common_event_icon">活动图标</string>
-    <string name="common_article_image">文章图片</string>
-    <string name="common_article_icon">文章图标</string>
-    <string name="common_time_in_space">太空停留时间</string>
-    <string name="common_overview">概览</string>
-    <string name="common_timeline">时间线</string>
-    <string name="common_updates">动态</string>
-    <string name="common_launch_location">发射地点</string>
-    <string name="common_oops_something_went_wrong">哎呀，出错了</string>
-    <string name="common_try_again">重试</string>
-    <string name="common_share">分享</string>
-    <string name="common_description">说明</string>
-    <string name="common_go_for_launch">Go for Launch</string>
-    <string name="common_launch_placeholder">发射占位图</string>
-    <string name="common_latest_news">最新新闻</string>
-    <string name="common_explore">探索</string>
-    <string name="common_search">搜索</string>
-    <string name="common_search_title">搜索</string>
-    <string name="common_filters">筛选</string>
-    <string name="common_no_updates_available">暂无动态</string>
-    <string name="common_maybe_later">以后再说</string>
-    <string name="common_open_in_browser">在浏览器中打开</string>
-    <string name="common_settings">设置</string>
-    <string name="common_image_placeholder">图片占位图</string>
-    <string name="common_duration">时长</string>
-    <string name="common_agencies">机构</string>
-    <string name="common_astronauts">航天员</string>
-    <string name="common_news_and_events">新闻与活动</string>
-    <string name="common_rockets">火箭</string>
-    <string name="common_starship">Starship</string>
-    <string name="common_news">新闻</string>
-    <string name="common_filter">筛选</string>
-    <string name="common_close">关闭</string>
-    <string name="common_remove_filter">移除筛选</string>
-    <string name="common_roadmap">路线图</string>
-    <string name="common_events">活动</string>
-    <string name="common_status">状态</string>
-    <string name="common_links">链接</string>
-    <string name="common_upcoming">即将发射</string>
-    <string name="common_previous">历史发射</string>
-    <string name="common_cancel">取消</string>
-    <string name="common_apply">应用</string>
-    <string name="common_reload_filter_options_title">重新加载筛选选项？</string>
-    <string name="common_reload">重新加载</string>
-    <string name="common_reload_filter_options">重新加载筛选选项</string>
-    <string name="common_clear_all">全部清除</string>
-    <string name="common_programs">项目</string>
-    <string name="common_locations">地点</string>
-    <string name="common_select_options">选择选项...</string>
-    <string name="common_no_results_found">未找到结果</string>
-    <string name="common_selected">已选择</string>
-    <string name="common_selected_count">已选 %1$d 项</string>
-    <string name="common_notification_filters">通知筛选</string>
-    <string name="common_notifications_disabled">通知已关闭</string>
-    <string name="common_enable">开启</string>
-    <string name="common_open_settings">打开设置</string>
-    <string name="common_notifications">通知</string>
-    <string name="common_ad_free_experience">无广告体验</string>
-    <string name="common_calendar_sync">日历同步</string>
-    <string name="common_start_free_trial">开始免费试用</string>
-    <string name="common_filter_and_sort">筛选与排序</string>
-    <string name="common_clear">清除</string>
-    <string name="common_sort_by">排序方式</string>
-    <string name="common_order">顺序</string>
-    <string name="common_done">完成</string>
-    <string name="common_unknown_error">未知错误</string>
-    <string name="common_try_adjusting_your_filters">试试调整筛选条件</string>
-    <string name="common_launch_statistics">发射统计</string>
-    <string name="common_attempted">尝试</string>
-    <string name="common_successful">成功</string>
-    <string name="common_failed">失败</string>
-    <string name="common_spacecraft">航天器</string>
-    <string name="common_named_logo_description">%1$s 标志</string>
-    <string name="common_sort_name_asc">名称（A-Z）</string>
-    <string name="common_sort_name_desc">名称（Z-A）</string>
-    <string name="common_sort_total_launches_asc">发射总数（从低到高）</string>
-    <string name="common_sort_total_launches_desc">发射总数（从高到低）</string>
-    <string name="common_sort_successful_launches_asc">成功发射（从低到高）</string>
-    <string name="common_sort_successful_launches_desc">成功发射（从高到低）</string>
-    <string name="common_sort_failed_launches_asc">失败发射（从低到高）</string>
-    <string name="common_sort_failed_launches_desc">失败发射（从高到低）</string>
-    <string name="common_sort_pending_launches_asc">待发射（从低到高）</string>
-    <string name="common_sort_pending_launches_desc">待发射（从高到低）</string>
-    <string name="common_sort_consecutive_successes_asc">连续成功（从低到高）</string>
-    <string name="common_sort_consecutive_successes_desc">连续成功（从高到低）</string>
-    <string name="common_sort_attempted_landings_asc">尝试着陆（从低到高）</string>
-    <string name="common_sort_attempted_landings_desc">尝试着陆（从高到低）</string>
-    <string name="common_sort_successful_landings_asc">成功着陆（从低到高）</string>
-    <string name="common_sort_successful_landings_desc">成功着陆（从高到低）</string>
-    <string name="common_sort_failed_landings_asc">失败着陆（从低到高）</string>
-    <string name="common_sort_failed_landings_desc">失败着陆（从高到低）</string>
-    <string name="common_sort_consecutive_landing_successes_asc">连续着陆成功（从低到高）</string>
-    <string name="common_sort_consecutive_landing_successes_desc">连续着陆成功（从高到低）</string>
-    <string name="common_value_meters">%1$s 米</string>
-    <string name="common_value_kilograms">%1$s 千克</string>
-    <string name="common_premium">Premium</string>
-    <string name="common_wear_os">Wear OS</string>
-    <string name="common_premium_feature">Premium 功能</string>
-    <string name="common_24h_premium_access">24 小时 Premium 体验</string>
-    <string name="common_upgrade_to_premium">升级到 Premium</string>
-    <string name="rocket_detail_error_title">加载火箭详情出错</string>
-    <string name="about_header_logo_description">应用标志</string>
-    <string name="about_header_version">版本：%1$s (%2$d)</string>
-    <string name="about_link_github">GitHub</string>
-    <string name="about_link_changelog">Changelog</string>
-    <string name="about_link_discord">Discord</string>
-    <string name="about_sln_title">关于 Space Launch Now</string>
-    <string name="about_sln_description">Space Launch Now 于 2016 年起步，最初只是一个周末小项目，如今已成为了解全球火箭发射动态的最佳发射日程应用。获取 SpaceX、NASA、ULA、Roscosmos、ISRO 等众多机构的发射更新和通知！ </string>
-    <string name="about_sln_link">了解更多</string>
-    <string name="about_tsd_title">关于 The Space Devs</string>
-    <string name="about_tsd_description">The Space Devs 是一个由航天爱好者开发者和资料管理员组成的联盟，共同目标是免费提供航天数据。我们的 REST API 涵盖航天领域的方方面面，从火箭发射到活动和新闻。\n\n作为 Space Launch Now 的开发者，我是 The Space Devs 的董事会成员，也是它的骄傲支持者！</string>
-    <string name="about_tsd_link">访问 The Space Devs</string>
-    <string name="about_libraries_heading">开源库</string>
-    <string name="common_error_no_connection">没有网络连接。请检查网络后重试。</string>
-    <string name="common_error_timeout">请求耗时过长，请重试。</string>
-    <string name="common_error_rate_limit">请求过多，请稍等片刻后重试。</string>
-    <string name="common_error_server">服务器出现问题，请稍后重试。</string>
-    <string name="common_error_not_found">我们找不到相关内容。</string>
+    <!-- Shared word. Top bar navigation icon, content description for screen readers. -->
+    <!-- Shared word. Title and icon description on an error screen. -->
+    <!-- Shared word. Top bar title while a screen loads. -->
+    <!-- Button, one line, max 14 chars. Tries a failed load again. -->
+    <!-- Shared word. Red badge on live video, one word, max 8 chars. -->
+    <!-- Shared word. Fallback label when a name is missing, for example a country or event type. One word. -->
+    <!-- Shared text, used in several places. Screen title in the top bar. One line, large heading. Also: Heading above the agency description on the agency card. One line. And 2 more places. -->
+    <!-- Shared text. The app name. Brand name, do not translate. -->
+    <!-- Shared text, used in several places. Content description of the info icon on the Website button. Read by screen readers. Also: Agency detail screen, overview card, accessibility description of the info icon on the website button. Screen reader text, not shown, max 20 characters. -->
+    <!-- Shared text, used in several places. Button label, one word. Opens the website of an agency, rocket or location. Also: Agency detail screen, overview card, button that opens the agency website. Button label, one line, max 14 characters. -->
+    <!-- Shared text, used in several places. Content description of the Wikipedia icon on the Wikipedia button. Read by screen readers. Also: Button label, one word. Opens the Wikipedia page of an agency, rocket or location. And 3 more places. -->
+    <!-- Shared text, used in several places. Statistic label under a percentage. Two short lines; the line break is part of the text. Also: Agency detail screen, statistic card caption under the success rate percentage. Caption, two lines split by a line break, max 12 characters per line. -->
+    <!-- Shared text, used in several places. Statistic label under a launch count. Two short lines; the line break is part of the text. Also: Agency detail screen, statistic card caption under the total launch count. Caption, two lines split by a line break, max 12 characters per line. -->
+    <!-- Shared text, used in several places. Statistic label under a launch count. Two short lines; the line break is part of the text. Also: Agency detail screen, statistic card caption under the successful launch count. Caption, two lines split by a line break, max 12 characters per line. -->
+    <!-- Shared text, used in several places. Statistic label under a launch count. Two short lines; the line break is part of the text. Also: Agency detail screen, statistic card caption under the failed launch count. Caption, two lines split by a line break, max 12 characters per line. -->
+    <!-- Shared text, used in several places. Content description of the agency logo image. Read by screen readers. Also: Content description of the round agency logo badge. Read by screen readers. And 2 more places. -->
+    <!-- Shared text, used in several places. Content description of the placeholder agency icon, shown when the logo is missing. Read by screen readers. Also: Tab title on the phone launch detail screen. One word. And 2 more places. Max 10 chars. -->
+    <!-- Shared text, used in several places. Label of an info tile on the agency card. One word; the value is the agency type, such as Government. Also: Agency detail screen, overview card, small tile label above the agency type. Tile label, one line, max 16 characters. And 1 more places. -->
+    <!-- Shared text, used in several places. Label of an info tile on the agency card. One word; the value is a year. Also: Agency detail screen, overview card, small tile label above the founding year. Tile label, one line, max 16 characters. And 1 more places. -->
+    <!-- Shared text, used in several places. Label of an info tile on the agency card. The value is a person's name. Also: Agency detail screen, overview card, small tile label above the administrator name. Tile label, one line, max 16 characters. Max 14 chars. -->
+    <!-- Shared text, used in several places. Label of an info tile on the agency card. One word; the value is a country code. Also: Label above one launch country. One word. And 1 more places. -->
+    <!-- Shared text, used in several places. Value shown when a time or result is not known yet. Also: Launch date on a featured launch card when the date is not known. One short word. And 1 more places. Max 4 chars. -->
+    <!-- Shared text, used in several places. Label of an info tile with the mission name. One word. Also: Content description of the placeholder icon shown when the mission patch fails to load. Read by screen readers. And 2 more places. Max 10 chars. -->
+    <!-- Shared text, used in several places. Landing summary in an info tile when one landing is attempted. One word. Also: Label of an info tile that says if a landing was attempted. One word. -->
+    <!-- Shared text, used in several places. Sub-heading above the crew that stays on the spacecraft. One line. Also: Station statistics card. Label above the number of people on board. -->
+    <!-- Shared text, used in several places. Name shown when an astronaut has no name. Two words. Also: Astronaut list item, name line when the astronaut has no name. Title text, one line, max 24 characters. -->
+    <!-- Shared text, used in several places. Answer value in an info tile. One word. Also: Astronaut filter sheet, filters card, segmented button for yes. Segment label, one line, max 10 characters. And 1 more places. -->
+    <!-- Shared text, used in several places. Answer value in an info tile. One word. Also: Astronaut filter sheet, filters card, segmented button for no. Segment label, one line, max 10 characters. And 1 more places. -->
+    <!-- Shared text, used in several places. Heading of the landing details block on a rocket stage card. Two words. Also: Heading of the Landing Details section on the launch detail screen. One line. -->
+    <!-- Shared text, used in several places. Label of an info row with the landing location. One word. Also: Row label in the event details list. Value (a place name) shows beside it. One word. And 1 more places. -->
+    <!-- Shared text, used in several places. Landing distance in kilometres. %1$s is a number, or the text for a missing value. Also: Station position card. Altitude value. %1$s is a number, such as 408.3. Keep the unit short. -->
+    <!-- Shared text, used in several places. Value shown when a number is not available. Also: Astronaut detail screen, overview card, tile value when the time is not known. Value text, one line, max 8 characters. Max 4 chars. -->
+    <!-- Shared text, used in several places. Text button under a long description. Collapses the text. Two words. Also: Text button under an expanded video description. One line. -->
+    <!-- Shared text, used in several places. Text button under a long description. Expands the text. Two words. Also: Text button under a clipped video description. One line. -->
+    <!-- Shared text, used in several places. Label under the number of launches from a pad. One word. Also: Feed name. One word. -->
+    <!-- Shared text, used in several places. Text button under a list. Collapses the list. Two words. Also: Astronaut detail screen, biography card, button that collapses a long biography. Button label, one line, max 16 characters. And 1 more places. -->
+    <!-- Shared text, used in several places. Chip on the rocket card. One word. Also: Small badge on a rocket list card. One word. Shown when the rocket is in service. -->
+    <!-- Shared text, used in several places. Chip on the rocket card. One word. Also: Value of the Status row on the rocket detail screen. One word. Shown when the rocket is out of service. -->
+    <!-- Shared text, used in several places. Chip on the rocket card. One word. Also: Small badge on a rocket list card. One word. Shown when the rocket can fly again. And 2 more places. Max 12 chars. -->
+    <!-- Shared text, used in several places. Chip on the rocket card. One word. Also: Segmented button. Shows rockets that fly once only. One word. Max 12 chars. -->
+    <!-- Shared text, used in several places. Label of an info tile with the rocket manufacturer. One word. Also: Row label, left column. The maker of the rocket is the value. -->
+    <!-- Shared text, used in several places. Label of an info tile with the rocket variant. One word. Also: Row label, left column. The rocket variant is the value. -->
+    <!-- Shared text, used in several places. Label of an info tile with several rocket families. One word. Also: Heading above the rocket family filter field. One line. -->
+    <!-- Shared text, used in several places. Label of an info tile with the number of rocket stages. One word. Also: Row label, left column. The value is a number of stages or a range such as 1-2. -->
+    <!-- Shared text, used in several places. Label of an info tile with the date of the first flight of the rocket. Two words. Also: Row label, left column. The date of the first flight is the value. -->
+    <!-- Shared text, used in several places. Content description of the arrow icon of an open section. Read by screen readers. Also: Content description of the dropdown arrow when the list is open. Read by screen readers. And 1 more places. -->
+    <!-- Shared text, used in several places. Content description of the arrow icon of a closed section. Read by screen readers. Also: Content description of the dropdown arrow when the list is closed. Read by screen readers. And 1 more places. -->
+    <!-- Shared text, used in several places. Label of a rocket specification. One word. Also: Row label, left column. The rocket length is the value. -->
+    <!-- Shared text, used in several places. Label of a rocket specification. One word. Also: Row label, left column. The rocket diameter is the value. -->
+    <!-- Shared text, used in several places. Label of a rocket specification, the mass at lift-off. Two words. Also: Row label, left column. The mass at launch is the value. -->
+    <!-- Shared text, used in several places. Label of a rocket specification, the price of one launch. Two words. Also: Row label, left column. The cost of one launch is the value. -->
+    <!-- Shared text, used in several places. Label of a rocket specification: payload to low Earth orbit. Abbreviation. Also: Row label, left column. Payload to low Earth orbit. Orbit code, keep short. Max 4 chars. -->
+    <!-- Shared text, used in several places. Label of a rocket specification: payload to geostationary transfer orbit. Abbreviation. Also: Row label, left column. Payload to geostationary transfer orbit. Orbit code, keep short. Max 4 chars. -->
+    <!-- Shared text, used in several places. Label of a rocket specification: payload to geostationary orbit. Abbreviation. Also: Row label, left column. Payload to geostationary orbit. Orbit code, keep short. Max 4 chars. -->
+    <!-- Shared text, used in several places. Label of a rocket specification: payload to sun-synchronous orbit. Abbreviation. Also: Row label, left column. Payload to sun-synchronous orbit. Orbit code, keep short. Max 4 chars. -->
+    <!-- Shared text, used in several places. Statistic label under a launch count. Two short lines; the line break is part of the text. Also: Agency detail screen, statistic card caption under the pending launch count. Caption, two lines split by a line break, max 12 characters per line. -->
+    <!-- Shared text, used in several places. Statistic label under a count of successes in a row. Two short lines; the line break is part of the text. Also: Agency detail screen, statistic card caption under the count of consecutive successes, in the launch and landing sections. Caption, two lines split by a line break, max 12 characters per line. -->
+    <!-- Shared text, used in several places. Heading above the landing statistics of a rocket. One line. Also: Agency detail screen, section heading above the landing statistic cards. Heading text, one line, max 24 characters. And 1 more places. -->
+    <!-- Shared text, used in several places. Statistic label under a landing count. Two short lines; the line break is part of the text. Also: Agency detail screen, statistic card caption under the attempted landing count. Caption, two lines split by a line break, max 12 characters per line. -->
+    <!-- Shared text, used in several places. Statistic label under a landing count. Two short lines; the line break is part of the text. Also: Agency detail screen, statistic card caption under the successful landing count. Caption, two lines split by a line break, max 12 characters per line. -->
+    <!-- Shared text, used in several places. Statistic label under a landing count. Two short lines; the line break is part of the text. Also: Agency detail screen, statistic card caption under the failed landing count. Caption, two lines split by a line break, max 12 characters per line. -->
+    <!-- Shared text, used in several places. Content description of the mission patch image. Read by screen readers. Also: Expedition card. Screen reader description of the mission patch image. -->
+    <!-- Shared text, used in several places. Button that closes the launch time precision dialog. One word. Also: Button that closes the launch status dialog. One word. Max 6 chars. -->
+    <!-- Shared text, used in several places. Text button under the list of related events. %1$d is the number of hidden events. One line. Also: Text button under the list of related news. %1$d is the number of hidden articles. One line. And 1 more places. -->
+    <!-- Shared text, used in several places. Content description of the image of a related event. Read by screen readers. Also: Content description of an event image. Read by screen readers. -->
+    <!-- Shared text, used in several places. Content description of the placeholder icon of a related event. Read by screen readers. Also: Content description of the placeholder icon shown when an event has no image. Read by screen readers. -->
+    <!-- Shared text, used in several places. Content description of the image of a news article. Read by screen readers. Also: Content description of a news article thumbnail. Read by screen readers. -->
+    <!-- Shared text, used in several places. Content description of the placeholder icon of a news article. Read by screen readers. Also: Content description of the placeholder icon shown when a news article has no image. Read by screen readers. -->
+    <!-- Shared text, used in several places. Label of an info tile with the total time a spacecraft spent in space. Three words. Also: Astronaut detail screen, overview card, tile label above the total time in space. Label text, one line, max 20 characters. -->
+    <!-- Shared text, used in several places. Heading of the Overview section on the launch detail screen. One line. Also: Tab title on the phone launch detail screen. One word. And 2 more places. Max 10 chars. -->
+    <!-- Shared text, used in several places. Heading of the Timeline section on the launch detail screen. One line. Also: Welcome page. Caption under a feature icon. One word. -->
+    <!-- Shared text, used in several places. Heading of the Updates section on the launch detail screen. One line. Also: Card heading above the list of news updates for the event. One line, bold. And 1 more places. -->
+    <!-- Shared text, used in several places. Heading of the Launch Location section on the launch detail screen. One line. Also: Content description of the location icon on a launch card header. Read by screen readers. -->
+    <!-- Shared text, used in several places. Heading on the launch detail error card, above the error message. One or two lines. Also: Heading on the event detail error card, above the error message. One or two lines. And 1 more places. -->
+    <!-- Shared text, used in several places. Button on the launch detail error card. Loads the launch again. Two words. Also: Button on the event detail error card. Loads the event again. One line. And 1 more places. Max 14 chars. -->
+    <!-- Shared text, used in several places. Content description of the share button in the top bar. Read by screen readers. Also: Button on the next launch card, and content description of its icon. Shares the launch. One word. -->
+    <!-- Shared text, used in several places. Small heading above the launch status explanation in the status dialog. One line. Also: Section heading in the event detail card, above the event description text. One line, bold. And 1 more places. -->
+    <!-- Shared text, used in several places. Launch status, full name. Shown on a launch card or detail page. Also: Widget picture on the widgets page. Launch status at the end of each sample row. -->
+    <!-- Shared text, used in several places. Content description of the rocket icon shown when a launch has no image. Read by screen readers. Also: Premium offer page. Content description of the rocket icon shown when the launch image fails. Read by screen readers. -->
+    <!-- Shared text, used in several places. Section heading on the home screen. One line, bold. Also: News and events page. Heading above the sample news list. One line. -->
+    <!-- Shared text, used in several places. Button on the next launch card, and content description of its icon. Opens the launch details. One word. Also: Top bar title of the Explore screen. One line, large bold. And 1 more places. Max 12 chars. -->
+    <!-- Shared text, used in several places. Placeholder text of the search field, and content description of its icon. One word. Also: Default placeholder in the search field when the caller gives none. One line. And 1 more places. -->
+    <!-- Shared text, used in several places. Agency filter sheet, title of the search card. Title text, one line, max 16 characters. Also: Astronaut filter sheet, title of the search card. Title text, one line, max 16 characters. And 1 more places. -->
+    <!-- Shared text, used in several places. Content description of the filter icon button in the home top bar. Read by screen readers. Also: Agency filter sheet, title of the filters card. Title text, one line, max 16 characters. And 2 more places. -->
+    <!-- Shared text, used in several places. Message in the Latest Updates section when there are no updates. One line. Also: Starship overview tab. Empty state when no update exists. -->
+    <!-- Shared text, used in several places. Text button that closes the feedback dialog, full width, one line. Also: Notification permission page. Text button that skips the permission request. -->
+    <!-- Shared text, used in several places. Button with an open icon that opens the article in the system browser again. One line. Also: Content description of the open icon in the news detail top bar. Read by screen readers. -->
+    <!-- Shared text, used in several places. Content description of the settings icon in the empty state button. Read by screen readers. Also: Label of the Settings tab in the bottom bar or side rail. One word. And 1 more places. Max 12 chars. -->
+    <!-- Shared text, used in several places. Content description of the hero image placeholder at the top of a detail screen. Read by screen readers. Also: Content description of the image placeholder in the shared detail header. Read by screen readers. -->
+    <!-- Shared text, used in several places. Small label above the launch window length. One word. Also: Row label in the event details list. Value (a length of time) shows beside it. One word. -->
+    <!-- Shared text, used in several places. Title of the Agencies card on the Explore screen. Bold, centered, one line. Also: Card heading above the list of agencies, used when the event has two or more agencies. One line, bold. And 4 more places. -->
+    <!-- Shared text, used in several places. Title of the Astronauts card on the Explore screen. Bold, centered, one line. Also: Card heading above the list of astronauts at the event. One line, bold. And 2 more places. -->
+    <!-- Shared text, used in several places. Title of the News & Events card on the Explore screen. Bold, centered, one line. Also: Top bar title of the News & Events screen. One line, large bold. And 1 more places. -->
+    <!-- Shared text, used in several places. Title of the Rockets card on the Explore screen. Bold, centered, one line. Also: Filter section heading on the filter sheet. Rocket types. One line. And 2 more places. -->
+    <!-- Shared text, used in several places. Title of the Starship card on the Explore screen. Bold, centered, one line. Also: Starship screen. Top bar title and name used when the program has no name. One line. -->
+    <!-- Shared text, used in several places. Label of the News tab in the bottom bar or side rail. One word. Also: Tab title on the News and Events screen. One word. Max 12 chars. -->
+    <!-- Shared text, used in several places. Content description of the filter icon button next to the title. Read by screen readers. Also: Content description of the filter icon button in the top bar. Opens the filter sheet. Read by screen readers. -->
+    <!-- Shared text, used in several places. Text button that closes the filter bottom sheet. One word. Also: Content description of the close icon button on the filter sheet. Read by screen readers. And 2 more places. Max 12 chars. -->
+    <!-- Shared text, used in several places. Content description of the close icon on a selected filter chip. Read by screen readers. Also: Content description of the small X icon on a selected filter chip. Removes that filter. Read by screen readers. And 1 more places. -->
+    <!-- Shared text, used in several places. Top bar title of the Roadmap screen. One line, very large bold. Also: Row title. Opens the roadmap. One line. -->
+    <!-- Shared text, used in several places. Tab title on the News and Events screen. One word. Also: Feed name. One word. And 2 more places. -->
+    <!-- Shared text, used in several places. Row label in the event details list. Value is the live state, for example Live Now. One word. Also: Astronaut detail screen, personal info and overview cards, tile label above the status chip; astronaut filter sheet, heading above the status chips. Label text, one line, max 16 characters. And 1 more places. -->
+    <!-- Shared text, used in several places. Card heading above the list of link buttons for the event. One line, bold. Also: Astronaut detail screen, links card, heading. Heading text, one line, max 20 characters. -->
+    <!-- Shared text, used in several places. Tab label. Shows launches that have not happened yet. One word. Also: Schedule page. Tab label for launches that have not happened yet. One word. Max 14 chars. -->
+    <!-- Shared text, used in several places. Tab label. Shows launches that already happened. One word. Also: Schedule page. Tab label for launches that already happened. One word. Max 14 chars. -->
+    <!-- Shared text, used in several places. Button on the filter sheet and the reload dialog. Dismisses without changes. One word. Also: Astronaut filter sheet, reload dialog, cancel button. Button label, one line, max 12 characters. And 1 more places. Max 14 chars. -->
+    <!-- Shared text, used in several places. Button on the filter sheet when no filter is selected. Applies the filters. One word. Also: Agency filter sheet, search card, button that applies the search text. Button label, one line, max 10 characters. And 2 more places. Max 14 chars. -->
+    <!-- Shared text, used in several places. Title of the confirm dialog opened by the reload button on the filter sheet. A question. One line. Also: Astronaut filter sheet, reload dialog, title. Title text, may wrap, max 28 characters. -->
+    <!-- Shared text, used in several places. Confirm button of the reload dialog. One word. Also: Astronaut filter sheet, reload dialog, confirm button. Button label, one line, max 12 characters. Max 14 chars. -->
+    <!-- Shared text, used in several places. Button at the bottom of the filter sheet. Opens the reload confirm dialog. One line. Also: Astronaut filter sheet, bottom, button that opens the reload dialog. Button label, one line, max 28 characters. -->
+    <!-- Shared text, used in several places. Small button on the filter sheet next to the active filter count. Removes every selected filter. Also: Agency filter sheet, header, text button that resets all filters. Button label, one line, max 12 characters. And 2 more places. Max 14 chars. -->
+    <!-- Shared text, used in several places. Filter section heading on the filter sheet. Space programs. One line. Also: Heading above the program filter field. One line. -->
+    <!-- Shared text, used in several places. Filter section heading on the filter sheet. Launch sites. One line. Also: Notification filters page. Section heading above sample location checkboxes. One word. -->
+    <!-- Shared text, used in several places. Placeholder in a filter dropdown field when nothing is selected. One line. Keep the three dots. Also: Placeholder of a filter field when nothing is selected. One line. -->
+    <!-- Shared text, used in several places. Disabled item in a filter dropdown when the typed search matches nothing. One line. Also: Disabled menu item when the filter search matches no option. One line. -->
+    <!-- Shared text, used in several places. Content description of the check mark beside a selected filter option. Read by screen readers. Also: Agency filter sheet, sort order menu, accessibility description of the check mark on the chosen item. Screen reader text, not shown, max 20 characters. And 2 more places. -->
+    <!-- Shared text, used in several places. Placeholder in a filter dropdown field when options are chosen. %1$d is the number of chosen options. One line. Also: Placeholder of a filter field when options are selected. %1$d is the number of selected options. One line. -->
+    <!-- Shared text, used in several places. Screen title in the top bar of the notification settings screen. One line. Also: Row title. Opens the notification filter screen. One line. -->
+    <!-- Shared text, used in several places. Heading of the warning card shown when the system notification permission is off. One line. Also: Warning title when the app has no notification permission. One line. -->
+    <!-- Shared text, used in several places. Button in the warning card. Asks the system for the notification permission. One word. Also: Text button. Asks the system for notification permission. One word. Max 14 chars. -->
+    <!-- Shared text, used in several places. Button in the warning card. Opens the system settings screen for the app. Also: Notification permission page. Button that opens the system settings after the user denied permission. And 1 more places. Max 14 chars. -->
+    <!-- Shared text, used in several places. Notification permission page. Content description of the bell icon. Read by screen readers. Also: Section heading in Settings. One line. -->
+    <!-- Shared text, used in several places. Premium offer page. Perk title. One line. Also: Premium feature name in a list of benefits. Short, one line. -->
+    <!-- Shared text, used in several places. Premium offer page. Perk title. One line. Also: Row title in Settings and top bar title of the calendar screen. One line. And 1 more places. -->
+    <!-- Shared text, used in several places. Premium offer page. Main button when the store gives no free trial length. Also: Button on a plan card with a free trial. One line. -->
+    <!-- Shared text, used in several places. Agency filter sheet, header at top. Title text, one line, max 20 characters. Also: Astronaut filter sheet, header at top. Title text, one line, max 20 characters. And 2 more places. -->
+    <!-- Shared text, used in several places. Agency filter sheet, search card, button that clears the search text. Button label, one line, max 10 characters. Also: Astronaut filter sheet, search card, button that clears the search text. Button label, one line, max 10 characters. And 1 more places. Max 14 chars. -->
+    <!-- Shared text, used in several places. Agency filter sheet, title of the sort card. Title text, one line, max 16 characters. Also: Astronaut filter sheet, title of the sort card. Title text, one line, max 16 characters. And 1 more places. -->
+    <!-- Shared text, used in several places. Agency filter sheet, label of the sort order dropdown field. Field label, one line, max 16 characters. Also: Astronaut filter sheet, label of the sort order dropdown field. Field label, one line, max 16 characters. -->
+    <!-- Shared text, used in several places. Agency filter sheet, full width button at bottom that closes the sheet. Button label, one line, max 12 characters. Also: Astronaut filter sheet, bottom, button that closes the sheet. Button label, one line, max 12 characters. -->
+    <!-- Shared text, used in several places. Agency list screen, centre of screen, error message shown when the error has no text. Body text, may wrap, max 32 characters. Also: Astronaut detail and list screens, error state, message shown when the error has no text. Message text, may wrap, max 32 characters. And 1 more places. -->
+    <!-- Shared text, used in several places. Agency list screen, centre of screen, hint under the empty heading. Body text, may wrap, max 40 characters. Also: Hint under the empty rocket list heading. One or two lines. -->
+    <!-- Shared text, used in several places. Agency detail screen, section heading above the launch statistic cards. Heading text, one line, max 24 characters. Also: Card heading on the rocket detail screen, above the launch count rows. One line, bold. -->
+    <!-- Shared text, used in several places. Agency detail screen, spacecraft landing section, statistic card caption under the attempted count. Caption, one line, max 14 characters. Also: Row label, left column. The count of landing attempts is the value. -->
+    <!-- Shared text, used in several places. Agency detail screen, spacecraft landing section, statistic card caption under the successful count. Caption, one line, max 14 characters. Also: Row label, left column, on the launch and the landing cards. The count of successes is the value. -->
+    <!-- Shared text, used in several places. Agency detail screen, spacecraft landing section, statistic card caption under the failed count. Caption, one line, max 14 characters. Also: Row label, left column, on the launch and the landing cards. The count of failures is the value. -->
+    <!-- Shared text, used in several places. Agency detail screen, vehicles card, heading above the spacecraft text. Heading text, one line, max 16 characters. Also: Starship vehicles tab. Section heading and name used when a spacecraft configuration has no name. -->
+    <!-- Shared text, used in several places. Astronaut detail screen, links card, social media row, accessibility description of the platform logo. %1$s is the platform name. Screen reader text, not shown, max 32 characters. Also: Station owners card. Screen reader description of an agency logo. %1$s is the agency name. -->
+    <!-- Shared text, used in several places. Sort option in the agency filter sheet menu. The text in brackets says the direction. One line. Also: Sort option in the astronaut filter sheet menu. The text in brackets says the direction. One line. And 2 more places. -->
+    <!-- Shared text, used in several places. Sort option in the agency filter sheet menu. The text in brackets says the direction. One line. Also: Sort option in the astronaut filter sheet menu. The text in brackets says the direction. One line. And 2 more places. -->
+    <!-- Shared text, used in several places. Sort option in the agency filter sheet menu. The text in brackets says the direction. One line. Also: Sort option in the rocket filter sheet menu. The text in brackets says the direction. One line. -->
+    <!-- Shared text, used in several places. Sort option in the agency filter sheet menu. The text in brackets says the direction. One line. Also: Sort option in the rocket filter sheet menu. The text in brackets says the direction. One line. -->
+    <!-- Shared text, used in several places. Sort option in the agency filter sheet menu. The text in brackets says the direction. One line. Also: Sort option in the rocket filter sheet menu. The text in brackets says the direction. One line. -->
+    <!-- Shared text, used in several places. Sort option in the agency filter sheet menu. The text in brackets says the direction. One line. Also: Sort option in the rocket filter sheet menu. The text in brackets says the direction. One line. -->
+    <!-- Shared text, used in several places. Sort option in the agency filter sheet menu. The text in brackets says the direction. One line. Also: Sort option in the rocket filter sheet menu. The text in brackets says the direction. One line. -->
+    <!-- Shared text, used in several places. Sort option in the agency filter sheet menu. The text in brackets says the direction. One line. Also: Sort option in the rocket filter sheet menu. The text in brackets says the direction. One line. -->
+    <!-- Shared text, used in several places. Sort option in the agency filter sheet menu. The text in brackets says the direction. One line. Also: Sort option in the rocket filter sheet menu. The text in brackets says the direction. One line. -->
+    <!-- Shared text, used in several places. Sort option in the agency filter sheet menu. The text in brackets says the direction. One line. Also: Sort option in the rocket filter sheet menu. The text in brackets says the direction. One line. -->
+    <!-- Shared text, used in several places. Sort option in the agency filter sheet menu. The text in brackets says the direction. One line. Also: Sort option in the rocket filter sheet menu. The text in brackets says the direction. One line. -->
+    <!-- Shared text, used in several places. Sort option in the agency filter sheet menu. The text in brackets says the direction. One line. Also: Sort option in the rocket filter sheet menu. The text in brackets says the direction. One line. -->
+    <!-- Shared text, used in several places. Sort option in the agency filter sheet menu. The text in brackets says the direction. One line. Also: Sort option in the rocket filter sheet menu. The text in brackets says the direction. One line. -->
+    <!-- Shared text, used in several places. Sort option in the agency filter sheet menu. The text in brackets says the direction. One line. Also: Sort option in the rocket filter sheet menu. The text in brackets says the direction. One line. -->
+    <!-- Shared text, used in several places. Sort option in the agency filter sheet menu. The text in brackets says the direction. One line. Also: Sort option in the rocket filter sheet menu. The text in brackets says the direction. One line. -->
+    <!-- Shared text, used in several places. Sort option in the agency filter sheet menu. The text in brackets says the direction. One line. Also: Sort option in the rocket filter sheet menu. The text in brackets says the direction. One line. -->
+    <!-- Shared text, used in several places. Sort option in the agency filter sheet menu. The text in brackets says the direction. One line. Also: Sort option in the rocket filter sheet menu. The text in brackets says the direction. One line. -->
+    <!-- Shared text, used in several places. Sort option in the agency filter sheet menu. The text in brackets says the direction. One line. Also: Sort option in the rocket filter sheet menu. The text in brackets says the direction. One line. -->
+    <!-- Shared text, used in several places. Sort option in the agency filter sheet menu. The text in brackets says the direction. One line. Also: Sort option in the rocket filter sheet menu. The text in brackets says the direction. One line. -->
+    <!-- Shared text, used in several places. Sort option in the agency filter sheet menu. The text in brackets says the direction. One line. Also: Sort option in the rocket filter sheet menu. The text in brackets says the direction. One line. -->
+    <!-- Shared text, used in several places. Row value, length in meters. %1$s is a formatted number such as 70.0. Also: Station statistics card. Length in metres. %1$s is a number, such as 109.0. -->
+    <!-- Shared text, used in several places. Row value, mass in kilograms. %1$s is a formatted number such as 549054. Also: Station statistics card. Mass in kilograms. %1$s is a number with thousands separators. -->
+    <!-- Shared text, used in several places. Section heading in Settings. One line. Also: Small badge text with a star icon, and content description of the lock icon. One word. -->
+    <!-- Shared text, used in several places. Section heading for the Wear OS watch app. One line. Wear OS is a product name. Also: Premium feature name in a list of benefits. Short, one line. Wear OS is a product name. -->
+    <!-- Shared text, used in several places. Content description of a lock icon, and a card heading, for features that need Premium. One line. Also: Heading on the locked-feature card. One line, large. -->
+    <!-- Shared text, used in several places. Card title for the rewarded-ad offer. One line. Also: Title of the 24-hour access card when the caller gives none. One line. -->
+    <!-- Shared text, used in several places. Button. Opens the premium screen. One line. Also: Button on the locked-feature card and the premium prompt. One line. Opens the paywall. Max 24 chars. -->
+    <!-- Heading on the rocket detail error screen, above the error message. One or two lines. -->
+    <!-- Content description of the app logo above the version. Read by screen readers. -->
+    <!-- Version line under the app name. %1$s is the version name, %2$d the build number. -->
+    <!-- Label under the GitHub icon button and its content description. One word. -->
+    <!-- Label under the changelog icon button and its content description. One word. -->
+    <!-- Label under the Discord icon button and its content description. One word. -->
+    <!-- Section heading, above the app description. One line. -->
+    <!-- Section body about the app. Several lines; ends with a space. -->
+    <!-- Text button under the app description. Opens the website. One line. -->
+    <!-- Section heading, above the Space Devs description. One line. -->
+    <!-- Section body about The Space Devs. Several lines with a blank line between two paragraphs. -->
+    <!-- Text button under the Space Devs description. Opens the website. One line. -->
+    <!-- Heading above the list of open source libraries. One line. -->
+    <!-- Message on any screen when the device is offline or cannot reach the server. Body text, may wrap, one or two sentences. -->
+    <!-- Message on any screen when a request took too long. Body text, may wrap, one or two sentences. -->
+    <!-- Message on any screen when the server refuses too many requests. Body text, may wrap, one or two sentences. -->
+    <!-- Message on any screen when the server fails. Body text, may wrap, one or two sentences. -->
+    <!-- Message on any screen when the requested item does not exist. Body text, may wrap, one short sentence. -->
 </resources>

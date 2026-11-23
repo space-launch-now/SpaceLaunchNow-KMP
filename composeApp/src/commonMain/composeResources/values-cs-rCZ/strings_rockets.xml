@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- Rocket list top bar title when filters are active. %1$d is the number of matching rockets. One line. -->
+    <!-- Content description of the filter icon button in the rocket list top bar. Read by screen readers. -->
+    <!-- Text under the spinner while the rocket list loads the first time. One line. -->
+    <!-- Heading of the rocket list error state, above the error message. One or two lines, bold. -->
+    <!-- Heading of the empty rocket list, above the hint. One or two lines, bold. -->
+    <!-- Content description of a rocket picture in the list. %1$s is the rocket name. Read by screen readers. -->
+    <!-- Card heading on the rocket detail screen, above the basic facts. One line, bold. -->
+    <!-- Card heading on the rocket detail screen, above size and thrust rows. One line, bold. -->
+    <!-- Card heading on the rocket detail screen, above the orbit payload rows. One line, bold. -->
+    <!-- Row label format on the rocket detail screen. %1$s is the row label, such as Length. Keep the colon style of the language. -->
+    <!-- Row label, left column. The rocket full name is the value. -->
+    <!-- Row value, range of stages. %1$d is the fewest stages, %2$d the most stages. Example: 1-2. -->
+    <!-- Row label, left column. The thrust at liftoff is the value. -->
+    <!-- Row value, thrust in kilonewtons. %1$s is a formatted number such as 7607. -->
+    <!-- Row value, cost in millions of US dollars. %1$s is a formatted number such as 67. Keep the dollar sign and the M. -->
+    <!-- Row label, left column. The number of launches is the value. -->
+    <!-- Row label, left column. The count of launches not flown yet is the value. -->
+    <!-- Row label, left column, on the launch and the landing cards. The count of successes in a row is the value. -->
+    <!-- Floating label of the search field in the filter sheet. One line. -->
+    <!-- Placeholder of the search field in the filter sheet. Example rocket names. One line. -->
+    <!-- Label above the active status segmented buttons. One line. -->
+    <!-- Segmented button. No filter on this setting. One word, max 12 chars. -->
+    <!-- Segmented button. Shows rockets in service only. Max 12 chars. -->
+    <!-- Segmented button. Shows rockets out of service only. One word, max 12 chars. -->
+    <!-- Label above the reusable segmented buttons. One line. -->
+    <!-- Small text in the filter sheet while the program and family lists load. One line. -->
+    <!-- Small text in the filter sheet when the program and family lists are empty. One line. -->
+    <!-- Text button under the empty-options message. Loads the lists again. One line. -->
+    <!-- Text button at the end of the filter section. Loads the lists again. One line. -->
+    <!-- Sort option in the rocket filter sheet menu. The text in brackets says the direction. One line. -->
+    <!-- Sort option in the rocket filter sheet menu. The text in brackets says the direction. One line. -->
+    <!-- Sort option in the rocket filter sheet menu. The text in brackets says the direction. One line. -->
+    <!-- Sort option in the rocket filter sheet menu. The text in brackets says the direction. One line. -->
+    <!-- Sort option in the rocket filter sheet menu. The text in brackets says the direction. One line. -->
+    <!-- Sort option in the rocket filter sheet menu. The text in brackets says the direction. One line. -->
+    <!-- Sort option in the rocket filter sheet menu. The text in brackets says the direction. One line. -->
+    <!-- Sort option in the rocket filter sheet menu. The text in brackets says the direction. One line. -->
+    <!-- Sort option in the rocket filter sheet menu. The text in brackets says the direction. One line. -->
+    <!-- Sort option in the rocket filter sheet menu. The text in brackets says the direction. One line. -->
+    <!-- Sort option in the rocket filter sheet menu. The text in brackets says the direction. One line. -->
+    <!-- Sort option in the rocket filter sheet menu. The text in brackets says the direction. One line. -->
+    <!-- Sort option in the rocket sort menu. Short phrase, one line. -->
+    <!-- Sort option in the rocket sort menu. Short phrase, one line. -->
+    <!-- Sort option in the rocket sort menu. Short phrase, one line. -->
+    <!-- Sort option in the rocket sort menu. Short phrase, one line. -->
+</resources>

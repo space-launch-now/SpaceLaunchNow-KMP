@@ -1,0 +1,95 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- Heading above the list of alternate videos for a launch. One line. -->
+    <!-- Content description of the play button on a video row. Read by screen readers. -->
+    <!-- Label of an info tile with the launch weather probability. One word. -->
+    <!-- Label of an info tile with the landing result. One word. -->
+    <!-- Content description of the info button on the launch time. Opens the precision dialog. Read by screen readers. -->
+    <!-- Label of an info tile with the launch pad location. Two words. -->
+    <!-- Landing summary in an info tile. %1$d is the number of successful landings, %2$d the number of attempts. One line. -->
+    <!-- Landing summary in an info tile. %1$d is the number of landing attempts. One line. -->
+    <!-- Label of an info tile with the landing summary. One word. -->
+    <!-- Label above several launch countries. One word. -->
+    <!-- Heading of the crew card on a launch. One line. -->
+    <!-- Sub-heading above the crew that launches. One line. -->
+    <!-- Sub-heading above the crew that lands. One line. -->
+    <!-- Role shown when a crew member has no role. Two words. -->
+    <!-- Content description of the Flight Club logo. Read by screen readers. -->
+    <!-- Button text on the Flight Club card. Opens the Flight Club website. One or two lines. -->
+    <!-- Content description of the external link icon on the Flight Club card. Read by screen readers. -->
+    <!-- Text button under a long description. Collapses the text. Two words. -->
+    <!-- Text button under a long description. Expands the text. Two words. -->
+    <!-- Heading of a rocket stage card. %1$d is the stage number, starting at 1. One line. -->
+    <!-- Tag on a rocket stage card. %1$s is the flight number of the booster. One line. -->
+    <!-- Label of an info row with the date of the previous flight of the booster. Two words. -->
+    <!-- Label of an info row with the booster turnaround time. One word. -->
+    <!-- Label of an info tile with the rocket stage type. Two words. -->
+    <!-- Label of an info tile with the landing type. Two words. -->
+    <!-- Value of the landing result tile. One word. -->
+    <!-- Value of the landing result tile. One word. -->
+    <!-- Label of an info row with the downrange landing distance. One word. -->
+    <!-- Content description of the location photo. Read by screen readers. -->
+    <!-- Content description of the location map image. Read by screen readers. -->
+    <!-- Content description of the country flag image. Read by screen readers. -->
+    <!-- Content description of the launch pad photo. Read by screen readers. -->
+    <!-- Content description of the launch pad map image. Read by screen readers. -->
+    <!-- Line of small text on the pad card. %1$s is the latitude, %2$s the longitude, both decimal numbers. -->
+    <!-- Content description of the map icon on the Open Map button. Read by screen readers. -->
+    <!-- Button label. Opens the pad location in a map app. Two words. -->
+    <!-- Label under the number of orbital launch attempts from a pad. Two words. -->
+    <!-- Line of small text on the pad card. %1$s is a duration such as 3 days. -->
+    <!-- Text button under the list of launch updates. %1$d is the number of hidden updates. One line. -->
+    <!-- Content description of the rocket image. Read by screen readers. -->
+    <!-- Name shown when a rocket has no name. Two words. -->
+    <!-- Label of an info tile with another name of the rocket. One word. -->
+    <!-- Label of an info tile with the rocket family. One word. -->
+    <!-- Label of an info tile with the shortest time between two flights. Two words. -->
+    <!-- Heading of the expandable list of rocket specifications. One line. -->
+    <!-- Label of a rocket specification. One word. -->
+    <!-- Value of the thrust specification, followed by a second value. %1$s is a number. -->
+    <!-- Label of a rocket specification, the highest point of the orbit. One word. -->
+    <!-- Heading above the launch statistics of a rocket. One line. -->
+    <!-- Name shown when a mission has no name. Two words. -->
+    <!-- Title of the dialog that explains how exact the launch time is. One line. -->
+    <!-- Body of the dialog that explains how exact the launch time is. Several lines. NET means No Earlier Than. -->
+    <!-- Label under a launch count in the Quick Facts grid. Two short lines; the line break is part of the text. -->
+    <!-- Label under a launch count in the Quick Facts grid. Two short lines; the line break is part of the text. -->
+    <!-- Label under a launch count in the Quick Facts grid. %1$s is a year such as 2026. Two short lines; the line break is part of the text. -->
+    <!-- Heading above the grid of launch count cards. One line. -->
+    <!-- Message under a spinner while related events load. One line. -->
+    <!-- Message when a launch has no related events. One line. -->
+    <!-- Message under a spinner while related news load. One line. -->
+    <!-- Message when a launch has no related news. One line. -->
+    <!-- Content description of the placeholder icon shown when the spacecraft image fails to load. Read by screen readers. -->
+    <!-- Chip on the spacecraft card. S/N means serial number. %1$s is the serial number. -->
+    <!-- Chip on the spacecraft card when the craft is in orbit. Two words. -->
+    <!-- Label of an info tile with the flight destination. One word. -->
+    <!-- Label of an info tile with the number of flights of a spacecraft. Two words. -->
+    <!-- Label of an info tile with the number of finished missions of a spacecraft. Two words. -->
+    <!-- Label of an info tile with the end time of a mission. Two words. -->
+    <!-- Label of an info tile with the length of a mission. Two words. -->
+    <!-- Label of an info tile with the total time a spacecraft spent docked. Two words. -->
+    <!-- Label of an info tile with the time between two flights of a spacecraft. Two words. -->
+    <!-- Label of an info tile with the place where a spacecraft lands. Two words. -->
+    <!-- Heading above the list of docking events. %1$d is the number of events. One line. -->
+    <!-- Small label above the docking date. One word. -->
+    <!-- Small label above the departure date. One word. -->
+    <!-- Title of a timeline entry that has no type. One word. -->
+    <!-- Heading of the Related Events section on the launch detail screen. One line. -->
+    <!-- Heading of the Related News section on the launch detail screen. One line. -->
+    <!-- Heading of the Mission Details section on the launch detail screen. One line. -->
+    <!-- Heading of the Spacecraft Details section on the launch detail screen. One line. -->
+    <!-- Heading of the Launch Service Provider section on the launch detail screen. One line. -->
+    <!-- Heading of the Launch Service Provider Statistics section on the launch detail screen. One line. -->
+    <!-- Heading of the Launch Vehicle Details section on the launch detail screen. One line. -->
+    <!-- Heading above the video player before the launch. Two words. -->
+    <!-- Heading above the video player after the launch. Two words. -->
+    <!-- Heading above the video player when the launch time is unknown. Two words. -->
+    <!-- Name of a launch in a video title when the mission has no name. Two words. -->
+    <!-- Message on the Rocket tab when a launch has no rocket or spacecraft data. One or two lines. -->
+    <!-- Title of the system share sheet when a launch is shared. One line. -->
+    <!-- Content description of the button that opens the video in full screen. Read by screen readers. -->
+    <!-- Tab title on the phone launch detail screen. One word, max 10 chars. -->
+    <!-- Title of the dialog that explains the launch status shown on the countdown. One line. -->
+    <!-- Description of the info icon in the launch status dialog. Read by screen readers. -->
+</resources>

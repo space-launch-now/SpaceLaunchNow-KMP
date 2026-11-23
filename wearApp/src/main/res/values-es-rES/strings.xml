@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- Tile edge button under the next launch, one line -->
+    <!-- Tile edge button when the tile has no launch to open, one line -->
+    <!-- Tile body for a free user, two lines, \n splits them -->
+    <!-- Tile title when the tile failed to load, one line -->
+    <!-- Tile body under the error title -->
+    <!-- Countdown label under the days digits, tile and launch detail, one line, caps -->
+    <!-- Countdown label under the hours digits, tile and launch detail, one line, caps -->
+    <!-- Countdown label under the minutes digits, tile and launch detail, one line, caps -->
+    <!-- Launch list and detail countdown once the launch time has passed -->
+    <!-- Launch list and detail countdown: T-minus, %1$d days, %2$d hours -->
+    <!-- Launch list and detail countdown: T-minus, %1$d hours, %2$d minutes -->
+    <!-- Launch list and detail countdown: T-minus, %1$d minutes -->
+    <!-- Launch list and detail countdown under one minute -->
+    <!-- Launch list, text next to the spinner while loading -->
+    <!-- Launch list, heading above the cards -->
+    <!-- Launch list, shown when a refresh fails and the error has no message -->
+    <!-- Launch detail, shown when the launch id is not in the cache -->
+    <!-- Premium gate screen, heading -->
+    <!-- Premium gate screen, body under the heading -->
+    <!-- Premium gate screen, button that opens the paywall on the phone, one line -->
+    <!-- Settings screen, app name line -->
+    <!-- Settings screen, version line, %1$s is the version number -->
+    <!-- Settings screen, heading above the about text -->
+    <!-- Settings screen, about text, two paragraphs, \n\n splits them -->
+    <!-- Complication, accessibility text: %1$s vehicle name, %2$s countdown such as T-1D 13H -->
+    <!-- Complication, long text: %1$s vehicle name, %2$s countdown such as T-1D 13H -->
+    <!-- Complication, short text for a free user, about 9 chars -->
+    <!-- Complication, accessibility text for a free user -->
+    <!-- Complication, short text when no launch is cached, about 11 chars -->
+    <!-- Complication, accessibility text when no launch is cached -->
+    <!-- Complication, short text once the launch time has passed, max 7 chars -->
+    <!-- Complication, short text under one minute, max 7 chars -->
+    <!-- Complication, short text: %1$d days, %2$d hours, max 7 chars, letters stay caps -->
+    <!-- Complication, short text: %1$d hours, %2$d minutes, max 7 chars, letters stay caps -->
+    <!-- Complication, short text: %1$d minutes, max 7 chars, letters stay caps -->
+    <!-- Complication, long text: T-minus, %1$d days, %2$d hours, letters stay caps -->
+    <!-- Complication, long text: T-minus, %1$d hours, %2$d minutes, letters stay caps -->
+    <!-- Complication, long text: T-minus, %1$d minutes, letters stay caps -->
+    <!-- Complication, long text under one minute -->
+    <!-- Complication title when the launch has no agency name, max 7 chars -->
+    <!-- Complication picker preview, vehicle name -->
+    <!-- Complication picker preview, agency abbreviation, max 7 chars -->
+</resources>
