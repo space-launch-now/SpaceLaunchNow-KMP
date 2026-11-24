@@ -44,8 +44,8 @@ Van bemande vluchten tot het uitzetten van satellieten: Space Launch Now dekt el
 • Maanmissies Artemis van NASA, SLS en bemanningswissels naar het ISS
 • ULA Atlas V, Vulcan Centaur en Delta IV Heavy
 • ISRO PSLV, GSLV en LVM3 vanaf Sriharikota
-• Roscosmos Sojoez- en Progress-vluchten
-• Chinese Lange Mars, Japanse H3, Europese Ariane 6 en Vega
+• Roscosmos Soyuz- en Progress-vluchten
+• Chinese Long March, Japanse H3, Europese Ariane 6 en Vega
 • Rocket Lab Electron, Blue Origin New Shepard en New Glenn en nieuwe draagraketten
 
 Of het nu een Starship-testvlucht, een Falcon 9 Starlink-missie, een Artemis-maanlancering of een nieuwe Indiase satelliet is: je ziet het in het schema met alle missiedetails.

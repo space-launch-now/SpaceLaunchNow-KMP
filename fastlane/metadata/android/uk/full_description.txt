@@ -43,9 +43,9 @@ Space Launch Now створюють шанувальники космосу дл
 • SpaceX Falcon 9, Falcon Heavy, Starship, Crew Dragon і Cargo Dragon
 • Місячні місії NASA Artemis, SLS і ротації екіпажу на МКС
 • ULA Atlas V, Vulcan Centaur і Delta IV Heavy
-• Запуски ISRO PSLV, GSLV і LVM3 із Шрихарікоти
-• Польоти Roscosmos Союз і Прогрес
-• Китайський Чанчжен, японська H3, європейські Ariane 6 і Vega
+• Запуски ISRO PSLV, GSLV і LVM3 із Sriharikota
+• Польоти Roscosmos Soyuz і Progress
+• Китайський Long March, японська H3, європейські Ariane 6 і Vega
 • Rocket Lab Electron, Blue Origin New Shepard і New Glenn та нові ракети-носії
 
 Тестовий політ Starship, місія Starlink на Falcon 9, місячний запуск Artemis чи новий індійський супутник: ти побачиш усе в розкладі з повними подробицями місії.

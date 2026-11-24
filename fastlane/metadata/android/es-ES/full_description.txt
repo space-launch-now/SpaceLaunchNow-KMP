@@ -45,7 +45,7 @@ De los vuelos tripulados al despliegue de satélites, Space Launch Now cubre tod
 • ULA Atlas V, Vulcan Centaur y Delta IV Heavy
 • Lanzamientos PSLV, GSLV y LVM3 de ISRO desde Sriharikota
 • Vuelos Soyuz y Progress de Roscosmos
-• Larga Marcha china, H3 japonés, Ariane 6 y Vega europeos
+• Long March chino, H3 japonés, Ariane 6 y Vega europeos
 • Electron de Rocket Lab, New Shepard y New Glenn de Blue Origin y nuevos lanzadores
 
 Ya sea un vuelo de prueba de Starship, una misión Starlink en Falcon 9, un lanzamiento lunar Artemis o un nuevo satélite indio, lo verás en el calendario con todos los detalles de la misión.

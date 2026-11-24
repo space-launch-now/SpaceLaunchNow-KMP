@@ -44,8 +44,8 @@ Des vols habités aux déploiements de satellites, Space Launch Now couvre chaqu
 • Missions lunaires Artemis de la NASA, SLS et relèves d'équipage vers l'ISS
 • ULA Atlas V, Vulcan Centaur et Delta IV Heavy
 • Lancements ISRO PSLV, GSLV et LVM3 depuis Sriharikota
-• Vols Soyouz et Progress de Roscosmos
-• Longue Marche chinoise, H3 japonais, Ariane 6 et Vega européens
+• Vols Soyuz et Progress de Roscosmos
+• Long March chinois, H3 japonais, Ariane 6 et Vega européens
 • Electron de Rocket Lab, New Shepard et New Glenn de Blue Origin, et lanceurs émergents
 
 Vol d'essai de Starship, mission Starlink sur Falcon 9, lancement lunaire Artemis ou nouveau satellite indien : tu le verras au calendrier avec tous les détails de la mission.

@@ -43,9 +43,9 @@ Od pilotovaných letů po vysazování družic pokrývá Space Launch Now všech
 • SpaceX Falcon 9, Falcon Heavy, Starship, Crew Dragon a Cargo Dragon
 • Lunární mise NASA Artemis, SLS a výměny posádky na ISS
 • ULA Atlas V, Vulcan Centaur a Delta IV Heavy
-• Starty ISRO PSLV, GSLV a LVM3 ze Šríharikoty
-• Lety Roscosmosu Sojuz a Progress
-• Čínský Dlouhý pochod, japonská H3, evropské Ariane 6 a Vega
+• Starty ISRO PSLV, GSLV a LVM3 ze Sriharikota
+• Lety Roscosmosu Soyuz a Progress
+• Čínský Long March, japonská H3, evropské Ariane 6 a Vega
 • Rocket Lab Electron, Blue Origin New Shepard a New Glenn a nové nosné rakety
 
 Ať jde o zkušební let Starship, misi Starlink na Falconu 9, lunární start Artemis, nebo novou indickou družici, uvidíš ji v harmonogramu se všemi podrobnostmi mise.

@@ -43,9 +43,9 @@ Space Launch Now 由航天爱好者打造，为航天爱好者服务。它快速
 • SpaceX Falcon 9、Falcon Heavy、Starship、Crew Dragon 和 Cargo Dragon
 • NASA Artemis 登月任务、SLS 以及前往国际空间站的乘组轮换
 • ULA Atlas V、Vulcan Centaur 和 Delta IV Heavy
-• ISRO 从斯里哈里科塔发射的 PSLV、GSLV 和 LVM3
-• Roscosmos 联盟号和进步号飞行
-• 中国长征、日本 H3、欧洲 Ariane 6 和 Vega
+• ISRO 从 Sriharikota 发射的 PSLV、GSLV 和 LVM3
+• Roscosmos Soyuz 和 Progress 飞行
+• 中国 Long March、日本 H3、欧洲 Ariane 6 和 Vega
 • Rocket Lab Electron、Blue Origin New Shepard 和 New Glenn，以及新兴运载火箭
 
 无论是 Starship 试飞、Falcon 9 星链任务、Artemis 登月发射，还是印度的新卫星，你都能在时间表中看到完整的任务详情。
