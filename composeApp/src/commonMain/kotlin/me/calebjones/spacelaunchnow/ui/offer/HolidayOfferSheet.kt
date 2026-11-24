@@ -96,10 +96,10 @@ fun HolidayOfferSheetHost(
     LaunchedEffect(isOnHome, subscriptionState.isLoading, productsLoaded) {
         if (isOnHome && !checked && !subscriptionState.isLoading && productsLoaded) {
             checked = true
-            if (controller.isEligible(subscriptionState.subscriptionType, monthlyProduct)) {
-                config = controller.config()
-            }
-            HolidayOfferSession.markChecked()
+            val eligible = controller.isEligible(subscriptionState.subscriptionType, monthlyProduct)
+            if (eligible) config = controller.config()
+            // Shown goes first, in this same step, so the win-back host never reads it stale.
+            HolidayOfferSession.recordDecision(eligible)
         }
     }
 
@@ -111,7 +111,6 @@ fun HolidayOfferSheetHost(
 
     LaunchedEffect(visible) {
         if (visible && activeConfig != null) {
-            HolidayOfferSession.markShown()
             controller.markShown(activeConfig.campaignId) // once only, even if the app closes first
             viewModel.trackPaywallViewed(source)
             countdown.run()

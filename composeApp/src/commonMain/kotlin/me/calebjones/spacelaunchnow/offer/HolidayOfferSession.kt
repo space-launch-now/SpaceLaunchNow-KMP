@@ -21,4 +21,19 @@ object HolidayOfferSession {
     fun markChecked() { _checked.value = true }
 
     fun markShown() { _shown.value = true }
+
+    /**
+     * Record the offer decision. [shown] is set before [checked], so a host that wakes on
+     * [checked] never reads a stale [shown].
+     */
+    fun recordDecision(eligible: Boolean) {
+        if (eligible) markShown()
+        markChecked()
+    }
+
+    /** Back to the start-of-launch state. For tests. */
+    fun reset() {
+        _checked.value = false
+        _shown.value = false
+    }
 }
