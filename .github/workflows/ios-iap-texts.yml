@@ -41,7 +41,7 @@ jobs:
         with:
           node-version: '22'
       - run: node scripts/appstore-iap/check-iap-texts.mjs
-      - run: node --test scripts/appstore-iap/
+      - run: node --test scripts/appstore-iap/*.test.mjs
 
   download:
     name: Download live texts from App Store Connect

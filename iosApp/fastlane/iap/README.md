@@ -40,7 +40,7 @@ All scripts are in `scripts/appstore-iap/`. They need Node 22 and no npm package
 | Step | Command | Needs credentials |
 |---|---|---|
 | Check the files | `node scripts/appstore-iap/check-iap-texts.mjs` | no |
-| Unit tests | `node --test scripts/appstore-iap/` | no |
+| Unit tests | `node --test scripts/appstore-iap/*.test.mjs` | no |
 | Download the live texts | `node scripts/appstore-iap/download-iap.mjs [--out <folder>] [--check-against-git]` | yes |
 | Dry run (prints create, update, unchanged) | `node scripts/appstore-iap/upload-iap.mjs` | yes |
 | Live upload | `IAP_UPLOAD_APPROVED=yes node scripts/appstore-iap/upload-iap.mjs --live` | yes |
