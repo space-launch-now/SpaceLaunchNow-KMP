@@ -1,0 +1,98 @@
+NEPROPÁSNI ŽÁDNÝ START RAKETY.
+
+Space Launch Now ti nabízí harmonogramy v reálném čase, odpočty živě, údaje o misích a upozornění na každý významný start rakety a kosmickou událost ve světě.
+
+Sleduj starty SpaceX, NASA, ULA, ISRO, JAXA, Roscosmos, ESA a dalších v jedné rychlé, spolehlivé a pěkně navržené aplikaci.
+
+────────────────────────
+🚀 FUNKCE
+────────────────────────
+
+• Živé sledování startů raket
+  - Světový harmonogram startů, stále aktualizovaný
+  - Odpočty živě s přesností na sekundu
+  - Push oznámení o změnách u startů
+
+• Podrobnosti o misích a nosičích
+  - Podrobné informace o nákladu, oběžné dráze a typu mise
+  - Výsledky přistání a historie opakovaného použití boosterů SpaceX
+  - Encyklopedie raket z celé historie kosmonautiky
+
+• Profily astronautů
+  - Složení posádek a nadcházející lety
+  - Celá historie pilotovaných letů, od prvních misí po dnešek
+
+• Historický archiv kosmických letů
+  - Prozkoumej desítky let kosmických misí a důležité milníky
+  - Procházej dřívější starty a údaje o letech
+
+────────────────────────
+🌍 PROČ SPACE LAUNCH NOW?
+────────────────────────
+
+Space Launch Now vytvářejí fanoušci vesmíru pro fanoušky vesmíru. Aplikace je rychlá, přesná a drží tě v obraze bez zbytečného zmatku a rušení.
+
+Ať sleduješ každý start SpaceX, nebo jen chceš vědět, kdy poletí další velká mise, aplikace ti dá nástroje, abys byl vždy a všude v obraze.
+
+────────────────────────
+🛰️ SLEDUJ KAŽDÝ DRUH MISE
+────────────────────────
+
+Od pilotovaných letů po vysazování družic pokrývá Space Launch Now všechny kategorie orbitální i suborbitální činnosti:
+
+• SpaceX Falcon 9, Falcon Heavy, Starship, Crew Dragon a Cargo Dragon
+• Lunární mise NASA Artemis, SLS a výměny posádky na ISS
+• ULA Atlas V, Vulcan Centaur a Delta IV Heavy
+• Starty ISRO PSLV, GSLV a LVM3 ze Sriharikota
+• Lety Roscosmosu Soyuz a Progress
+• Čínský Long March, japonská H3, evropské Ariane 6 a Vega
+• Rocket Lab Electron, Blue Origin New Shepard a New Glenn a nové nosné rakety
+
+Ať jde o zkušební let Starship, misi Starlink na Falconu 9, lunární start Artemis, nebo novou indickou družici, uvidíš ji v harmonogramu se všemi podrobnostmi mise.
+
+────────────────────────
+⌚ DOPLŇEK PRO WEAR OS
+────────────────────────
+
+Space Launch Now Premium zahrnuje plnohodnotné prostředí Wear OS pro tvé chytré hodinky:
+
+• Živé odpočty startů na zápěstí
+• Komplikace ciferníku s další misí
+• Dlaždice pro okamžitý přístup k nadcházejícím startům a podrobnostem
+• Oznámení hladce synchronizovaná z tvého telefonu
+
+Mrkni na hodinky a víš přesně, kdy je start.
+
+────────────────────────
+⭐ FUNKCE PREMIUM
+────────────────────────
+
+Podpoř vývoj a odemkni další vylepšení:
+
+• Odemkni widgety Premium
+• Přizpůsob vzhled widgetů
+• Získej synchronizaci s kalendářem
+• Motivy aplikace Premium
+• Aplikace pro Wear OS s komplikacemi a dlaždicemi
+• BEZ REKLAM
+
+Všechna vylepšení podporují další vývoj.
+
+────────────────────────
+🔔 NEPROPÁSNI ŽÁDNÝ START
+────────────────────────
+
+Zapni oznámení a dostávej upozornění na události kolem startů.
+
+Buď připraven na start kdekoli na světě.
+
+────────────────────────
+📫 KONTAKT NA VÝVOJÁŘE
+────────────────────────
+
+E-mail: support@spacelaunchnow.me
+Web: https://spacelaunchnow.me
+Zásady ochrany osobních údajů: https://spacelaunchnow.me/privacy
+
+
+Space Launch Now je nezávislý projekt a není spojen se SpaceX, NASA, ULA, ISRO, ESA, ROSCOSMOS, JAXA ani s žádným jiným poskytovatelem startů.
