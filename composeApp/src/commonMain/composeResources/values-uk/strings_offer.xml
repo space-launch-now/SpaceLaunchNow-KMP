@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="offer_title">Святкова пропозиція</string>
+    <string name="offer_product_name">Space Launch Now Pro</string>
+    <string name="offer_benefit_no_ads">Без реклами</string>
+    <string name="offer_benefit_widgets">Розширені віджети</string>
+    <string name="offer_benefit_themes">Власні теми</string>
+    <string name="offer_benefit_more">та інше</string>
+    <string name="offer_price_line">%1$s за перший місяць, далі %2$s/міс. · скасувати можна будь-коли</string>
+    <string name="offer_cta">Почати за %1$s</string>
+    <string name="offer_see_all_plans">Усі плани</string>
+    <string name="offer_close_loading_description">Кнопка закриття скоро з’явиться</string>
+    <string name="paywall_intro_price_first_month">%1$s за перший місяць, далі %2$s/міс.</string>
+    <string name="paywall_intro_price_generic">Вступна ціна %1$s, далі %2$s/міс.</string>
+</resources>

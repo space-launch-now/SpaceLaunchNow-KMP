@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="offer_title">节日优惠</string>
+    <string name="offer_product_name">Space Launch Now Pro</string>
+    <string name="offer_benefit_no_ads">无广告</string>
+    <string name="offer_benefit_widgets">高级小组件</string>
+    <string name="offer_benefit_themes">自定义主题</string>
+    <string name="offer_benefit_more">以及更多</string>
+    <string name="offer_price_line">首月 %1$s，之后每月 %2$s · 可随时取消</string>
+    <string name="offer_cta">仅需 %1$s 开始</string>
+    <string name="offer_see_all_plans">查看所有方案</string>
+    <string name="offer_close_loading_description">关闭按钮即将出现</string>
+    <string name="paywall_intro_price_first_month">首月 %1$s，之后每月 %2$s</string>
+    <string name="paywall_intro_price_generic">%1$s 入门价，之后每月 %2$s</string>
+</resources>
