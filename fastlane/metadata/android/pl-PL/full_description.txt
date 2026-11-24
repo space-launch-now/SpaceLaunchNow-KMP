@@ -1,0 +1,98 @@
+NIE PRZEGAP ŻADNEGO STARTU RAKIETY.
+
+Space Launch Now daje ci harmonogramy w czasie rzeczywistym, odliczanie na żywo, dane o misjach i alerty o każdym ważnym starcie rakiety i wydarzeniu kosmicznym na świecie.
+
+Śledź starty SpaceX, NASA, ULA, ISRO, JAXA, Roscosmos, ESA i nie tylko w jednej szybkiej, niezawodnej i ładnie zaprojektowanej aplikacji.
+
+────────────────────────
+🚀 FUNKCJE
+────────────────────────
+
+• Śledzenie startów rakiet na żywo
+  - Światowy harmonogram startów, stale aktualizowany
+  - Odliczanie na żywo z dokładnością do sekundy
+  - Powiadomienia push o zmianach w startach
+
+• Szczegóły misji i pojazdów
+  - Dokładne informacje o ładunku, orbicie i rodzaju misji
+  - Wyniki lądowań i historia ponownego użycia boosterów SpaceX
+  - Encyklopedia rakiet z całej historii lotów kosmicznych
+
+• Profile astronautów
+  - Przydziały załóg i nadchodzące loty
+  - Pełna historia załogowych lotów kosmicznych, od pierwszych misji do dziś
+
+• Archiwum historii lotów kosmicznych
+  - Poznaj dziesięciolecia misji kosmicznych i ważne kamienie milowe
+  - Przeglądaj dawne starty i dane lotów
+
+────────────────────────
+🌍 DLACZEGO SPACE LAUNCH NOW?
+────────────────────────
+
+Space Launch Now tworzą miłośnicy kosmosu dla miłośników kosmosu. Aplikacja jest szybka, dokładna i informuje cię bez bałaganu i rozpraszaczy.
+
+Niezależnie od tego, czy śledzisz każdy start SpaceX, czy chcesz tylko wiedzieć, kiedy ruszy następna wielka misja, aplikacja da ci narzędzia, by być na bieżąco zawsze i wszędzie.
+
+────────────────────────
+🛰️ ŚLEDŹ KAŻDY RODZAJ MISJI
+────────────────────────
+
+Od lotów załogowych po wynoszenie satelitów, Space Launch Now obejmuje każdą kategorię działań orbitalnych i suborbitalnych:
+
+• SpaceX Falcon 9, Falcon Heavy, Starship, Crew Dragon i Cargo Dragon
+• Księżycowe misje NASA Artemis, SLS i zmiany załogi na ISS
+• ULA Atlas V, Vulcan Centaur i Delta IV Heavy
+• Starty ISRO PSLV, GSLV i LVM3 z Sriharikoty
+• Loty Roscosmos Sojuz i Progress
+• Chiński Długi Marsz, japoński H3, europejskie Ariane 6 i Vega
+• Rocket Lab Electron, Blue Origin New Shepard i New Glenn oraz nowe rakiety nośne
+
+Test Starshipa, misja Starlink na Falconie 9, księżycowy start Artemis czy nowy indyjski satelita: zobaczysz to w harmonogramie z pełnymi szczegółami misji.
+
+────────────────────────
+⌚ APLIKACJA NA WEAR OS
+────────────────────────
+
+Space Launch Now Premium zawiera pełną obsługę Wear OS dla twojego smartwatcha:
+
+• Odliczanie do startu na żywo na nadgarstku
+• Komplikacje tarczy zegarka z następną misją
+• Kafelki z błyskawicznym dostępem do nadchodzących startów i szczegółów
+• Powiadomienia płynnie synchronizowane z telefonu
+
+Zerknij na zegarek i wiedz dokładnie, kiedy start.
+
+────────────────────────
+⭐ FUNKCJE PREMIUM
+────────────────────────
+
+Wesprzyj rozwój aplikacji i odblokuj dodatkowe ulepszenia:
+
+• Odblokuj widżety Premium
+• Dostosuj wygląd widżetów
+• Synchronizuj z kalendarzem
+• Motywy aplikacji Premium
+• Aplikacja na Wear OS z komplikacjami i kafelkami
+• BEZ REKLAM
+
+Wszystkie ulepszenia wspierają dalszy rozwój aplikacji.
+
+────────────────────────
+🔔 NIE PRZEGAP STARTU
+────────────────────────
+
+Włącz powiadomienia, by dostawać alerty o wydarzeniach startowych.
+
+Bądź gotowy na start w dowolnym miejscu świata.
+
+────────────────────────
+📫 KONTAKT Z DEWELOPEREM
+────────────────────────
+
+E-mail: support@spacelaunchnow.me
+Strona internetowa: https://spacelaunchnow.me
+Polityka prywatności: https://spacelaunchnow.me/privacy
+
+
+Space Launch Now to niezależny projekt, niezwiązany z SpaceX, NASA, ULA, ISRO, ESA, ROSCOSMOS, JAXA ani żadnym innym dostawcą usług startowych.
