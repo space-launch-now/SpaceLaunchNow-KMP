@@ -20,7 +20,7 @@ import re
 import sys
 from pathlib import Path
 
-LIMIT = 500
+LIMIT = 500  # Play limit; the workflow prompt asks the model for 480 to leave room
 DEFAULT_LOCALE = "en-US"
 LISTING = Path(__file__).resolve().parent.parent / "fastlane" / "metadata" / "android"
 HEADER = re.compile(r"^=== *([A-Za-z-]+) *===\s*$", re.MULTILINE)
@@ -61,6 +61,7 @@ def main(argv):
         answer = sys.stdin.read()
     answer = answer.replace("
 ", "
+")
 ")
     english = (out / f"whatsnew-{DEFAULT_LOCALE}").read_text(encoding="utf-8").strip()
     blocks = parse(answer)
