@@ -11,6 +11,7 @@ import me.calebjones.spacelaunchnow.data.model.DataBackend
 import me.calebjones.spacelaunchnow.data.model.OnboardingVariant
 import me.calebjones.spacelaunchnow.data.model.PinnedContent
 import me.calebjones.spacelaunchnow.data.model.RoadmapData
+import me.calebjones.spacelaunchnow.offer.HolidayOfferConfig
 import me.calebjones.spacelaunchnow.util.isFirebaseAppConfigured
 import me.calebjones.spacelaunchnow.util.logging.logger
 import kotlin.time.Duration
@@ -70,6 +71,11 @@ class RemoteConfigRepositoryImpl(
         private const val NOTIFICATION_RATING_PROMPT_KEY = "rating_prompt_after_notification_enabled"
         private const val LOCKED_NOTIFICATION_TAP_PAYWALL_KEY = "paywall_locked_notification_tap_enabled"
         private const val WINBACK_SHEET_KEY = "winback_sheet_enabled"
+        private const val HOLIDAY_OFFER_ENABLED_KEY = "holiday_offer_enabled"
+        private const val HOLIDAY_OFFER_CAMPAIGN_ID_KEY = "holiday_offer_campaign_id"
+        private const val HOLIDAY_OFFER_START_KEY = "holiday_offer_start"
+        private const val HOLIDAY_OFFER_END_KEY = "holiday_offer_end"
+        private const val HOLIDAY_OFFER_CLOSE_DELAY_KEY = "holiday_offer_close_delay_s"
         private const val INTERSTITIAL_MIN_INTERVAL_KEY = "ads_interstitial_min_interval_s"
         private const val HOME_UPGRADE_ROW_KEY = "home_upgrade_row_enabled"
         const val DEFAULT_INTERSTITIAL_VISITS = 4
@@ -184,7 +190,12 @@ class RemoteConfigRepositoryImpl(
                 INTERSTITIAL_MIN_INTERVAL_KEY to DEFAULT_INTERSTITIAL_MIN_INTERVAL_S.toString(),
                 NOTIFICATION_RATING_PROMPT_KEY to "false",
                 LOCKED_NOTIFICATION_TAP_PAYWALL_KEY to "false",
-                WINBACK_SHEET_KEY to "false"
+                WINBACK_SHEET_KEY to "false",
+                HOLIDAY_OFFER_ENABLED_KEY to "false",
+                HOLIDAY_OFFER_CAMPAIGN_ID_KEY to "",
+                HOLIDAY_OFFER_START_KEY to "",
+                HOLIDAY_OFFER_END_KEY to "",
+                HOLIDAY_OFFER_CLOSE_DELAY_KEY to HolidayOfferConfig.DEFAULT_CLOSE_DELAY_SECONDS.toString()
             )
         } catch (e: Exception) {
             // Log warning but don't fail - defaults are optional
@@ -242,6 +253,22 @@ class RemoteConfigRepositoryImpl(
 
     override suspend fun getWinbackSheetEnabled(): Boolean =
         readBooleanFlag(WINBACK_SHEET_KEY, "win-back sheet")
+
+    override suspend fun getHolidayOfferConfig(): HolidayOfferConfig {
+        val config = remoteConfig ?: return HolidayOfferConfig.DISABLED
+        return try {
+            HolidayOfferConfig.fromRaw(
+                enabled = config.getValue(HOLIDAY_OFFER_ENABLED_KEY).asString(),
+                campaignId = config.getValue(HOLIDAY_OFFER_CAMPAIGN_ID_KEY).asString(),
+                start = config.getValue(HOLIDAY_OFFER_START_KEY).asString(),
+                end = config.getValue(HOLIDAY_OFFER_END_KEY).asString(),
+                closeDelaySeconds = config.getValue(HOLIDAY_OFFER_CLOSE_DELAY_KEY).asString(),
+            )
+        } catch (e: Exception) {
+            log.w(e) { "Failed to read holiday offer config - defaulting to off" }
+            HolidayOfferConfig.DISABLED
+        }
+    }
 
     override suspend fun getHomeUpgradeRowEnabled(): Boolean =
         readBooleanFlag(HOME_UPGRADE_ROW_KEY, "home upgrade row")

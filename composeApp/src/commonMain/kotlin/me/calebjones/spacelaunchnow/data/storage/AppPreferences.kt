@@ -49,6 +49,8 @@ class AppPreferences(private val dataStore: DataStore<Preferences>) {
         // whether the sheet was already shown. Both are written once and never reset.
         private val ONBOARDING_PAYWALL_DISMISSED_AT_MS = longPreferencesKey("onboarding_paywall_dismissed_at_ms")
         private val WINBACK_SHEET_SHOWN = booleanPreferencesKey("winback_sheet_shown")
+        // Id of the last holiday-offer campaign whose sheet was shown (a new campaign id shows again)
+        private val HOLIDAY_OFFER_SHOWN_CAMPAIGN_ID = stringPreferencesKey("holiday_offer_shown_campaign_id")
 
         // Live onboarding (feature preview carousel) completed flag
         private val LIVE_ONBOARDING_COMPLETED = booleanPreferencesKey("live_onboarding_completed")
@@ -220,6 +222,13 @@ class AppPreferences(private val dataStore: DataStore<Preferences>) {
 
     suspend fun markWinbackSheetShown() {
         dataStore.edit { preferences -> preferences[WINBACK_SHEET_SHOWN] = true }
+    }
+
+    suspend fun getHolidayOfferShownCampaignId(): String? =
+        dataStore.data.map { it[HOLIDAY_OFFER_SHOWN_CAMPAIGN_ID] }.first()
+
+    suspend fun markHolidayOfferShown(campaignId: String) {
+        dataStore.edit { preferences -> preferences[HOLIDAY_OFFER_SHOWN_CAMPAIGN_ID] = campaignId }
     }
 
     // Live onboarding completed methods
