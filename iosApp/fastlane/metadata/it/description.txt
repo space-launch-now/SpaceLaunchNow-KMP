@@ -1,0 +1,21 @@
+Ricevi aggiornamenti e notifiche sui lanci di razzi di SpaceX, NASA, ULA, ROSCOSMOS, ISRO e molti altri!
+
+Funzioni:
+• Notifiche per i prossimi lanci di razzi.
+• Storia dei voli spaziali, fino al primo volo con equipaggio.
+• Dettagli sui veicoli di lancio più usati da SpaceX, NASA, ULA e altri.
+• Ricerca avanzata e filtri per trovare lanci specifici.
+• Tema chiaro/scuro opzionale.
+
+Monitoraggio dei lanci
+Segui i lanci di SpaceX, ULA e Orbital/ATK, oltre ai lanci internazionali di NASA, ROSCOSMOS, ISRO, JAXA ed ESA.
+
+Missioni scientifiche
+Segui le missioni di rifornimento della NASA verso la Stazione Spaziale Internazionale, i lanci di satelliti commerciali di fornitori come IRIDIUM e missioni scientifiche come il telescopio spaziale James Webb!
+
+Informazioni sui veicoli
+Scopri tutti i razzi che ci portano in orbita, come le famiglie di lanciatori Soyuz, Atlas, Delta, Ariane, Proton e Falcon 9.
+
+Space Launch Now non è affiliata in alcun modo a SpaceX, NASA, ULA, ISRO, ESA o a qualsiasi altro fornitore di lanci.
+
+Usando questa app accetti i Termini di utilizzo di Apple (EULA): https://www.apple.com/legal/internet-services/itunes/dev/stdeula/

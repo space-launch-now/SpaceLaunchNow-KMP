@@ -1,0 +1,21 @@
+Získejte novinky a oznámení o startech raket SpaceX, NASA, ULA, ROSCOSMOS, ISRO a mnoha dalších!
+
+Funkce:
+• Oznámení o nadcházejících startech raket.
+• Historie kosmických letů až k prvnímu pilotovanému letu.
+• Podrobnosti o běžně používaných nosných raketách SpaceX, NASA, ULA a dalších.
+• Pokročilé vyhledávání a filtry pro nalezení konkrétních startů.
+• Volitelný denní/noční motiv.
+
+Sledování startů
+Sledujte starty raket SpaceX, ULA a Orbital/ATK i mezinárodní starty NASA, ROSCOSMOS, ISRO, JAXA a ESA.
+
+Vědecké mise
+Sledujte zásobovací mise NASA k Mezinárodní vesmírné stanici, komerční starty satelitů od poskytovatelů, jako je IRIDIUM, a vědecké mise, například Vesmírný dalekohled Jamese Webba!
+
+Informace o raketách
+Poznejte všechny rakety, které nás vynášejí na oběžnou dráhu, například rodiny nosných raket Sojuz, Atlas, Delta, Ariane, Proton a Falcon 9.
+
+Space Launch Now nemá žádnou souvislost se SpaceX, NASA, ULA, ISRO, ESA ani s žádným jiným poskytovatelem startů.
+
+Používáním této aplikace souhlasíte s Podmínkami použití Apple (EULA): https://www.apple.com/legal/internet-services/itunes/dev/stdeula/

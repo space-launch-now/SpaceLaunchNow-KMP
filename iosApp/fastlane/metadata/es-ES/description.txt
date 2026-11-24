@@ -1,0 +1,21 @@
+¡Recibe novedades y notificaciones de lanzamientos de cohetes de SpaceX, NASA, ULA, ROSCOSMOS, ISRO y muchos más!
+
+Funciones:
+• Notificaciones de los próximos lanzamientos de cohetes.
+• Historial de los vuelos espaciales, desde el primer vuelo tripulado.
+• Detalles de los vehículos de lanzamiento más usados por SpaceX, NASA, ULA y otros.
+• Búsqueda avanzada y filtros para encontrar lanzamientos concretos.
+• Tema claro u oscuro opcional.
+
+Seguimiento de lanzamientos
+Sigue los lanzamientos de SpaceX, ULA y Orbital/ATK, así como los de NASA, ROSCOSMOS, ISRO, JAXA y ESA en todo el mundo.
+
+Misiones científicas
+Acompaña las misiones de reabastecimiento de la NASA a la Estación Espacial Internacional, los lanzamientos de satélites comerciales de proveedores como IRIDIUM y misiones científicas como el telescopio espacial James Webb.
+
+Información de vehículos
+Conoce todos los cohetes que nos llevan a la órbita, como las familias de lanzadores Soyuz, Atlas, Delta, Ariane, Proton y Falcon 9.
+
+Space Launch Now no tiene ninguna relación con SpaceX, NASA, ULA, ISRO, ESA ni con ningún otro proveedor de lanzamientos.
+
+Al usar esta app aceptas las Condiciones de uso de Apple (EULA): https://www.apple.com/legal/internet-services/itunes/dev/stdeula/

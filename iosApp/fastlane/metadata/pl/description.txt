@@ -1,0 +1,21 @@
+Odbieraj nowości i powiadomienia o startach rakiet SpaceX, NASA, ULA, ROSCOSMOS, ISRO i wielu innych!
+
+Funkcje:
+• Powiadomienia o nadchodzących startach rakiet.
+• Historia lotów kosmicznych aż do pierwszego lotu załogowego.
+• Szczegóły o najczęściej używanych rakietach nośnych SpaceX, NASA, ULA i innych.
+• Zaawansowane wyszukiwanie i filtry do znajdowania konkretnych startów.
+• Opcjonalny motyw jasny/ciemny.
+
+Śledzenie startów
+Śledź starty rakiet SpaceX, ULA i Orbital/ATK oraz międzynarodowe starty NASA, ROSCOSMOS, ISRO, JAXA i ESA.
+
+Misje naukowe
+Śledź misje zaopatrzeniowe NASA na Międzynarodową Stację Kosmiczną, komercyjne starty satelitów od dostawców takich jak IRIDIUM oraz misje naukowe, jak Kosmiczny Teleskop Jamesa Webba!
+
+Informacje o rakietach
+Poznaj wszystkie rakiety, które wynoszą nas na orbitę, takie jak rodziny rakiet Sojuz, Atlas, Delta, Ariane, Proton i Falcon 9.
+
+Space Launch Now nie jest w żaden sposób powiązana z SpaceX, NASA, ULA, ISRO, ESA ani z żadnym innym dostawcą usług startowych.
+
+Korzystając z tej aplikacji, akceptujesz Warunki korzystania Apple (EULA): https://www.apple.com/legal/internet-services/itunes/dev/stdeula/

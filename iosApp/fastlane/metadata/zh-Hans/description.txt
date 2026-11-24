@@ -1,0 +1,21 @@
+获取 SpaceX、NASA、ULA、ROSCOSMOS、ISRO 等众多机构的火箭发射动态和通知！
+
+功能：
+• 接收即将进行的火箭发射通知。
+• 回顾航天史，一直追溯到首次载人航天飞行。
+• 查看 SpaceX、NASA、ULA 等常用运载火箭的详细信息。
+• 高级搜索和筛选，快速找到特定发射任务。
+• 可选日间/夜间主题。
+
+发射追踪
+追踪 SpaceX、ULA 和 Orbital/ATK 的发射，以及 NASA、ROSCOSMOS、ISRO、JAXA 和 ESA 的国际发射。
+
+科学任务
+关注 NASA 前往国际空间站的补给任务、IRIDIUM 等供应商的商业卫星发射，以及詹姆斯·韦布空间望远镜等科学任务！
+
+火箭信息
+了解送我们进入轨道的各种火箭，例如联盟号、宇宙神、德尔塔、阿丽亚娜、质子号和猎鹰 9 号运载火箭系列。
+
+Space Launch Now 与 SpaceX、NASA、ULA、ISRO、ESA 或任何其他发射服务商均无任何关联。
+
+使用本应用即表示您同意 Apple 使用条款 (EULA)： https://www.apple.com/legal/internet-services/itunes/dev/stdeula/
