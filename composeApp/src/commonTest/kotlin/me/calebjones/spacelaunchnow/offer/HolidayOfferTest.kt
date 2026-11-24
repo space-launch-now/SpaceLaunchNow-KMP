@@ -147,6 +147,7 @@ class HolidayOfferTest {
         value: Int? = 1,
         unit: String? = "MONTH",
         cycles: Int = 1,
+        freeTrial: Boolean = false,
     ) = ProductInfo(
         productId = "premium_monthly",
         basePlanId = "monthly",
@@ -155,6 +156,7 @@ class HolidayOfferTest {
         formattedPrice = "2.99 USD",
         priceAmountMicros = 2_990_000L,
         currencyCode = "USD",
+        hasFreeTrial = freeTrial,
         hasIntroOffer = hasIntro,
         introOfferPrice = price,
         introOfferPeriodValue = value,
@@ -176,6 +178,7 @@ class HolidayOfferTest {
         assertFalse(product(unit = "WEEK").isFirstMonthIntroOffer)
         assertFalse(product(unit = null).isFirstMonthIntroOffer)
         assertFalse(product(cycles = 3).isFirstMonthIntroOffer)
+        assertFalse(product(freeTrial = true).isFirstMonthIntroOffer)
     }
 
     @Test

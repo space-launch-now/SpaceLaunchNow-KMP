@@ -17,7 +17,7 @@ fun introPriceText(product: ProductInfo?): String? {
     return when {
         product.isFirstMonthIntroOffer ->
             stringResource(Res.string.paywall_intro_price_first_month, intro, product.formattedPrice)
-        product.hasIntroOffer ->
+        product.hasIntroOffer && !product.hasFreeTrial ->
             stringResource(Res.string.paywall_intro_price_generic, intro, product.formattedPrice)
         else -> null
     }
