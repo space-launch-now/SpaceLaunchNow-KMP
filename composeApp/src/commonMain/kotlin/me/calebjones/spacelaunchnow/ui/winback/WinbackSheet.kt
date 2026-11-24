@@ -34,6 +34,9 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import me.calebjones.spacelaunchnow.analytics.events.PaywallSource
+import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.withTimeoutOrNull
+import me.calebjones.spacelaunchnow.offer.HolidayOfferSession
 import me.calebjones.spacelaunchnow.data.model.ProductInfo
 import me.calebjones.spacelaunchnow.ui.theme.SpaceLaunchNowPreviewTheme
 import me.calebjones.spacelaunchnow.ui.viewmodel.ProductType
@@ -52,6 +55,8 @@ import spacelaunchnow_kmp.composeapp.generated.resources.winback_price_no_trial
 import spacelaunchnow_kmp.composeapp.generated.resources.winback_price_trial
 import spacelaunchnow_kmp.composeapp.generated.resources.winback_title
 import kotlin.time.TimeSource
+
+private const val HOLIDAY_OFFER_WAIT_MS = 10_000L
 
 /**
  * Day-7 win-back offer. Checks eligibility once per app open, after the user reaches Home, and
@@ -75,10 +80,13 @@ fun WinbackSheetHost(
     var checked by remember { mutableStateOf(false) }
     var closed by remember { mutableStateOf(false) }
 
-    // One check per app open, once subscription state has settled.
+    // One check per app open, once subscription state has settled. The holiday offer goes
+    // first: wait (up to 10 s) for its decision, and stay away when it showed.
     LaunchedEffect(isOnHome, subscriptionState.isLoading) {
         if (isOnHome && !checked && !subscriptionState.isLoading) {
             checked = true
+            withTimeoutOrNull(HOLIDAY_OFFER_WAIT_MS) { HolidayOfferSession.checked.first { it } }
+            if (HolidayOfferSession.shown.value) return@LaunchedEffect
             eligible = controller.isEligible(isSubscribed = subscriptionState.isSubscribed)
         }
     }
