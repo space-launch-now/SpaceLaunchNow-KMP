@@ -367,6 +367,17 @@ tasks.withType<org.jetbrains.kotlin.gradle.tasks.KotlinCompile>().configureEach 
     }
 }
 
+// The live-API integration tests call spacelaunchnow.app and need a real API key, so CI skips them.
+// Everything else in desktopTest runs on CI.
+tasks.withType<Test>().configureEach {
+    if (System.getenv("CI") == "true") {
+        filter {
+            excludeTestsMatching("*.GeneratedApiClientIntegrationTest")
+            excludeTestsMatching("*.BidirectionalCarouselIntegrationTest")
+        }
+    }
+}
+
 // Fix resource path configuration
 tasks.withType<ProcessResources> {
     // Ensure resources from commonMain are copied to all targets
