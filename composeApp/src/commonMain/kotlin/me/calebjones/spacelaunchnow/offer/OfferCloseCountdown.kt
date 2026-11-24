@@ -7,10 +7,11 @@ import kotlinx.coroutines.delay
 
 /**
  * Close-button countdown for the holiday offer sheet. The sheet cannot be dismissed until
- * [canClose] is true. With a delay of 0 it is closable at once.
+ * [canClose] is true. With a delay of 0 it is closable at once. [delaySeconds] must
+ * already be clamped by [HolidayOfferConfig]; this class does not clamp it.
  */
 class OfferCloseCountdown(delaySeconds: Int) {
-    val totalMs: Long = delaySeconds.coerceIn(0, HolidayOfferConfig.MAX_CLOSE_DELAY_SECONDS) * 1000L
+    val totalMs: Long = delaySeconds * 1000L
 
     var elapsedMs: Long by mutableLongStateOf(0L)
         private set

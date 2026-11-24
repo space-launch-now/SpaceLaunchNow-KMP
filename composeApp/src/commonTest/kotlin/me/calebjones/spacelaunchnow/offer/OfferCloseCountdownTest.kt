@@ -40,10 +40,4 @@ class OfferCloseCountdownTest {
         assertTrue(c.canClose)
         assertEquals(3_000L, testScheduler.currentTime)
     }
-
-    @Test
-    fun `delay is clamped to the maximum`() {
-        assertEquals(30_000L, OfferCloseCountdown(500).totalMs)
-        assertEquals(0L, OfferCloseCountdown(-3).totalMs)
-    }
 }
