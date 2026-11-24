@@ -220,6 +220,7 @@ jobs:
             ${{ steps.changelog.outputs.clean_changelog }}
 
       # One call translates the humanized English notes into every Play listing language.
+      # The language list in the prompt must match fastlane/metadata/android (scripts/split-play-store-translations.py).
       # Skipped when the English notes are not humanized (raw changelog); the split step then
       # copies the English notes into every locale. A failed call has the same result.
       - name: Translate Play Store notes (Copilot)

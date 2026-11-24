@@ -9,7 +9,9 @@ answers with one block per language:
 
 This script splits that answer into whatsnew-<locale> files. The languages come
 from the listing folders in fastlane/metadata/android (the same folders Play
-gets), so a new listing language needs no edit here. A language with a missing,
+gets), so a new listing language needs no edit here. The language list in the
+translate step's prompt in release-main.yml must match; a language the prompt
+lacks falls back to English. A language with a missing,
 empty or broken block gets the English notes. Play limits notes to 500
 characters per language; this counts characters, not bytes.
 
@@ -63,12 +65,13 @@ def main(argv):
     english = (out / f"whatsnew-{DEFAULT_LOCALE}").read_text(encoding="utf-8").strip()
     blocks = parse(answer)
     translated = 0
-    for locale in listing_locales():
+    locales = listing_locales()
+    for locale in locales:
         text = fit(blocks.get(locale, ""))
         if text:
             translated += 1
         (out / f"whatsnew-{locale}").write_text(text or english, encoding="utf-8", newline="")
-    print(f"{translated} translated, {len(listing_locales()) - translated} fell back to English")
+    print(f"{translated} translated, {len(locales) - translated} fell back to English")
     return 0
 
 
