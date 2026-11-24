@@ -106,6 +106,16 @@ jobs:
       - name: Run unit tests
         run: ./gradlew test --parallel --continue --build-cache
 
+      # `./gradlew test` has no :composeApp test task, so run the desktop tests by name.
+      # DesktopSecret.kt is gitignored (it exists only on developer machines), so CI builds
+      # it from the committed template, which holds placeholder values. Tests that need a real
+      # secret read it from the environment and skip when it is absent.
+      - name: Run desktop tests
+        run: |
+          secret=composeApp/src/desktopMain/kotlin/me/calebjones/spacelaunchnow/util/DesktopSecret.kt
+          [ -f "$secret" ] || cp "$secret.template" "$secret"
+          ./gradlew :composeApp:desktopTest --continue --build-cache
+
       - name: Generate test report
         if: always()
         uses: dorny/test-reporter@v3
