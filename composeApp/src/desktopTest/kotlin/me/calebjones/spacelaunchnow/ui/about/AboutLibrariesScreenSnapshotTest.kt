@@ -17,8 +17,9 @@ class AboutLibrariesScreenSnapshotTest {
                 AboutLibrariesScreen(onNavigateBack = {})
             }
         }
+        // The heading renders before the libraries JSON loads; wait for a library row so the tree is complete.
         waitUntil(timeoutMillis = 15_000) {
-            onAllNodesWithText("Open Source Libraries").fetchSemanticsNodes().isNotEmpty()
+            onAllNodesWithText("AboutLibraries Compose Material 3 Library").fetchSemanticsNodes().isNotEmpty()
         }
         waitForIdle()
         TextTreeSnapshot.assertMatches("about_screen", TextTreeSnapshot.dump(this))
