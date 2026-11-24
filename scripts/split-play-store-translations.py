@@ -54,7 +54,14 @@ def main(argv):
         print(__doc__)
         return 2
     out = Path(argv[0])
-    answer = Path(argv[1]).read_text(encoding="utf-8") if len(argv) > 1 else sys.stdin.read()
+    if len(argv) > 1:
+        answer = Path(argv[1]).read_text(encoding="utf-8")
+    else:
+        sys.stdin.reconfigure(encoding="utf-8")
+        answer = sys.stdin.read()
+    answer = answer.replace("
+", "
+")
     english = (out / f"whatsnew-{DEFAULT_LOCALE}").read_text(encoding="utf-8").strip()
     blocks = parse(answer)
     translated = 0
