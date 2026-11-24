@@ -59,10 +59,7 @@ def main(argv):
     else:
         sys.stdin.reconfigure(encoding="utf-8")
         answer = sys.stdin.read()
-    answer = answer.replace("
-", "
-")
-")
+    answer = answer.replace("\r\n", "\n")
     english = (out / f"whatsnew-{DEFAULT_LOCALE}").read_text(encoding="utf-8").strip()
     blocks = parse(answer)
     translated = 0
