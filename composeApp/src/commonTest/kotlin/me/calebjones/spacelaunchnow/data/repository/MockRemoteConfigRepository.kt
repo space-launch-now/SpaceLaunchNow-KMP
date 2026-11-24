@@ -1,5 +1,6 @@
 package me.calebjones.spacelaunchnow.data.repository
 
+import me.calebjones.spacelaunchnow.offer.HolidayOfferConfig
 import me.calebjones.spacelaunchnow.data.model.DataBackend
 import me.calebjones.spacelaunchnow.data.model.OnboardingVariant
 import me.calebjones.spacelaunchnow.data.model.PinnedContent
@@ -20,6 +21,7 @@ class MockRemoteConfigRepository : RemoteConfigRepository {
     var dataBackend: DataBackend = DataBackend.DEFAULT
     var notificationRatingPromptEnabled = false
     var winbackSheetEnabled = false
+    var holidayOfferConfig = HolidayOfferConfig.DISABLED
     var lockedNotificationTapPaywallEnabled = false
     var homeUpgradeRowEnabled = false
     var fetchAndActivateCalled = false
@@ -71,6 +73,8 @@ class MockRemoteConfigRepository : RemoteConfigRepository {
 
     override suspend fun getWinbackSheetEnabled(): Boolean = winbackSheetEnabled
 
+    override suspend fun getHolidayOfferConfig(): HolidayOfferConfig = holidayOfferConfig
+
     override suspend fun getInterstitialMinIntervalSeconds(): Long = 120L
 
     override suspend fun getLockedNotificationTapPaywallEnabled(): Boolean = lockedNotificationTapPaywallEnabled
@@ -85,6 +89,7 @@ class MockRemoteConfigRepository : RemoteConfigRepository {
         onboardingVariant = OnboardingVariant.CONTROL
         notificationRatingPromptEnabled = false
         winbackSheetEnabled = false
+        holidayOfferConfig = HolidayOfferConfig.DISABLED
         lockedNotificationTapPaywallEnabled = false
         homeUpgradeRowEnabled = false
         fetchAndActivateCalled = false

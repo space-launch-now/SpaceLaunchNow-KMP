@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="offer_title">Sváteční nabídka</string>
+    <string name="offer_product_name">Space Launch Now Pro</string>
+    <string name="offer_benefit_no_ads">Bez reklam</string>
+    <string name="offer_benefit_widgets">Pokročilé widgety</string>
+    <string name="offer_benefit_themes">Vlastní motivy</string>
+    <string name="offer_benefit_more">a další</string>
+    <string name="offer_price_line">%1$s za první měsíc, poté %2$s/měsíc · zrušit můžete kdykoli</string>
+    <string name="offer_cta">Začít za %1$s</string>
+    <string name="offer_see_all_plans">Zobrazit všechny plány</string>
+    <string name="offer_close_loading_description">Tlačítko zavřít bude brzy k dispozici</string>
+    <string name="paywall_intro_price_first_month">%1$s za první měsíc, poté %2$s/měsíc</string>
+    <string name="paywall_intro_price_generic">Úvodní cena %1$s, poté %2$s/měsíc</string>
+</resources>

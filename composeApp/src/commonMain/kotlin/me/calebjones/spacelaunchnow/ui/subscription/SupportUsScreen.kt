@@ -1,5 +1,6 @@
 package me.calebjones.spacelaunchnow.ui.subscription
 
+import me.calebjones.spacelaunchnow.data.model.ProductInfo
 import me.calebjones.spacelaunchnow.analytics.events.PaywallSource
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.fadeIn
@@ -427,7 +428,8 @@ fun SupportUsScreen(
                                 viewModel.purchaseProduct(monthlyProduct, source)
                             }
                         },
-                        enabled = monthlyProduct != null
+                        enabled = monthlyProduct != null,
+                        introPriceLine = introPriceText(monthlyProduct)
                     )
                 }
             }
@@ -695,6 +697,7 @@ private fun PricingCard(
     enabled: Boolean = true,
     hasFreeTrial: Boolean = false,
     freeTrialPeriodDisplay: String? = null,
+    introPriceLine: String? = null,
     subscribeButtonText: String = if (hasFreeTrial) stringResource(Res.string.common_start_free_trial) else stringResource(Res.string.support_us_subscribe_now)
 ) {
     val glowPrimary = MaterialTheme.colorScheme.primary
@@ -776,6 +779,16 @@ private fun PricingCard(
                     style = MaterialTheme.typography.titleMedium,
                     modifier = Modifier.padding(bottom = 6.dp),
                     color = if (isRecommended) MaterialTheme.colorScheme.onPrimaryFixedVariant else MaterialTheme.colorScheme.onSurfaceVariant
+                )
+            }
+
+            // Intro price (first-month offer), under the normal price
+            introPriceLine?.let {
+                Text(
+                    text = it,
+                    style = MaterialTheme.typography.titleSmall,
+                    fontWeight = FontWeight.SemiBold,
+                    color = if (isRecommended) MaterialTheme.colorScheme.onPrimaryContainer else MaterialTheme.colorScheme.tertiary
                 )
             }
 
@@ -1743,6 +1756,59 @@ private fun PricingCardNoTrialPreview() {
         }
     }
 }
+
+@Preview
+@Composable
+private fun PricingCardIntroPreview() {
+    SpaceLaunchNowPreviewTheme {
+        Surface {
+            PricingCard(
+                title = stringResource(Res.string.support_us_plan_monthly),
+                price = "$2.99",
+                period = stringResource(Res.string.support_us_period_month),
+                isRecommended = false,
+                isProcessing = false,
+                onSubscribe = {},
+                enabled = true,
+                introPriceLine = introPriceText(previewIntroMonthlyProduct)
+            )
+        }
+    }
+}
+
+@Preview
+@Composable
+private fun PricingCardIntroDarkPreview() {
+    SpaceLaunchNowPreviewTheme(isDark = true) {
+        Surface {
+            PricingCard(
+                title = stringResource(Res.string.support_us_plan_monthly),
+                price = "$2.99",
+                period = stringResource(Res.string.support_us_period_month),
+                isRecommended = false,
+                isProcessing = false,
+                onSubscribe = {},
+                enabled = true,
+                introPriceLine = introPriceText(previewIntroMonthlyProduct)
+            )
+        }
+    }
+}
+
+private val previewIntroMonthlyProduct = ProductInfo(
+    productId = "sln_premium",
+    basePlanId = "monthly",
+    title = "Space Launch Now Premium", // i18n-ignore: preview sample data
+    description = "Monthly subscription", // i18n-ignore: preview sample data
+    formattedPrice = "$2.99",
+    priceAmountMicros = 2_990_000L,
+    currencyCode = "USD",
+    hasIntroOffer = true,
+    introOfferPrice = "$0.99",
+    introOfferPeriodValue = 1,
+    introOfferPeriodUnit = "MONTH",
+    introOfferCycles = 1
+)
 
 @Preview
 @Composable

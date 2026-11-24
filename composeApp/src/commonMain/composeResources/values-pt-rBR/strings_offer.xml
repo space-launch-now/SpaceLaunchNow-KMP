@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="offer_title">Oferta de fim de ano</string>
+    <string name="offer_product_name">Space Launch Now Pro</string>
+    <string name="offer_benefit_no_ads">Sem anúncios</string>
+    <string name="offer_benefit_widgets">Widgets avançados</string>
+    <string name="offer_benefit_themes">Temas personalizados</string>
+    <string name="offer_benefit_more">e muito mais</string>
+    <string name="offer_price_line">%1$s no primeiro mês, depois %2$s/mês · cancele quando quiser</string>
+    <string name="offer_cta">Começar por %1$s</string>
+    <string name="offer_see_all_plans">Ver todos os planos</string>
+    <string name="offer_close_loading_description">O botão de fechar estará disponível em breve</string>
+    <string name="paywall_intro_price_first_month">%1$s no primeiro mês, depois %2$s/mês</string>
+    <string name="paywall_intro_price_generic">Preço de lançamento de %1$s, depois %2$s/mês</string>
+</resources>

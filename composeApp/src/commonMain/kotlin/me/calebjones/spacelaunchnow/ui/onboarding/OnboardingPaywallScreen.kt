@@ -77,6 +77,7 @@ import me.calebjones.spacelaunchnow.ui.compose.PlainShimmerCard
 import me.calebjones.spacelaunchnow.ui.icons.CustomIcons
 import me.calebjones.spacelaunchnow.ui.icons.RocketLaunch
 import me.calebjones.spacelaunchnow.ui.theme.SpaceLaunchNowPreviewTheme
+import me.calebjones.spacelaunchnow.ui.subscription.introPriceText
 import me.calebjones.spacelaunchnow.ui.viewmodel.NextUpViewModel
 import me.calebjones.spacelaunchnow.ui.viewmodel.ProductType
 import me.calebjones.spacelaunchnow.ui.viewmodel.SubscriptionViewModel
@@ -435,13 +436,24 @@ fun OnboardingContent(
                                 contentColor = Color.White.copy(alpha = 0.85f)
                             )
                         ) {
-                            Text(
-                                text = buildString {
-                                    append(stringResource(Res.string.onboarding_paywall_monthly))
-                                    if (perMonth != null) append(stringResource(Res.string.onboarding_paywall_monthly_per_month, perMonth))
-                                },
-                                style = MaterialTheme.typography.labelMedium
-                            )
+                            Column(horizontalAlignment = Alignment.CenterHorizontally) {
+                                Text(
+                                    text = buildString {
+                                        append(stringResource(Res.string.onboarding_paywall_monthly))
+                                        if (perMonth != null) append(stringResource(Res.string.onboarding_paywall_monthly_per_month, perMonth))
+                                    },
+                                    style = MaterialTheme.typography.labelMedium
+                                )
+                                val introLine = introPriceText(monthlyProduct)
+                                if (introLine != null) {
+                                    Text(
+                                        text = introLine,
+                                        style = MaterialTheme.typography.labelSmall,
+                                        fontWeight = FontWeight.Bold,
+                                        textAlign = TextAlign.Center
+                                    )
+                                }
+                            }
                         }
                     }
 
@@ -899,6 +911,41 @@ private val previewMonthlyProduct = ProductInfo(
 private fun OnboardingLoadingPreview() {
     SpaceLaunchNowPreviewTheme {
         OnboardingContent(savingsPercent = null)
+    }
+}
+
+// Monthly pill with the first-month intro price
+@Preview
+@Composable
+private fun OnboardingIntroPreview() {
+    SpaceLaunchNowPreviewTheme {
+        OnboardingContent(
+            annualProduct = previewAnnualProduct,
+            monthlyProduct = previewMonthlyProduct.copy(
+                hasIntroOffer = true,
+                introOfferPrice = "$0.99",
+                introOfferPeriodValue = 1,
+                introOfferPeriodUnit = "MONTH"
+            ),
+            savingsPercent = "38%"
+        )
+    }
+}
+
+@Preview
+@Composable
+private fun OnboardingIntroDarkPreview() {
+    SpaceLaunchNowPreviewTheme(isDark = true) {
+        OnboardingContent(
+            annualProduct = previewAnnualProduct,
+            monthlyProduct = previewMonthlyProduct.copy(
+                hasIntroOffer = true,
+                introOfferPrice = "$0.99",
+                introOfferPeriodValue = 1,
+                introOfferPeriodUnit = "MONTH"
+            ),
+            savingsPercent = "38%"
+        )
     }
 }
 

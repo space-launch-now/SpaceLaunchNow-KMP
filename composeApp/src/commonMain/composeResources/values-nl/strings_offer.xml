@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="offer_title">Feestaanbieding</string>
+    <string name="offer_product_name">Space Launch Now Pro</string>
+    <string name="offer_benefit_no_ads">Geen advertenties</string>
+    <string name="offer_benefit_widgets">Geavanceerde widgets</string>
+    <string name="offer_benefit_themes">Eigen thema's</string>
+    <string name="offer_benefit_more">en meer</string>
+    <string name="offer_price_line">%1$s voor je eerste maand, daarna %2$s/maand · altijd opzegbaar</string>
+    <string name="offer_cta">Start voor %1$s</string>
+    <string name="offer_see_all_plans">Alle abonnementen bekijken</string>
+    <string name="offer_close_loading_description">Sluitknop binnenkort beschikbaar</string>
+    <string name="paywall_intro_price_first_month">%1$s voor de eerste maand, daarna %2$s/maand</string>
+    <string name="paywall_intro_price_generic">Introductieprijs van %1$s, daarna %2$s/maand</string>
+</resources>

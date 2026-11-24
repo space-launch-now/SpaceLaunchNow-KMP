@@ -92,6 +92,7 @@ import me.calebjones.spacelaunchnow.ui.viewmodel.StarshipViewModel
 import me.calebjones.spacelaunchnow.ui.viewmodel.StatsViewModel
 import me.calebjones.spacelaunchnow.ui.viewmodel.SubscriptionViewModel
 import me.calebjones.spacelaunchnow.winback.WinbackSheetController
+import me.calebjones.spacelaunchnow.offer.HolidayOfferController
 import me.calebjones.spacelaunchnow.ui.viewmodel.UpdatesViewModel
 import me.calebjones.spacelaunchnow.util.BuildConfig
 import me.calebjones.spacelaunchnow.util.logging.LoggingPreferences
@@ -249,6 +250,18 @@ val appModule = module {
             onboardingDismissedAtMs = { prefs.getOnboardingPaywallDismissedAtMs() },
             alreadyShown = { prefs.isWinbackSheetShown() },
             saveShown = { prefs.markWinbackSheetShown() },
+            nowMs = { kotlin.time.Clock.System.now().toEpochMilliseconds() },
+        )
+    }
+
+    // Holiday offer sheet - Remote Config campaign window, shown once per campaign id
+    single {
+        val prefs = get<AppPreferences>()
+        val remoteConfig = get<RemoteConfigRepository>()
+        HolidayOfferController(
+            readConfig = { remoteConfig.getHolidayOfferConfig() },
+            shownCampaignId = { prefs.getHolidayOfferShownCampaignId() },
+            saveShown = { campaignId -> prefs.markHolidayOfferShown(campaignId) },
             nowMs = { kotlin.time.Clock.System.now().toEpochMilliseconds() },
         )
     }

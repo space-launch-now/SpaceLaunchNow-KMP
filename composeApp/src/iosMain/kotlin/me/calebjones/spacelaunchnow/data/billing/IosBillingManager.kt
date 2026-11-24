@@ -7,6 +7,8 @@ import com.revenuecat.purchases.kmp.configure
 import com.revenuecat.purchases.kmp.ktx.awaitCustomerInfo
 import com.revenuecat.purchases.kmp.ktx.awaitOfferings
 import com.revenuecat.purchases.kmp.ktx.awaitPurchase
+import com.revenuecat.purchases.kmp.ktx.awaitTrialOrIntroPriceEligibility
+import com.revenuecat.purchases.kmp.models.IntroEligibilityStatus
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -138,11 +140,33 @@ class IosBillingManager : BillingManager {
             log.i { "📦 Fetching available products..." }
             val offerings = purchases.awaitOfferings()
             
-            val products = offerings.current?.availablePackages?.map { pkg ->
+            val packages = offerings.current?.availablePackages.orEmpty()
+
+            // The intro discount exists on the App Store product whether or not this user can
+            // still get it, so ask RevenueCat. Fail closed: not ELIGIBLE (or a failed check)
+            // means no intro offer is shown. Free trials keep their existing behaviour.
+            val needsEligibilityCheck = packages.any {
+                val discount = it.storeProduct.introductoryDiscount
+                discount != null && discount.paymentMode != DiscountPaymentMode.FREE_TRIAL
+            }
+            val eligibleProductIds: Set<String> = if (needsEligibilityCheck) {
+                try {
+                    purchases.awaitTrialOrIntroPriceEligibility(packages.map { it.storeProduct })
+                        .filterValues { it == IntroEligibilityStatus.ELIGIBLE }
+                        .keys.map { it.id }.toSet()
+                } catch (e: Exception) {
+                    log.w { "Intro price eligibility check failed - hiding intro offers: ${e.message}" }
+                    emptySet()
+                }
+            } else {
+                emptySet()
+            }
+
+            val products = packages.map { pkg ->
                 // Extract free trial / intro offer from introductory discount (iOS/App Store)
                 val introDiscount = pkg.storeProduct.introductoryDiscount
                 val isFreeTrial = introDiscount?.paymentMode == DiscountPaymentMode.FREE_TRIAL
-                val hasIntro = introDiscount != null && !isFreeTrial
+                val hasIntro = introDiscount != null && !isFreeTrial && pkg.storeProduct.id in eligibleProductIds
 
                 ProductInfo(
                     productId = pkg.storeProduct.id,
@@ -158,9 +182,12 @@ class IosBillingManager : BillingManager {
                     freeTrialPeriodUnit = if (isFreeTrial) introDiscount?.subscriptionPeriod?.unit?.name else null,
                     hasIntroOffer = hasIntro,
                     introOfferPrice = if (hasIntro) introDiscount?.price?.formatted else null,
-                    introOfferPeriodDisplay = if (hasIntro) introDiscount?.subscriptionPeriod?.toDisplayString() else null
+                    introOfferPeriodDisplay = if (hasIntro) introDiscount?.subscriptionPeriod?.toDisplayString() else null,
+                    introOfferPeriodValue = if (hasIntro) introDiscount?.subscriptionPeriod?.value else null,
+                    introOfferPeriodUnit = if (hasIntro) introDiscount?.subscriptionPeriod?.unit?.name else null,
+                    introOfferCycles = if (hasIntro) introDiscount?.numberOfPeriods?.toInt() ?: 1 else 1
                 )
-            } ?: emptyList()
+            }
             
             log.i { "✅ Found ${products.size} products" }
             Result.success(products)

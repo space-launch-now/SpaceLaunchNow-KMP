@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- Holiday offer sheet title. Short. -->
+    <string name="offer_title">Holiday offer</string>
+    <!-- Product name shown under the title. Do not translate. -->
+    <string name="offer_product_name">Space Launch Now Pro</string>
+    <!-- Benefit row. Short. -->
+    <string name="offer_benefit_no_ads">No ads</string>
+    <!-- Benefit row. Short. -->
+    <string name="offer_benefit_widgets">Advanced widgets</string>
+    <!-- Benefit row. Short. -->
+    <string name="offer_benefit_themes">Custom themes</string>
+    <!-- Last benefit row, hints at more features. -->
+    <string name="offer_benefit_more">and more</string>
+    <!-- %1$s is the intro price for the first month, %2$s is the regular monthly price. Both include currency. -->
+    <string name="offer_price_line">%1$s for your first month, then %2$s/month · cancel any time</string>
+    <!-- Button. %1$s is the intro price with currency. -->
+    <string name="offer_cta">Start for %1$s</string>
+    <!-- Text link that opens the full paywall. -->
+    <string name="offer_see_all_plans">See all plans</string>
+    <!-- Accessibility text for the countdown spinner shown before the close button appears. -->
+    <string name="offer_close_loading_description">Close button available soon</string>
+    <!-- Paywall line under the monthly price. %1$s intro price, %2$s regular monthly price. -->
+    <string name="paywall_intro_price_first_month">%1$s for the first month, then %2$s/month</string>
+    <!-- Paywall line under the monthly price. %1$s intro price, %2$s regular monthly price. -->
+    <string name="paywall_intro_price_generic">%1$s introductory price, then %2$s/month</string>
+</resources>

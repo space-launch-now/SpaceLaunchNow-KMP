@@ -22,5 +22,7 @@ enum class PaywallSource(val value: String) {
     /** A free user tapped a locked notification control (flag `paywall_locked_notification_tap_enabled`). */
     LOCKED_NOTIFICATION_CONTROL("locked_notification_control"),
     WINBACK("winback"),
-    HOME_UPGRADE_ROW("home_upgrade_row");
+    HOME_UPGRADE_ROW("home_upgrade_row"),
+    /** The holiday offer sheet for never-paid users (flag `holiday_offer_enabled`). */
+    OFFER_SHEET("offer_sheet");
 }

@@ -80,6 +80,7 @@ import me.calebjones.spacelaunchnow.ui.newsevents.NewsEventsScreen
 import me.calebjones.spacelaunchnow.ui.layout.phone.composableWithCompositionLocal
 import me.calebjones.spacelaunchnow.ui.onboarding.LiveOnboardingScreen
 import me.calebjones.spacelaunchnow.ui.onboarding.OnboardingPaywallScreen
+import me.calebjones.spacelaunchnow.ui.offer.HolidayOfferSheetHost
 import me.calebjones.spacelaunchnow.ui.winback.WinbackSheetHost
 import me.calebjones.spacelaunchnow.ui.preload.PreloadScreen
 import me.calebjones.spacelaunchnow.ui.roadmap.RoadmapScreen
@@ -744,7 +745,12 @@ fun SpaceLaunchNowApp(
 
                     // Day-7 win-back offer (Tasks#1175): checks once the user is on Home
                     val currentEntry by navController.currentBackStackEntryAsState()
-                    WinbackSheetHost(isOnHome = currentEntry?.destination?.hasRoute<Home>() == true)
+                    val isOnHome = currentEntry?.destination?.hasRoute<Home>() == true
+                    HolidayOfferSheetHost(
+                        isOnHome = isOnHome,
+                        onSeeAllPlans = { navController.navigate(SupportUs(PaywallSource.OFFER_SHEET.value)) },
+                    )
+                    WinbackSheetHost(isOnHome = isOnHome)
                 } // end else — onboarding state resolved
             }
         }

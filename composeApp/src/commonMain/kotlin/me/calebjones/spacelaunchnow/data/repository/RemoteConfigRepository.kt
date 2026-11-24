@@ -4,6 +4,7 @@ import me.calebjones.spacelaunchnow.data.model.DataBackend
 import me.calebjones.spacelaunchnow.data.model.OnboardingVariant
 import me.calebjones.spacelaunchnow.data.model.PinnedContent
 import me.calebjones.spacelaunchnow.data.model.RoadmapData
+import me.calebjones.spacelaunchnow.offer.HolidayOfferConfig
 
 /**
  * Repository for Firebase Remote Config operations
@@ -98,6 +99,13 @@ interface RemoteConfigRepository {
      * Default false; false on read failure.
      */
     suspend fun getWinbackSheetEnabled(): Boolean
+
+    /**
+     * The holiday offer campaign, from 'holiday_offer_enabled', 'holiday_offer_campaign_id',
+     * 'holiday_offer_start', 'holiday_offer_end' (ISO-8601 UTC) and 'holiday_offer_close_delay_s'
+     * (0..30, default 5). Disabled config when unset or on read failure.
+     */
+    suspend fun getHolidayOfferConfig(): HolidayOfferConfig
 
     /**
      * Minimum seconds between interstitials, from 'ads_interstitial_min_interval_s'.

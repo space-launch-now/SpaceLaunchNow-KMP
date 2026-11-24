@@ -192,7 +192,10 @@ class AndroidBillingManager(
                     freeTrialPeriodUnit = freeTrialPhase?.billingPeriod?.unit?.name,
                     hasIntroOffer = introPhase != null,
                     introOfferPrice = introPhase?.price?.formatted,
-                    introOfferPeriodDisplay = introPhase?.billingPeriod?.toDisplayString()
+                    introOfferPeriodDisplay = introPhase?.billingPeriod?.toDisplayString(),
+                    introOfferPeriodValue = introPhase?.billingPeriod?.value,
+                    introOfferPeriodUnit = introPhase?.billingPeriod?.unit?.name,
+                    introOfferCycles = introPhase?.billingCycleCount ?: 1
                 )
             } ?: emptyList()
 
