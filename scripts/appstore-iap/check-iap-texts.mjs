@@ -2,12 +2,12 @@
 // Checks the purchase text files in iosApp/fastlane/iap (Tasks#1269).
 // Usage: node scripts/appstore-iap/check-iap-texts.mjs [folder]
 import { pathToFileURL } from 'node:url';
-import { readTree, validateTree, defaultRoot } from './iap-lib.mjs';
+import { readTree, validateTree, defaultRoot, countFiles } from './iap-lib.mjs';
 
 export function checkFolder(root) {
   const { tree, errors } = readTree(root);
   const all = [...errors, ...validateTree(tree)];
-  const files = Object.values(tree).reduce((n, l) => n + Object.keys(l).length, 0);
+  const files = countFiles(tree);
   return { errors: all, files };
 }
 

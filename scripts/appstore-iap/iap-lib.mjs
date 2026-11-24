@@ -1,7 +1,7 @@
 // Pure logic for the App Store purchase texts (Tasks#1269). No network, no env.
 import { readdirSync, readFileSync, existsSync, statSync, mkdirSync, writeFileSync } from 'node:fs';
 import { join, dirname } from 'node:path';
-import { fileURLToPath } from 'node:url';
+import { fileURLToPath, pathToFileURL } from 'node:url';
 
 export const BUNDLE_ID = 'me.spacelaunchnow.spacelaunchnow';
 export const GROUP = '_group';
@@ -140,4 +140,21 @@ export function parseArgs(argv) {
     else args[k] = true;
   }
   return args;
+}
+
+/** Count the localization files in a tree. */
+export function countFiles(tree) {
+  return Object.values(tree).reduce((n, l) => n + Object.keys(l).length, 0);
+}
+
+/** Run `main(argv)` when the file is the entry point; exit 2 on a thrown error. */
+export function runCli(main, metaUrl) {
+  if (metaUrl !== pathToFileURL(process.argv[1] ?? '').href) return;
+  main(process.argv.slice(2)).then(
+    (code) => process.exit(code),
+    (e) => {
+      console.error(`error ${e.message}`);
+      process.exit(2);
+    },
+  );
 }

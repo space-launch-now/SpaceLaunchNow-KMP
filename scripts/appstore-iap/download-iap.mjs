@@ -4,9 +4,8 @@
 // Default folder: iosApp/fastlane/iap_downloaded. Needs APPLE_API_KEY_ID, APPLE_API_ISSUER_ID, APPLE_API_KEY_CONTENT.
 // With --check-against-git it exits 1 on any difference to iosApp/fastlane/iap and prints it.
 import { join } from 'node:path';
-import { pathToFileURL } from 'node:url';
 import { createClient, resolveTargets, readRemote, tokenFromEnv } from './asc.mjs';
-import { readTree, writeTree, diffTrees, parseArgs, defaultRoot } from './iap-lib.mjs';
+import { readTree, writeTree, diffTrees, parseArgs, defaultRoot, countFiles, runCli } from './iap-lib.mjs';
 
 export const defaultOut = join(defaultRoot, '..', 'iap_downloaded');
 
@@ -33,7 +32,7 @@ export async function main(argv, env = process.env, client) {
   const out = typeof args.out === 'string' ? args.out : defaultOut;
   client = client ?? createClient({ getToken: () => tokenFromEnv(env) });
   const { tree } = await download({ client, out });
-  console.log(`downloaded ${Object.values(tree).reduce((n, l) => n + Object.keys(l).length, 0)} localization(s) to ${out}`);
+  console.log(`downloaded ${countFiles(tree)} localization(s) to ${out}`);
   if (args['check-against-git']) {
     const git = readTree(defaultRoot).tree;
     const lines = formatDifferences(diffTrees(git, tree));
@@ -44,12 +43,4 @@ export async function main(argv, env = process.env, client) {
   return 0;
 }
 
-if (import.meta.url === pathToFileURL(process.argv[1] ?? '').href) {
-  main(process.argv.slice(2)).then(
-    (code) => process.exit(code),
-    (e) => {
-      console.error(`error ${e.message}`);
-      process.exit(2);
-    },
-  );
-}
+runCli(main, import.meta.url);

@@ -3,14 +3,8 @@
 // DRY RUN BY DEFAULT: prints create / update / unchanged per locale and product, sends nothing.
 // --live sends POST and PATCH, and only when env IAP_UPLOAD_APPROVED=yes. It never deletes.
 // A changed localization goes to App Review. Read iosApp/fastlane/iap/README.md first.
-import { pathToFileURL } from 'node:url';
 import { createClient, resolveTargets, readRemote, tokenFromEnv, LOCALIZATION } from './asc.mjs';
-import { readTree, validateTree, diffTrees, parseArgs, defaultRoot } from './iap-lib.mjs';
-
-/** Build the work list: create and update items only (extra remote locales are left alone). */
-export function buildPlan(want, remote) {
-  return diffTrees(want, remote);
-}
+import { readTree, validateTree, diffTrees, parseArgs, defaultRoot, runCli } from './iap-lib.mjs';
 
 /** Send one change. Returns the HTTP-level result for logging. */
 export async function applyItem({ client, item, want, targets, ids }) {
@@ -51,7 +45,7 @@ export async function main(argv, env = process.env, client, log = console.log) {
   client = client ?? createClient({ getToken: () => tokenFromEnv(env) });
   const { targets } = await resolveTargets(client);
   const { tree: remote, ids } = await readRemote(client, targets);
-  const plan = buildPlan(want, remote);
+  const plan = diffTrees(want, remote);
   const counts = { create: 0, update: 0, unchanged: 0, extra: 0 };
   for (const item of plan) {
     counts[item.status]++;
@@ -66,12 +60,4 @@ export async function main(argv, env = process.env, client, log = console.log) {
   return 0;
 }
 
-if (import.meta.url === pathToFileURL(process.argv[1] ?? '').href) {
-  main(process.argv.slice(2)).then(
-    (code) => process.exit(code),
-    (e) => {
-      console.error(`error ${e.message}`);
-      process.exit(2);
-    },
-  );
-}
+runCli(main, import.meta.url);
