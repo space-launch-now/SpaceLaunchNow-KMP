@@ -206,37 +206,38 @@ class HolidayOfferTest {
     @Test
     fun `controller is off by default`() = runTest {
         val f = Fixture(now)
-        assertFalse(f.controller.isEligible(SubscriptionType.FREE, monthly))
+        assertFalse(f.controller.evaluate(SubscriptionType.FREE, monthly).eligible)
     }
 
     @Test
     fun `controller needs an eligible monthly product`() = runTest {
         val f = Fixture(now).apply { remote.holidayOfferConfig = config() }
-        assertTrue(f.controller.isEligible(SubscriptionType.FREE, monthly))
-        assertFalse(f.controller.isEligible(SubscriptionType.FREE, product(hasIntro = false)))
-        assertFalse(f.controller.isEligible(SubscriptionType.FREE, null))
-        assertFalse(f.controller.isEligible(SubscriptionType.PREMIUM, monthly))
+        assertTrue(f.controller.evaluate(SubscriptionType.FREE, monthly).eligible)
+        assertFalse(f.controller.evaluate(SubscriptionType.FREE, product(hasIntro = false)).eligible)
+        assertFalse(f.controller.evaluate(SubscriptionType.FREE, null).eligible)
+        assertFalse(f.controller.evaluate(SubscriptionType.PREMIUM, monthly).eligible)
     }
 
     @Test
     fun `markShown persists per campaign`() = runTest {
         val f = Fixture(now).apply { remote.holidayOfferConfig = config(campaignId = "a") }
-        assertTrue(f.controller.isEligible(SubscriptionType.FREE, monthly))
+        assertTrue(f.controller.evaluate(SubscriptionType.FREE, monthly).eligible)
         f.controller.markShown("a")
         assertEquals("a", f.shown)
-        assertFalse(f.controller.isEligible(SubscriptionType.FREE, monthly))
+        assertFalse(f.controller.evaluate(SubscriptionType.FREE, monthly).eligible)
         // A new campaign id shows again.
         f.remote.holidayOfferConfig = config(campaignId = "b")
-        assertTrue(f.controller.isEligible(SubscriptionType.FREE, monthly))
+        assertTrue(f.controller.evaluate(SubscriptionType.FREE, monthly).eligible)
         f.controller.markShown("b")
         assertEquals("b", f.shown)
-        assertFalse(f.controller.isEligible(SubscriptionType.FREE, monthly))
+        assertFalse(f.controller.evaluate(SubscriptionType.FREE, monthly).eligible)
     }
 
     @Test
-    fun `controller exposes the close delay`() = runTest {
+    fun `evaluation carries the config`() = runTest {
         val f = Fixture(now).apply { remote.holidayOfferConfig = config().copy(closeDelaySeconds = 9) }
-        assertEquals(9, f.controller.closeDelaySeconds())
-        assertEquals("holiday-2026", f.controller.config().campaignId)
+        val evaluation = f.controller.evaluate(SubscriptionType.FREE, monthly)
+        assertEquals(9, evaluation.config.closeDelaySeconds)
+        assertEquals("holiday-2026", evaluation.config.campaignId)
     }
 }

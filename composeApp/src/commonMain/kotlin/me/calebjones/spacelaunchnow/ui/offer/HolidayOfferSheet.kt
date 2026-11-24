@@ -96,8 +96,9 @@ fun HolidayOfferSheetHost(
     LaunchedEffect(isOnHome, subscriptionState.isLoading, productsLoaded) {
         if (isOnHome && !checked && !subscriptionState.isLoading && productsLoaded) {
             checked = true
-            val eligible = controller.isEligible(subscriptionState.subscriptionType, monthlyProduct)
-            if (eligible) config = controller.config()
+            val evaluation = controller.evaluate(subscriptionState.subscriptionType, monthlyProduct)
+            val eligible = evaluation.eligible
+            if (eligible) config = evaluation.config
             // Shown goes first, in this same step, so the win-back host never reads it stale.
             HolidayOfferSession.recordDecision(eligible)
         }

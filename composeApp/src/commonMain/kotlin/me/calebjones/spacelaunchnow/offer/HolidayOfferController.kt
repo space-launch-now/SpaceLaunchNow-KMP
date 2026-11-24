@@ -5,9 +5,9 @@ import me.calebjones.spacelaunchnow.data.model.SubscriptionType
 
 /**
  * Decides whether the holiday offer sheet may open and records that it did, per campaign.
- * The host calls [isEligible] once per app open and [markShown] with the campaign id when
- * the sheet appears. A new campaign id makes the sheet eligible again. Read the close delay
- * with [closeDelaySeconds].
+ * The host calls [evaluate] once per app open and [markShown] with the campaign id when
+ * the sheet appears. A new campaign id makes the sheet eligible again. The evaluation
+ * carries the config, for the campaign id and the close delay.
  */
 class HolidayOfferController(
     private val readConfig: suspend () -> HolidayOfferConfig,
@@ -15,29 +15,28 @@ class HolidayOfferController(
     private val saveShown: suspend (campaignId: String) -> Unit,
     private val nowMs: () -> Long,
 ) {
+    /** The decision and the config it used, so the host reads Remote Config once per check. */
+    data class Evaluation(val decision: HolidayOfferRule.Decision, val config: HolidayOfferConfig) {
+        val eligible: Boolean get() = decision == HolidayOfferRule.Decision.SHOW
+    }
+
     /**
      * [subscriptionType] and [monthlyProduct] are read by the caller at the moment of the
      * check. Pass the monthly [ProductInfo] (null when products have not loaded).
      */
-    suspend fun isEligible(subscriptionType: SubscriptionType, monthlyProduct: ProductInfo?): Boolean =
-        decide(subscriptionType, monthlyProduct) == HolidayOfferRule.Decision.SHOW
-
-    suspend fun decide(subscriptionType: SubscriptionType, monthlyProduct: ProductInfo?): HolidayOfferRule.Decision =
-        HolidayOfferRule.evaluate(
+    suspend fun evaluate(subscriptionType: SubscriptionType, monthlyProduct: ProductInfo?): Evaluation {
+        val config = readConfig()
+        val decision = HolidayOfferRule.evaluate(
             HolidayOfferRule.Input(
-                config = readConfig(),
+                config = config,
                 subscriptionType = subscriptionType,
                 monthlyIntroEligible = monthlyProduct?.isFirstMonthIntroOffer == true,
                 shownCampaignId = shownCampaignId(),
                 nowMs = nowMs(),
             )
         )
-
-    /** The current campaign config (id for [markShown], close delay for the sheet). */
-    suspend fun config(): HolidayOfferConfig = readConfig()
-
-    /** Seconds before the sheet's close button appears, 0..30. */
-    suspend fun closeDelaySeconds(): Int = readConfig().closeDelaySeconds
+        return Evaluation(decision, config)
+    }
 
     suspend fun markShown(campaignId: String) = saveShown(campaignId)
 }
