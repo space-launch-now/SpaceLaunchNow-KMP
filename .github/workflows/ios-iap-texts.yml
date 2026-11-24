@@ -1,0 +1,94 @@
+name: iOS purchase texts
+
+# Tasks#1269. Checks the purchase text files and the scripts on every change.
+# Download and upload run by hand only. No push or pull request ever uploads.
+on:
+  push:
+    paths:
+      - 'iosApp/fastlane/iap/**'
+      - 'scripts/appstore-iap/**'
+      - '.github/workflows/ios-iap-texts.yml'
+  pull_request:
+    paths:
+      - 'iosApp/fastlane/iap/**'
+      - 'scripts/appstore-iap/**'
+      - '.github/workflows/ios-iap-texts.yml'
+  workflow_dispatch:
+    inputs:
+      mode:
+        description: 'download = read the live texts, upload-dry-run = print the plan, upload-live = send the texts'
+        type: choice
+        options:
+          - download
+          - upload-dry-run
+          - upload-live
+        default: download
+      approved:
+        description: 'upload-live only: Caleb approved this run (Tasks#1269)'
+        type: boolean
+        default: false
+
+permissions:
+  contents: read
+
+jobs:
+  check:
+    name: Check texts and run tests
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v5
+      - uses: actions/setup-node@v5
+        with:
+          node-version: '22'
+      - run: node scripts/appstore-iap/check-iap-texts.mjs
+      - run: node --test scripts/appstore-iap/
+
+  download:
+    name: Download live texts from App Store Connect
+    needs: check
+    if: github.event_name == 'workflow_dispatch' && inputs.mode == 'download'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v5
+      - uses: actions/setup-node@v5
+        with:
+          node-version: '22'
+      - name: Download
+        env:
+          APPLE_API_KEY_ID: ${{ secrets.APPLE_API_KEY_ID }}
+          APPLE_API_ISSUER_ID: ${{ secrets.APPLE_API_ISSUER_ID }}
+          APPLE_API_KEY_CONTENT: ${{ secrets.APPLE_API_KEY_CONTENT }}
+        # Prints the differences to git. They are expected before the first upload, so this step does not fail the run.
+        run: node scripts/appstore-iap/download-iap.mjs --check-against-git || true
+      - uses: actions/upload-artifact@v4
+        with:
+          name: app-store-purchase-texts
+          path: iosApp/fastlane/iap_downloaded
+          if-no-files-found: error
+
+  upload:
+    name: Upload texts to App Store Connect
+    needs: check
+    if: >-
+      github.event_name == 'workflow_dispatch' &&
+      (inputs.mode == 'upload-dry-run' || (inputs.mode == 'upload-live' && inputs.approved))
+    runs-on: ubuntu-latest
+    concurrency: ios-iap-texts-upload
+    steps:
+      - uses: actions/checkout@v5
+      - uses: actions/setup-node@v5
+        with:
+          node-version: '22'
+      - name: Upload
+        env:
+          APPLE_API_KEY_ID: ${{ secrets.APPLE_API_KEY_ID }}
+          APPLE_API_ISSUER_ID: ${{ secrets.APPLE_API_ISSUER_ID }}
+          APPLE_API_KEY_CONTENT: ${{ secrets.APPLE_API_KEY_CONTENT }}
+          IAP_UPLOAD_APPROVED: ${{ inputs.mode == 'upload-live' && inputs.approved && 'yes' || 'no' }}
+          IAP_MODE: ${{ inputs.mode }}
+        run: |
+          if [ "$IAP_MODE" = "upload-live" ]; then
+            node scripts/appstore-iap/upload-iap.mjs --live
+          else
+            node scripts/appstore-iap/upload-iap.mjs
+          fi
