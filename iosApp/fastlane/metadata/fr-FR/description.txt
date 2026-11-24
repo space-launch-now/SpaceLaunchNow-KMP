@@ -1,4 +1,4 @@
-Recevez des actualités et des notifications sur les lancements de fusées de SpaceX, NASA, ULA, ROSCOSMOS, ISRO et bien d’autres !
+Reçois des actualités et des notifications sur les lancements de fusées de SpaceX, NASA, ULA, ROSCOSMOS, ISRO et bien d’autres !
 
 Fonctionnalités :
 • Notifications pour les prochains lancements de fusées.
@@ -8,14 +8,14 @@ Fonctionnalités :
 • Thème jour/nuit en option.
 
 Suivi des lancements
-Suivez les lancements de SpaceX, ULA et Orbital/ATK, ainsi que les lancements internationaux de la NASA, ROSCOSMOS, ISRO, JAXA et ESA.
+Suis les lancements de SpaceX, ULA et Orbital/ATK, ainsi que les lancements internationaux de la NASA, ROSCOSMOS, ISRO, JAXA et ESA.
 
 Missions scientifiques
-Suivez les missions de ravitaillement de la NASA vers la Station spatiale internationale, les lancements de satellites commerciaux de fournisseurs comme IRIDIUM et les missions scientifiques comme le télescope spatial James Webb !
+Suis les missions de ravitaillement de la NASA vers la Station spatiale internationale, les lancements de satellites commerciaux de fournisseurs comme IRIDIUM et les missions scientifiques comme le télescope spatial James Webb !
 
 Informations sur les lanceurs
-Découvrez toutes les fusées qui nous emmènent en orbite, comme les familles de lanceurs Soyouz, Atlas, Delta, Ariane, Proton et Falcon 9.
+Découvre toutes les fusées qui nous emmènent en orbite, comme les familles de lanceurs Soyuz, Atlas, Delta, Ariane, Proton et Falcon 9.
 
 Space Launch Now n’est affilié ni à SpaceX, ni à la NASA, ni à ULA, ISRO, ESA ou tout autre fournisseur de lancements.
 
-En utilisant cette app, vous acceptez les Conditions d’utilisation d’Apple (EULA) : https://www.apple.com/legal/internet-services/itunes/dev/stdeula/
+En utilisant cette app, tu acceptes les Conditions d’utilisation d’Apple (EULA) : https://www.apple.com/legal/internet-services/itunes/dev/stdeula/

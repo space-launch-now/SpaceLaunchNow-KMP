@@ -14,7 +14,7 @@
 关注 NASA 前往国际空间站的补给任务、IRIDIUM 等供应商的商业卫星发射，以及詹姆斯·韦布空间望远镜等科学任务！
 
 火箭信息
-了解送我们进入轨道的各种火箭，例如联盟号、宇宙神、德尔塔、阿丽亚娜、质子号和猎鹰 9 号运载火箭系列。
+了解送我们进入轨道的各种火箭，例如Soyuz、Atlas、Delta、Ariane、Proton 和 Falcon 9 运载火箭系列。
 
 Space Launch Now 与 SpaceX、NASA、ULA、ISRO、ESA 或任何其他发射服务商均无任何关联。
 
