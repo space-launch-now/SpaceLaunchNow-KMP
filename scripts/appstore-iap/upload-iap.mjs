@@ -4,7 +4,8 @@
 // --live sends POST and PATCH, and only when env IAP_UPLOAD_APPROVED=yes. It never deletes.
 // A changed localization goes to App Review. Read iosApp/fastlane/iap/README.md first.
 import { createClient, resolveTargets, readRemote, tokenFromEnv, LOCALIZATION } from './asc.mjs';
-import { readTree, validateTree, diffTrees, parseArgs, defaultRoot, runCli } from './iap-lib.mjs';
+import { loadAndValidate, diffTrees, defaultRoot } from './iap-lib.mjs';
+import { parseArgs, runCli } from './cli.mjs';
 
 /** Send one change. Returns the HTTP-level result for logging. */
 export async function applyItem({ client, item, want, targets, ids }) {
@@ -36,8 +37,7 @@ export async function main(argv, env = process.env, client, log = console.log) {
     log('error --live refused: set IAP_UPLOAD_APPROVED=yes (see iosApp/fastlane/iap/README.md)');
     return 3;
   }
-  const { tree: want, errors } = readTree(defaultRoot);
-  const bad = [...errors, ...validateTree(want)];
+  const { tree: want, errors: bad } = loadAndValidate(defaultRoot);
   if (bad.length) {
     bad.forEach((e) => log(`error ${e}`));
     return 1;

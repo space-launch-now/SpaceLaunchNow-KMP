@@ -1,7 +1,7 @@
 // Pure logic for the App Store purchase texts (Tasks#1269). No network, no env.
 import { readdirSync, readFileSync, existsSync, statSync, mkdirSync, writeFileSync } from 'node:fs';
 import { join, dirname } from 'node:path';
-import { fileURLToPath, pathToFileURL } from 'node:url';
+import { fileURLToPath } from 'node:url';
 
 export const BUNDLE_ID = 'me.spacelaunchnow.spacelaunchnow';
 export const GROUP = '_group';
@@ -27,7 +27,7 @@ export const defaultRoot = join(dirname(fileURLToPath(import.meta.url)), '..', '
 const len = (s) => [...s].length;
 
 /** Validate one parsed file. Returns a list of error strings (empty = ok). */
-export function validateEntry(entry, value) {
+export function validateEntry(entry, value, { checkLimits = true } = {}) {
   const errors = [];
   if (value === null || typeof value !== 'object' || Array.isArray(value)) return ['not a JSON object'];
   const spec = entry === GROUP ? KEYS[GROUP] : KEYS.product;
@@ -44,7 +44,7 @@ export function validateEntry(entry, value) {
     if (v.trim() === '') errors.push(`"${k}" is empty`);
     if (v !== v.trim()) errors.push(`"${k}" has leading or trailing space`);
     const max = k === 'description' ? LIMITS.description : LIMITS.name;
-    if (len(v) > max) errors.push(`"${k}" has ${len(v)} characters, limit ${max}`);
+    if (checkLimits && len(v) > max) errors.push(`"${k}" has ${len(v)} characters, limit ${max}`);
   }
   return errors;
 }
@@ -74,6 +74,12 @@ export function readTree(root) {
   return { tree, errors };
 }
 
+/** Read the folder and validate it. Returns { tree, errors } with read and validation errors together. */
+export function loadAndValidate(root) {
+  const { tree, errors } = readTree(root);
+  return { tree, errors: [...errors, ...validateTree(tree)] };
+}
+
 /** Validate a whole tree. Returns a list of error strings. */
 export function validateTree(tree) {
   const errors = [];
@@ -90,7 +96,8 @@ export function validateTree(tree) {
     for (const [l, value] of Object.entries(locales)) {
       if (l === 'ru') errors.push(`${entry}/${l}.json: ru is not allowed`);
       else if (!ALLOWED_LOCALES.includes(l)) errors.push(`${entry}/${l}.json: locale not in the allowed list`);
-      for (const e of validateEntry(entry, value)) errors.push(`${entry}/${l}.json: ${e}`);
+      // en-US mirrors the live App Store Connect text, which can be longer than Apple's limit today.
+      for (const e of validateEntry(entry, value, { checkLimits: l !== 'en-US' })) errors.push(`${entry}/${l}.json: ${e}`);
     }
   }
   return errors;
@@ -128,33 +135,7 @@ export function writeTree(root, tree) {
   }
 }
 
-/** Parse `--flag`, `--key=value` and `--out <value>`. */
-export function parseArgs(argv) {
-  const args = {};
-  for (let i = 0; i < argv.length; i++) {
-    const a = argv[i];
-    if (!a.startsWith('--')) continue;
-    const [k, v] = a.slice(2).split('=');
-    if (v !== undefined) args[k] = v;
-    else if (k === 'out' && argv[i + 1] !== undefined) args[k] = argv[++i];
-    else args[k] = true;
-  }
-  return args;
-}
-
 /** Count the localization files in a tree. */
 export function countFiles(tree) {
   return Object.values(tree).reduce((n, l) => n + Object.keys(l).length, 0);
-}
-
-/** Run `main(argv)` when the file is the entry point; exit 2 on a thrown error. */
-export function runCli(main, metaUrl) {
-  if (metaUrl !== pathToFileURL(process.argv[1] ?? '').href) return;
-  main(process.argv.slice(2)).then(
-    (code) => process.exit(code),
-    (e) => {
-      console.error(`error ${e.message}`);
-      process.exit(2);
-    },
-  );
 }

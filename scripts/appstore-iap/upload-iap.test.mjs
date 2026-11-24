@@ -42,12 +42,12 @@ const fromGit = (entry, locale) => ({ locale, ...git[entry][locale] });
 
 function remoteMostlyMatching() {
   return {
-    // group: all but cs present; de-DE differs; plus an en-US only on the remote
+    // group: all but cs present; de-DE differs; base_plan has only an en-US whose description differs
     group: [
       ...Object.keys(git._group).filter((l) => l !== 'cs' && l !== 'de-DE').map((l, i) => loc(`g${i}`, l, fromGit('_group', l))),
       loc('gde', 'de-DE', { locale: 'de-DE', name: 'Old name' }),
     ],
-    base_plan: [loc('m-en', 'en-US', { name: 'Premium Monthly', description: 'old english' })],
+    base_plan: [loc('m-en', 'en-US', { ...fromGit('base_plan', 'en-US'), description: 'old english' })],
     yearly: Object.keys(git.yearly).map((l, i) => loc(`y${i}`, l, fromGit('yearly', l))),
     spacelaunchnow_pro: [loc('p-fr', 'fr-FR', { ...fromGit('spacelaunchnow_pro', 'fr-FR'), description: 'old' })],
   };
@@ -63,8 +63,8 @@ test('dry run prints the plan and sends nothing but GETs', async () => {
   assert.ok(lines.some((l) => /update\s+_group\/de-DE \(name\)/.test(l)));
   assert.ok(lines.some((l) => /unchanged\s+yearly\/cs/.test(l)));
   assert.ok(lines.some((l) => /update\s+spacelaunchnow_pro\/fr-FR \(description\)/.test(l)));
-  assert.ok(lines.every((l) => !/en-US/.test(l) || /spacelaunchnow_pro|_group/.test(l) || /extra|left alone/.test(l)));
-  assert.match(lines.at(-1), /^DRY RUN: 21 create, 2 update, 1[0-9] unchanged/);
+  assert.ok(lines.some((l) => /update\s+base_plan\/en-US \(description\)/.test(l)));
+  assert.match(lines.at(-1), /^DRY RUN: 21 create, 3 update, 20 unchanged/);
   console.log(lines.join('\n'));
 });
 
@@ -105,7 +105,7 @@ test('download writes the tree and --check-against-git reports differences', asy
     console.log = orig;
   }
   assert.equal(code, 1);
-  assert.ok(lines.some((l) => /base_plan\/en-US: in App Store Connect, not in git/.test(l)));
-  assert.deepEqual(JSON.parse(readFileSync(join(out, 'base_plan', 'en-US.json'), 'utf8')), { name: 'Premium Monthly', description: 'old english' });
+  assert.ok(lines.some((l) => /base_plan\/en-US: differs \(description\)/.test(l)));
+  assert.deepEqual(JSON.parse(readFileSync(join(out, 'base_plan', 'en-US.json'), 'utf8')), { name: 'Pro Access Monthly', description: 'old english' });
   assert.deepEqual(formatDifferences([{ entry: 'a', locale: 'b', status: 'unchanged' }]), []);
 });

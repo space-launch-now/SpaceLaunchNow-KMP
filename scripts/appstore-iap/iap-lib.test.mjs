@@ -1,7 +1,8 @@
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import { generateKeyPairSync, verify } from 'node:crypto';
-import { validateEntry, validateTree, diffTrees, readTree, defaultRoot, parseArgs, REQUIRED_LOCALES, ENTRIES } from './iap-lib.mjs';
+import { validateEntry, validateTree, diffTrees, readTree, defaultRoot, REQUIRED_LOCALES, ENTRIES } from './iap-lib.mjs';
+import { parseArgs } from './cli.mjs';
 import { buildJwt, normalizeKey, createClient } from './asc.mjs';
 import { checkFolder } from './check-iap-texts.mjs';
 
@@ -11,6 +12,15 @@ test('validateEntry counts Unicode code points', () => {
   assert.match(validateEntry('yearly', { name: 'ok', description: 'y'.repeat(46) })[0], /limit 45/);
   // an emoji is one code point but two UTF-16 units
   assert.deepEqual(validateEntry('yearly', { name: '😀'.repeat(30), description: 'ok' }), []);
+});
+
+test('validateTree skips the length limit for en-US only', () => {
+  const long = { name: 'ok', description: 'y'.repeat(52) };
+  const tree = Object.fromEntries(ENTRIES.map((e) => [e, Object.fromEntries(REQUIRED_LOCALES.map((l) => [l, e === '_group' ? { name: 'ok' } : { name: 'ok', description: 'ok' }]))]));
+  tree.yearly['en-US'] = long;
+  assert.deepEqual(validateTree(tree), []);
+  tree.yearly.cs = long;
+  assert.match(validateTree(tree)[0], /yearly\/cs.json.*limit 45/);
 });
 
 test('validateEntry rejects stray, missing and non-string keys', () => {
@@ -97,6 +107,7 @@ test('the files in git pass the check', () => {
   assert.ok(files >= 42);
   const { tree } = readTree(defaultRoot);
   assert.ok(!('ru' in tree._group));
-  assert.ok(!('en-US' in tree.base_plan) && !('en-US' in tree.yearly));
+  assert.equal(tree.base_plan['en-US'].name, 'Pro Access Monthly');
+  assert.equal(tree.yearly['en-US'].name, 'Pro Access Annual');
   assert.deepEqual(tree.spacelaunchnow_pro['en-US'], { name: 'All Access Lifetime', description: 'Unlock all features once and for all!' });
 });
