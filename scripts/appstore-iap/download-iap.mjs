@@ -5,7 +5,8 @@
 // With --check-against-git it exits 1 on any difference to iosApp/fastlane/iap and prints it.
 import { join } from 'node:path';
 import { createClient, resolveTargets, readRemote, tokenFromEnv } from './asc.mjs';
-import { readTree, writeTree, diffTrees, parseArgs, defaultRoot, countFiles, runCli } from './iap-lib.mjs';
+import { readTree, writeTree, diffTrees, defaultRoot, countFiles } from './iap-lib.mjs';
+import { parseArgs, runCli } from './cli.mjs';
 
 export const defaultOut = join(defaultRoot, '..', 'iap_downloaded');
 

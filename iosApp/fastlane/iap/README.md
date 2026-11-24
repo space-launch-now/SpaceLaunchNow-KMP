@@ -20,7 +20,7 @@ iosApp/fastlane/iap/
 
 The folder names match the product ids. `_group` may also hold an optional `customAppName` (the app name shown in the subscription list). Locales use the App Store Connect codes, the same as the folders in `fastlane/metadata`: `cs`, `de-DE`, `es-ES`, `fr-FR`, `it`, `nl-NL`, `pl`, `pt-BR`, `uk`, `zh-Hans`. `en-US` is allowed. Never `ru`.
 
-There is no `en-US` file for `base_plan` or `yearly`. Their live English text is not in git yet; `download` shows it.
+`en-US` files hold the live English text from App Store Connect (downloaded 2026-11-24). The subscriptions are named "Pro Access Monthly" and "Pro Access Annual" there; the group is "All Access" and the lifetime purchase "All Access Lifetime". The live monthly and yearly descriptions are 51 and 52 characters, over the 45 limit, so the check skips the length limit for `en-US` only. Do not edit them without shortening them first: Apple rejects a change that is over the limit.
 
 ## Limits
 
@@ -31,7 +31,7 @@ There is no `en-US` file for `base_plan` or `yearly`. Their live English text is
 
 Counted in Unicode code points. No prices and no review notes: this repo is public.
 
-Style: informal "you", and "All Access" stays in English in every name (see `specs/017-app-text-translation/glossary.md`). The words Monthly, Yearly and Lifetime are translated.
+Style: informal "you". "All Access" (group, lifetime) and "Pro Access" (monthly, yearly) stay in English in every name, as in the live English names (see `specs/017-app-text-translation/glossary.md`). The words Monthly, Yearly and Lifetime are translated.
 
 ## Steps
 
