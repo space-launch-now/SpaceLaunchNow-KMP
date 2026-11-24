@@ -116,6 +116,14 @@ jobs:
           [ -f "$secret" ] || cp "$secret.template" "$secret"
           ./gradlew :composeApp:desktopTest --continue --build-cache
 
+      - name: Upload desktop test results
+        if: failure()
+        uses: actions/upload-artifact@v6
+        with:
+          name: desktop-test-results
+          path: composeApp/build/test-results/desktopTest
+          retention-days: 7
+
       - name: Generate test report
         if: always()
         uses: dorny/test-reporter@v3
