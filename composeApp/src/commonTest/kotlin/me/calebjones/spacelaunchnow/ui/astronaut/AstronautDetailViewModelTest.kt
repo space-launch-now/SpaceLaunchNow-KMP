@@ -39,13 +39,36 @@ class AstronautDetailViewModelTest {
     @BeforeTest
     fun setup() {
         TestSpaceLoggerInit.ensureInitialized()
-        Dispatchers.setMain(testDispatcher)
+        withMainGuardRetry { Dispatchers.setMain(testDispatcher) }
         mockRepository = MockAstronautDetailRepository()
     }
 
     @AfterTest
     fun tearDown() {
-        Dispatchers.resetMain()
+        withMainGuardRetry { Dispatchers.resetMain() }
+    }
+
+    /**
+     * kotlinx-coroutines-test throws "Dispatchers.Main is used concurrently with setting it"
+     * when another thread reads Dispatchers.Main while we set or reset it. Other test classes
+     * never clear their ViewModels, so a leaked collector can read Main from a background
+     * thread at that moment. The read is brief, so retry the call instead of failing this test.
+     */
+    private fun withMainGuardRetry(action: () -> Unit) {
+        var attempts = 0
+        while (true) {
+            try {
+                action()
+                return
+            } catch (e: IllegalStateException) {
+                val guardTripped = e.message?.contains("used concurrently with setting it") == true
+                if (!guardTripped || ++attempts >= MAIN_GUARD_MAX_ATTEMPTS) throw e
+            }
+        }
+    }
+
+    private companion object {
+        const val MAIN_GUARD_MAX_ATTEMPTS = 100_000
     }
 
     // ========================================
