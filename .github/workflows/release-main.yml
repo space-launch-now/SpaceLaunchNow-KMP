@@ -739,6 +739,22 @@ jobs:
           PLAY_CONSOLE_SERVICE_ACCOUNT_JSON: ${{ secrets.PLAY_CONSOLE_SERVICE_ACCOUNT_JSON }}
         run: echo "$PLAY_CONSOLE_SERVICE_ACCOUNT_JSON" | base64 -d > service-account.json
 
+      # Firebase App Distribution rejects release notes over 16,384 characters. The raw
+      # changelog of a large batch runs past that (5.53.0: ~33k, run 45565250461), so send
+      # the short English Play "What's new" text and link the full notes file on main.
+      - name: Create Firebase release notes
+        run: |
+          VERSION_NAME="${{ needs.version.outputs.version_name }}"
+          {
+            echo "Space Launch Now $VERSION_NAME (AAB)"
+            echo ""
+            cat docs/release-notes/whatsnew/whatsnew-en-US 2>/dev/null || echo "Bug fixes and performance improvements."
+            echo ""
+            echo ""
+            echo "Full notes: https://github.com/${{ github.repository }}/blob/main/docs/release-notes/v$VERSION_NAME.md"
+          } | head -c 4000 > firebase-release-notes.txt
+          cat firebase-release-notes.txt
+
       - name: Deploy AAB to Firebase Distribution
         uses: wzieba/Firebase-Distribution-Github-Action@v1
         with:
@@ -746,12 +762,7 @@ jobs:
           serviceCredentialsFile: service-account.json
           groups: vip_testers
           file: ${{ steps.artifacts.outputs.aab }}
-          releaseNotes: |
-            Space Launch Now ${{ needs.version.outputs.version_name }} (AAB)
-            
-            ${{ needs.version.outputs.changelog }}
-            
-            See full details at: https://github.com/${{ github.repository }}/releases/tag/v${{ needs.version.outputs.version_name }}
+          releaseNotesFile: firebase-release-notes.txt
 
       - name: Firebase Deployment Summary
         run: |
