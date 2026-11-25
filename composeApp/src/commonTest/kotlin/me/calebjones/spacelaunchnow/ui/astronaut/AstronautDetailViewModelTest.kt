@@ -1,12 +1,11 @@
 package me.calebjones.spacelaunchnow.ui.astronaut
 
+import me.calebjones.spacelaunchnow.test.TestMain
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.StandardTestDispatcher
 import kotlinx.coroutines.test.advanceUntilIdle
-import kotlinx.coroutines.test.resetMain
 import kotlinx.coroutines.test.runTest
-import kotlinx.coroutines.test.setMain
 import me.calebjones.spacelaunchnow.data.repository.AstronautRepository
 import me.calebjones.spacelaunchnow.analytics.core.AnalyticsManager
 import me.calebjones.spacelaunchnow.analytics.core.AnalyticsManagerImpl
@@ -39,13 +38,13 @@ class AstronautDetailViewModelTest {
     @BeforeTest
     fun setup() {
         TestSpaceLoggerInit.ensureInitialized()
-        Dispatchers.setMain(testDispatcher)
+        TestMain.install(testDispatcher)
         mockRepository = MockAstronautDetailRepository()
     }
 
     @AfterTest
     fun tearDown() {
-        Dispatchers.resetMain()
+        TestMain.reset()
     }
 
     // ========================================

@@ -1,12 +1,11 @@
 package me.calebjones.spacelaunchnow.ui.viewmodel
 
+import me.calebjones.spacelaunchnow.test.TestMain
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.StandardTestDispatcher
 import kotlinx.coroutines.test.advanceUntilIdle
-import kotlinx.coroutines.test.resetMain
 import kotlinx.coroutines.test.runTest
-import kotlinx.coroutines.test.setMain
 import me.calebjones.spacelaunchnow.cache.LaunchCache
 import me.calebjones.spacelaunchnow.data.model.DataResult
 import me.calebjones.spacelaunchnow.data.model.DataSource
@@ -29,12 +28,12 @@ class LaunchesViewModelTest {
 
     @BeforeTest
     fun setup() {
-        Dispatchers.setMain(dispatcher)
+        TestMain.install(dispatcher)
     }
 
     @AfterTest
     fun tearDown() {
-        Dispatchers.resetMain()
+        TestMain.reset()
     }
 
     @Test

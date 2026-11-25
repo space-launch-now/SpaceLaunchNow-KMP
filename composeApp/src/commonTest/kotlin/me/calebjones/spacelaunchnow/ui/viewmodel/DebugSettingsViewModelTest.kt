@@ -1,12 +1,11 @@
 package me.calebjones.spacelaunchnow.ui.viewmodel
 
+import me.calebjones.spacelaunchnow.test.TestMain
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.test.StandardTestDispatcher
-import kotlinx.coroutines.test.resetMain
 import kotlinx.coroutines.test.runTest
-import kotlinx.coroutines.test.setMain
 import me.calebjones.spacelaunchnow.data.billing.MockBillingManager
 import me.calebjones.spacelaunchnow.data.model.ProductInfo
 import me.calebjones.spacelaunchnow.data.repository.FakeNotificationRepository
@@ -35,7 +34,7 @@ class DebugSettingsViewModelTest {
     
     @BeforeTest
     fun setup() {
-        Dispatchers.setMain(testDispatcher)
+        TestMain.install(testDispatcher)
         billingManager = MockBillingManager()
         viewModel = DebugSettingsViewModel(
             debugPreferences = null,  // Not testing debug preferences here
@@ -47,7 +46,7 @@ class DebugSettingsViewModelTest {
     
     @AfterTest
     fun tearDown() {
-        Dispatchers.resetMain()
+        TestMain.reset()
     }
     
     // ========================================

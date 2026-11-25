@@ -35,6 +35,7 @@ import me.calebjones.spacelaunchnow.ui.viewmodel.InMemoryPreferencesDataStore
 import org.koin.core.qualifier.named
 import org.koin.dsl.koinApplication
 import org.koin.dsl.module
+import java.util.concurrent.CopyOnWriteArrayList
 import kotlin.test.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertFailsWith
@@ -86,8 +87,9 @@ class TerminusLaunchRepositoryTest {
     private fun env(terminusHandler: (String) -> Reply): Env = envFor(DataBackend.TERMINUS, terminusHandler)
 
     private fun envFor(backend: DataBackend, terminusHandler: (String) -> Reply): Env {
-        val terminusRequests = mutableListOf<String>()
-        val llRequests = mutableListOf<String>()
+        // The detail read sends three requests in parallel; a plain list loses one when two add at once.
+        val terminusRequests = CopyOnWriteArrayList<String>()
+        val llRequests = CopyOnWriteArrayList<String>()
         val terminusEngine = MockEngine { request ->
             terminusRequests += request.url.encodedPath
             val reply = terminusHandler(request.url.encodedPath)
