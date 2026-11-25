@@ -5,10 +5,7 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Runnable
 import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.withContext
-import me.calebjones.spacelaunchnow.util.ErrorKind
 import org.jetbrains.compose.resources.getString
-import spacelaunchnow_kmp.composeapp.generated.resources.Res
-import spacelaunchnow_kmp.composeapp.generated.resources.station_iss_live_stream_description
 import java.util.concurrent.CopyOnWriteArrayList
 import kotlin.coroutines.CoroutineContext
 import kotlin.test.Test
@@ -34,8 +31,7 @@ class TestMainWarmUpTest {
         runBlocking {
             withContext(recorder) {
                 dispatchThreads.clear()
-                ErrorKind.entries.forEach { getString(it.text) }
-                getString(Res.string.station_iss_live_stream_description)
+                TestMain.viewModelTexts.forEach { getString(it) }
             }
         }
 

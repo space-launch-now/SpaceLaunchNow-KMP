@@ -7,6 +7,7 @@ import kotlinx.coroutines.test.TestDispatcher
 import kotlinx.coroutines.test.resetMain
 import kotlinx.coroutines.test.setMain
 import me.calebjones.spacelaunchnow.util.ErrorKind
+import org.jetbrains.compose.resources.StringResource
 import org.jetbrains.compose.resources.getString
 import spacelaunchnow_kmp.composeapp.generated.resources.Res
 import spacelaunchnow_kmp.composeapp.generated.resources.station_iss_live_stream_description
@@ -24,7 +25,7 @@ import spacelaunchnow_kmp.composeapp.generated.resources.station_iss_live_stream
  * leave the thread.
  *
  * [install] loads every text that a view model reads in a coroutine before the first `setMain`,
- * so no test leaves a resume from another thread pending. Add a text to [warmUp] when a view
+ * so no test leaves a resume from another thread pending. Add a text to [viewModelTexts] when a view
  * model starts to read a new one.
  */
 @OptIn(ExperimentalCoroutinesApi::class)
@@ -42,9 +43,12 @@ internal object TestMain {
         Dispatchers.resetMain()
     }
 
-    /** Loads each text that a view model reads through `getString`. */
+    /** Every text that a view model reads through `getString`. */
+    internal val viewModelTexts: List<StringResource> =
+        ErrorKind.entries.map { it.text } + Res.string.station_iss_live_stream_description
+
+    /** Loads each of [viewModelTexts]. */
     internal suspend fun warmUp() {
-        ErrorKind.entries.forEach { getString(it.text) }
-        getString(Res.string.station_iss_live_stream_description)
+        viewModelTexts.forEach { getString(it) }
     }
 }
