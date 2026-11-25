@@ -1,3 +1,131 @@
+# [5.53.0](https://github.com/space-launch-now/SpaceLaunchNow-KMP/compare/v5.52.0...v5.53.0) (2026-11-25)
+
+
+### Bug Fixes
+
+* **ads:** drop the banner when the slot is too short and blank it under a cover ([43a01bf](https://github.com/space-launch-now/SpaceLaunchNow-KMP/commit/43a01bf7d873c314a68e3587377d1d86a4eacdc4))
+* **ads:** host the banner AdView at its own size and destroy replaced views ([0611d2f](https://github.com/space-launch-now/SpaceLaunchNow-KMP/commit/0611d2f365888e56265c4d26cafbbc4d0612bcf1))
+* **ads:** reload banners when density, font scale or window size class changes ([11be25a](https://github.com/space-launch-now/SpaceLaunchNow-KMP/commit/11be25ac00c3877600936f2fcf156c775dcf7b68))
+* **ads:** rename ad impression event to ad_shown and accept numeric error code ([05fc21e](https://github.com/space-launch-now/SpaceLaunchNow-KMP/commit/05fc21e225599cf70e6318dcdd8b530d34122bf3))
+* **ads:** report the AdMob error code for failed iOS banners ([c9dbc86](https://github.com/space-launch-now/SpaceLaunchNow-KMP/commit/c9dbc86ad0b7ca39fd66b141d04bb9a69ee0a16b)), closes [ItsCalebJones/SpaceLaunchNow-Tasks#1267](https://github.com/ItsCalebJones/SpaceLaunchNow-Tasks/issues/1267)
+* **ci:** pass test files to node --test on Node 22 ([12e9ea6](https://github.com/space-launch-now/SpaceLaunchNow-KMP/commit/12e9ea6d2619d54e99ba55aa2226d0d4fd204d28))
+* **i18n:** do not read a percent sign in prose as a placeholder ([2cd02d2](https://github.com/space-launch-now/SpaceLaunchNow-KMP/commit/2cd02d2036a9db34cc680957eaf7b22df02a2f08))
+* **i18n:** drop committed bytecode and ignore it ([37f030d](https://github.com/space-launch-now/SpaceLaunchNow-KMP/commit/37f030d0a4544726a02e5ab43e0680067e0a7f55))
+* **i18n:** drop the backslash from four apostrophes Compose resources show literally ([86c6035](https://github.com/space-launch-now/SpaceLaunchNow-KMP/commit/86c6035aac143b84a852fcc04414ede7c5f4b56e))
+* **i18n:** inline widget status key ([9743669](https://github.com/space-launch-now/SpaceLaunchNow-KMP/commit/9743669e5ab277d8b6ba4de9e3a753a1a843d094))
+* **i18n:** keep ISS marker snippet literal ([39e8ce9](https://github.com/space-launch-now/SpaceLaunchNow-KMP/commit/39e8ce98c041a3959e7b8ca0e14ebb1550d3b5c4))
+* **i18n:** keep moved text in the hunks verify_move checks ([9563016](https://github.com/space-launch-now/SpaceLaunchNow-KMP/commit/9563016d38deecd26c2854f1b1f0e473ca73790f))
+* **i18n:** keep onboarding spaces and apostrophes exact at runtime ([5f34aaf](https://github.com/space-launch-now/SpaceLaunchNow-KMP/commit/5f34aafbe987c02780610cd88f68c837cd6eff44))
+* **i18n:** keep the store name as its own key in FinePrint ([52ac35b](https://github.com/space-launch-now/SpaceLaunchNow-KMP/commit/52ac35b201e93ef0ebad294de969154ee39a9c17))
+* **i18n:** leave FinePrint text for a follow-up that joins split literals ([29ad8c6](https://github.com/space-launch-now/SpaceLaunchNow-KMP/commit/29ad8c6e28da18aa9538abc8b2fbdc30743a0092))
+* **i18n:** move FinePrint text to string resources ([b06048c](https://github.com/space-launch-now/SpaceLaunchNow-KMP/commit/b06048c6363cd9ff5706d5154fa4633964b2ed41))
+* **i18n:** move the subscription plan Member label to a string resource ([5a354ef](https://github.com/space-launch-now/SpaceLaunchNow-KMP/commit/5a354ef137613261d2bee3ffeac4cc74689efb85))
+* **i18n:** restore three comments ([c042ae9](https://github.com/space-launch-now/SpaceLaunchNow-KMP/commit/c042ae969335b4a937ba197ac50b33047a389734))
+* **i18n:** retry a bad model reply once, name the plural warning in one place ([9ca5cf4](https://github.com/space-launch-now/SpaceLaunchNow-KMP/commit/9ca5cf4a683a8810de2eca79ed7733c970998028))
+* **i18n:** reuse time strings for the launch date lead ([032bb5e](https://github.com/space-launch-now/SpaceLaunchNow-KMP/commit/032bb5ee47efa889f5a25363b2ed0b8bb1b18a4f))
+* **i18n:** use a plurals resource for the astronaut mission count ([4c0a638](https://github.com/space-launch-now/SpaceLaunchNow-KMP/commit/4c0a638e28a48471c30c08c3cb600d8c0d5e4e79))
+* **i18n:** use plain apostrophes in notification, event and schedule strings ([af5c8c7](https://github.com/space-launch-now/SpaceLaunchNow-KMP/commit/af5c8c76e232a3c54c144497e2dcc00ce8af2fe4))
+* **i18n:** use plain apostrophes in subscription strings ([02d5589](https://github.com/space-launch-now/SpaceLaunchNow-KMP/commit/02d5589b5b6eee1cea6f694be0449ce650201044))
+* **i18n:** use plain quotes in calendar setup steps ([00e5214](https://github.com/space-launch-now/SpaceLaunchNow-KMP/commit/00e521470c430136467c2e06f9211e631bf4ae88))
+* **i18n:** use the project resource package in FinePrint ([6b6fbe4](https://github.com/space-launch-now/SpaceLaunchNow-KMP/commit/6b6fbe4771b147a5eec6581ef2d9fb2dad650223))
+* **i18n:** verify_move accepts a key swap with equal English ([ecb3c16](https://github.com/space-launch-now/SpaceLaunchNow-KMP/commit/ecb3c16f19a8c40be27b76eca1145f850b90e3e9))
+* **i18n:** verify_move counts keys in new files as new text and reads nested braces in templates ([a98d581](https://github.com/space-launch-now/SpaceLaunchNow-KMP/commit/a98d581699b63acca2e4dfae4d83034f134a328f))
+* **i18n:** verify_move reads every strings*.xml and handles hoisted and concatenated literals ([169fba4](https://github.com/space-launch-now/SpaceLaunchNow-KMP/commit/169fba4d6a8b33a5cb5d12d7c38fd54801211a47))
+* **i18n:** verify_move reads multi-line and nested literals in a template ([e086fc8](https://github.com/space-launch-now/SpaceLaunchNow-KMP/commit/e086fc854ae13a18cf2194cbe3d01cb3644090d7))
+* **i18n:** write divider padding as escapes, not quotes ([5d7f6d9](https://github.com/space-launch-now/SpaceLaunchNow-KMP/commit/5d7f6d9d7f30d906e1e0324316c4b52e8e6b7a80))
+* **ios:** bump compose-shimmer to 1.5.0 so shimmer no longer aborts on skiko 0.150 ([e5d1195](https://github.com/space-launch-now/SpaceLaunchNow-KMP/commit/e5d1195505cbd302bfb1d7f4e048d5f0371a20ee))
+* **ios:** keep vehicle names in English and use informal you in fr and cs listings ([77fc0ff](https://github.com/space-launch-now/SpaceLaunchNow-KMP/commit/77fc0ff154ab8598eec54129f3d5819d1c79c2f8))
+* **ios:** trim en-US keywords to 95 bytes ([c228d9e](https://github.com/space-launch-now/SpaceLaunchNow-KMP/commit/c228d9e1e1154ea789a294f57fe540bbbfa87e98))
+* **ios:** write the downloaded listing where the artifact step reads it and drop the review contact ([62441f0](https://github.com/space-launch-now/SpaceLaunchNow-KMP/commit/62441f0de18a60326dbf57d50d75b55a38f84614))
+* keep the raw exception detail in the logs ([00e22a8](https://github.com/space-launch-now/SpaceLaunchNow-KMP/commit/00e22a899e2310fc3ce40841a96bae6bb79426bc))
+* **offer:** mark holiday offer shown before checked ([5baa888](https://github.com/space-launch-now/SpaceLaunchNow-KMP/commit/5baa8885dcc3fdc2568b9a653fe7aa81bb7e773d))
+* **offer:** no first-month intro promise when a free trial exists ([6aac6e6](https://github.com/space-launch-now/SpaceLaunchNow-KMP/commit/6aac6e6b1ab264f9d729811a1800fe1a7e80ed8c))
+* **paywall:** keep bottom bar hidden on the SupportUs route with args ([4513610](https://github.com/space-launch-now/SpaceLaunchNow-KMP/commit/45136107c410fcb229b168ea8924380e6a69463f))
+* **paywall:** let the locked Starlink row take the tap ([af3ee22](https://github.com/space-launch-now/SpaceLaunchNow-KMP/commit/af3ee22cf7126766f68c525c1d814303c7e5e1b0))
+* **paywall:** report paywall_dismissed on iOS swipe-back and desktop window close ([dcf97c6](https://github.com/space-launch-now/SpaceLaunchNow-KMP/commit/dcf97c66fcf6f3dd194536678ec8f5e8da5d441c))
+* **paywall:** use ad-covering bottom sheet for win-back ([02ca66b](https://github.com/space-launch-now/SpaceLaunchNow-KMP/commit/02ca66b0f9d98a32d5a40e95574dc77c80800530))
+* **play:** keep Soyuz, Progress, Long March and Sriharikota in English ([5f36a39](https://github.com/space-launch-now/SpaceLaunchNow-KMP/commit/5f36a393fa4441436f8f64aa7bd82a8e1c2da676))
+* **play:** let supply download the live listing by not creating its folder first ([0bcb9a4](https://github.com/space-launch-now/SpaceLaunchNow-KMP/commit/0bcb9a416e5d093335818c94563978b94bd85f48))
+* **release:** normalize CRLF and read stdin as UTF-8 in notes splitter ([c60e41c](https://github.com/space-launch-now/SpaceLaunchNow-KMP/commit/c60e41cf878c3ebe9c459e0d8df9962ec4841030))
+* **release:** repair CRLF normalization in notes splitter ([d5d4cb3](https://github.com/space-launch-now/SpaceLaunchNow-KMP/commit/d5d4cb3677ee810c252f49ede3911b6b3ee14de7))
+* **release:** repair CRLF normalization in notes splitter ([3dda666](https://github.com/space-launch-now/SpaceLaunchNow-KMP/commit/3dda66684b53d1dde6151aa177f2be4aaadc61cc))
+* **wear:** escape apostrophe and newlines in wear strings ([05c9028](https://github.com/space-launch-now/SpaceLaunchNow-KMP/commit/05c9028305010f63e8d79d44e7d34a57c48a0edc))
+* **wear:** mark app_name untranslatable so lint finds no missing translation ([82553e5](https://github.com/space-launch-now/SpaceLaunchNow-KMP/commit/82553e530854ba107d55a90767151e40280bc4e3))
+* **wear:** send SpaceLaunchNow User-Agent on Coil image loads ([e30cab0](https://github.com/space-launch-now/SpaceLaunchNow-KMP/commit/e30cab0238cfa28b9ef5f3373eecf7daf50b7a71))
+* **wear:** show localized text when no launch data loads ([ac93d3c](https://github.com/space-launch-now/SpaceLaunchNow-KMP/commit/ac93d3ca2801d8fb320251f3ce1c599012f3eb0f))
+* **widgets:** pass the access flag to the launch source ([543ffd9](https://github.com/space-launch-now/SpaceLaunchNow-KMP/commit/543ffd919a79eef0b8ac8ccb91d9bbd04cca9fb6))
+* **widgets:** redraw from cache and refresh by launch proximity ([4ebc95f](https://github.com/space-launch-now/SpaceLaunchNow-KMP/commit/4ebc95ff3d117664537e797351d957f31e398ea2))
+
+
+### Features
+
+* **ads:** add ad_frame_mismatch event, frame check and rate limiter ([dacf10e](https://github.com/space-launch-now/SpaceLaunchNow-KMP/commit/dacf10eeed131b89d2a3a30cb7bd432f2adfd30b))
+* **ads:** add height-aware banner frame guard ([9baa1da](https://github.com/space-launch-now/SpaceLaunchNow-KMP/commit/9baa1da332a4f7ea0774a6c7054a5bf0976f0c30))
+* **ads:** hide banner ads while sheets, dialogs, menus or the keyboard cover them ([1a5c834](https://github.com/space-launch-now/SpaceLaunchNow-KMP/commit/1a5c834a0864141bd5f7e1dba858be159e7621c5))
+* **ads:** report banner frame mismatches from the host ([db46928](https://github.com/space-launch-now/SpaceLaunchNow-KMP/commit/db46928c1712b103d694cd8625723abc65f7e956))
+* **analytics:** refresh app_language when the per-app language changes ([88e3529](https://github.com/space-launch-now/SpaceLaunchNow-KMP/commit/88e35295c77390f8375ac2663c9965367871fb65))
+* **analytics:** set app_language user property from the resolved UI language ([9af2734](https://github.com/space-launch-now/SpaceLaunchNow-KMP/commit/9af2734c06d22fc1fa3360846a3b4b6151de3a88))
+* **billing:** add first-month intro offer fields to ProductInfo ([c5d1ca8](https://github.com/space-launch-now/SpaceLaunchNow-KMP/commit/c5d1ca885162ee5a28b1e96a5668182a75abd2e1))
+* **config:** add holiday offer Remote Config and shown-campaign pref ([b4034ab](https://github.com/space-launch-now/SpaceLaunchNow-KMP/commit/b4034abe0cde20e87b0c22cb670c9f52b03e1cdf))
+* dismissible upgrade row on Home behind a remote flag ([3aab4f8](https://github.com/space-launch-now/SpaceLaunchNow-KMP/commit/3aab4f8a2b8ea14862160af63b90445f22367a76))
+* fire paywall_dismissed from the Support Us screen ([075a705](https://github.com/space-launch-now/SpaceLaunchNow-KMP/commit/075a705735f4b628331042bee0d8caae4220a208))
+* **i18n:** add Android and Wear OS translations in 10 languages ([866c837](https://github.com/space-launch-now/SpaceLaunchNow-KMP/commit/866c837367c0a78ee0b908469471ef6bb3dadedb))
+* **i18n:** add Crowdin config and move rocket detail error text to string resources ([4e759d2](https://github.com/space-launch-now/SpaceLaunchNow-KMP/commit/4e759d23906f47ccaef3a898d85f2b8cc30d05c1))
+* **i18n:** add first translations of the shared screens in 10 languages ([84704d2](https://github.com/space-launch-now/SpaceLaunchNow-KMP/commit/84704d2635f1c35d05060fc48e3602e4ee33e5ab))
+* **i18n:** add locales_config.xml and localeConfig for per-app language ([8c69059](https://github.com/space-launch-now/SpaceLaunchNow-KMP/commit/8c69059d3fa08432d7cd4f14159a9f0fb14420de))
+* **i18n:** add verify_move.py check and pseudo-locale generator ([7f950ac](https://github.com/space-launch-now/SpaceLaunchNow-KMP/commit/7f950ac1a793203dd2efc0d3e1828980bac8cb1e))
+* **i18n:** add widget and permission prompt translations in 10 languages ([751fc57](https://github.com/space-launch-now/SpaceLaunchNow-KMP/commit/751fc579de1416372ab38e32ce83331565786d98))
+* **i18n:** build launch push body text from translated keys on Android and iOS ([0b4494d](https://github.com/space-launch-now/SpaceLaunchNow-KMP/commit/0b4494d552393b96eafe4b763d7de5537c864b9b))
+* **i18n:** check every Compose strings file and the iOS catalogs, run the check in CI ([15e776d](https://github.com/space-launch-now/SpaceLaunchNow-KMP/commit/15e776daf0c379c2505bf226d84389e37051f482))
+* **i18n:** CI check for new hard-coded UI text with baseline ([dae33c1](https://github.com/space-launch-now/SpaceLaunchNow-KMP/commit/dae33c1fc606806b8119f76accfa87601d4635bc))
+* **i18n:** map Android res and Wear strings in crowdin.yml ([86034fe](https://github.com/space-launch-now/SpaceLaunchNow-KMP/commit/86034feaab0497b3fc4afa8113518d0b0e619c46))
+* **i18n:** map API status, orbit, mission type and country labels to string keys ([4975d24](https://github.com/space-launch-now/SpaceLaunchNow-KMP/commit/4975d24c479b318429e88371e60cb8509496c6b2))
+* **i18n:** move agencies text to string keys ([f65e523](https://github.com/space-launch-now/SpaceLaunchNow-KMP/commit/f65e523c6fe31a514960f9cb808d7919f7507836))
+* **i18n:** move Android notification channel, fallback and share strings to resources ([b949d44](https://github.com/space-launch-now/SpaceLaunchNow-KMP/commit/b949d44c1003d44809304740cae9f031ed8981ca))
+* **i18n:** move astronaut text to string keys ([e9d23d6](https://github.com/space-launch-now/SpaceLaunchNow-KMP/commit/e9d23d65e26b13bb31910f52a059683a75d75b0d))
+* **i18n:** move enum display names to string keys ([6028911](https://github.com/space-launch-now/SpaceLaunchNow-KMP/commit/60289118d5a2f45904286d312b1a6a5c836373a4))
+* **i18n:** move explore, news, roadmap and shared component text to string keys ([040c72f](https://github.com/space-launch-now/SpaceLaunchNow-KMP/commit/040c72f003db4a0190d2e735d85517c399ee620d))
+* **i18n:** move iOS widget and Info.plist text to String Catalogs, add 10 languages ([dbe472c](https://github.com/space-launch-now/SpaceLaunchNow-KMP/commit/dbe472c0b3e0f3638932d2349258a0619033c88b))
+* **i18n:** move leftover user text to string keys ([c4f1300](https://github.com/space-launch-now/SpaceLaunchNow-KMP/commit/c4f1300d2f59069431b9a35d101c73a4a837d938))
+* **i18n:** move onboarding text to string keys ([08f4b30](https://github.com/space-launch-now/SpaceLaunchNow-KMP/commit/08f4b30cad996621df6fba9af44d4ccfdc907b09))
+* **i18n:** move relative time, countdown labels and timeline offsets to string keys ([720fa94](https://github.com/space-launch-now/SpaceLaunchNow-KMP/commit/720fa947d227c4a87066fc09394c173981421b0c))
+* **i18n:** move rockets screens to string keys ([bb2fc17](https://github.com/space-launch-now/SpaceLaunchNow-KMP/commit/bb2fc172339454efaf03d1451ce43193d0a28571))
+* **i18n:** move space station and starship text to string keys ([cf08873](https://github.com/space-launch-now/SpaceLaunchNow-KMP/commit/cf08873b8f5700ce7f6627aa54a9fd0ccf355953))
+* **i18n:** move subscription and paywall text to string keys ([498e6c6](https://github.com/space-launch-now/SpaceLaunchNow-KMP/commit/498e6c6ea8c5042465f47db7d59ff2aec49edead))
+* **i18n:** sync shared keys from Compose master to Wear and String Catalog ([9a76775](https://github.com/space-launch-now/SpaceLaunchNow-KMP/commit/9a767757085dc1641d3653d030ef9ce287552054))
+* **i18n:** translation script, glossary, placeholder and plural checks ([2017c7d](https://github.com/space-launch-now/SpaceLaunchNow-KMP/commit/2017c7dfb6a0343e9f949c0cb108d7ba0903f447))
+* **i18n:** update hardcoded text baseline for subscription move ([7b16925](https://github.com/space-launch-now/SpaceLaunchNow-KMP/commit/7b16925a62f15f38e6f7ec7b7e16033dd427b6d7))
+* **ios:** add App Store listing text for 10 languages ([96ee930](https://github.com/space-launch-now/SpaceLaunchNow-KMP/commit/96ee93001078f4432de24f130bf081aeb46d5f1a))
+* **ios:** add App Store purchase text check, download and upload scripts ([0dec3a5](https://github.com/space-launch-now/SpaceLaunchNow-KMP/commit/0dec3a57db5ec73ebbfe0ac92606e782e3229430))
+* **ios:** add purchase display texts in 10 languages ([610063f](https://github.com/space-launch-now/SpaceLaunchNow-KMP/commit/610063f28b928769595e69057e5462e2932948d8))
+* **ios:** add purchase texts workflow and README ([ff85989](https://github.com/space-launch-now/SpaceLaunchNow-KMP/commit/ff85989b96ea604b59687112c5d3a2d92075ff30))
+* **ios:** add the live en-US App Store keywords ([7d4f7e2](https://github.com/space-launch-now/SpaceLaunchNow-KMP/commit/7d4f7e23f8ba395398105184bdad9fd9ab57f090))
+* **ios:** App Store listing text as files with fastlane deliver upload ([589ef19](https://github.com/space-launch-now/SpaceLaunchNow-KMP/commit/589ef1924adba1f1243915f4e754e55f90491f3b))
+* **ios:** live subtitle and a download_metadata lane for keywords ([e1ed6fc](https://github.com/space-launch-now/SpaceLaunchNow-KMP/commit/e1ed6fc088069b9d6b5e9ddf7da165481074f5f9))
+* **ios:** propose comma-separated en-US keywords without name and subtitle words ([879fb9a](https://github.com/space-launch-now/SpaceLaunchNow-KMP/commit/879fb9a58cac89ebe1307b55ea2c757f90bfce2c))
+* **ios:** reconcile purchase texts with live App Store English ([6f37164](https://github.com/space-launch-now/SpaceLaunchNow-KMP/commit/6f3716464192580a6f0fa9bab017a48446a2fa75))
+* **launch-detail:** add Share button to tablet layout ([b69a3e8](https://github.com/space-launch-now/SpaceLaunchNow-KMP/commit/b69a3e8e59949ed3102fc8f84757b4fd4b5f4b41))
+* **offer:** add holiday offer and intro price strings in all locales ([b84f8ad](https://github.com/space-launch-now/SpaceLaunchNow-KMP/commit/b84f8adc426902d40d512ef003764255a9e2093c))
+* **offer:** add holiday offer rule, controller and OFFER_SHEET source ([84c10b0](https://github.com/space-launch-now/SpaceLaunchNow-KMP/commit/84c10b03bd47ab2c3ccb7f4fcf9e2e4d352fe9c3))
+* **offer:** add holiday offer sheet with close countdown ([93b7795](https://github.com/space-launch-now/SpaceLaunchNow-KMP/commit/93b7795f40687f752ac5e4443ab7a4436d58442f))
+* **paywall:** day-7 win-back sheet after a dismissed onboarding paywall ([2fc9aa4](https://github.com/space-launch-now/SpaceLaunchNow-KMP/commit/2fc9aa4c7844e86a7ac9492a4a58fb5ac4eceb5c))
+* **paywall:** open the paywall on a tap of a locked notification control behind a flag ([b1e5067](https://github.com/space-launch-now/SpaceLaunchNow-KMP/commit/b1e50676193c0aead6983ec0562edc2dccd37fc0))
+* **paywall:** show first-month intro price line on monthly plan ([049df1e](https://github.com/space-launch-now/SpaceLaunchNow-KMP/commit/049df1eee2b358494392cb58da73a547d7bcd5c4))
+* **paywall:** tag every paywall entry with a source ([41e14f2](https://github.com/space-launch-now/SpaceLaunchNow-KMP/commit/41e14f2e28cdd3ad3a6d289777e00527a20a1ccf))
+* **play:** add 10 translated Play listing locales ([078b083](https://github.com/space-launch-now/SpaceLaunchNow-KMP/commit/078b083678829f4594f677cf1ce57f91774d0bb4))
+* **play:** manage Google Play listing text in git with a fastlane upload lane ([7cfade8](https://github.com/space-launch-now/SpaceLaunchNow-KMP/commit/7cfade8452af00cf1f6802ad00a82fa3afc2f503))
+* **release:** translate Play What's new notes into the 10 listing languages ([00914b2](https://github.com/space-launch-now/SpaceLaunchNow-KMP/commit/00914b211ae77c6bbc66598dd436fdedce465e1a))
+* **settings:** add Language row that opens the OS per-app language screen ([be8acdd](https://github.com/space-launch-now/SpaceLaunchNow-KMP/commit/be8acdd93921adfd0d052a8b8602bf29f4176d7a))
+* show errors from a fixed list, never raw exception text ([5da06f1](https://github.com/space-launch-now/SpaceLaunchNow-KMP/commit/5da06f14f7e0005be615e0e532d77fd04108429d))
+* **wear:** move Wear UI, tile and complication text into string resources ([c63cd74](https://github.com/space-launch-now/SpaceLaunchNow-KMP/commit/c63cd74245bcaef48f124a600498f1ac5bd693d0))
+
+
+### Reverts
+
+* Revert "build: run the desktop tests from ./gradlew test" ([e2fc767](https://github.com/space-launch-now/SpaceLaunchNow-KMP/commit/e2fc7671bee6b369d32db50d4ef7fd46ea200548))
+
+
+
 # [5.52.0](https://github.com/space-launch-now/SpaceLaunchNow-KMP/compare/v5.51.0...v5.52.0) (2026-11-19)
 
 
@@ -90,15 +218,6 @@
 * **data:** fall back to stale cache when a 200 LL2 response fails to deserialize ([62f5022](https://github.com/space-launch-now/SpaceLaunchNow-KMP/commit/62f5022b9aaef2a92b706eefcbb75eadaf3ca83b)), closes [#240](https://github.com/space-launch-now/SpaceLaunchNow-KMP/issues/240)
 * **data:** guard remaining LL2 launch repository call sites against non-2xx responses ([8c6fb3d](https://github.com/space-launch-now/SpaceLaunchNow-KMP/commit/8c6fb3d4923502906234192bca37a296bca12065)), closes [#240](https://github.com/space-launch-now/SpaceLaunchNow-KMP/issues/240)
 * **data:** serve stale cache when LL2 returns non-2xx for featured and in-flight launches ([d378e75](https://github.com/space-launch-now/SpaceLaunchNow-KMP/commit/d378e75f3d4f9b40fa2b7d3c57c3755224607cc5)), closes [#240](https://github.com/space-launch-now/SpaceLaunchNow-KMP/issues/240) [#240](https://github.com/space-launch-now/SpaceLaunchNow-KMP/issues/240)
-
-
-
-# [5.50.0](https://github.com/space-launch-now/SpaceLaunchNow-KMP/compare/v5.49.0...v5.50.0) (2026-10-20)
-
-
-### Features
-
-* **logging:** emit push_summary after the app-start reconcile with toggle state ([1986654](https://github.com/space-launch-now/SpaceLaunchNow-KMP/commit/1986654e58db0ae428db8486cd024ce25c8610bf))
 
 
 
