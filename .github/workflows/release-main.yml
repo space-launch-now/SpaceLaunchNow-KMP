@@ -219,49 +219,17 @@ jobs:
             Raw changelog:
             ${{ steps.changelog.outputs.clean_changelog }}
 
-      # One call translates the humanized English notes into every Play listing language.
-      # The language list in the prompt must match fastlane/metadata/android (scripts/split-play-store-translations.py).
-      # Skipped when the English notes are not humanized (raw changelog); the split step then
-      # copies the English notes into every locale. A failed call has the same result.
-      - name: Translate Play Store notes (Copilot)
-        id: ai_translate
-        if: ${{ steps.ai_playstore.outputs.response != '' }}
-        uses: actions/ai-inference@v3
-        continue-on-error: true
-        env:
-          COPILOT_GITHUB_TOKEN: ${{ secrets.COPILOT_GITHUB_TOKEN }}
-        with:
-          model: claude-sonnet-5
-          system-prompt: |
-            You translate the Google Play "What's new" text of Space Launch Now, a rocket-launch tracking app.
-            Translate the English text into each language below, in this order:
-            cs-CZ (Czech), de-DE (German), es-ES (Spanish), fr-FR (French), it-IT (Italian), nl-NL (Dutch), pl-PL (Polish), pt-BR (Brazilian Portuguese), uk (Ukrainian), zh-CN (Simplified Chinese).
-
-            Output format, exactly. One block per language, each starting with its header line:
-            === cs-CZ ===
-            <translated text>
-            === de-DE ===
-            <translated text>
-            Print nothing before the first header and nothing after the last block.
-
-            Rules:
-            - Plain text only. No markdown, no bullets, no quotes, no emoji. Keep one sentence per line, as in the English text.
-            - Keep the meaning and the tone. Do not add or drop sentences.
-            - Keep "Space Launch Now" and "Wear OS" in English.
-            - Hard limit: 480 characters per language, counting every character. Shorten the wording if a language runs over.
-          prompt: |
-            English text:
-            ${{ steps.ai_playstore.outputs.response }}
-
       - name: Create release notes
         env:
           AI_PLAYSTORE: ${{ steps.ai_playstore.outputs.response }}
           AI_GITHUB: ${{ steps.ai_github.outputs.response }}
-          AI_TRANSLATE: ${{ steps.ai_translate.outputs.response }}
           RAW_CHANGELOG: ${{ steps.changelog.outputs.clean_changelog }}
         run: |
           mkdir -p docs/release-notes
           mkdir -p docs/release-notes/whatsnew
+          # Play notes stay English (Tasks#1234): the release commit keeps this folder, so drop any
+          # other locale file left over from an earlier release. Play shows en-US where a language has no file.
+          find docs/release-notes/whatsnew -type f ! -name whatsnew-en-US -delete
 
           # ---- GitHub Release body ----
           # Prefer humanized markdown; fall back to raw changelog if the AI step was skipped or failed.
@@ -307,10 +275,6 @@ jobs:
             echo "⚠️ Falling back to raw changelog for Play Store notes"
           fi
 
-          # ---- Play Store "What's new" per language (English fills any gap) ----
-          printf '%s' "$AI_TRANSLATE" > /tmp/play-translations.txt
-          python3 scripts/split-play-store-translations.py docs/release-notes/whatsnew /tmp/play-translations.txt
-
           # Surface results in the workflow summary for review
           {
             echo "## 📝 Release Notes Preview"
@@ -320,15 +284,6 @@ jobs:
             cat docs/release-notes/whatsnew/whatsnew-en-US
             echo ''
             echo '```'
-            for f in docs/release-notes/whatsnew/whatsnew-*; do
-              [ "$f" = docs/release-notes/whatsnew/whatsnew-en-US ] && continue
-              echo ""
-              echo "### Play Store (${f##*/})"
-              echo '```'
-              cat "$f"
-              echo ''
-              echo '```'
-            done
             echo ""
             echo "### GitHub Release body"
             echo ""
