@@ -6,6 +6,7 @@
 //  Copyright © 2026 orgName. All rights reserved.
 //
 
+import FirebaseMessaging
 import UserNotifications
 import os
 
@@ -81,6 +82,11 @@ class NotificationService: UNNotificationServiceExtension {
         withContentHandler contentHandler: @escaping (UNNotificationContent) -> Void
     ) {
         self.contentHandler = contentHandler
+
+        // Opt in to FCM delivery data export (BigQuery). Reports MESSAGE_DELIVERED for this push.
+        // Runs before every filter branch below and does not change what is shown. Only the FCM
+        // message ids in the payload are read; no user content leaves the device through this call.
+        Messaging.serviceExtension().exportDeliveryMetricsToBigQuery(withMessageInfo: request.content.userInfo)
         bestAttemptContent = (request.content.mutableCopy() as? UNMutableNotificationContent)
 
         guard let bestAttemptContent = bestAttemptContent else {

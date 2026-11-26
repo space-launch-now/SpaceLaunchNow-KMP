@@ -20,6 +20,7 @@
 		3C4393F12E956CDF005E97B3 /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 3C4393F02E956CDF005E97B3 /* LaunchScreen.storyboard */; };
 		3C5462FC2E9446F60032E227 /* LaunchWidgetExtension.appex in Embed Foundation Extensions */ = {isa = PBXBuildFile; fileRef = 3C2F71412E936FBD0026D5CD /* LaunchWidgetExtension.appex */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
 		3C5463142E946EBF0032E227 /* Secrets.plist in Resources */ = {isa = PBXBuildFile; fileRef = 3C9137E42E9008320095D5AB /* Secrets.plist */; };
+		F9AF02702F4B000100010001 /* FirebaseMessaging in Frameworks */ = {isa = PBXBuildFile; productRef = F9AF02712F4B000100010002 /* FirebaseMessaging */; };
 		3C7AFD342EADADF0002FEDEE /* FirebaseMessaging in Frameworks */ = {isa = PBXBuildFile; productRef = 3C7AFD332EADADF0002FEDEE /* FirebaseMessaging */; };
 		F9FC00012F0E000100000001 /* FirebaseCrashlytics in Frameworks */ = {isa = PBXBuildFile; productRef = F9FC00002F0E000100000001 /* FirebaseCrashlytics */; };
 
@@ -216,6 +217,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				F9AF02702F4B000100010001 /* FirebaseMessaging in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -416,6 +418,7 @@
 			);
 			name = NotificationServiceExtension;
 			packageProductDependencies = (
+				F9AF02712F4B000100010002 /* FirebaseMessaging */,
 			);
 			productName = NotificationServiceExtension;
 			productReference = F9AF02562F29DD7B00E31B3C /* NotificationServiceExtension.appex */;
@@ -1145,6 +1148,11 @@
 /* End XCRemoteSwiftPackageReference section */
 
 /* Begin XCSwiftPackageProductDependency section */
+		F9AF02712F4B000100010002 /* FirebaseMessaging */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 3CC6E4C32EAC8A84002F6FE9 /* XCRemoteSwiftPackageReference "firebase-ios-sdk" */;
+			productName = FirebaseMessaging;
+		};
 		3C2B8C832EB3C13800CB87C4 /* GoogleMobileAds */ = {
 			isa = XCSwiftPackageProductDependency;
 			package = 3C35B9592EA97E1B00E28A01 /* XCRemoteSwiftPackageReference "swift-package-manager-google-mobile-ads" */;
