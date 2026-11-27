@@ -281,10 +281,6 @@ class SubscriptionViewModel(
                     log.i { "Purchase successful for $productId" }
                 },
                 onFailure = { error ->
-                    _uiState.value = _uiState.value.copy(
-                        isProcessing = false,
-                        errorMessage = error.toSubscriptionMessage(Res.string.subscription_error_purchase_failed)
-                    )
                     // Spec 018 FR-1.1: 73% of purchase attempts previously ended in
                     // silence — attribute every failure with a coarse step + error code.
                     val (step, errorCode) = when (error) {
@@ -303,6 +299,11 @@ class SubscriptionViewModel(
                         )
                     )
                     log.e(error) { "Purchase failed for $productId ($step/$errorCode)" }
+                    // Last: the text loads from a resource and may suspend.
+                    _uiState.value = _uiState.value.copy(
+                        isProcessing = false,
+                        errorMessage = error.toSubscriptionMessage(Res.string.subscription_error_purchase_failed)
+                    )
                 }
             )
         }
@@ -416,6 +417,13 @@ class SubscriptionViewModel(
             errorMessage = null
         )
     }
+
+    /**
+     * Shows the shared text for a known error kind (offline, timeout, rate limit, server). Any
+     * other failure shows [fallback], the text for the step that failed. The raw text stays in logs.
+     */
+    private suspend fun Throwable.toSubscriptionMessage(fallback: StringResource): String =
+        if (toErrorKind() == ErrorKind.UNKNOWN) getString(fallback) else toUserMessage()
 }
 
 /**
@@ -486,11 +494,4 @@ data class SubscriptionUiState(
         val prefix = yearly.formattedPrice.takeWhile { !it.isDigit() }
         return "Just $prefix$dollars.${cents.toString().padStart(2, '0')}/mo"
     }
-
-    /**
-     * Shows the shared text for a known error kind (offline, timeout, rate limit, server). Any
-     * other failure shows [fallback], the text for the step that failed. The raw text stays in logs.
-     */
-    private suspend fun Throwable.toSubscriptionMessage(fallback: StringResource): String =
-        if (toErrorKind() == ErrorKind.UNKNOWN) getString(fallback) else toUserMessage()
 }

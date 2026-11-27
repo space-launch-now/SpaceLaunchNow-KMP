@@ -32,6 +32,8 @@ import kotlin.test.assertTrue
 import org.jetbrains.compose.resources.getString
 import spacelaunchnow_kmp.composeapp.generated.resources.Res
 import spacelaunchnow_kmp.composeapp.generated.resources.subscription_error_verify_failed
+import kotlinx.coroutines.withContext
+import kotlinx.coroutines.withTimeout
 
 /**
  * Tests for SubscriptionViewModel using BillingManager
@@ -324,7 +326,10 @@ class SubscriptionViewModelTest {
         testDispatcher.scheduler.advanceUntilIdle()
         
         // Then: UI state should show the fixed text for a failed verification
-        val uiState = viewModel.uiState.first()
+        // The text loads from a resource off the test dispatcher, so wait for it.
+        val uiState = withContext(Dispatchers.Default) {
+            withTimeout(5_000) { viewModel.uiState.first { it.errorMessage != null } }
+        }
         assertEquals(getString(Res.string.subscription_error_verify_failed), uiState.errorMessage)
     }
     

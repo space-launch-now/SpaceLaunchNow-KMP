@@ -18,6 +18,12 @@ import kotlin.test.assertEquals
 import kotlin.test.assertNotNull
 import kotlin.test.assertNull
 import kotlin.test.assertTrue
+import kotlinx.coroutines.withContext
+import kotlinx.coroutines.withTimeout
+import kotlinx.coroutines.flow.first
+import org.jetbrains.compose.resources.getString
+import spacelaunchnow_kmp.composeapp.generated.resources.Res
+import spacelaunchnow_kmp.composeapp.generated.resources.common_unknown_error
 
 /**
  * T160: Unit tests for [AgencyViewModel].
@@ -75,7 +81,11 @@ class AgencyViewModelTest {
         advanceUntilIdle()
 
         assertTrue(viewModel.agencies.value.isEmpty())
-        assertNotNull(viewModel.error.value)
+        // The text loads from a resource off the test dispatcher, so wait for it.
+        val error = withContext(Dispatchers.Default) {
+            withTimeout(5_000) { viewModel.error.first { it != null } }
+        }
+        assertEquals(getString(Res.string.common_unknown_error), error)
         assertEquals(false, viewModel.isLoading.value)
     }
 
