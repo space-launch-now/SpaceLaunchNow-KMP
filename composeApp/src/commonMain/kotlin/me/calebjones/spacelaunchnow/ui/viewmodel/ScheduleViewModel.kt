@@ -17,6 +17,7 @@ import me.calebjones.spacelaunchnow.domain.model.Launch
 import me.calebjones.spacelaunchnow.ui.schedule.ScheduleFilterState
 import me.calebjones.spacelaunchnow.util.logging.logger
 import kotlin.time.Clock.System
+import me.calebjones.spacelaunchnow.util.toUserMessage
 
 /** Launches requested per page; the schedule list also places its inline ads by this. */
 const val SCHEDULE_PAGE_SIZE = 25
@@ -332,7 +333,7 @@ class ScheduleViewModel(
                     tabState.copy(
                         isLoading = false,
                         isRefreshing = false,
-                        error = t.message ?: t.toString()
+                        error = t.toUserMessage()
                     )
                 )
             }

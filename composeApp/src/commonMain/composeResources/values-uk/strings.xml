@@ -183,4 +183,7 @@
     <string name="common_error_rate_limit">Забагато запитів. Зачекайте трохи й спробуйте ще раз.</string>
     <string name="common_error_server">На сервері сталася помилка. Спробуйте пізніше.</string>
     <string name="common_error_not_found">Нам не вдалося це знайти.</string>
+    <string name="subscription_error_purchase_failed">Покупку не завершено. Спробуйте ще раз.</string>
+    <string name="subscription_error_restore_failed">Не вдалося відновити ваші покупки. Спробуйте ще раз.</string>
+    <string name="subscription_error_verify_failed">Не вдалося перевірити вашу підписку. Спробуйте ще раз.</string>
 </resources>

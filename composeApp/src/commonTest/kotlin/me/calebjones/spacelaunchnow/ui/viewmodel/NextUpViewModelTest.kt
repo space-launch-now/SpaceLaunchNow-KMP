@@ -16,6 +16,9 @@ import kotlin.test.BeforeTest
 import kotlin.test.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertNull
+import org.jetbrains.compose.resources.getString
+import spacelaunchnow_kmp.composeapp.generated.resources.Res
+import spacelaunchnow_kmp.composeapp.generated.resources.common_unknown_error
 
 @OptIn(ExperimentalCoroutinesApi::class)
 class NextUpViewModelTest {
@@ -66,7 +69,7 @@ class NextUpViewModelTest {
         viewModel.fetchNextLaunch()
         advanceUntilIdle()
 
-        assertEquals("boom", viewModel.error.value)
+        assertEquals(getString(Res.string.common_unknown_error), viewModel.error.value)
         assertNull(viewModel.nextLaunch.value)
     }
 }

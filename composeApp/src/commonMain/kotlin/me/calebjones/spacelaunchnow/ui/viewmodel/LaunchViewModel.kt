@@ -23,6 +23,7 @@ import me.calebjones.spacelaunchnow.domain.model.PaginatedResult
 import me.calebjones.spacelaunchnow.domain.model.VideoLink
 import me.calebjones.spacelaunchnow.rating.NotificationRatingTrigger
 import me.calebjones.spacelaunchnow.ui.state.VideoPlayerState
+import me.calebjones.spacelaunchnow.util.toUserMessage
 
 class LaunchViewModel(
     private val repository: LaunchRepository,
@@ -117,7 +118,8 @@ class LaunchViewModel(
             result.onSuccess { dataResult ->
                 _upcomingLaunchesNormal.value = dataResult.data
             }.onFailure { exception ->
-                _error.value = exception.message
+                log.e(exception) { "Launch request failed" }
+                _error.value = exception.toUserMessage()
             }
         }
     }
@@ -182,7 +184,8 @@ class LaunchViewModel(
             }
             // Only show error if we don't have any data to display
             if (_launchDetails.value == null) {
-                _error.value = exception.message
+                log.e(exception) { "Launch request failed" }
+                _error.value = exception.toUserMessage()
             }
         }
         _isLoading.value = false
@@ -268,7 +271,8 @@ class LaunchViewModel(
                     put(agencyId, agencyData)
                 }
             }.onFailure { exception ->
-                _error.value = exception.message
+                log.e(exception) { "Launch request failed" }
+                _error.value = exception.toUserMessage()
             }
         }
     }
@@ -366,7 +370,7 @@ class LaunchViewModel(
             _relatedNews.value = paginatedList.results
         }.onFailure { exception ->
             print("Error fetching related news: ${exception.message}")
-            _newsError.value = exception.message
+            _newsError.value = exception.toUserMessage()
         }
 
         _isNewsLoading.value = false
@@ -404,7 +408,7 @@ class LaunchViewModel(
             _relatedEvents.value = paginatedResult.results
         }.onFailure { exception ->
             print("Error fetching related events: ${exception.message}")
-            _eventsError.value = exception.message
+            _eventsError.value = exception.toUserMessage()
         }
 
         _isEventsLoading.value = false

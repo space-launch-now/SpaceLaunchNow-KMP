@@ -183,4 +183,7 @@
     <string name="common_error_rate_limit">Troppe richieste. Attendi un momento e riprova.</string>
     <string name="common_error_server">Il server ha avuto un problema. Riprova più tardi.</string>
     <string name="common_error_not_found">Non siamo riusciti a trovarlo.</string>
+    <string name="subscription_error_purchase_failed">L'acquisto non è andato a buon fine. Riprova.</string>
+    <string name="subscription_error_restore_failed">Non siamo riusciti a ripristinare i tuoi acquisti. Riprova.</string>
+    <string name="subscription_error_verify_failed">Non siamo riusciti a verificare il tuo abbonamento. Riprova.</string>
 </resources>

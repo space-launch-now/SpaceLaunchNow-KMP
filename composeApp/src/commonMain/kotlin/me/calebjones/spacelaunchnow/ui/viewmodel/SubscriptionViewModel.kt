@@ -19,6 +19,15 @@ import me.calebjones.spacelaunchnow.data.model.SubscriptionState
 import me.calebjones.spacelaunchnow.data.repository.SubscriptionRepository
 import me.calebjones.spacelaunchnow.getPlatform
 import me.calebjones.spacelaunchnow.util.logging.logger
+import org.jetbrains.compose.resources.StringResource
+import org.jetbrains.compose.resources.getString
+import me.calebjones.spacelaunchnow.util.ErrorKind
+import me.calebjones.spacelaunchnow.util.toErrorKind
+import me.calebjones.spacelaunchnow.util.toUserMessage
+import spacelaunchnow_kmp.composeapp.generated.resources.Res
+import spacelaunchnow_kmp.composeapp.generated.resources.subscription_error_purchase_failed
+import spacelaunchnow_kmp.composeapp.generated.resources.subscription_error_restore_failed
+import spacelaunchnow_kmp.composeapp.generated.resources.subscription_error_verify_failed
 
 /**
  * ViewModel for subscription management
@@ -184,7 +193,7 @@ class SubscriptionViewModel(
                     } == true
                     _uiState.value = _uiState.value.copy(
                         billingUnavailable = true,
-                        errorMessage = if (isKnownUnavailable) null else error.message
+                        errorMessage = if (isKnownUnavailable) null else error.toUserMessage()
                     )
                 }
             )
@@ -226,7 +235,7 @@ class SubscriptionViewModel(
                 onFailure = { error ->
                     _uiState.value = _uiState.value.copy(
                         isProcessing = false,
-                        errorMessage = error.message ?: "Verification failed"
+                        errorMessage = error.toSubscriptionMessage(Res.string.subscription_error_verify_failed)
                     )
                 }
             )
@@ -274,7 +283,7 @@ class SubscriptionViewModel(
                 onFailure = { error ->
                     _uiState.value = _uiState.value.copy(
                         isProcessing = false,
-                        errorMessage = error.message ?: "Purchase failed"
+                        errorMessage = error.toSubscriptionMessage(Res.string.subscription_error_purchase_failed)
                     )
                     // Spec 018 FR-1.1: 73% of purchase attempts previously ended in
                     // silence — attribute every failure with a coarse step + error code.
@@ -380,7 +389,7 @@ class SubscriptionViewModel(
                     )
                     _uiState.value = _uiState.value.copy(
                         isProcessing = false,
-                        errorMessage = error.message ?: "Restore failed"
+                        errorMessage = error.toSubscriptionMessage(Res.string.subscription_error_restore_failed)
                     )
                 }
             )
@@ -477,4 +486,11 @@ data class SubscriptionUiState(
         val prefix = yearly.formattedPrice.takeWhile { !it.isDigit() }
         return "Just $prefix$dollars.${cents.toString().padStart(2, '0')}/mo"
     }
+
+    /**
+     * Shows the shared text for a known error kind (offline, timeout, rate limit, server). Any
+     * other failure shows [fallback], the text for the step that failed. The raw text stays in logs.
+     */
+    private suspend fun Throwable.toSubscriptionMessage(fallback: StringResource): String =
+        if (toErrorKind() == ErrorKind.UNKNOWN) getString(fallback) else toUserMessage()
 }

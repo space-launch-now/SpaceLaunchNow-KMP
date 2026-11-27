@@ -24,6 +24,9 @@ import kotlin.test.BeforeTest
 import me.calebjones.spacelaunchnow.rating.NotificationRatingTrigger
 import kotlin.test.Test
 import kotlin.test.assertEquals
+import org.jetbrains.compose.resources.getString
+import spacelaunchnow_kmp.composeapp.generated.resources.Res
+import spacelaunchnow_kmp.composeapp.generated.resources.common_unknown_error
 
 @OptIn(ExperimentalCoroutinesApi::class)
 class LaunchViewModelTest {
@@ -96,7 +99,7 @@ class LaunchViewModelTest {
         viewModel.fetchLaunchDetails("missing")
         advanceUntilIdle()
 
-        assertEquals("detail failed", viewModel.error.value)
+        assertEquals(getString(Res.string.common_unknown_error), viewModel.error.value)
     }
 
     private class RecordingTrigger : NotificationRatingTrigger {

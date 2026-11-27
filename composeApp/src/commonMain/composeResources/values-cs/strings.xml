@@ -183,4 +183,7 @@
     <string name="common_error_rate_limit">Příliš mnoho požadavků. Chvíli počkejte a zkuste to znovu.</string>
     <string name="common_error_server">Na serveru nastala chyba. Zkuste to prosím později.</string>
     <string name="common_error_not_found">Nepodařilo se to najít.</string>
+    <string name="subscription_error_purchase_failed">Nákup se nepodařil. Zkuste to prosím znovu.</string>
+    <string name="subscription_error_restore_failed">Nepodařilo se nám obnovit vaše nákupy. Zkuste to prosím znovu.</string>
+    <string name="subscription_error_verify_failed">Nepodařilo se nám ověřit vaše předplatné. Zkuste to prosím znovu.</string>
 </resources>

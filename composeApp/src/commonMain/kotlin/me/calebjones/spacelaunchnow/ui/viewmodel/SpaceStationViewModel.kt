@@ -28,6 +28,7 @@ import kotlin.time.Clock
 import org.jetbrains.compose.resources.getString
 import spacelaunchnow_kmp.composeapp.generated.resources.Res
 import spacelaunchnow_kmp.composeapp.generated.resources.station_iss_live_stream_description
+import me.calebjones.spacelaunchnow.util.toUserMessage
 
 /**
  * Complete ISS position data including location, velocity, altitude, and visibility
@@ -139,13 +140,13 @@ class SpaceStationViewModel(
                     }
                 }.onFailure { exception ->
                     log.e(exception as? Exception) { "Error fetching station details" }
-                    _error.value = exception.message ?: "Failed to load station details"
+                    _error.value = exception.toUserMessage()
                 }
 
                 _isLoading.value = false
             } catch (exception: Exception) {
                 log.e(exception) { "Error fetching station details" }
-                _error.value = exception.message ?: "Failed to load station details"
+                _error.value = exception.toUserMessage()
                 _isLoading.value = false
             }
         }

@@ -183,4 +183,7 @@
     <string name="common_error_rate_limit">Trop de requêtes. Patientez un instant et réessayez.</string>
     <string name="common_error_server">Le serveur a rencontré un problème. Veuillez réessayer plus tard.</string>
     <string name="common_error_not_found">Nous n'avons pas pu le trouver.</string>
+    <string name="subscription_error_purchase_failed">L'achat n'a pas abouti. Veuillez réessayer.</string>
+    <string name="subscription_error_restore_failed">Nous n'avons pas pu restaurer vos achats. Veuillez réessayer.</string>
+    <string name="subscription_error_verify_failed">Nous n'avons pas pu vérifier votre abonnement. Veuillez réessayer.</string>
 </resources>

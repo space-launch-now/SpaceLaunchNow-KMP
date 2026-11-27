@@ -183,4 +183,7 @@
     <string name="common_error_rate_limit">Zbyt wiele żądań. Poczekaj chwilę i spróbuj ponownie.</string>
     <string name="common_error_server">Serwer napotkał problem. Spróbuj ponownie później.</string>
     <string name="common_error_not_found">Nie udało się tego znaleźć.</string>
+    <string name="subscription_error_purchase_failed">Zakup się nie powiódł. Spróbuj ponownie.</string>
+    <string name="subscription_error_restore_failed">Nie udało się przywrócić zakupów. Spróbuj ponownie.</string>
+    <string name="subscription_error_verify_failed">Nie udało się zweryfikować subskrypcji. Spróbuj ponownie.</string>
 </resources>

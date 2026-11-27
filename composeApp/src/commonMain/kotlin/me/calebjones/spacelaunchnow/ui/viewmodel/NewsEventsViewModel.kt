@@ -28,6 +28,7 @@ import me.calebjones.spacelaunchnow.util.logging.isCoroutineCancellation
 import me.calebjones.spacelaunchnow.util.logging.logger
 import org.jetbrains.compose.resources.StringResource
 import spacelaunchnow_kmp.composeapp.generated.resources.*
+import me.calebjones.spacelaunchnow.util.toUserMessage
 
 /**
  * ViewModel for the combined News and Events screen.
@@ -194,7 +195,7 @@ class NewsEventsViewModel(
                     log.e { "Failed to load news: ${exception.message}" }
                     _uiState.update {
                         it.copy(
-                            newsError = exception.message ?: "Failed to load news",
+                            newsError = exception.toUserMessage(),
                             isLoadingNews = false
                         )
                     }
@@ -271,7 +272,7 @@ class NewsEventsViewModel(
                 log.e { "Failed to load more news: ${exception.message}" }
                 _uiState.update {
                     it.copy(
-                        newsError = exception.message ?: "Failed to load more news",
+                        newsError = exception.toUserMessage(),
                         isLoadingMoreNews = false
                     )
                 }
@@ -345,7 +346,7 @@ class NewsEventsViewModel(
                     log.e { "Failed to load events: ${exception.message}" }
                     _uiState.update {
                         it.copy(
-                            eventsError = exception.message ?: "Failed to load events",
+                            eventsError = exception.toUserMessage(),
                             isLoadingEvents = false
                         )
                     }
@@ -409,7 +410,7 @@ class NewsEventsViewModel(
                 log.e { "Failed to load more events: ${exception.message}" }
                 _uiState.update {
                     it.copy(
-                        eventsError = exception.message ?: "Failed to load more events",
+                        eventsError = exception.toUserMessage(),
                         isLoadingMoreEvents = false
                     )
                 }
