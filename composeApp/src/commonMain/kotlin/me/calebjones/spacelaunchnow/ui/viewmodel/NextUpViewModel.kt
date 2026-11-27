@@ -9,6 +9,7 @@ import kotlinx.coroutines.launch
 import me.calebjones.spacelaunchnow.data.repository.LaunchRepository
 import me.calebjones.spacelaunchnow.domain.model.Launch
 import me.calebjones.spacelaunchnow.util.logging.logger
+import me.calebjones.spacelaunchnow.util.toUserMessage
 
 
 class NextUpViewModel(private val repository: LaunchRepository) : ViewModel() {
@@ -58,14 +59,8 @@ class NextUpViewModel(private val repository: LaunchRepository) : ViewModel() {
                     }
                 }.onFailure { exception ->
                     // Handle failure to get upcoming launches
-                    val errorMessage = when {
-                        exception.message?.contains("throttled") == true -> 
-                            "API rate limit exceeded. Please try again later."
-                        exception.message?.contains("API Error") == true -> 
-                            exception.message!!.substringAfter("API Error: ")
-                        else -> exception.message ?: "Unknown error occurred"
-                    }
-                    log.e(exception) { "Failed to get upcoming launches: $errorMessage" }
+                    val errorMessage = exception.toUserMessage()
+                    log.e(exception) { "Failed to get upcoming launches: ${exception.message}" }
                     _error.value = errorMessage
                     _nextLaunch.value = null
                     _isLoading.value = false
@@ -73,7 +68,7 @@ class NextUpViewModel(private val repository: LaunchRepository) : ViewModel() {
 
             } catch (exception: Exception) {
                 log.e(exception) { "Unexpected error while fetching next launch" }
-                _error.value = exception.message
+                _error.value = exception.toUserMessage()
                 _isLoading.value = false
             }
         }

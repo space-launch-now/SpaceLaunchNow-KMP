@@ -10,6 +10,7 @@ import me.calebjones.spacelaunchnow.analytics.events.AnalyticsEvent
 import me.calebjones.spacelaunchnow.data.repository.AgencyRepository
 import me.calebjones.spacelaunchnow.domain.model.Agency
 import me.calebjones.spacelaunchnow.util.logging.logger
+import me.calebjones.spacelaunchnow.util.toUserMessage
 
 class AgencyViewModel(
     private val agencyRepository: AgencyRepository,
@@ -41,7 +42,7 @@ class AgencyViewModel(
                 _agencies.value = paginatedList.results
             }.onFailure { exception ->
                 log.e(exception) { "Failed to fetch agencies" }
-                _error.value = exception.message
+                _error.value = exception.toUserMessage()
             }
             _isLoading.value = false
         }
@@ -60,7 +61,7 @@ class AgencyViewModel(
                 analyticsManager.track(AnalyticsEvent.AgencyViewed(agency.id))
             }.onFailure { exception ->
                 log.e(exception) { "Failed to fetch agency details for id: $id" }
-                _error.value = exception.message
+                _error.value = exception.toUserMessage()
             }
             _isLoading.value = false
         }
@@ -78,7 +79,7 @@ class AgencyViewModel(
                 _agencies.value = paginatedList.results
             }.onFailure { exception ->
                 log.e(exception) { "Failed to search agencies with query: '$query'" }
-                _error.value = exception.message
+                _error.value = exception.toUserMessage()
             }
             _isLoading.value = false
         }

@@ -9,8 +9,12 @@ import me.calebjones.spacelaunchnow.data.repository.UpdatesRepository
 import me.calebjones.spacelaunchnow.domain.mapper.toDomain
 import me.calebjones.spacelaunchnow.domain.model.PaginatedResult
 import me.calebjones.spacelaunchnow.domain.model.Update
+import me.calebjones.spacelaunchnow.util.logging.logger
+import me.calebjones.spacelaunchnow.util.toUserMessage
 
 class UpdatesViewModel(private val repository: UpdatesRepository) : ViewModel() {
+    private val log = logger()
+
 
     private val _updates = MutableStateFlow<PaginatedResult<Update>?>(null)
     val updates: StateFlow<PaginatedResult<Update>?> = _updates
@@ -31,7 +35,8 @@ class UpdatesViewModel(private val repository: UpdatesRepository) : ViewModel() 
             result.onSuccess { dataResult ->
                 _updates.value = dataResult.data
             }.onFailure { exception ->
-                _error.value = exception.message
+                log.e(exception) { "Failed to fetch latest updates" }
+                _error.value = exception.toUserMessage()
             }
             
             _isLoading.value = false

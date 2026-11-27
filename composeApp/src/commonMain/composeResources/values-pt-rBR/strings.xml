@@ -183,4 +183,7 @@
     <string name="common_error_rate_limit">Muitas solicitações. Aguarde um momento e tente novamente.</string>
     <string name="common_error_server">O servidor teve um problema. Tente novamente mais tarde.</string>
     <string name="common_error_not_found">Não conseguimos encontrar isso.</string>
+    <string name="subscription_error_purchase_failed">A compra não foi concluída. Tente novamente.</string>
+    <string name="subscription_error_restore_failed">Não foi possível restaurar suas compras. Tente novamente.</string>
+    <string name="subscription_error_verify_failed">Não foi possível verificar sua assinatura. Tente novamente.</string>
 </resources>

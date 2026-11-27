@@ -366,4 +366,10 @@
     <string name="common_error_server">The server had a problem. Please try again later.</string>
     <!-- Message on any screen when the requested item does not exist. Body text, may wrap, one short sentence. -->
     <string name="common_error_not_found">We could not find that.</string>
+    <!-- Subscription screen, message shown when a purchase fails for an unknown reason. Body text, may wrap, one short sentence. -->
+    <string name="subscription_error_purchase_failed">The purchase did not go through. Please try again.</string>
+    <!-- Subscription screen, message shown when restoring purchases fails for an unknown reason. Body text, may wrap, one short sentence. -->
+    <string name="subscription_error_restore_failed">We could not restore your purchases. Please try again.</string>
+    <!-- Subscription screen, message shown when verifying the subscription fails for an unknown reason. Body text, may wrap, one short sentence. -->
+    <string name="subscription_error_verify_failed">We could not verify your subscription. Please try again.</string>
 </resources>

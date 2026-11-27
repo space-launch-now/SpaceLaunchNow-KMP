@@ -32,6 +32,9 @@ import kotlin.test.assertEquals
 import kotlin.test.assertNotNull
 import kotlin.test.assertNull
 import kotlin.test.assertTrue
+import org.jetbrains.compose.resources.getString
+import spacelaunchnow_kmp.composeapp.generated.resources.Res
+import spacelaunchnow_kmp.composeapp.generated.resources.common_unknown_error
 
 /**
  * T162: Unit tests for [SpaceStationViewModel].
@@ -128,7 +131,7 @@ class SpaceStationViewModelTest {
         advanceUntilIdle()
 
         assertNull(viewModel.stationDetails.value)
-        assertEquals("boom", viewModel.error.value)
+        assertEquals(getString(Res.string.common_unknown_error), viewModel.error.value)
         assertEquals(false, viewModel.isLoading.value)
         assertTrue(viewModel.activeExpeditions.value.isEmpty())
     }

@@ -11,6 +11,7 @@ import me.calebjones.spacelaunchnow.data.repository.EventsRepository
 import me.calebjones.spacelaunchnow.domain.model.Event
 import me.calebjones.spacelaunchnow.ui.state.VideoPlayerState
 import me.calebjones.spacelaunchnow.util.logging.logger
+import me.calebjones.spacelaunchnow.util.toUserMessage
 
 class EventViewModel(
     private val repository: EventsRepository,
@@ -66,7 +67,7 @@ class EventViewModel(
                 analyticsManager.track(AnalyticsEvent.EventViewed(event.id))
             }.onFailure { exception ->
                 log.e(exception) { "Failed to fetch event details for id: $id" }
-                _error.value = exception.message
+                _error.value = exception.toUserMessage()
             }
             _isLoading.value = false
         }

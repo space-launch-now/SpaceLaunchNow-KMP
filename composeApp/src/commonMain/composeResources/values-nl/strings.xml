@@ -183,4 +183,7 @@
     <string name="common_error_rate_limit">Te veel verzoeken. Wacht even en probeer het opnieuw.</string>
     <string name="common_error_server">De server had een probleem. Probeer het later opnieuw.</string>
     <string name="common_error_not_found">We konden dit niet vinden.</string>
+    <string name="subscription_error_purchase_failed">De aankoop is niet gelukt. Probeer het opnieuw.</string>
+    <string name="subscription_error_restore_failed">We konden je aankopen niet herstellen. Probeer het opnieuw.</string>
+    <string name="subscription_error_verify_failed">We konden je abonnement niet verifiëren. Probeer het opnieuw.</string>
 </resources>
