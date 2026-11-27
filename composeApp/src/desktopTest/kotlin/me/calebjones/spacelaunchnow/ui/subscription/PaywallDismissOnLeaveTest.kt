@@ -1,5 +1,6 @@
 package me.calebjones.spacelaunchnow.ui.subscription
 
+import me.calebjones.spacelaunchnow.test.TestMain
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
@@ -8,12 +9,9 @@ import androidx.compose.ui.ImageComposeScene
 import androidx.compose.ui.test.ExperimentalTestApi
 import androidx.compose.ui.test.runComposeUiTest
 import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.test.UnconfinedTestDispatcher
-import kotlinx.coroutines.test.resetMain
-import kotlinx.coroutines.test.setMain
 import me.calebjones.spacelaunchnow.analytics.FakeAnalyticsProvider
 import me.calebjones.spacelaunchnow.analytics.core.AnalyticsManagerImpl
 import me.calebjones.spacelaunchnow.analytics.events.AnalyticsEvent
@@ -43,7 +41,7 @@ class PaywallDismissOnLeaveTest {
     @BeforeTest
     fun setup() {
         TestSpaceLoggerInit.ensureInitialized()
-        Dispatchers.setMain(dispatcher)
+        TestMain.install(dispatcher)
         repository = MockSubscriptionRepository()
         fake = FakeAnalyticsProvider()
         val analytics = AnalyticsManagerImpl(listOf(fake), scope = CoroutineScope(SupervisorJob() + dispatcher))
@@ -52,7 +50,7 @@ class PaywallDismissOnLeaveTest {
 
     @AfterTest
     fun tearDown() {
-        Dispatchers.resetMain()
+        TestMain.reset()
     }
 
     private fun dismissed() = fake.trackedEvents.filterIsInstance<AnalyticsEvent.PaywallDismissed>()

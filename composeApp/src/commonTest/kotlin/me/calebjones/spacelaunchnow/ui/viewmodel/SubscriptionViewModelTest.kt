@@ -1,5 +1,6 @@
 package me.calebjones.spacelaunchnow.ui.viewmodel
 
+import me.calebjones.spacelaunchnow.test.TestMain
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
@@ -7,9 +8,7 @@ import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.test.StandardTestDispatcher
 import kotlinx.coroutines.test.advanceUntilIdle
-import kotlinx.coroutines.test.resetMain
 import kotlinx.coroutines.test.runTest
-import kotlinx.coroutines.test.setMain
 import me.calebjones.spacelaunchnow.analytics.FakeAnalyticsProvider
 import me.calebjones.spacelaunchnow.analytics.core.AnalyticsManager
 import me.calebjones.spacelaunchnow.analytics.core.AnalyticsManagerImpl
@@ -51,7 +50,7 @@ class SubscriptionViewModelTest {
     @BeforeTest
     fun setup() {
         TestSpaceLoggerInit.ensureInitialized()
-        Dispatchers.setMain(testDispatcher)
+        TestMain.install(testDispatcher)
         billingManager = MockBillingManager()
         repository = MockSubscriptionRepository()
         viewModel = SubscriptionViewModel(repository, billingManager, analyticsManager)
@@ -59,7 +58,7 @@ class SubscriptionViewModelTest {
     
     @AfterTest
     fun tearDown() {
-        Dispatchers.resetMain()
+        TestMain.reset()
     }
     
     // ========================================

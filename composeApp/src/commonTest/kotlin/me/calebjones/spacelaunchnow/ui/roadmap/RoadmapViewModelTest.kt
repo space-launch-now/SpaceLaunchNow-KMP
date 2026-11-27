@@ -1,11 +1,9 @@
 package me.calebjones.spacelaunchnow.ui.roadmap
 
-import kotlinx.coroutines.Dispatchers
+import me.calebjones.spacelaunchnow.test.TestMain
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.StandardTestDispatcher
-import kotlinx.coroutines.test.resetMain
 import kotlinx.coroutines.test.runTest
-import kotlinx.coroutines.test.setMain
 import me.calebjones.spacelaunchnow.data.model.RoadmapCategory
 import me.calebjones.spacelaunchnow.data.model.RoadmapData
 import me.calebjones.spacelaunchnow.data.model.RoadmapItem
@@ -34,13 +32,13 @@ class RoadmapViewModelTest {
     
     @BeforeTest
     fun setup() {
-        Dispatchers.setMain(testDispatcher)
+        TestMain.install(testDispatcher)
         mockRepository = MockRemoteConfigRepository()
     }
     
     @AfterTest
     fun tearDown() {
-        Dispatchers.resetMain()
+        TestMain.reset()
     }
     
     // ========================================

@@ -1,16 +1,14 @@
 package me.calebjones.spacelaunchnow.ui.viewmodel
 
+import me.calebjones.spacelaunchnow.test.TestMain
 import io.ktor.client.HttpClient
 import io.ktor.client.engine.mock.MockEngine
 import io.ktor.client.engine.mock.respond
 import io.ktor.http.HttpStatusCode
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.StandardTestDispatcher
 import kotlinx.coroutines.test.advanceUntilIdle
-import kotlinx.coroutines.test.resetMain
 import kotlinx.coroutines.test.runTest
-import kotlinx.coroutines.test.setMain
 import kotlinx.datetime.Instant
 import kotlinx.datetime.LocalDate
 import me.calebjones.spacelaunchnow.analytics.core.AnalyticsManagerImpl
@@ -54,12 +52,12 @@ class SpaceStationViewModelTest {
 
     @BeforeTest
     fun setup() {
-        Dispatchers.setMain(dispatcher)
+        TestMain.install(dispatcher)
     }
 
     @AfterTest
     fun tearDown() {
-        Dispatchers.resetMain()
+        TestMain.reset()
     }
 
     @Test

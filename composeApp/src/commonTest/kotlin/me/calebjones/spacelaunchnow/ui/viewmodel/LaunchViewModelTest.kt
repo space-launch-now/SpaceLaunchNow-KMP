@@ -1,12 +1,10 @@
 package me.calebjones.spacelaunchnow.ui.viewmodel
 
-import kotlinx.coroutines.Dispatchers
+import me.calebjones.spacelaunchnow.test.TestMain
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.StandardTestDispatcher
 import kotlinx.coroutines.test.advanceUntilIdle
-import kotlinx.coroutines.test.resetMain
 import kotlinx.coroutines.test.runTest
-import kotlinx.coroutines.test.setMain
 import me.calebjones.spacelaunchnow.analytics.core.AnalyticsManagerImpl
 import me.calebjones.spacelaunchnow.api.snapi.models.Article
 import me.calebjones.spacelaunchnow.api.snapi.models.PaginatedArticleList
@@ -35,12 +33,12 @@ class LaunchViewModelTest {
 
     @BeforeTest
     fun setup() {
-        Dispatchers.setMain(dispatcher)
+        TestMain.install(dispatcher)
     }
 
     @AfterTest
     fun tearDown() {
-        Dispatchers.resetMain()
+        TestMain.reset()
     }
 
     @Test
