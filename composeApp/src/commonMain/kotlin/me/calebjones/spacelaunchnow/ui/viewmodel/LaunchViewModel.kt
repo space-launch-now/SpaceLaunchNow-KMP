@@ -118,7 +118,7 @@ class LaunchViewModel(
             result.onSuccess { dataResult ->
                 _upcomingLaunchesNormal.value = dataResult.data
             }.onFailure { exception ->
-                log.e(exception) { "Launch request failed" }
+                log.e(exception) { "Failed to fetch upcoming launches" }
                 _error.value = exception.toUserMessage()
             }
         }
@@ -184,7 +184,7 @@ class LaunchViewModel(
             }
             // Only show error if we don't have any data to display
             if (_launchDetails.value == null) {
-                log.e(exception) { "Launch request failed" }
+                log.e(exception) { "Failed to fetch launch details" }
                 _error.value = exception.toUserMessage()
             }
         }
@@ -271,7 +271,7 @@ class LaunchViewModel(
                     put(agencyId, agencyData)
                 }
             }.onFailure { exception ->
-                log.e(exception) { "Launch request failed" }
+                log.e(exception) { "Failed to fetch agency data" }
                 _error.value = exception.toUserMessage()
             }
         }
