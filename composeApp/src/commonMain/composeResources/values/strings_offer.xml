@@ -24,4 +24,14 @@
     <string name="paywall_intro_price_first_month">%1$s for the first month, then %2$s/month</string>
     <!-- Paywall line under the monthly price. %1$s intro price, %2$s regular monthly price. -->
     <string name="paywall_intro_price_generic">%1$s introductory price, then %2$s/month</string>
+    <!-- Holiday offer sheet line when the intro price lasts 2 or more months. %1$s intro price per month, %2$s regular monthly price (both with currency), %3$d number of intro months. -->
+    <plurals name="offer_price_line_months">
+        <item quantity="one">%1$s/month for your first %3$d month, then %2$s/month · cancel any time</item>
+        <item quantity="other">%1$s/month for your first %3$d months, then %2$s/month · cancel any time</item>
+    </plurals>
+    <!-- Paywall line under the monthly price when the intro price lasts 2 or more months. %1$s intro price per month, %2$s regular monthly price, %3$d number of intro months. -->
+    <plurals name="paywall_intro_price_months">
+        <item quantity="one">%1$s/month for the first %3$d month, then %2$s/month</item>
+        <item quantity="other">%1$s/month for the first %3$d months, then %2$s/month</item>
+    </plurals>
 </resources>

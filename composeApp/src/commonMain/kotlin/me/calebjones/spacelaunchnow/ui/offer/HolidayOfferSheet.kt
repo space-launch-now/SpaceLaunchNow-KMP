@@ -48,6 +48,7 @@ import me.calebjones.spacelaunchnow.ui.ads.AdCoveringModalBottomSheet
 import me.calebjones.spacelaunchnow.ui.theme.SpaceLaunchNowPreviewTheme
 import me.calebjones.spacelaunchnow.ui.viewmodel.ProductType
 import me.calebjones.spacelaunchnow.ui.viewmodel.SubscriptionViewModel
+import org.jetbrains.compose.resources.pluralStringResource
 import org.jetbrains.compose.resources.stringResource
 import org.jetbrains.compose.ui.tooling.preview.Preview
 import org.koin.compose.koinInject
@@ -60,6 +61,7 @@ import spacelaunchnow_kmp.composeapp.generated.resources.offer_benefit_widgets
 import spacelaunchnow_kmp.composeapp.generated.resources.offer_close_loading_description
 import spacelaunchnow_kmp.composeapp.generated.resources.offer_cta
 import spacelaunchnow_kmp.composeapp.generated.resources.offer_price_line
+import spacelaunchnow_kmp.composeapp.generated.resources.offer_price_line_months
 import spacelaunchnow_kmp.composeapp.generated.resources.offer_product_name
 import spacelaunchnow_kmp.composeapp.generated.resources.offer_see_all_plans
 import spacelaunchnow_kmp.composeapp.generated.resources.offer_title
@@ -219,8 +221,15 @@ fun HolidayOfferSheetContent(
             BenefitRow(stringResource(Res.string.offer_benefit_more))
         }
         Spacer(Modifier.height(16.dp))
+        val introMonths = product.introOfferCycles
         Text(
-            text = stringResource(Res.string.offer_price_line, introPrice, product.formattedPrice),
+            text = if (introMonths > 1) {
+                pluralStringResource(
+                    Res.plurals.offer_price_line_months, introMonths, introPrice, product.formattedPrice, introMonths
+                )
+            } else {
+                stringResource(Res.string.offer_price_line, introPrice, product.formattedPrice)
+            },
             style = MaterialTheme.typography.bodyMedium,
             textAlign = TextAlign.Center,
         )
@@ -285,6 +294,12 @@ private fun HolidayOfferSheetPreview() {
 @Composable
 private fun HolidayOfferSheetDarkPreview() {
     SpaceLaunchNowPreviewTheme(isDark = true) { HolidayOfferSheetContent(product = previewMonthly) }
+}
+
+@Preview
+@Composable
+private fun HolidayOfferSheetThreeMonthsPreview() {
+    SpaceLaunchNowPreviewTheme { HolidayOfferSheetContent(product = previewMonthly.copy(introOfferCycles = 3)) }
 }
 
 @Preview

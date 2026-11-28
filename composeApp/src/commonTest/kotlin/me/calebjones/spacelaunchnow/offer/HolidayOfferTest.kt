@@ -185,7 +185,35 @@ class HolidayOfferTest {
     fun `a default product has no first month intro offer`() {
         val bare = ProductInfo("p", null, "t", "d", "1 USD", 1_000_000L, "USD")
         assertFalse(bare.isFirstMonthIntroOffer)
+        assertFalse(bare.isMonthlyIntroOffer)
         assertEquals(1, bare.introOfferCycles)
+    }
+
+    // --- ProductInfo.isMonthlyIntroOffer ---
+
+    @Test
+    fun `monthly intro offer holds for one or more monthly cycles`() {
+        assertTrue(product(cycles = 1).isMonthlyIntroOffer)
+        assertTrue(product(cycles = 3).isMonthlyIntroOffer)
+        assertTrue(product(cycles = 12).isMonthlyIntroOffer)
+    }
+
+    @Test
+    fun `monthly intro offer fails when any part differs`() {
+        assertFalse(product(cycles = 0).isMonthlyIntroOffer)
+        assertFalse(product(hasIntro = false).isMonthlyIntroOffer)
+        assertFalse(product(price = null).isMonthlyIntroOffer)
+        assertFalse(product(value = 3).isMonthlyIntroOffer)
+        assertFalse(product(value = null).isMonthlyIntroOffer)
+        assertFalse(product(unit = "WEEK").isMonthlyIntroOffer)
+        assertFalse(product(unit = null).isMonthlyIntroOffer)
+        assertFalse(product(freeTrial = true).isMonthlyIntroOffer)
+    }
+
+    @Test
+    fun `controller accepts a three month intro offer`() = runTest {
+        val f = Fixture(now).apply { remote.holidayOfferConfig = config() }
+        assertTrue(f.controller.evaluate(SubscriptionType.FREE, product(cycles = 3)).eligible)
     }
 
     // --- controller ---

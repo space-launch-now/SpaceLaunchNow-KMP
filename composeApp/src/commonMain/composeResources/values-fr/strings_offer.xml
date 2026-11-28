@@ -12,4 +12,14 @@
     <string name="offer_close_loading_description">Le bouton de fermeture sera bientôt disponible</string>
     <string name="paywall_intro_price_first_month">%1$s le premier mois, puis %2$s/mois</string>
     <string name="paywall_intro_price_generic">Prix de lancement de %1$s, puis %2$s/mois</string>
+    <plurals name="offer_price_line_months">
+        <item quantity="one">%1$s/mois le premier %3$d mois, puis %2$s/mois · résiliable à tout moment</item>
+        <item quantity="many">%1$s/mois les %3$d premiers mois, puis %2$s/mois · résiliable à tout moment</item>
+        <item quantity="other">%1$s/mois les %3$d premiers mois, puis %2$s/mois · résiliable à tout moment</item>
+    </plurals>
+    <plurals name="paywall_intro_price_months">
+        <item quantity="one">%1$s/mois le premier %3$d mois, puis %2$s/mois</item>
+        <item quantity="many">%1$s/mois les %3$d premiers mois, puis %2$s/mois</item>
+        <item quantity="other">%1$s/mois les %3$d premiers mois, puis %2$s/mois</item>
+    </plurals>
 </resources>

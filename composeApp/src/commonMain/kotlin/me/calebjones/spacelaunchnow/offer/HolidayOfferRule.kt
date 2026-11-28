@@ -12,7 +12,7 @@ object HolidayOfferRule {
         val config: HolidayOfferConfig,
         /** The user's current subscription type. Only [SubscriptionType.FREE] may see the offer. */
         val subscriptionType: SubscriptionType,
-        /** True when the monthly product has an eligible one-month intro price ([me.calebjones.spacelaunchnow.data.model.ProductInfo.isFirstMonthIntroOffer]). */
+        /** True when the monthly product has an eligible monthly intro price for one or more months ([me.calebjones.spacelaunchnow.data.model.ProductInfo.isMonthlyIntroOffer]). */
         val monthlyIntroEligible: Boolean,
         /** Id of the last campaign whose sheet was shown, or null if none. */
         val shownCampaignId: String?,
