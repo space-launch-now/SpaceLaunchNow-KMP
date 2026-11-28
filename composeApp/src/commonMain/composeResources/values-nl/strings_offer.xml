@@ -12,4 +12,12 @@
     <string name="offer_close_loading_description">Sluitknop binnenkort beschikbaar</string>
     <string name="paywall_intro_price_first_month">%1$s voor de eerste maand, daarna %2$s/maand</string>
     <string name="paywall_intro_price_generic">Introductieprijs van %1$s, daarna %2$s/maand</string>
+    <plurals name="offer_price_line_months">
+        <item quantity="one">%1$s/maand voor je eerste %3$d maand, daarna %2$s/maand · altijd opzegbaar</item>
+        <item quantity="other">%1$s/maand voor je eerste %3$d maanden, daarna %2$s/maand · altijd opzegbaar</item>
+    </plurals>
+    <plurals name="paywall_intro_price_months">
+        <item quantity="one">%1$s/maand voor de eerste %3$d maand, daarna %2$s/maand</item>
+        <item quantity="other">%1$s/maand voor de eerste %3$d maanden, daarna %2$s/maand</item>
+    </plurals>
 </resources>

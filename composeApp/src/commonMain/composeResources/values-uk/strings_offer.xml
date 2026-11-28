@@ -12,4 +12,16 @@
     <string name="offer_close_loading_description">Кнопка закриття скоро з’явиться</string>
     <string name="paywall_intro_price_first_month">%1$s за перший місяць, далі %2$s/міс.</string>
     <string name="paywall_intro_price_generic">Вступна ціна %1$s, далі %2$s/міс.</string>
+    <plurals name="offer_price_line_months">
+        <item quantity="one">%1$s/міс. протягом перших %3$d місяця, далі %2$s/міс. · скасувати можна будь-коли</item>
+        <item quantity="few">%1$s/міс. протягом перших %3$d місяців, далі %2$s/міс. · скасувати можна будь-коли</item>
+        <item quantity="many">%1$s/міс. протягом перших %3$d місяців, далі %2$s/міс. · скасувати можна будь-коли</item>
+        <item quantity="other">%1$s/міс. протягом перших %3$d місяця, далі %2$s/міс. · скасувати можна будь-коли</item>
+    </plurals>
+    <plurals name="paywall_intro_price_months">
+        <item quantity="one">%1$s/міс. протягом перших %3$d місяця, далі %2$s/міс.</item>
+        <item quantity="few">%1$s/міс. протягом перших %3$d місяців, далі %2$s/міс.</item>
+        <item quantity="many">%1$s/міс. протягом перших %3$d місяців, далі %2$s/міс.</item>
+        <item quantity="other">%1$s/міс. протягом перших %3$d місяця, далі %2$s/міс.</item>
+    </plurals>
 </resources>

@@ -30,7 +30,7 @@ class HolidayOfferController(
             HolidayOfferRule.Input(
                 config = config,
                 subscriptionType = subscriptionType,
-                monthlyIntroEligible = monthlyProduct?.isFirstMonthIntroOffer == true,
+                monthlyIntroEligible = monthlyProduct?.isMonthlyIntroOffer == true,
                 shownCampaignId = shownCampaignId(),
                 nowMs = nowMs(),
             )

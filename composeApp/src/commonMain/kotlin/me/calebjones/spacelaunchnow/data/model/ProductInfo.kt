@@ -28,17 +28,22 @@ data class ProductInfo(
     val introOfferCycles: Int = 1
 ) {
     /**
-     * True when the user can get a single-month intro price: an eligible intro offer with a
-     * price, lasting exactly one cycle of one month. [hasIntroOffer] already carries the
-     * store eligibility check, so this is also false for a user who cannot get the offer. It is
-     * false too when a free trial exists: the store's default purchase option would then be the
-     * trial, not the paid intro price.
+     * True when the user can get a monthly intro price: an eligible intro offer with a price,
+     * billed per one-month period for one or more cycles ([introOfferCycles] months). For
+     * example $0.99/month for the first 3 months. [hasIntroOffer] already carries the store
+     * eligibility check, so this is also false for a user who cannot get the offer. It is false
+     * too when a free trial exists: the store's default purchase option would then be the trial,
+     * not the paid intro price.
      */
-    val isFirstMonthIntroOffer: Boolean
+    val isMonthlyIntroOffer: Boolean
         get() = hasIntroOffer &&
             !hasFreeTrial &&
             introOfferPrice != null &&
             introOfferPeriodValue == 1 &&
             introOfferPeriodUnit == "MONTH" &&
-            introOfferCycles == 1
+            introOfferCycles >= 1
+
+    /** True for a [isMonthlyIntroOffer] that lasts exactly one month. */
+    val isFirstMonthIntroOffer: Boolean
+        get() = isMonthlyIntroOffer && introOfferCycles == 1
 }

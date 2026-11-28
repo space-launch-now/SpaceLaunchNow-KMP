@@ -12,4 +12,12 @@
     <string name="offer_close_loading_description">Schließen-Schaltfläche gleich verfügbar</string>
     <string name="paywall_intro_price_first_month">%1$s für den ersten Monat, danach %2$s/Monat</string>
     <string name="paywall_intro_price_generic">Einführungspreis %1$s, danach %2$s/Monat</string>
+    <plurals name="offer_price_line_months">
+        <item quantity="one">%1$s/Monat für den ersten %3$d Monat, danach %2$s/Monat · jederzeit kündbar</item>
+        <item quantity="other">%1$s/Monat für die ersten %3$d Monate, danach %2$s/Monat · jederzeit kündbar</item>
+    </plurals>
+    <plurals name="paywall_intro_price_months">
+        <item quantity="one">%1$s/Monat für den ersten %3$d Monat, danach %2$s/Monat</item>
+        <item quantity="other">%1$s/Monat für die ersten %3$d Monate, danach %2$s/Monat</item>
+    </plurals>
 </resources>
