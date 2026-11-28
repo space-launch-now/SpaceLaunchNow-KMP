@@ -1,0 +1,2 @@
+texts=9
+findings=0
