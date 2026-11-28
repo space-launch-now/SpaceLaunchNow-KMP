@@ -200,7 +200,7 @@ fun HolidayOfferSheetContent(
             }
         }
         Text(
-            text = stringResource(Res.string.offer_title),
+            text = "$GIFT_EMOJI ${stringResource(Res.string.offer_title)} $GIFT_EMOJI", // i18n-ignore: emoji frame around the translated title, same in every language
             style = MaterialTheme.typography.titleMedium,
             color = MaterialTheme.colorScheme.primary,
             fontWeight = FontWeight.SemiBold,
@@ -268,6 +268,8 @@ private fun BenefitRow(text: String) {
         Text(text = text, style = MaterialTheme.typography.bodyLarge)
     }
 }
+
+private const val GIFT_EMOJI = "🎁" // 🎁
 
 private val previewMonthly = ProductInfo(
     productId = "sln_premium",
